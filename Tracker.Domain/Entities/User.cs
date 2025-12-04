@@ -1,7 +1,7 @@
 ﻿using Tracker.Domain.Entities.Common;
 
 namespace Tracker.Domain.Entities;
-internal class User : BaseEntity
+public class User : BaseEntity
 {
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
