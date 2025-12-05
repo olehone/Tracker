@@ -1,6 +1,7 @@
 ﻿using Tracker.Domain.Entities.Common;
 
 namespace Tracker.Domain.Entities;
+
 public class User : BaseEntity
 {
     public required string Email { get; set; }

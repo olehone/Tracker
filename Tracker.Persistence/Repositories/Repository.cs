@@ -1,18 +1,19 @@
-﻿using Tracker.Application;
-using Tracker.Domain.Entities;
-using Tracker.Application.Common.Repositories;
+﻿using Tracker.Application.Common.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Tracker.Persistence.Repositories;
+
 public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : class
 {
     protected DbSet<TEntity> _dbSet;
     protected ApplicationDbContext _dbContext;
+
     public Repository(ApplicationDbContext applicationDbContext)
     {
         _dbContext = applicationDbContext;
         _dbSet = applicationDbContext.Set<TEntity>();
     }
+
     public async Task AddAsync(TEntity entity)
     {
         await _dbSet.AddAsync(entity);

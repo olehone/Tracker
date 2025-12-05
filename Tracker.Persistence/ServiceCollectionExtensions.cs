@@ -6,6 +6,7 @@ using Tracker.Application.Common.UnitOfWork;
 using Tracker.Persistence.Repositories;
 
 namespace Tracker.Persistence;
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
@@ -16,5 +17,4 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         return services;
     }
-    
 }
