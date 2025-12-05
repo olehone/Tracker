@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Persistence.Repositories;

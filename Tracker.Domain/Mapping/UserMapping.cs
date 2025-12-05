@@ -1,5 +1,6 @@
 ﻿using Tracker.Domain.DTOs;
 using Tracker.Domain.Entities;
+
 namespace Tracker.Domain.Mapping;
 
 public static class UserMapping
