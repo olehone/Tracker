@@ -4,7 +4,7 @@ namespace Tracker.Application.Common.UnitOfWork;
 
 public interface IUnitOfWork : IAsyncDisposable
 {
-    IUserRepository Users { get; }
+    IUserRepository UserRepository { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

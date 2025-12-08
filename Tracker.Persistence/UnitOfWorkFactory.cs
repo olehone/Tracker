@@ -1,20 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.UnitOfWork;
 
 namespace Tracker.Persistence;
 
 public class UnitOfWorkFactory : IUnitOfWorkFactory
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public UnitOfWorkFactory(IServiceProvider serviceProvider)
+    private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
+    
+    public UnitOfWorkFactory(IDbContextFactory<ApplicationDbContext> dbContextFactory)
     {
-        _serviceProvider = serviceProvider;
+        _dbContextFactory = dbContextFactory;
     }
 
     public IUnitOfWork Create()
     {
-        var db = _serviceProvider.GetRequiredService<ApplicationDbContext>();
-        return new UnitOfWork(db);
+        var context = _dbContextFactory.CreateDbContext();
+        return new UnitOfWork(context);
     }
 }

@@ -6,22 +6,24 @@ namespace Tracker.Persistence;
 
 internal class UnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDbContext _db;
-    public IUserRepository Users { get; }
+    private readonly ApplicationDbContext _dbContext;
 
-    public UnitOfWork (ApplicationDbContext applicationDbContext)
+    private IUserRepository _userRepository = null!;
+    public IUserRepository UserRepository
+        => _userRepository ??= new UserRepository(_dbContext);
+
+    public UnitOfWork(ApplicationDbContext applicationDbContext)
     {
-        _db = applicationDbContext;
-        Users = new UserRepository(_db);
+        _dbContext = applicationDbContext;
     }
 
     public ValueTask DisposeAsync()
     {
-        return _db.DisposeAsync();
+        return _dbContext.DisposeAsync();
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await _db.SaveChangesAsync(cancellationToken);
+        return await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
