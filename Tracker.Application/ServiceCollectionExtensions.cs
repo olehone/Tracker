@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Tracker.Persistence;
+namespace Tracker.Application;
 
 public static class ServiceCollectionExtensions
 {
