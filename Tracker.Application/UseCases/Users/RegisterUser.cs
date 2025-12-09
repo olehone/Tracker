@@ -13,13 +13,13 @@ public sealed class RegisterUser(
     IPasswordHasher passwordHasher,
     IDbExceptionsHandler dbExceptionsHandler)
 {
-    public record Request(string Email,
+    public record RegisterRequest(string Email,
         string Password,
         string Username,
         string FirstName,
         string LastName);
 
-    public async Task<UserDto> Handle(Request request)
+    public async Task<UserDto> Handle(RegisterRequest request)
     {
         await using var uow = unitOfWorkFactory.Create();
 

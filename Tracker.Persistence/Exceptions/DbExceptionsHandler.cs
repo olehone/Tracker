@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
 using Tracker.Application.Common.Database;
 
 namespace Tracker.Persistence.Exceptions;

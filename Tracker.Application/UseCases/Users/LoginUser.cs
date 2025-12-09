@@ -8,11 +8,12 @@ namespace Tracker.Application.UseCases.Users;
 
 public sealed class LoginUser(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher)
+    IPasswordHasher passwordHasher,
+    ITokenProvider tokenProvider)
 {
-    public record Request(string Email, string Password);
+    public record LoginRequest(string Email, string Password);
 
-    public async Task<UserDto> Handle(Request request)
+    public async Task<string> Handle(LoginRequest request)
     {
         await using var uow =  unitOfWorkFactory.Create();
 
@@ -29,7 +30,8 @@ public sealed class LoginUser(
         {
             throw new Exception("Password is incorrect");
         }
+        string token = tokenProvider.Create(user);
 
-        return user.ToDto();
+        return token;
     }
 }

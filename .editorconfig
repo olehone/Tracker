@@ -28,7 +28,7 @@ dotnet_search_reference_assemblies = true
 #### .NET Coding Conventions ####
 
 # Organize usings
-dotnet_separate_import_directive_groups = true
+dotnet_separate_import_directive_groups = false
 csharp_new_line_after_usings = true
 dotnet_sort_system_directives_first = true
 file_header_template = unset
