@@ -12,8 +12,8 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        services.AddScoped<RegisterUser>();
-        services.AddScoped<LoginUser>();
+        services.AddScoped<RegisterUserHandler>();
+        services.AddScoped<LoginUserHandler>();
 
         return services;
     }

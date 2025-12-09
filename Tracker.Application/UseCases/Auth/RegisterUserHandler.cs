@@ -4,20 +4,15 @@ using Tracker.Domain.Entities;
 using Tracker.Domain.Exceptions;
 using Tracker.Domain.DTOs;
 using Tracker.Domain.Mapping;
+using MediatR;
 
 namespace Tracker.Application.UseCases.Users;
 
-public sealed class RegisterUser(
+public sealed class RegisterUserHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher)
+    IPasswordHasher passwordHasher) : IRequestHandler<RegisterUserCommand, UserDto>
 {
-    public record RegisterRequest(string Email,
-        string Password,
-        string Username,
-        string FirstName,
-        string LastName);
-
-    public async Task<UserDto> Handle(RegisterRequest request)
+    public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 

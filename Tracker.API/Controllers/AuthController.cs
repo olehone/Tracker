@@ -1,6 +1,7 @@
 ﻿using Tracker.Application.UseCases.Users;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.Domain.DTOs;
+using MediatR;
 
 namespace Tracker.API.Controllers;
 
@@ -8,23 +9,22 @@ namespace Tracker.API.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly RegisterUser _registerUser;
-    private readonly LoginUser _loginUser;
-
-    public AuthController(RegisterUser registerUser, LoginUser loginUser)
+    private readonly IMediator _mediator;
+    public AuthController(IMediator mediator)
     {
-        _registerUser = registerUser;
-        _loginUser = loginUser;
+        _mediator = mediator;
     }
     [HttpPost("register")]
-    public async Task<UserDto> Register([FromBody] RegisterUser.RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand request)
     {
-        return await _registerUser.Handle(request);
+        var response = await _mediator.Send(request);
+        return Ok(response);
     }
 
     [HttpPost("login")]
-    public async Task<string> Login([FromBody] LoginUser.LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginUserCommand request)
     {
-        return await _loginUser.Handle(request);
+        var response = await _mediator.Send(request);
+        return Ok(response);
     }
 }

@@ -1,21 +1,18 @@
 ﻿using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.Common.Auth;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Mapping;
-using Tracker.Domain.DTOs;
+using MediatR;
 
 namespace Tracker.Application.UseCases.Users;
 
-public sealed class LoginUser(
+public sealed class LoginUserHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider)
+    ITokenProvider tokenProvider) : IRequestHandler<LoginUserCommand, string>
 {
-    public record LoginRequest(string Email, string Password);
-
-    public async Task<string> Handle(LoginRequest request)
+    public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        await using var uow =  unitOfWorkFactory.Create();
+        await using var uow = unitOfWorkFactory.Create();
 
         User? user = await uow.UserRepository.GetByEmailAsync(request.Email);
 
