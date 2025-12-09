@@ -1,30 +1,35 @@
-﻿using Tracker.Application.Common;
-using Tracker.Application.Common.UnitOfWork;
+﻿using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.Common.Auth;
 using Tracker.Domain.Entities;
+using Tracker.Application.Common.Database;
+using Tracker.Domain.Exceptions;
+using Tracker.Domain.DTOs;
+using Tracker.Domain.Mapping;
 
 namespace Tracker.Application.UseCases.Users;
 
 public sealed class RegisterUser(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher)
+    IPasswordHasher passwordHasher,
+    IDbExceptionsHandler dbExceptionsHandler)
 {
-    public record Request(string Email, 
-        string Password, 
-        string Username, 
-        string FirstName, 
+    public record Request(string Email,
+        string Password,
+        string Username,
+        string FirstName,
         string LastName);
 
-    public async Task<User> Handle(Request request)
+    public async Task<UserDto> Handle(Request request)
     {
-        await using var uow =  unitOfWorkFactory.Create();
+        await using var uow = unitOfWorkFactory.Create();
 
-        if (await uow.Users.EmailExistsAsync(request.Email))
+        if (await uow.UserRepository.EmailExistsAsync(request.Email))
         {
-            throw new Exception("Email is already in use");
+            throw new DuplicateException("Email is already in use");
         }
-        if (await uow.Users.UsernameExistsAsync(request.Username))
+        if (await uow.UserRepository.UsernameExistsAsync(request.Username))
         {
-            throw new Exception("Username is already in use");
+            throw new DuplicateException("Username is already in use");
         }
 
         var user = new User()
@@ -36,8 +41,18 @@ public sealed class RegisterUser(
             LastName = request.LastName
         };
 
-        await uow.Users.AddAsync(user);
+        await uow.UserRepository.AddAsync(user);
 
-        return user;
+        // To avoid race condition
+        try
+        {
+            await uow.SaveChangesAsync();
+        }
+        catch (Exception ex) when (dbExceptionsHandler. IsExceptionUniqueViolation(ex))
+        {
+            throw new DuplicateException("Sorry, someone take email or username, try again", ex);
+        }
+
+        return user.ToDto();
     }
 }

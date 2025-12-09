@@ -1,43 +1,35 @@
-﻿using Tracker.Application.Common;
-using Tracker.Application.Common.UnitOfWork;
+﻿using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.Common.Auth;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Mapping;
+using Tracker.Domain.DTOs;
 
 namespace Tracker.Application.UseCases.Users;
 
-public sealed class RegisterUser(
+public sealed class LoginUser(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher)
 {
-    public record Request(string Email, 
-        string Password, 
-        string Username, 
-        string FirstName, 
-        string LastName);
+    public record Request(string Email, string Password);
 
-    public async Task<User> Handle(Request request)
+    public async Task<UserDto> Handle(Request request)
     {
         await using var uow =  unitOfWorkFactory.Create();
 
-        if (await uow.Users.EmailExistsAsync(request.Email))
+        User? user = await uow.UserRepository.GetByEmailAsync(request.Email);
+
+        if (user is null)
         {
-            throw new Exception("Email is already in use");
-        }
-        if (await uow.Users.UsernameExistsAsync(request.Username))
-        {
-            throw new Exception("Username is already in use");
+            throw new Exception("User is not found");
         }
 
-        var user = new User()
+        bool verified = passwordHasher.Verify(request.Password, user.PasswordHash);
+
+        if (!verified)
         {
-            Email = request.Email,
-            PasswordHash = passwordHasher.Hash(request.Password),
-            Username = request.Username,
-            FirstName = request.FirstName,
-            LastName = request.LastName
-        };
+            throw new Exception("Password is incorrect");
+        }
 
-        await uow.Users.AddAsync(user);
-
-        return user;
+        return user.ToDto();
     }
 }
