@@ -1,7 +1,6 @@
 ﻿using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.Common.Auth;
 using Tracker.Domain.Entities;
-using Tracker.Application.Common.Database;
 using Tracker.Domain.Exceptions;
 using Tracker.Domain.DTOs;
 using Tracker.Domain.Mapping;
@@ -10,8 +9,7 @@ namespace Tracker.Application.UseCases.Users;
 
 public sealed class RegisterUser(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher,
-    IDbExceptionsHandler dbExceptionsHandler)
+    IPasswordHasher passwordHasher)
 {
     public record RegisterRequest(string Email,
         string Password,
@@ -48,9 +46,9 @@ public sealed class RegisterUser(
         {
             await uow.SaveChangesAsync();
         }
-        catch (Exception ex) when (dbExceptionsHandler. IsExceptionUniqueViolation(ex))
+        catch (DuplicateException)
         {
-            throw new DuplicateException("Sorry, someone take email or username, try again", ex);
+            throw new DuplicateException("Sorry, someone take email or username, try again");
         }
 
         return user.ToDto();

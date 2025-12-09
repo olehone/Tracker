@@ -1,6 +1,6 @@
 ﻿namespace Tracker.Domain.Exceptions;
 
-public class DuplicateException : Exception
+public class DuplicateException : DatabaseException
 {
 
     public DuplicateException()
