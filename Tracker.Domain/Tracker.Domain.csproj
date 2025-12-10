@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="Enums\" />
     <Folder Include="Enum\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 
 </Project>

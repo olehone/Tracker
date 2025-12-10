@@ -1,7 +1,8 @@
-﻿using Tracker.Application.UseCases.Users;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Tracker.Domain.DTOs;
 using MediatR;
+using Tracker.Application.UseCases.Auth.Login;
+using Tracker.Application.UseCases.Auth.Register;
 
 namespace Tracker.API.Controllers;
 

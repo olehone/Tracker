@@ -1,8 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using Tracker.Application.Results;
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Domain.Exceptions;
 using Tracker.Persistence.Repositories;
 
 namespace Tracker.Persistence;
@@ -25,7 +24,7 @@ internal class UnitOfWork : IUnitOfWork
         return _dbContext.DisposeAsync();
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -33,16 +32,16 @@ internal class UnitOfWork : IUnitOfWork
         }
         catch (SqlException ex)
         {
-            throw ExceptionMapper(ex);
+            return ExceptionToError(ex);
         }
     }
 
-    private static DatabaseException ExceptionMapper(SqlException ex)
+    private static Error ExceptionToError(SqlException ex)
     {
         return ex switch
         {
-            SqlException sqlEx when sqlEx.Number is 2601 or 2627 => new DuplicateException("Duplication in indexed field", ex),
-            _ => new DatabaseException(ex.Message, ex)
+            SqlException sqlEx when sqlEx.Number is 2601 or 2627 => PersistenceErrors.UniqueViolation,
+            _ => Error.Unknown
         };
     }
 }

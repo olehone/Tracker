@@ -1,16 +1,20 @@
-﻿using Tracker.Application.Common.UnitOfWork;
+﻿using MediatR;
 using Tracker.Application.Common.Auth;
+using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.Results;
 using Tracker.Domain.Entities;
-using MediatR;
 
-namespace Tracker.Application.UseCases.Users;
+namespace Tracker.Application.UseCases.Auth.Login;
 
 public sealed class LoginUserHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider) : IRequestHandler<LoginUserCommand, string>
+    ITokenProvider tokenProvider) 
+    : IRequestHandler<LoginUserCommand, Result<string>>
 {
-    public async Task<string> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(
+        LoginUserCommand request, 
+        CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
@@ -18,14 +22,14 @@ public sealed class LoginUserHandler(
 
         if (user is null)
         {
-            throw new Exception("User is not found");
+            return AuthErrors.UserNotFound;
         }
 
         bool verified = passwordHasher.Verify(request.Password, user.PasswordHash);
 
         if (!verified)
         {
-            throw new Exception("Password is incorrect");
+            return AuthErrors.PasswordIsIncorrect;
         }
         string token = tokenProvider.Create(user);
 

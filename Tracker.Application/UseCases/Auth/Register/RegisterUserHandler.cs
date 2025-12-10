@@ -1,28 +1,30 @@
-﻿using Tracker.Application.Common.UnitOfWork;
+﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Domain.Entities;
-using Tracker.Domain.Exceptions;
+using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.Results;
 using Tracker.Domain.DTOs;
+using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
-using MediatR;
 
-namespace Tracker.Application.UseCases.Users;
+namespace Tracker.Application.UseCases.Auth.Register;
 
 public sealed class RegisterUserHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher) : IRequestHandler<RegisterUserCommand, UserDto>
+    IPasswordHasher passwordHasher) : IRequestHandler<RegisterUserCommand, Result<UserDto>>
 {
-    public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> Handle(
+        RegisterUserCommand request, 
+        CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
         if (await uow.UserRepository.EmailExistsAsync(request.Email))
         {
-            throw new DuplicateException("Email is already in use");
+            return AuthErrors.EmailExists;
         }
         if (await uow.UserRepository.UsernameExistsAsync(request.Username))
         {
-            throw new DuplicateException("Username is already in use");
+            return AuthErrors.UsernameExists;
         }
 
         var user = new User()
@@ -36,16 +38,18 @@ public sealed class RegisterUserHandler(
 
         await uow.UserRepository.AddAsync(user);
 
-        // To avoid race condition
-        try
+        var sc = await uow.SaveChangesAsync();
+
+        if (sc.IsSuccess)
         {
-            await uow.SaveChangesAsync();
-        }
-        catch (DuplicateException)
-        {
-            throw new DuplicateException("Sorry, someone take email or username, try again");
+            return user.ToDto();
         }
 
-        return user.ToDto();
+        if (sc.Error.Type == ErrorType.UniqueViolation)
+        {
+            return AuthErrors.UsernameOrEmailExists;
+        }
+
+        return Error.Unknown;
     }
 }
