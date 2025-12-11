@@ -20,11 +20,11 @@ public class Result
     }
 
     public static Result Success() => new(true, Error.None);
-    public static Result<TValue> Success<TValue>(TValue value) => 
+    public static Result<TValue> SuccessOf<TValue>(TValue value) => 
         new(value, true, Error.None);
 
     public static Result Failure(Error error) => new(false, error);
-    public static Result<TValue> Failure<TValue>(Error error) =>
+    public static Result<TValue> FailureOf<TValue>(Error error) =>
         new(default, false, error);
 }
 
@@ -42,6 +42,6 @@ public class Result<TValue>: Result
         ? _value! :
         throw new InvalidOperationException("Can't call Value at failed result");
 
-    public static implicit operator Result<TValue>(TValue value) => Success(value);
-    public static implicit operator Result<TValue>(Error error) => Failure<TValue>(error); 
+    public static implicit operator Result<TValue>(TValue value) => SuccessOf(value);
+    public static implicit operator Result<TValue>(Error error) => FailureOf<TValue>(error); 
 }
