@@ -10,7 +10,8 @@ namespace Tracker.Application.UseCases.Auth.Register;
 
 public sealed class RegisterUserHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher) : IRequestHandler<RegisterUserCommand, Result<UserDto>>
+    IPasswordHasher passwordHasher) 
+    : IRequestHandler<RegisterUserCommand, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(
         RegisterUserCommand request, 

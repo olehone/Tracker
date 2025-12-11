@@ -3,6 +3,7 @@ using Tracker.Domain.DTOs;
 using MediatR;
 using Tracker.Application.UseCases.Auth.Login;
 using Tracker.Application.UseCases.Auth.Register;
+using Tracker.API.Services;
 
 namespace Tracker.API.Controllers;
 
@@ -19,13 +20,18 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand request)
     {
         var response = await _mediator.Send(request);
-        return Ok(response);
+
+        return response.IsSuccess ?
+            new OkObjectResult(response.Value) :
+            response.Error.ToProblemDetails();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserCommand request)
     {
         var response = await _mediator.Send(request);
-        return Ok(response);
+        return response.IsSuccess ?
+            new OkObjectResult(response.Value) :
+            response.Error.ToProblemDetails();
     }
 }

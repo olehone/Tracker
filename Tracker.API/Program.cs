@@ -2,12 +2,23 @@ using Tracker.Application;
 using Tracker.Database;
 using Tracker.Persistence;
 using Tracker.Infrastructure;
+using Tracker.Domain.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 DbMigrations.Initialize(connectionString);
+
+builder.Services.AddOptions<RegistrationOptions>()
+    .BindConfiguration("RegistrationOptions")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<LoginOptions>()
+    .BindConfiguration("LoginOptions")
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
