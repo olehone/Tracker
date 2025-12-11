@@ -5,9 +5,9 @@ using Tracker.Domain.Options;
 
 namespace Tracker.Application.UseCases.Auth.Register;
 
-public class RegisterCommandValidator : AbstractValidator<RegisterUserCommand>
+public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
-    public RegisterCommandValidator(IOptions<RegistrationOptions> options)
+    public RegisterUserCommandValidator(IOptions<RegistrationOptions> options)
     {
         RuleFor(x => x.Email)
             .NotEmpty()

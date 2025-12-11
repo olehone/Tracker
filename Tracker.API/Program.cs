@@ -11,12 +11,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 DbMigrations.Initialize(connectionString);
 
 builder.Services.AddOptions<RegistrationOptions>()
-    .BindConfiguration("RegistrationOptions")
+    .BindConfiguration(RegistrationOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
 builder.Services.AddOptions<LoginOptions>()
-    .BindConfiguration("LoginOptions")
+    .BindConfiguration(LoginOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
 

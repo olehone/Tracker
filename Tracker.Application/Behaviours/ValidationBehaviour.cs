@@ -1,12 +1,14 @@
 ﻿using FluentValidation;
 using MediatR;
-using Tracker.Application.Results;
+using Tracker.Domain.DTOs;
+using Tracker.Domain.Results;
 
 namespace Tracker.Application.Behaviours;
 
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TResponse : Result
+    where TRequest : notnull
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -20,6 +22,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
+        
         if (!_validators.Any())
         {
             return await next(cancellationToken);
@@ -38,8 +41,14 @@ public sealed class ValidationBehavior<TRequest, TResponse>
         {
             return await next(cancellationToken);
         }
-
+        
         var error = Error.Validation(failures.Select(x => x.ErrorMessage).ToArray());
+        if (typeof(TResponse).IsGenericType)
+        {
+            var innerType = typeof(TResponse).GenericTypeArguments[0];
+            
+            return (TResponse).Result.Failure<innerType>(error);
+        }
 
         return (TResponse)Result.Failure(error);
     }

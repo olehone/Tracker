@@ -1,4 +1,4 @@
-﻿namespace Tracker.Application.Results;
+﻿namespace Tracker.Domain.Results;
 
 public sealed record Error(
     string Code,

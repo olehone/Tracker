@@ -7,8 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Enums\" />
-    <Folder Include="Enum\" />
+    <Compile Remove="Enums\**" />
+    <Compile Remove="Enum\**" />
+    <EmbeddedResource Remove="Enums\**" />
+    <EmbeddedResource Remove="Enum\**" />
+    <None Remove="Enums\**" />
+    <None Remove="Enum\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Exceptions\" />
   </ItemGroup>
 

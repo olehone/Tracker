@@ -1,5 +1,5 @@
 ﻿
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 using Tracker.Domain.Entities;
 
 namespace Tracker.Application.Common.Repositories;

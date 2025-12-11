@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserCommand request)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterUserCommand request)
     {
         var response = await _mediator.Send(request);
 
@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginUserCommand request)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginUserCommand request)
     {
         var response = await _mediator.Send(request);
         return response.IsSuccess ?

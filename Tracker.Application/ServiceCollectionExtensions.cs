@@ -15,8 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         
-        services.AddScoped<RegisterUserHandler>();
-        services.AddScoped<LoginUserHandler>();
+        services.AddScoped<RegisterUserCommandHandler>();
+        services.AddScoped<LoginUserCommandHandler>();
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));

@@ -1,5 +1,5 @@
 ﻿using Tracker.Domain.DTOs;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 using MediatR;
 
 namespace Tracker.Application.UseCases.Auth.Register;

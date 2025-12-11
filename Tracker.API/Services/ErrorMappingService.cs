@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 
 namespace Tracker.API.Services;
 

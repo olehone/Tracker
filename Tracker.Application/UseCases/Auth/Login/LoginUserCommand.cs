@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Auth.Login;
 

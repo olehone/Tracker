@@ -1,5 +1,5 @@
 ﻿using Tracker.Application.Common.Repositories;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 
 namespace Tracker.Application.Common.UnitOfWork;
 

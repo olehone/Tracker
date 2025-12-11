@@ -1,6 +1,4 @@
-﻿using Tracker.Application.Results;
-
-namespace Tracker.Application.UseCases.Auth;
+﻿namespace Tracker.Domain.Results;
 
 public static class AuthErrors
 {

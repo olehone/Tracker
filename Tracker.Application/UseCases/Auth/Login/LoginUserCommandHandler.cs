@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 using Tracker.Domain.Entities;
 
 namespace Tracker.Application.UseCases.Auth.Login;
 
-public sealed class LoginUserHandler(
+public sealed class LoginUserCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher,
     ITokenProvider tokenProvider) 

@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace Tracker.Application.UseCases.Auth.Login;
 
-internal class LoginUserValidator : AbstractValidator<LoginUserCommand>
+internal class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
-    public LoginUserValidator(IOptions<LoginOptions> options)
+    public LoginUserCommandValidator(IOptions<LoginOptions> options)
     {
         RuleFor(x => x.Email)
             .NotEmpty()

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Persistence.Repositories;

@@ -1,14 +1,14 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.Results;
+using Tracker.Domain.Results;
 using Tracker.Domain.DTOs;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 
 namespace Tracker.Application.UseCases.Auth.Register;
 
-public sealed class RegisterUserHandler(
+public sealed class RegisterUserCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher) 
     : IRequestHandler<RegisterUserCommand, Result<UserDto>>
