@@ -1,5 +1,8 @@
+using Tracker.Application;
 using Tracker.Database;
 using Tracker.Persistence;
+using Tracker.Infrastructure;
+using Tracker.Domain.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,11 +10,23 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 DbMigrations.Initialize(connectionString);
 
+builder.Services.AddOptions<RegistrationOptions>()
+    .BindConfiguration(RegistrationOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddOptions<LoginOptions>()
+    .BindConfiguration(LoginOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddInfrastructureServices();
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 
@@ -25,4 +40,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

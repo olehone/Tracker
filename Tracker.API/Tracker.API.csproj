@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>76ff1653-d12c-4f7f-b6d0-fb57d5b11a92</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +14,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Tracker.Application\Tracker.Application.csproj" />
     <ProjectReference Include="..\Tracker.Database\Tracker.Database.csproj" />
+    <ProjectReference Include="..\Tracker.Infrastructure\Tracker.Infrastructure.csproj" />
     <ProjectReference Include="..\Tracker.Persistence\Tracker.Persistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

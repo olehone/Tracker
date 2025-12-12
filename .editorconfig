@@ -10,6 +10,7 @@ root = true
 indent_size = 4
 indent_style = space
 tab_width = 4
+max_line_length = 100
 
 # New line preferences
 end_of_line = crlf
@@ -28,7 +29,7 @@ dotnet_search_reference_assemblies = true
 #### .NET Coding Conventions ####
 
 # Organize usings
-dotnet_separate_import_directive_groups = true
+dotnet_separate_import_directive_groups = false
 csharp_new_line_after_usings = true
 dotnet_sort_system_directives_first = true
 file_header_template = unset
@@ -83,8 +84,8 @@ dotnet_code_quality_unused_parameters = all
 dotnet_remove_unnecessary_suppression_exclusions = none
 
 # New line preferences
-dotnet_style_allow_multiple_blank_lines_experimental = true
-dotnet_style_allow_statement_immediately_after_block_experimental = true
+dotnet_style_allow_multiple_blank_lines_experimental = false
+dotnet_style_allow_statement_immediately_after_block_experimental = false
 
 #### C# Coding Conventions ####
 
@@ -161,7 +162,7 @@ csharp_new_line_after_namespace_declaration = true
 #### C# Formatting Rules ####
 
 # New line preferences
-csharp_new_line_before_catch = true
+sharp_new_line_before_catch = true
 csharp_new_line_before_else = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_anonymous_types = true
@@ -247,3 +248,7 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# Custom Rules - configure these as required
+
+# .NET Code Analyzers rules
