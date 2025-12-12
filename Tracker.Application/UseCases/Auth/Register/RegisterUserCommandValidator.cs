@@ -15,9 +15,8 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .MinimumLength(options.Value.PasswordMinimumLength)
-            .WithMessage($"Password must be at least {options.Value.PasswordMinimumLength} characters long");
-        
+            .MinimumLength(options.Value.PasswordMinimumLength);
+
         RuleFor(x => x.FirstName)
             .NotEmpty();
 

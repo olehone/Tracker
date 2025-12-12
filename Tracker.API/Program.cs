@@ -1,8 +1,8 @@
 using Tracker.Application;
 using Tracker.Database;
-using Tracker.Persistence;
-using Tracker.Infrastructure;
 using Tracker.Domain.Options;
+using Tracker.Infrastructure;
+using Tracker.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
-builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 

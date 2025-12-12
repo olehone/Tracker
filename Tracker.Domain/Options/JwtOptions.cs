@@ -1,10 +1,18 @@
-﻿namespace Tracker.Domain.Options;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Tracker.Domain.Options;
 
 public class JwtOptions
 {
-    public string Issuer { get; set; } = string.Empty;
-    public string Audience { get; set; } = string.Empty;
-    public string SecretKey { get; set; } = string.Empty;
-    public int ExpirationHours { get; set; } = 1;
-    public int RefreshTokenExpirationDays { get; set; } = 7;
+    public const string SectionName = "JwtOptions";
+    [Required]
+    public required string Issuer { get; init; }
+    [Required]
+    public required string Audience { get; init; }
+    [Required]
+    public required string SecretKey { get; init; }
+    [Required]
+    public int ExpirationInMinutes { get; init; }
+    [Required]
+    public int RefreshTokenExpirationDays { get; init; }
 }

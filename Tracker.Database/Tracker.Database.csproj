@@ -17,6 +17,8 @@
   <ItemGroup>
     <PackageReference Include="dbup" Version="5.0.41" />
     <PackageReference Include="dbup-sqlserver" Version="6.0.16" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

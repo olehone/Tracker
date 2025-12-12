@@ -1,10 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Tracker.Domain.Results;
 
 namespace Tracker.API.Services;
 
 public static class ErrorMappingService
 {
+    public static IActionResult ToActionResult<TValue>(this Result<TValue> response)
+    {
+        return ResultToActionResult(response);
+    }
+
+    public static IActionResult ResultToActionResult<TValue>(Result<TValue> response)
+    {
+        return response.IsSuccess ?
+            new OkObjectResult(response.Value) :
+            response.Error.ToProblemDetails();
+    }
+
     public static IActionResult ToProblemDetails(this Error error)
     {
         return ErrorToProblemDetails(error);
