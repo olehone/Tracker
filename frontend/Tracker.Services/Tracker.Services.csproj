@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tracker.Services.Abstraction\Tracker.Services.Abstraction.csproj" />
+  </ItemGroup>
+
 </Project>
