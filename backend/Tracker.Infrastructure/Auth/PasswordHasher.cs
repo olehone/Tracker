@@ -1,21 +1,21 @@
 ﻿using System.Security.Cryptography;
-
+using Microsoft.Extensions.Options;
 using Tracker.Application.Common.Auth;
+using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Auth;
 
-internal class PasswordHasher : IPasswordHasher
+internal class PasswordHasher(IOptions<PasswordHasherOptions> options) : IPasswordHasher
 {
-    private const int SaltSize = 16;
-    private const int HashSize = 32;
-    private const int Iterations = 100000;
-
-    private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA512;
-
     public string Hash(string password)
     {
-        byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
-        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, Algorithm, HashSize);
+
+        byte[] salt = RandomNumberGenerator.GetBytes(options.Value.HashSize);
+        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password,
+            salt,
+            options.Value.Iterations,
+            options.Value.AlgorithmName,
+            options.Value.HashSize);
 
         return $"{Convert.ToHexString(hash)}-{Convert.ToHexString(salt)}";
     }
@@ -25,7 +25,12 @@ internal class PasswordHasher : IPasswordHasher
         string[] parts = passwordHash.Split("-");
         byte[] hash = Convert.FromHexString(parts[0]);
         byte[] salt = Convert.FromHexString(parts[1]);
-        byte[] inputHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, Algorithm, HashSize);
+        byte[] inputHash = Rfc2898DeriveBytes.Pbkdf2(password,
+            salt,
+            options.Value.Iterations,
+            options.Value.AlgorithmName,
+            options.Value.HashSize
+        );
 
         return CryptographicOperations.FixedTimeEquals(hash, inputHash);
     }
