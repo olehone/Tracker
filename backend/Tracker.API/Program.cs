@@ -10,20 +10,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 DbMigrations.Initialize(connectionString);
 
-builder.Services.AddOptions<RegistrationOptions>()
-    .BindConfiguration(RegistrationOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services.AddOptions<LoginOptions>()
-    .BindConfiguration(LoginOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
 

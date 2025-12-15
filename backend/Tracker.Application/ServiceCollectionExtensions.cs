@@ -17,11 +17,6 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-
-        services.AddOptions<RegistrationOptions>()
-            
-            .ValidateOnStart();
-
         services.AddOptions<RegistrationOptions>()
             .BindConfiguration(RegistrationOptions.SectionName)
             .ValidateDataAnnotations()
@@ -35,9 +30,6 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         
-        //services.AddScoped<RegisterUserCommandHandler>();
-        //services.AddScoped<LoginUserCommandHandler>();
-
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
