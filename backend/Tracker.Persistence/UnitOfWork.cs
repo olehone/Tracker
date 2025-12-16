@@ -11,8 +11,12 @@ internal class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _dbContext;
 
     private IUserRepository _userRepository = null!;
+    private IRefreshTokenRepository _refreshTokenRepository = null!;
+
     public IUserRepository UserRepository
         => _userRepository ??= new UserRepository(_dbContext);
+    public IRefreshTokenRepository RefreshTokenRepository
+        => _refreshTokenRepository ??= new RefreshTokenRepository(_dbContext);
 
     public UnitOfWork(ApplicationDbContext applicationDbContext)
     {

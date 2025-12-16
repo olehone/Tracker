@@ -20,11 +20,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerAuth();
 
 
+builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
-builder.Services.AddInfrastructureServices();
-
-
 
 builder.Services.AddAuthorization();
 builder.Services
@@ -50,6 +48,8 @@ builder.Services
                     Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey))
         };
     });
+
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

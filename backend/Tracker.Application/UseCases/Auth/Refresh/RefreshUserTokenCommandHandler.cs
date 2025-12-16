@@ -1,0 +1,49 @@
+﻿using MediatR;
+using Microsoft.Extensions.Options;
+using Tracker.Application.Common.Auth;
+using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Entities;
+using Tracker.Domain.Mapping;
+using Tracker.Domain.Options;
+using Tracker.Domain.Results;
+
+namespace Tracker.Application.UseCases.Auth.Refresh;
+
+public sealed class RefreshUserTokenCommandHandler(
+    IUnitOfWorkFactory unitOfWorkFactory,
+    ITokenProvider tokenProvider,
+    IOptions<JwtOptions> jwtOptions)
+    : IRequestHandler<RefreshUserTokenCommand, Result<AuthResponse>>
+{
+    public async Task<Result<AuthResponse>> Handle(
+        RefreshUserTokenCommand request,
+        CancellationToken cancellationToken)
+    {
+        await using var uow = unitOfWorkFactory.Create();
+
+        RefreshToken? refreshToken = await uow.RefreshTokenRepository
+            .GetByTokenAsync(request.RefreshToken);
+
+        if (refreshToken == null || refreshToken.User == null)
+        {
+            return AuthErrors.RefreshTokenNotFound;
+        }
+        if (refreshToken.ExpiresAt < DateTimeOffset.UtcNow)
+        {
+            return AuthErrors.RefreshTokenExpired;
+        }
+
+        refreshToken.Token = tokenProvider.GenerateRefreshToken();
+        refreshToken.ExpiresAt = DateTimeOffset.UtcNow
+            .AddDays(jwtOptions.Value.RefreshTokenExpirationDays);
+        
+        await uow.SaveChangesAsync();
+
+        return new AuthResponse()
+        {
+            User = refreshToken.User.ToDto(),
+            AccessToken = tokenProvider.Create(refreshToken.User),
+            RefreshToken = refreshToken.ToDto()
+        };
+    }
+}

@@ -6,7 +6,12 @@ public static class DbMigrations
     public static void Initialize(string connectionString)
     {
         EnsureDatabase.For.SqlDatabase(connectionString);
+        var names = typeof(DbMigrations).Assembly.GetManifestResourceNames();
 
+        foreach (var name in names.OrderBy(x => x))
+        {
+            Console.WriteLine(name);
+        }
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptsEmbeddedInAssembly(typeof(DbMigrations).Assembly)

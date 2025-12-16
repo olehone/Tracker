@@ -6,6 +6,7 @@ using Tracker.Domain.Entities;
 using Tracker.Application.Common.Auth;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
+using System.Security.Cryptography;
 
 namespace Tracker.Infrastructure.Auth;
 
@@ -32,5 +33,11 @@ public class TokenProvider(IOptions<JwtOptions> options):ITokenProvider
         var token = handler.CreateToken(tokenDescriptor);
 
         return token;
+    }
+
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(
+            options.Value.RefreshTokenBytes));
     }
 }

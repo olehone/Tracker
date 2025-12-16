@@ -3,17 +3,21 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Results;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Mapping;
+using Tracker.Domain.Options;
+using Microsoft.Extensions.Options;
 
 namespace Tracker.Application.UseCases.Auth.Login;
 
 public sealed class LoginUserCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider) 
-    : IRequestHandler<LoginUserCommand, Result<string>>
+    ITokenProvider tokenProvider,
+    IOptions<JwtOptions> jwtOptions)
+    : IRequestHandler<LoginUserCommand, Result<AuthResponse>>
 {
-    public async Task<Result<string>> Handle(
-        LoginUserCommand request, 
+    public async Task<Result<AuthResponse>> Handle(
+        LoginUserCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -31,8 +35,28 @@ public sealed class LoginUserCommandHandler(
         {
             return AuthErrors.PasswordIsIncorrect;
         }
-        string token = tokenProvider.Create(user);
+        string accessToken = tokenProvider.Create(user);
 
-        return token;
+        var refreshToken = new RefreshToken()
+        {
+            Token = tokenProvider.GenerateRefreshToken(),
+            UserId = user.Id,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpirationDays)
+        };
+
+        await uow.RefreshTokenRepository.AddAsync(refreshToken);
+        var sc = await uow.SaveChangesAsync();
+
+        if (sc.IsSuccess)
+        {
+            return new AuthResponse()
+            {
+                User = user.ToDto(),
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.ToDto()
+            };
+        }
+
+        return Error.Unknown;
     }
 }

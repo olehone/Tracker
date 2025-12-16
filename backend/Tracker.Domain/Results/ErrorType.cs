@@ -8,5 +8,6 @@ public enum ErrorType
     Conflict,
     UniqueViolation,
     ForeignKeyViolation,
+    Unauthorized,
     Unknown
 }

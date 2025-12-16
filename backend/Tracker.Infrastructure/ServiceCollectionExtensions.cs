@@ -18,9 +18,11 @@ public static class ServiceCollectionExtensions
             .BindConfiguration(PasswordHasherOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
+        
+        services.AddHttpContextAccessor();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenProvider, TokenProvider>();
+        services.AddScoped<IUserContext, UserContext>();
 
         return services;
     }

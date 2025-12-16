@@ -4,5 +4,6 @@ namespace Tracker.Application.Common.Auth;
 
 public interface ITokenProvider
 {
-    string Create(User user); 
+    string Create(User user);
+    string GenerateRefreshToken();
 }

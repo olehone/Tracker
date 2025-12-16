@@ -16,16 +16,19 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
 
     public async Task<bool> EmailExistsAsync(string email)
     {
-        return await _dbSet.AnyAsync(user => user.Email == email);
+        return await _dbSet
+            .AnyAsync(user => user.Email == email);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _dbSet.FirstOrDefaultAsync(user => user.Email == email);
+        return await _dbSet
+            .FirstOrDefaultAsync(user => user.Email == email);
     }
 
     public async Task<bool> UsernameExistsAsync(string username)
     {
-        return await _dbSet.AnyAsync(user => user.Username == username);
+        return await _dbSet
+            .AnyAsync(user => user.Username == username);
     }
 }

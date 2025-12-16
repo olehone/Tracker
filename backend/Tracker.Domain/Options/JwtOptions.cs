@@ -15,4 +15,6 @@ public class JwtOptions
     public int ExpirationInMinutes { get; init; }
     [Required]
     public int RefreshTokenExpirationDays { get; init; }
+    [Required]
+    public int RefreshTokenBytes { get; init; }
 }

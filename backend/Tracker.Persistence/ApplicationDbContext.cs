@@ -14,12 +14,6 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>(cfg =>
-        {
-            cfg.ToTable("Users");
-            cfg.HasKey(u => u.Id);
-            cfg.Property(u => u.Email).IsRequired();
-            cfg.Property(u => u.Username).IsRequired();
-        });
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

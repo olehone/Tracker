@@ -6,6 +6,6 @@ namespace Tracker.Application.Common.UnitOfWork;
 public interface IUnitOfWork : IAsyncDisposable
 {
     IUserRepository UserRepository { get; }
-
+    IRefreshTokenRepository RefreshTokenRepository { get; }
     Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

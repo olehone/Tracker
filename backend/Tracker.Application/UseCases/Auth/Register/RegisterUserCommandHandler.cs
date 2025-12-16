@@ -1,20 +1,23 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Options;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Domain.Results;
-using Tracker.Domain.DTOs;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
+using Tracker.Domain.Options;
+using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Auth.Register;
 
 public sealed class RegisterUserCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IPasswordHasher passwordHasher) 
-    : IRequestHandler<RegisterUserCommand, Result<UserDto>>
+    IPasswordHasher passwordHasher,
+    ITokenProvider tokenProvider,
+    IOptions<JwtOptions> jwtOptions)
+    : IRequestHandler<RegisterUserCommand, Result<AuthResponse>>
 {
-    public async Task<Result<UserDto>> Handle(
-        RegisterUserCommand request, 
+    public async Task<Result<AuthResponse>> Handle(
+        RegisterUserCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -39,18 +42,34 @@ public sealed class RegisterUserCommandHandler(
 
         await uow.UserRepository.AddAsync(user);
 
+        string accessToken = tokenProvider.Create(user);
+
+        var refreshToken = new RefreshToken()
+        {
+            Token = tokenProvider.GenerateRefreshToken(),
+            UserId = user.Id,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpirationDays)
+        };
+
+        await uow.RefreshTokenRepository.AddAsync(refreshToken);
+
         var sc = await uow.SaveChangesAsync();
 
-        if (sc.IsSuccess)
+        if (sc.IsFailure)
         {
-            return user.ToDto();
+            return sc.Error.Type switch
+            {
+                ErrorType.UniqueViolation => AuthErrors.UsernameOrEmailExists,
+                _ => Error.Unknown
+            };
         }
 
-        if (sc.Error.Type == ErrorType.UniqueViolation)
+        return new AuthResponse()
         {
-            return AuthErrors.UsernameOrEmailExists;
-        }
+            User = user.ToDto(),
+            RefreshToken = refreshToken.ToDto(),
+            AccessToken = accessToken
+        };
 
-        return Error.Unknown;
     }
 }
