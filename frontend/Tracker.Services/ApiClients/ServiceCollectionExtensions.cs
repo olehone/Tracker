@@ -1,20 +1,21 @@
 ﻿using Refit;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
-using Tracker.WebApp.ApiClients;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Tracker.WebApp;
+namespace Tracker.Services.ApiClients;
 
-internal static class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiClients(this IServiceCollection services)
     {
+
         services.AddOptions<ApiOptions>()
             .BindConfiguration(ApiOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddRefitClient<AuthApiClient>()
+        services.AddRefitClient<IAuthApi>()
             .ConfigureHttpClient((serviceProvider, client) =>
             {
                 var options = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;

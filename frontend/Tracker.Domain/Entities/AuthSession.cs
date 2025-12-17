@@ -2,7 +2,7 @@
 
 namespace Tracker.Domain.Entities;
 
-public class AuthResponse
+public class AuthSession
 {
     public required UserDto User { get; set; }
     public required RefreshTokenDto RefreshToken { get; set; }
