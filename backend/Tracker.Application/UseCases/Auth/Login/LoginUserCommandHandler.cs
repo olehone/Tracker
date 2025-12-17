@@ -23,20 +23,18 @@ public sealed class LoginUserCommandHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         User? user = await uow.UserRepository.GetByEmailAsync(request.Email);
-
         if (user is null)
         {
             return AuthErrors.UserNotFound;
         }
 
         bool verified = passwordHasher.Verify(request.Password, user.PasswordHash);
-
         if (!verified)
         {
             return AuthErrors.PasswordIsIncorrect;
         }
-        string accessToken = tokenProvider.Create(user);
 
+        string accessToken = tokenProvider.Create(user);
         var refreshToken = new RefreshToken()
         {
             Token = tokenProvider.GenerateRefreshToken(),

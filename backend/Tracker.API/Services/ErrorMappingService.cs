@@ -22,6 +22,7 @@ public static class ErrorMappingService
     {
         return ErrorToProblemDetails(error);
     }
+
     public static IActionResult ErrorToProblemDetails(Error error)
     {
         return error.Type switch

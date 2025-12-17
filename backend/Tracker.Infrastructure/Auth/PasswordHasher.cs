@@ -9,7 +9,6 @@ internal class PasswordHasher(IOptions<PasswordHasherOptions> options) : IPasswo
 {
     public string Hash(string password)
     {
-
         byte[] salt = RandomNumberGenerator.GetBytes(options.Value.HashSize);
         byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password,
             salt,

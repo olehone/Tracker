@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
 
-
 namespace Tracker.Application.UseCases.Auth.Register;
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>

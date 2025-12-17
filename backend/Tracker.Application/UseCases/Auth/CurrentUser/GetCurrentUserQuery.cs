@@ -7,4 +7,3 @@ namespace Tracker.Application.UseCases.Auth.CurrentUser;
 public class GetCurrentUserQuery: IRequest<Result<UserDto>>
 {
 }
-

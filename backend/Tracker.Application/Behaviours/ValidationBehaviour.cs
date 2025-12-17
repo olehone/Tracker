@@ -47,13 +47,13 @@ public sealed class ValidationBehavior<TRequest, TResponse>
         return FailureResponse<TResponse>(error);
     }
 
-    private static TResponse FailureResponse<TResponse>(Error error) where TResponse : Result
+    private static TResponse FailureResponse<TResult>(Error error) where TResult : Result
     {
-        if (typeof(TResponse) == typeof(Result))
+        if (typeof(TResult) == typeof(Result))
         {
             return (TResponse)(object)Result.Failure(error);
         }
-        var genericResultType = typeof(TResponse);
+        var genericResultType = typeof(TResult);
         if (genericResultType.IsGenericType && genericResultType.GetGenericTypeDefinition() == typeof(Result<>))
         {
             var valueType = genericResultType.GetGenericArguments()[0];

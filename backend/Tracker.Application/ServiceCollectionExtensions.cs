@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using System.Reflection;
 using FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tracker.Domain.Options;
 using Tracker.Application.Behaviours;
@@ -17,7 +16,6 @@ public static class ServiceCollectionExtensions
             .BindConfiguration(RegistrationOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-
         services.AddOptions<LoginOptions>()
             .BindConfiguration(LoginOptions.SectionName)
             .ValidateDataAnnotations()

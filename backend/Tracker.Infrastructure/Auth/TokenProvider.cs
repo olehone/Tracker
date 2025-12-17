@@ -30,6 +30,7 @@ public class TokenProvider(IOptions<JwtOptions> options):ITokenProvider
             Issuer = options.Value.Issuer,
             Audience = options.Value.Audience,
         };
+
         var handler = new JsonWebTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
 

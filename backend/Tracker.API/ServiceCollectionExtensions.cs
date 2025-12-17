@@ -33,9 +33,11 @@ internal static class ServiceCollectionExtensions
                     NameClaimType = JwtRegisteredClaimNames.Sub
                 };
             });
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
         services.AddAuthorization();
+
         return services;
     }
 
@@ -71,7 +73,6 @@ internal static class ServiceCollectionExtensions
                     []
                 }
             };
-
             o.AddSecurityRequirement(securityRequirement);
         });
 

@@ -5,7 +5,7 @@ namespace Tracker.Domain.Options;
 public class JwtOptions
 {
     public const string SectionName = "JwtOptions";
-    [Required]
+    //[Required]
     public required string Issuer { get; init; }
     [Required]
     public required string Audience { get; init; }

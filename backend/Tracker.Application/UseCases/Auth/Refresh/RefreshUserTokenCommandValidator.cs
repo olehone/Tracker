@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Tracker.Domain.Options;
+﻿using Tracker.Domain.Options;
 using FluentValidation;
 
 namespace Tracker.Application.UseCases.Auth.Refresh;

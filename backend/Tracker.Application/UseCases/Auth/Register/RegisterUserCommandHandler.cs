@@ -36,16 +36,13 @@ public sealed class RegisterUserCommandHandler(
             Email = request.Email,
             PasswordHash = passwordHasher.Hash(request.Password),
             Username = request.Username,
-            // Higher roles must be granted
-            Role = Roles.Lowest,
+            Role = Roles.User,
             FirstName = request.FirstName,
             LastName = request.LastName
         };
-
         await uow.UserRepository.AddAsync(user);
 
         string accessToken = tokenProvider.Create(user);
-
         var refreshToken = new RefreshToken()
         {
             Token = tokenProvider.GenerateRefreshToken(),
@@ -54,9 +51,7 @@ public sealed class RegisterUserCommandHandler(
         };
 
         await uow.RefreshTokenRepository.AddAsync(refreshToken);
-
         var sc = await uow.SaveChangesAsync(cancellationToken);
-
         if (sc.IsFailure)
         {
             return sc.Error.Type switch
@@ -72,6 +67,5 @@ public sealed class RegisterUserCommandHandler(
             RefreshToken = refreshToken.ToDto(),
             AccessToken = accessToken
         };
-
     }
 }

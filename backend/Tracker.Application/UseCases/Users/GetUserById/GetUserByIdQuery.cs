@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MediatR;
+﻿using MediatR;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 

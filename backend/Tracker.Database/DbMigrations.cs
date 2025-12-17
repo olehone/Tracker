@@ -1,4 +1,5 @@
 ﻿using DbUp;
+using Tracker.Domain.Exceptions;
 
 namespace Tracker.Database;
 public static class DbMigrations
@@ -6,12 +7,7 @@ public static class DbMigrations
     public static void Initialize(string connectionString)
     {
         EnsureDatabase.For.SqlDatabase(connectionString);
-        var names = typeof(DbMigrations).Assembly.GetManifestResourceNames();
 
-        foreach (var name in names.OrderBy(x => x))
-        {
-            Console.WriteLine(name);
-        }
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptsEmbeddedInAssembly(typeof(DbMigrations).Assembly)
@@ -30,7 +26,7 @@ public static class DbMigrations
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(result.Error);
             Console.ResetColor();
-            throw new Exception("Database migration failed");
+            throw new MigrationFailedException();
         }
     }
 }

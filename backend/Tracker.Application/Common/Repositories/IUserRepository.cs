@@ -1,6 +1,4 @@
-﻿
-using Tracker.Domain.Results;
-using Tracker.Domain.Entities;
+﻿using Tracker.Domain.Entities;
 using Tracker.Domain.Dtos;
 
 namespace Tracker.Application.Common.Repositories;
