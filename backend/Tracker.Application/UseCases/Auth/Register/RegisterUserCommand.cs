@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Tracker.Domain.DTOs;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 

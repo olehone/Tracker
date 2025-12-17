@@ -1,5 +1,6 @@
-﻿using MediatR;
-using Tracker.Domain.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
+using MediatR;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Users.GetUserById;

@@ -23,6 +23,7 @@ public class TokenProvider(IOptions<JwtOptions> options):ITokenProvider
                 [
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.Role),
                 ]),
             Expires = DateTime.UtcNow.AddMinutes(options.Value.ExpirationInMinutes),
             SigningCredentials = credential,

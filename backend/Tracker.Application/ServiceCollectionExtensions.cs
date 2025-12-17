@@ -2,20 +2,16 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Tracker.Domain.Options;
 using Tracker.Application.Behaviours;
-using Tracker.Application.UseCases.Auth.Login;
-using Tracker.Application.UseCases.Auth.Register;
 
 namespace Tracker.Application;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(
-        this IServiceCollection services,
-        IConfiguration configuration)
+        this IServiceCollection services)
     {
         services.AddOptions<RegistrationOptions>()
             .BindConfiguration(RegistrationOptions.SectionName)

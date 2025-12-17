@@ -1,14 +1,44 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Tracker.Application.Common.Auth;
 using Tracker.Domain.Options;
-using Tracker.Infrastructure.Auth;
 
 namespace Tracker.API;
 
 internal static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddJwtBearerAndAuth(this IServiceCollection services)
+    {
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtOptions>>((jwtBearer, jwtOptions) =>
+            {
+                jwtBearer.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = jwtOptions.Value.Issuer,
+                    ValidAudience = jwtOptions.Value.Audience,
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey)),
+                    RoleClaimType = ClaimTypes.Role,
+                    NameClaimType = JwtRegisteredClaimNames.Sub
+                };
+            });
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer();
+        services.AddAuthorization();
+        return services;
+    }
+
     public static IServiceCollection AddSwaggerAuth(this IServiceCollection services)
     {
         services.AddSwaggerGen(o =>
@@ -47,4 +77,5 @@ internal static class ServiceCollectionExtensions
 
         return services;
     }
+
 }

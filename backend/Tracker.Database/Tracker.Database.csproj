@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\004-Add-Role-Constrains.sql" />
+    <EmbeddedResource Include="Scripts\003-Add-Role-Column.sql" />
     <EmbeddedResource Include="Scripts\001-Create-User.sql" />
     <EmbeddedResource Include="Scripts\002-Add-Refresh-Tokens.sql" />
   </ItemGroup>
@@ -20,6 +22,10 @@
     <PackageReference Include="dbup-sqlserver" Version="6.0.16" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tracker.Domain\Tracker.Domain.csproj" />
   </ItemGroup>
 
 </Project>

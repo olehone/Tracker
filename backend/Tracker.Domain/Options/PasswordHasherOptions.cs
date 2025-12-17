@@ -13,7 +13,8 @@ public class PasswordHasherOptions
     [Required]
     public int Iterations { get; init; }
     [Required]
-    public string Algorithm { get; init; } = default!;
+    public required string Algorithm { get; init; }
+    [Required]
     public HashAlgorithmName AlgorithmName =>
-        new HashAlgorithmName(Algorithm);
+        new (Algorithm);
 }

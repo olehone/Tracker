@@ -32,7 +32,7 @@ internal class UnitOfWork : IUnitOfWork
     {
         try
         {
-            return await _dbContext.SaveChangesAsync();
+            return await _dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (SqlException ex)
         {

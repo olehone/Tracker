@@ -22,8 +22,9 @@ public sealed class ValidationBehavior<TRequest, TResponse>
         CancellationToken cancellationToken)
     {
         if (!_validators.Any())
+        {
             return await next(cancellationToken);
-
+        }
         var context = new ValidationContext<TRequest>(request);
 
         var results = await Task.WhenAll(
@@ -36,8 +37,9 @@ public sealed class ValidationBehavior<TRequest, TResponse>
             .ToList();
 
         if (failures.Count == 0)
+        {
             return await next(cancellationToken);
-
+        }
         var error = Error.Validation(
             failures.Select(x => x.ErrorMessage).ToArray()
         );
@@ -48,8 +50,9 @@ public sealed class ValidationBehavior<TRequest, TResponse>
     private static TResponse FailureResponse<TResponse>(Error error) where TResponse : Result
     {
         if (typeof(TResponse) == typeof(Result))
+        {
             return (TResponse)(object)Result.Failure(error);
-
+        }
         var genericResultType = typeof(TResponse);
         if (genericResultType.IsGenericType && genericResultType.GetGenericTypeDefinition() == typeof(Result<>))
         {

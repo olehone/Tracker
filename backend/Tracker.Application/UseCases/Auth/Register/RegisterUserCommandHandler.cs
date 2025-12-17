@@ -36,6 +36,8 @@ public sealed class RegisterUserCommandHandler(
             Email = request.Email,
             PasswordHash = passwordHasher.Hash(request.Password),
             Username = request.Username,
+            // Higher roles must be granted
+            Role = Roles.Lowest,
             FirstName = request.FirstName,
             LastName = request.LastName
         };
@@ -53,7 +55,7 @@ public sealed class RegisterUserCommandHandler(
 
         await uow.RefreshTokenRepository.AddAsync(refreshToken);
 
-        var sc = await uow.SaveChangesAsync();
+        var sc = await uow.SaveChangesAsync(cancellationToken);
 
         if (sc.IsFailure)
         {

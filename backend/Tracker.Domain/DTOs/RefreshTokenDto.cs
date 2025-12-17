@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Entities;
 
-namespace Tracker.Domain.DTOs;
+namespace Tracker.Domain.Dtos;
 
 public class RefreshTokenDto
 {

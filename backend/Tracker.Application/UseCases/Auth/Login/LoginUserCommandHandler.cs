@@ -45,7 +45,7 @@ public sealed class LoginUserCommandHandler(
         };
 
         await uow.RefreshTokenRepository.AddAsync(refreshToken);
-        var sc = await uow.SaveChangesAsync();
+        var sc = await uow.SaveChangesAsync(cancellationToken);
 
         if (sc.IsSuccess)
         {

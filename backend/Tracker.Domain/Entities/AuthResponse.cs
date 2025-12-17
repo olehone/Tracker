@@ -1,4 +1,4 @@
-﻿using Tracker.Domain.DTOs;
+﻿using Tracker.Domain.Dtos;
 
 namespace Tracker.Domain.Entities;
 

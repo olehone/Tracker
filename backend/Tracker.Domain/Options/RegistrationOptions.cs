@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Tracker.Domain.Entities;
 
 namespace Tracker.Domain.Options;
 
@@ -11,4 +12,6 @@ public class RegistrationOptions
     public int UsernameMinimumLength { get; init; }
     [Required]
     public int UsernameMaximumLength { get; init; }
+    [Required]
+    public string DefaultUserRole { get; init; } = Roles.User;
 }
