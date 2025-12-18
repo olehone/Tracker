@@ -6,6 +6,7 @@ using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Options;
 using Microsoft.Extensions.Options;
+using Tracker.Domain.Dtos;
 
 namespace Tracker.Application.UseCases.Auth.Login;
 
@@ -14,9 +15,9 @@ public sealed class LoginUserCommandHandler(
     IPasswordHasher passwordHasher,
     ITokenProvider tokenProvider,
     IOptions<JwtOptions> jwtOptions)
-    : IRequestHandler<LoginUserCommand, Result<AuthResponse>>
+    : IRequestHandler<LoginUserCommand, Result<TokensDto>>
 {
-    public async Task<Result<AuthResponse>> Handle(
+    public async Task<Result<TokensDto>> Handle(
         LoginUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -47,11 +48,10 @@ public sealed class LoginUserCommandHandler(
 
         if (sc.IsSuccess)
         {
-            return new AuthResponse()
+            return new TokensDto()
             {
-                User = user.ToDto(),
                 AccessToken = accessToken,
-                RefreshToken = refreshToken.ToDto()
+                RefreshToken = refreshToken.Token
             };
         }
 

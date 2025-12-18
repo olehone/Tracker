@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Auth.Register;
 
-public class RegisterUserCommand : IRequest<Result<AuthResponse>>
+public class RegisterUserCommand : IRequest<Result<TokensDto>>
 {
     public string Email {get; set;} = string.Empty;
     public string Password {get; set;} = string.Empty;

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Options;
@@ -13,9 +14,9 @@ public sealed class RefreshUserTokenCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     ITokenProvider tokenProvider,
     IOptions<JwtOptions> jwtOptions)
-    : IRequestHandler<RefreshUserTokenCommand, Result<AuthResponse>>
+    : IRequestHandler<RefreshUserTokenCommand, Result<TokensDto>>
 {
-    public async Task<Result<AuthResponse>> Handle(
+    public async Task<Result<TokensDto>> Handle(
         RefreshUserTokenCommand request,
         CancellationToken cancellationToken)
     {
@@ -39,11 +40,10 @@ public sealed class RefreshUserTokenCommandHandler(
         
         await uow.SaveChangesAsync(cancellationToken);
 
-        return new AuthResponse()
+        return new TokensDto()
         {
-            User = refreshToken.User.ToDto(),
             AccessToken = tokenProvider.Create(refreshToken.User),
-            RefreshToken = refreshToken.ToDto()
+            RefreshToken = refreshToken.Token
         };
     }
 }

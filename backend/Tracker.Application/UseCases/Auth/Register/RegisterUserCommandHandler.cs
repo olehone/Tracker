@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Options;
@@ -14,9 +15,9 @@ public sealed class RegisterUserCommandHandler(
     IPasswordHasher passwordHasher,
     ITokenProvider tokenProvider,
     IOptions<JwtOptions> jwtOptions)
-    : IRequestHandler<RegisterUserCommand, Result<AuthResponse>>
+    : IRequestHandler<RegisterUserCommand, Result<TokensDto>>
 {
-    public async Task<Result<AuthResponse>> Handle(
+    public async Task<Result<TokensDto>> Handle(
         RegisterUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -61,11 +62,10 @@ public sealed class RegisterUserCommandHandler(
             };
         }
 
-        return new AuthResponse()
+        return new TokensDto()
         {
-            User = user.ToDto(),
-            RefreshToken = refreshToken.ToDto(),
-            AccessToken = accessToken
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
         };
     }
 }
