@@ -6,15 +6,10 @@ namespace Tracker.Domain.Options;
 public class PasswordHasherOptions
 {
     public const string SectionName = "PasswordHasherOptions";
-    [Required]
-    public int SaltSize { get; init; }
-    [Required]
-    public int HashSize { get; init; }
-    [Required]
-    public int Iterations { get; init; }
-    [Required]
+    public required int SaltSize { get; init; }
+    public required int HashSize { get; init; }
+    public required int Iterations { get; init; }
     public required string Algorithm { get; init; }
-    [Required]
     public HashAlgorithmName AlgorithmName =>
         new (Algorithm);
 }

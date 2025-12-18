@@ -13,13 +13,9 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.AddOptions<RegistrationOptions>()
-            .BindConfiguration(RegistrationOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(RegistrationOptions.SectionName);
         services.AddOptions<LoginOptions>()
-            .BindConfiguration(LoginOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(LoginOptions.SectionName);
 
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));

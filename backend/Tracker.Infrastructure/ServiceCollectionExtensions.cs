@@ -10,14 +10,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {
         services.AddOptions<JwtOptions>()
-            .BindConfiguration(JwtOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(JwtOptions.SectionName);
 
         services.AddOptions<PasswordHasherOptions>()
-            .BindConfiguration(PasswordHasherOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(PasswordHasherOptions.SectionName);
         
         services.AddHttpContextAccessor();
         services.AddScoped<IPasswordHasher, PasswordHasher>();

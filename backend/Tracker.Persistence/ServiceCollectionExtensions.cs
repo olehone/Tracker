@@ -14,9 +14,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.AddOptions<DbConnectionOptions>()
-            .BindConfiguration(DbConnectionOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(DbConnectionOptions.SectionName);
         services.AddDbContextFactory<ApplicationDbContext>((serviceProvider, optionsBuilder) =>
         {
             var dbOptions = serviceProvider.GetRequiredService<IOptions<DbConnectionOptions>>().Value;

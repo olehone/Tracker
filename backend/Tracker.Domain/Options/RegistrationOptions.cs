@@ -6,12 +6,8 @@ namespace Tracker.Domain.Options;
 public class RegistrationOptions
 {
     public const string SectionName = "RegistrationOptions";
-    [Required]
-    public int PasswordMinimumLength { get; init; }
-    [Required]
-    public int UsernameMinimumLength { get; init; }
-    [Required]
-    public int UsernameMaximumLength { get; init; }
-    [Required]
+    public required int PasswordMinimumLength { get; init; }
+    public required int UsernameMinimumLength { get; init; }
+    public required int UsernameMaximumLength { get; init; }
     public string DefaultUserRole { get; init; } = Roles.User;
 }
