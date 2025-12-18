@@ -1,0 +1,2 @@
+ALTER TABLE [dbo].[Users]
+ADD [Role] VARCHAR(20) NULL;

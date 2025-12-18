@@ -1,0 +1,32 @@
+﻿using DbUp;
+using Tracker.Domain.Exceptions;
+
+namespace Tracker.Database;
+public static class DbMigrations
+{
+    public static void Initialize(string connectionString)
+    {
+        EnsureDatabase.For.SqlDatabase(connectionString);
+
+        var upgrader = DeployChanges.To
+            .SqlDatabase(connectionString)
+            .WithScriptsEmbeddedInAssembly(typeof(DbMigrations).Assembly)
+            .LogToConsole()
+            .Build();
+
+        if (!upgrader.IsUpgradeRequired())
+        {
+            return;
+        }
+
+        var result = upgrader.PerformUpgrade();
+        
+        if (!result.Successful)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(result.Error);
+            Console.ResetColor();
+            throw new MigrationFailedException();
+        }
+    }
+}
