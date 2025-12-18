@@ -3,15 +3,18 @@ using Tracker.Domain.Entities;
 
 namespace Tracker.Domain.Mapping;
 
-public static class RefreshTokenMapping
+public static class UserMapping
 {
-    public static RefreshTokenDto ToDto(this RefreshToken refreshToken)
+    public static UserDto ToDto(this User user)
     {
-        return new RefreshTokenDto()
+        return new UserDto()
         {
-            Token = refreshToken.Token,
-            ExpiresAt = refreshToken.ExpiresAt,
-            IsActive = refreshToken.IsActive
+            Id = user.Id,
+            Email = user.Email,
+            Username = user.Username,
+            Role = user.Role,
+            FirstName = user.FirstName,
+            LastName = user.LastName ?? "",
         };
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/login"
+﻿@page "/register"
 
 @using Microsoft.AspNetCore.Components.Routing
 @using Tracker.WebApp.Pages.Auth
@@ -12,23 +12,48 @@
 
 		<MudForm @ref=@form
 				 @bind-IsValid=@isSuccess
-			     Model=@loginModel>
+				 Model=@registerModel>
 			<MudStack Spacing="3">
+				<MudTextField T="string"
+							  @bind-Value=@registerModel.FirstName
+							  Label="First Name"
+							  For=@(() => registerModel.FirstName)
+							  Required="true"
+							  RequiredError="First name is required" />
 
 				<MudTextField T="string"
-							  @bind-Value=@loginModel.Email
+							  @bind-Value=@registerModel.LastName
+							  Label="Last Name"/>
+
+				<MudTextField T="string"
+							  @bind-Value=@registerModel.Email
 							  Label="Email"
-							  For=@(() => loginModel.Email)
+							  For=@(() => registerModel.Email)
 							  Required="true"
 							  RequiredError="Email is required" />
 
 				<MudTextField T="string"
-							  @bind-Value=@loginModel.Password
+							  @bind-Value=@registerModel.Username
+							  Label="Username"
+							  For=@(() => registerModel.Username)
+							  Required="true"
+							  RequiredError="Username is required" />
+
+				<MudTextField T="string"
+							  @bind-Value=@registerModel.Password
 							  Label="Password"
-							  For=@(() => loginModel.Password)
-							  InputType=InputType.Password
+							  For=@(() => registerModel.Password)
+							  InputType=@InputType.Password
 							  Required="true"
 							  RequiredError="Password is required" />
+
+				<MudTextField T="string"
+							  @bind-Value=@secondPassword
+							  Label="Repeat Password"
+							  For=@(() => secondPassword)
+							  InputType=@InputType.Password
+							  Required="true"
+							  RequiredError="Repeat password is required"/>
 
 				@if (!string.IsNullOrEmpty(errorMessage))
 				{
@@ -37,7 +62,7 @@
 					</MudAlert>
 				}
 
-				<MudButton OnClick=@HandleLogin
+				<MudButton OnClick=@HandleRegister
 						   Disabled=@(isLoading||!isSuccess)
 						   FullWidth="true"
 						   Variant=Variant.Filled

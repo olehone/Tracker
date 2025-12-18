@@ -1,30 +1,39 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Blazored.LocalStorage;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.Services;
 
-public class CustomAuthStateProvider(ILocalStorageService localStorage) : AuthenticationStateProvider
+public class CustomAuthStateProvider(IAuthStorage storage) 
+    : AuthenticationStateProvider, IAuthStateNotifier
 {
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        throw new NotImplementedException();
+        var tokensDto = await storage.GetAsync();
+        if (tokensDto is null)
+        {
+            return Anonymous();
+        }
+
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(tokensDto.AccessToken);
+        var claims = new List<Claim>(jwt.Claims);
+        var identity = new ClaimsIdentity(claims, "jwt");
+
+        return new AuthenticationState(new ClaimsPrincipal(identity));
     }
 
-    public async Task MarkUserAsAuthenticated(string token)
+    public void NotifyUserAuthentication()
     {
-        await localStorage.SetItemAsync("authToken", token);
-        var identity = GetClaimsIdentity(token);
-        var user = new ClaimsPrincipal(identity);
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        var authState = GetAuthenticationStateAsync();
+        NotifyAuthenticationStateChanged(authState);
     }
 
-    private ClaimsIdentity GetClaimsIdentity(string token)
+    public void NotifyUserLogout()
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jwtToken = handler.ReadJwtToken(token);
-        var claims = jwtToken.Claims;
-        return new ClaimsIdentity(claims, "jwt");
+        NotifyAuthenticationStateChanged(Task.FromResult(Anonymous()));
     }
+
+    private static AuthenticationState Anonymous()
+        => new(new ClaimsPrincipal(new ClaimsIdentity()));
 }

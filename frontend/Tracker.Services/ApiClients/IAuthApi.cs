@@ -1,19 +1,20 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
-using Tracker.Domain.Entities.Commands;
-using Tracker.Domain.Entities.Queries;
+using Tracker.Domain.Requests;
 
 namespace Tracker.Services.ApiClients;
 
 public interface IAuthApi
 {
-    [Get("/api/auth/register")]
-    Task<AuthSession> RegisterAsync(RegisterUserCommand request);
+    [Post("/api/auth/register")]
+    Task<TokensDto> RegisterAsync(RegisterUserRequest request);
+
     [Post("/api/auth/login")]
-    Task<AuthSession> LoginAsync(LoginUserCommand request);
+    Task<TokensDto> LoginAsync(LoginUserRequest request);
+    
     [Post("/api/auth/refresh-token")]
-    Task<AuthSession> RefreshTokenAsync(RefreshUserTokenCommand request);
+    Task<TokensDto?> RefreshTokenAsync(RefreshTokenRequest request);
+    
     [Get("/api/auth/me")]
-    Task<UserDto> GetCurrentUser(GetCurrentUserQuery request);
+    Task<UserDto?> GetCurrentUser();
 }

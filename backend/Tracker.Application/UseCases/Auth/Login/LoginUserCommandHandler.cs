@@ -3,7 +3,6 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Results;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Mapping;
 using Tracker.Domain.Options;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Dtos;

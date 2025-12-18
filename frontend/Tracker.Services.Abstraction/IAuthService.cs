@@ -1,12 +1,13 @@
-﻿using Tracker.Domain.Entities;
-using Tracker.Domain.Entities.Commands;
+﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 
 namespace Tracker.Services.Abstraction;
 
 public interface IAuthService
 {
-    Task LoginAsync(LoginUserCommand command);
-    Task<string?> GetAccessTokenAsync();
+    Task LoginAsync(LoginUserRequest request);
+    Task RegisterAsync(RegisterUserRequest request);
     Task LogoutAsync();
+    Task<UserDto?> GetCurrentUserAsync();
+    Task<string?> GetAccessTokenAsync();
 }
-
