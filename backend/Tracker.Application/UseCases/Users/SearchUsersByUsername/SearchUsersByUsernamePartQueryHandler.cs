@@ -15,7 +15,7 @@ public sealed class SearchUsersByUsernamePartQueryHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
         int skip = (query.Page - 1) * query.AmountInPage;
-        return await uow.UserRepository.SearchUsersByUsernameAsync(
+        return await uow.UserRepository.SearchByUsernamePartAsync(
             query.Username,
             skip, 
             query.AmountInPage);

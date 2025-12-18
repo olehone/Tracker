@@ -36,7 +36,7 @@ public sealed class AuthService : IAuthService
 
     public async Task<UserDto?> GetCurrentUserAsync()
     {
-        var user = await _api.GetCurrentUser();
+        var user = await _api.GetCurrentUserAsync();
         return user;
     }
 

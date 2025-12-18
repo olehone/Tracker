@@ -29,7 +29,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetUserByUsername([FromQuery] SearchUsersByUsernamePartQuery query)
+    public async Task<IActionResult> GetUserByUsernameAsync([FromQuery] SearchUsersByUsernamePartQuery query)
     {
         var response = await _mediator.Send(query);
         return response.ToActionResult();

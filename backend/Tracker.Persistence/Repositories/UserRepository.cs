@@ -26,7 +26,7 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
             .FirstOrDefaultAsync(user => user.Email == email);
     }
 
-    public async Task<List<UserDto>> SearchUsersByUsernameAsync(string username, int skip, int take)
+    public async Task<List<UserDto>> SearchByUsernamePartAsync(string username, int skip, int take)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
