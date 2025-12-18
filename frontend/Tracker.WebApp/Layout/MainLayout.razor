@@ -1,38 +1,37 @@
 ﻿@inherits LayoutComponentBase
 
-@inject NavigationManager Nav
-@inject AuthenticationStateProvider AuthStateProvider
-
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Tracker.Services.Abstraction
+@using Tracker.Services.States
 
-<MudPopoverProvider />
 <MudThemeProvider @bind-IsDarkMode=@_isDarkMode />
-<MudDialogProvider />
-<MudSnackbarProvider />
 
 <MudLayout>
 	<MudAppBar Elevation="1">
 		<MudIconButton Icon="@Icons.Material.Filled.Menu"
 					   Color="Color.Inherit"
 					   Edge="Edge.Start"
-					   OnClick="@DrawerToggle" />
-
+					   OnClick=@DrawerToggle />
+		<MudText Typo=Typo.h6>Tracker</MudText>
 		<MudText Typo="Typo.h6">Tracker</MudText>
-
 		<MudSpacer />
-
 		<AuthorizeView>
 			<Authorized Context="auth">
 				<MudText Class="mr-4">
-					Welcome, @auth.User.Identity?.Name
+					Hi, 
+					Welcome, @auth.User.FindFirst(ClaimTypes.Role)?.Value
 				</MudText>
+				<MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@Logout">
+					Logout
+				</MudButton>
 			</Authorized>
-
 			<NotAuthorized>
-				<MudButton Variant="Variant.Text"
-						   Color="Color.Inherit"
-						   OnClick="@GoToLogin">
+				<MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@GoToLogin">
 					Login
+				</MudButton>
+				<MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@GoToRegister">
+					Register
 				</MudButton>
 			</NotAuthorized>
 		</AuthorizeView>
@@ -49,17 +48,3 @@
 		@Body
 	</MudMainContent>
 </MudLayout>
-
-@code
-{
-	bool _isDarkMode = false;
-	bool _isDrawerOpen = true;
-
-	void DrawerToggle()
-	{
-		_isDrawerOpen = !_isDrawerOpen;
-	}
-
-	private void GoToLogin()
-		=> Nav.NavigateTo("/login");
-}

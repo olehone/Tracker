@@ -1,10 +1,10 @@
-﻿using Tracker.Domain.Entities;
+﻿using Tracker.Domain.Dtos;
 
 namespace Tracker.Services.Abstraction;
 
 public interface IAuthStorage
 {
-    Task<AuthSession?> GetAsync();
-    Task SetAsync(AuthSession tokens);
+    Task<TokensDto?> GetAsync();
+    Task SetAsync(TokensDto session);
     Task ClearAsync();
 }

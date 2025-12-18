@@ -1,5 +1,5 @@
 ﻿using Blazored.LocalStorage;
-using Tracker.Domain.Entities;
+using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.Services;
@@ -12,11 +12,11 @@ public class AuthStorage : IAuthStorage
     public AuthStorage(ILocalStorageService storage)
         => _storage = storage;
 
-    public async Task<AuthSession?> GetAsync()
-        => await _storage.GetItemAsync<AuthSession?>(Key);
+    public async Task<TokensDto?> GetAsync()
+        => await _storage.GetItemAsync<TokensDto?>(Key);
 
-    public async Task SetAsync(AuthSession tokens)
-        => await _storage.SetItemAsync(Key, tokens);
+    public async Task SetAsync(TokensDto session)
+        => await _storage.SetItemAsync(Key, session);
 
     public async Task ClearAsync()
         => await _storage.RemoveItemAsync(Key);
