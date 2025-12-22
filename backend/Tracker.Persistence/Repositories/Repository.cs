@@ -24,6 +24,11 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity 
         return await _dbSet.ToListAsync();
     }
 
+    public async Task<IReadOnlyList<TEntity>> GetAllAsync(int skip, int take)
+    {
+        return await _dbSet.Skip(skip).Take(take).ToListAsync();
+    }
+
     public async Task<TEntity?> GetByIdAsync(TId id)
     {
         return await _dbSet.FindAsync(id);

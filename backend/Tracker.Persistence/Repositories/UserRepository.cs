@@ -26,7 +26,7 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
             .FirstOrDefaultAsync(user => user.Email == email);
     }
 
-    public async Task<List<UserDto>> SearchByUsernamePartAsync(string username, int skip, int take)
+    public async Task<List<User>> SearchByUsernamePartAsync(string username, int skip, int take)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -37,7 +37,6 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
             .OrderBy(u => u.Username)
             .Skip(skip)
             .Take(take)
-            .Select(u => u.ToDto())
             .ToListAsync();
     }
 
