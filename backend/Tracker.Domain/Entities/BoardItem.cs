@@ -8,5 +8,5 @@ public class BoardItem : BaseEntity
     public int Position { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }
-    public required BoardList BoardList { get; set; }
+    public BoardList? BoardList { get; set; }
 }

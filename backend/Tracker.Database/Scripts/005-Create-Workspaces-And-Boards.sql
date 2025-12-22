@@ -17,7 +17,7 @@ CREATE TABLE [dbo].[Boards] (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IN_Boards_WorkspaceId
+CREATE INDEX IX_Boards_WorkspaceId
     ON Boards(WorkspaceId);
 
 
@@ -34,10 +34,10 @@ CREATE TABLE [dbo].[BoardLists] (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IN_BoardLists_BoardId_Position
-    ON Boards(BoardId, Position);
+CREATE INDEX IX_BoardLists_BoardId_Position
+    ON BoardLists(BoardId, Position);
 
-
+    
 CREATE TABLE [dbo].[BoardItems] (
     [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [BoardListId] UNIQUEIDENTIFIER NOT NULL,
@@ -47,9 +47,9 @@ CREATE TABLE [dbo].[BoardItems] (
 
     CONSTRAINT FK_BoardItems_BoardLists
         FOREIGN KEY (BoardListId)
-        REFERENCES [dbo].[Boardlists](Id)
+        REFERENCES [dbo].[BoardLists](Id)
         ON DELETE CASCADE
 );
 
-CREATE INDEX IN_BoardItems_BoardListId_Position
-    ON Boards(BoardListId, Position);
+CREATE INDEX IX_BoardItems_BoardListId_Position
+    ON BoardItems(BoardListId, Position);

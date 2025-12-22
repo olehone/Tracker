@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\005-Create-Workspaces-And-Boards.sql" />
     <EmbeddedResource Include="Scripts\004-Add-Role-Constrains.sql" />
     <EmbeddedResource Include="Scripts\003-Add-Role-Column.sql" />
     <EmbeddedResource Include="Scripts\001-Create-User.sql" />
