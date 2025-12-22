@@ -28,14 +28,9 @@ public sealed class CreateWorkspaceCommandHandler(
         await uow.WorkspaceRepository.AddAsync(workspace);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
-        if (sc.IsFailure)
-        {
-            return sc.Error.Type switch
-            {
-                _ => Error.Unknown
-            };
-        }
 
-        return workspace.ToDto();
+        return sc.IsFailure
+            ? Error.Unknown
+            : workspace.ToDto();
     }
 }
