@@ -20,6 +20,7 @@ public class WorkspaceController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetAsync([FromRoute] Guid id)
     {
         var query = new GetWorkspaceByIdQuery() { Id = id };
@@ -28,6 +29,7 @@ public class WorkspaceController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAsync()
     {
         var response = await _mediator.Send(new GetWorkspacesQuery());
