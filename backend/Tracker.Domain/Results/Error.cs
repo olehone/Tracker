@@ -8,7 +8,13 @@ public sealed record Error(
 {
     public static readonly Error None = new(string.Empty, ErrorType.None);
     public static readonly Error Unknown = new("Unknown error occurred", ErrorType.Unknown);
+
     public static Error Validation(params string[] messages)
         => new("Validation", ErrorType.Validation, "Validation failed", messages);
+
+    public static Error NotFound(string entityName, string propertyName = "id")
+        => new($"{entityName}.NotFound", 
+            ErrorType.NotFound, 
+            $"{entityName} with this {propertyName} not found");
 
 }

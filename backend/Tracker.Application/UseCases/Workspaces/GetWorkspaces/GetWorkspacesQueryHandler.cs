@@ -1,8 +1,9 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Results;
+using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
+using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Workspaces.GetWorkspaces;
 
@@ -18,14 +19,8 @@ public sealed class GetWorkspacesQueryHandler(
 
         var workspaces = await uow.WorkspaceRepository.GetAllAsync();
 
-        if (workspaces == null)
-        {
-            return new Error(
-                "Workspace.NotFound",
-                ErrorType.NotFound,
-                "There are no workspaces yet");
-        }
-
-        return workspaces.Select(workspace => workspace.ToDto()).ToList();
+        return workspaces is null
+            ? Error.NotFound("Workspace", "id")
+            : workspaces.Select(workspace => workspace.ToDto()).ToList();
     }
 }

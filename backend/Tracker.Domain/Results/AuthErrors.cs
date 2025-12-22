@@ -22,11 +22,6 @@ public static class AuthErrors
         ErrorType.Conflict,
         "Sorry, email or username was taken by someone else, try again");
 
-    public static readonly Error UserNotFound = new(
-        LoginCode,
-        ErrorType.Validation,
-        "User is not found");
-
     public static readonly Error PasswordIsIncorrect = new(
         LoginCode,
         ErrorType.Validation,

@@ -9,7 +9,7 @@ namespace Tracker.Application.UseCases.Users.GetUserById;
 
 public sealed class GetUserByIdQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory)
-    :IRequestHandler<GetUserByIdQuery, Result<UserDto>>
+    : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(
         GetUserByIdQuery query,
@@ -19,13 +19,8 @@ public sealed class GetUserByIdQueryHandler(
 
         var user = await uow.UserRepository.GetByIdAsync(query.Id);
 
-        if (user == null)
-        {
-            return new Error(
-                "User.NotFound",
-                ErrorType.NotFound,
-                "User with this id is not found");
-        }
-        return user.ToDto();
+        return user is null
+            ? Error.NotFound("User", "id")
+            : user.ToDto();
     }
 }
