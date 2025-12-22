@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Tracker.Domain\Tracker.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Boards\" />
+  </ItemGroup>
+
 </Project>

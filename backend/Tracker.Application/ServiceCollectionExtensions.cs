@@ -16,6 +16,8 @@ public static class ServiceCollectionExtensions
             .BindConfiguration(RegistrationOptions.SectionName);
         services.AddOptions<LoginOptions>()
             .BindConfiguration(LoginOptions.SectionName);
+        services.AddOptions<EntityOptions>()
+            .BindConfiguration(EntityOptions.SectionName);
 
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
