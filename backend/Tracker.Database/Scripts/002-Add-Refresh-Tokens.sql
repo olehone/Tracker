@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[RefreshTokens] (
         ON DELETE CASCADE
 );
 
-CREATE INDEX IN_RefreshTokens_UserId
+CREATE INDEX IX_RefreshTokens_UserId
     ON RefreshTokens(UserId);
