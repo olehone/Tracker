@@ -11,12 +11,12 @@ public class GetBoardByIdQueryHandler(
     : IRequestHandler<GetBoardByIdQuery, Result<BoardFullDto>>
 {
     public async Task<Result<BoardFullDto>> Handle(
-        GetBoardByIdQuery query, 
+        GetBoardByIdQuery request, 
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository.GetByIdWithListsAndItemsAsync(query.Id);
+        var board = await uow.BoardRepository.GetByIdWithListsAndItemsAsync(request.Id);
 
         if (board == null)
         {

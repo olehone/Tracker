@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Boards.AddNewBoard;
 using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Boards.GetBoardById;
 using Tracker.Application.UseCases.Boards.GetBoardsByWorkspaceId;
@@ -23,16 +21,17 @@ public class BoardsController : ControllerBase
     }
 
     [HttpGet("{Id:guid}")]
-    public async Task<IActionResult> GetAsync([FromRoute] GetBoardByIdQuery query)
+    public async Task<IActionResult> GetAsync([FromRoute] GetBoardByIdQuery request)
     {
-        var response = await _mediator.Send(query);
+        var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllInWorkspaceAsync([FromRoute] GetBoardsByWorkspaceIdQuery query)
+    public async Task<IActionResult> GetAllInWorkspaceAsync(
+        [FromRoute] GetBoardsByWorkspaceIdQuery request)
     {
-        var response = await _mediator.Send(query);
+        var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 

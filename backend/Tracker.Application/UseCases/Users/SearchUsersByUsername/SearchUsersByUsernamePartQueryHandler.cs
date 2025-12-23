@@ -11,14 +11,14 @@ public sealed class SearchUsersByUsernamePartQueryHandler(
     :IRequestHandler<SearchUsersByUsernamePartQuery, Result<List<UserDto>>>
 {
     public async Task<Result<List<UserDto>>> Handle(
-        SearchUsersByUsernamePartQuery query,
+        SearchUsersByUsernamePartQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
-        int skip = (query.Page - 1) * query.AmountInPage;
-        var users = await uow.UserRepository.SearchByUsernamePartAsync(query.Username,
+        int skip = (request.Page - 1) * request.AmountInPage;
+        var users = await uow.UserRepository.SearchByUsernamePartAsync(request.Username,
                                                                        skip,
-                                                                       query.AmountInPage);
+                                                                       request.AmountInPage);
         return users.Select(user => user.ToDto()).ToList();
     }
 }

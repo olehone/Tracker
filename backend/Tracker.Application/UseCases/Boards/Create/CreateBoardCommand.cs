@@ -2,7 +2,7 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Boards.AddNewBoard;
+namespace Tracker.Application.UseCases.Boards.Create;
 
 public class CreateBoardCommand : IRequest<Result<BoardSummaryDto>>
 {

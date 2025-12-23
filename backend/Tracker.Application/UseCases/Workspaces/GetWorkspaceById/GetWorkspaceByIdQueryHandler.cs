@@ -12,12 +12,12 @@ public sealed class GetWorkspaceByIdQueryHandler(
     : IRequestHandler<GetWorkspaceByIdQuery, Result<WorkspaceDto>>
 {
     public async Task<Result<WorkspaceDto>> Handle(
-        GetWorkspaceByIdQuery query,
+        GetWorkspaceByIdQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var workspace = await uow.WorkspaceRepository.GetByIdAsync(query.Id);
+        var workspace = await uow.WorkspaceRepository.GetByIdAsync(request.Id);
 
         return workspace is null
             ? Error.NotFound("Workspace")

@@ -11,13 +11,13 @@ public class GetBoardsByWorkspaceIdQueryHandler(
     : IRequestHandler<GetBoardsByWorkspaceIdQuery, Result<List<BoardSummaryDto>>>
 {
     public async Task<Result<List<BoardSummaryDto>>> Handle(
-        GetBoardsByWorkspaceIdQuery query, 
+        GetBoardsByWorkspaceIdQuery request, 
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
         var boards = await uow.BoardRepository
-            .GetAllByWorkspaceId(query.WorkspaceId);
+            .GetAllByWorkspaceId(request.WorkspaceId);
 
         return boards is null
             ? Error.NotFound("Workspace")

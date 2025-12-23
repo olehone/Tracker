@@ -12,12 +12,12 @@ public sealed class GetUserByIdQueryHandler(
     : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(
-        GetUserByIdQuery query,
+        GetUserByIdQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var user = await uow.UserRepository.GetByIdAsync(query.Id);
+        var user = await uow.UserRepository.GetByIdAsync(request.Id);
 
         return user is null
             ? Error.NotFound("User")

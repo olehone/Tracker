@@ -12,7 +12,7 @@ public sealed class GetWorkspacesQueryHandler(
     : IRequestHandler<GetWorkspacesQuery, Result<List<WorkspaceDto>>>
 {
     public async Task<Result<List<WorkspaceDto>>> Handle(
-        GetWorkspacesQuery query,
+        GetWorkspacesQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();

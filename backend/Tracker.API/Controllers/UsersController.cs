@@ -21,16 +21,17 @@ public class UserController : ControllerBase
 
     [HttpGet("{Id:guid}")]
     [Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> GetAsync([FromRoute] GetUserByIdQuery query)
+    public async Task<IActionResult> GetAsync([FromRoute] GetUserByIdQuery request)
     {
-        var response = await _mediator.Send(query);
+        var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetUserByUsernameAsync([FromQuery] SearchUsersByUsernamePartQuery query)
+    public async Task<IActionResult> GetUserByUsernameAsync(
+        [FromQuery] SearchUsersByUsernamePartQuery request)
     {
-        var response = await _mediator.Send(query);
+        var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 }
