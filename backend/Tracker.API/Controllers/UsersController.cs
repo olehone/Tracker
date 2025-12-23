@@ -10,20 +10,19 @@ namespace Tracker.API.Controllers;
 
 [Route("api/users")]
 [ApiController]
-public class UsersController : ControllerBase
+public class UserController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public UsersController(IMediator mediator)
+    public UserController(IMediator mediator)
     {
         _mediator = mediator;
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{Id:guid}")]
     [Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> GetAsync([FromRoute] Guid id)
+    public async Task<IActionResult> GetAsync([FromRoute] GetUserByIdQuery query)
     {
-        var query = new GetUserByIdQuery() { Id = id };
         var response = await _mediator.Send(query);
         return response.ToActionResult();
     }

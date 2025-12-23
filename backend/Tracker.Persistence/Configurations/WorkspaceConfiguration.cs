@@ -16,7 +16,7 @@ public class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
             .IsRequired();
 
         builder.HasMany(w => w.Boards)
-            .WithOne()
+            .WithOne(w=> w.Workspace)
             .HasForeignKey(b => b.WorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
     }

@@ -20,7 +20,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
         var workspace = await uow.WorkspaceRepository.GetByIdAsync(query.Id);
 
         return workspace is null
-            ? Error.NotFound("Workspace", "id")
+            ? Error.NotFound("Workspace")
             : workspace.ToDto();
     }
 }

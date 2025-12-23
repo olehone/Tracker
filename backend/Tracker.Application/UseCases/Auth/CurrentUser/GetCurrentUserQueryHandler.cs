@@ -28,7 +28,7 @@ public class GetCurrentUserQueryHandler(
         User? user = await uow.UserRepository.GetByIdAsync(userId);
 
         return user is null
-            ? Error.NotFound("User", "id")
+            ? Error.NotFound("User")
             : user.ToDto();
     }
 }

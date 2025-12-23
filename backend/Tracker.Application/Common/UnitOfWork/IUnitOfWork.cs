@@ -7,6 +7,7 @@ public interface IUnitOfWork : IAsyncDisposable
 {
     IUserRepository UserRepository { get; }
     IWorkspaceRepository WorkspaceRepository{ get; }
+    IBoardRepository BoardRepository{ get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
     Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

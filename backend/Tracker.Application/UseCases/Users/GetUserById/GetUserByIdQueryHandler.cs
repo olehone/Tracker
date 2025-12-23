@@ -20,7 +20,7 @@ public sealed class GetUserByIdQueryHandler(
         var user = await uow.UserRepository.GetByIdAsync(query.Id);
 
         return user is null
-            ? Error.NotFound("User", "id")
+            ? Error.NotFound("User")
             : user.ToDto();
     }
 }
