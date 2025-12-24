@@ -10,20 +10,14 @@ namespace Tracker.API.Controllers;
 
 [Route("api/users")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public UserController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     [HttpGet("{Id:guid}")]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> GetAsync([FromRoute] GetUserByIdQuery request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
@@ -31,7 +25,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserByUsernameAsync(
         [FromQuery] SearchUsersByUsernamePartQuery request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 }

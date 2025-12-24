@@ -9,26 +9,20 @@ namespace Tracker.API.Controllers;
 [Route("api/board-items")]
 [ApiController]
 [Authorize]
-public class BoardItemsController : ControllerBase
+public class BoardItemsController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public BoardItemsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] CreateBoardItemCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpPost("move")]
     public async Task<IActionResult> Post([FromBody] MoveBoardItemCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 }

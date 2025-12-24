@@ -11,19 +11,12 @@ namespace Tracker.API.Controllers;
 [Route("api/boards")]
 [ApiController]
 [Authorize]
-public class BoardsController : ControllerBase
+public class BoardsController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public BoardsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet("{Id:guid}")]
     public async Task<IActionResult> GetAsync([FromRoute] GetBoardByIdQuery request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
@@ -31,14 +24,14 @@ public class BoardsController : ControllerBase
     public async Task<IActionResult> GetAllInWorkspaceAsync(
         [FromQuery] GetBoardsByWorkspaceIdQuery request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] CreateBoardCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 }

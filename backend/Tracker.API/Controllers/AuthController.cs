@@ -11,26 +11,20 @@ namespace Tracker.API.Controllers;
 
 [Route("api/auth")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public AuthController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     [HttpPost("register")]
     public async Task<IActionResult> RegisterAsync([FromBody] RegisterUserCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] LoginUserCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
@@ -38,7 +32,7 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshUserTokenCommand request)
     {
-        var response = await _mediator.Send(request);
+        var response = await mediator.Send(request);
         return response.ToActionResult();
     }
 
@@ -46,7 +40,7 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetCurrentUserAsync()
     {
-        var response = await _mediator.Send(new GetCurrentUserQuery());
+        var response = await mediator.Send(new GetCurrentUserQuery());
         return response.ToActionResult();
     }
 }
