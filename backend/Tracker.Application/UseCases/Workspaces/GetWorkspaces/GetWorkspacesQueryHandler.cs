@@ -17,7 +17,7 @@ public sealed class GetWorkspacesQueryHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var workspaces = await uow.WorkspaceRepository.GetAllAsync();
+        var workspaces = await uow.WorkspaceRepository.GetAllWithBoardsAsync();
 
         return workspaces is null
             ? Error.NotFound("Workspace")

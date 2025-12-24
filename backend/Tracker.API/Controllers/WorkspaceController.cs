@@ -10,6 +10,7 @@ namespace Tracker.API.Controllers;
 
 [Route("api/workspaces")]
 [ApiController]
+[Authorize]
 public class WorkspaceController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -19,17 +20,14 @@ public class WorkspaceController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("{id:guid}")]
-    [Authorize]
-    public async Task<IActionResult> GetAsync([FromRoute] Guid id)
+    [HttpGet("{Id:guid}")]
+    public async Task<IActionResult> GetAsync([FromRoute] GetWorkspaceByIdQuery request)
     {
-        var query = new GetWorkspaceByIdQuery() { Id = id };
-        var response = await _mediator.Send(query);
+        var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> GetAsync()
     {
         var response = await _mediator.Send(new GetWorkspacesQuery());
@@ -37,7 +35,6 @@ public class WorkspaceController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceCommand request)
     {
         var response = await _mediator.Send(request);

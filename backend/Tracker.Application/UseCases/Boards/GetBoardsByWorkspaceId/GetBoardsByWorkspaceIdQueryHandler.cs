@@ -17,7 +17,7 @@ public class GetBoardsByWorkspaceIdQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var boards = await uow.BoardRepository
-            .GetAllByWorkspaceId(request.WorkspaceId);
+            .GetAllByWorkspaceIdAsync(request.WorkspaceId);
 
         return boards is null
             ? Error.NotFound("Workspace")

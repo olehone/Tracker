@@ -8,7 +8,7 @@ using Tracker.Application.UseCases.Boards.GetBoardsByWorkspaceId;
 
 namespace Tracker.API.Controllers;
 
-[Route("api/workspaces/{WorkspaceId}/boards")]
+[Route("api/boards")]
 [ApiController]
 [Authorize]
 public class BoardsController : ControllerBase
@@ -29,24 +29,15 @@ public class BoardsController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllInWorkspaceAsync(
-        [FromRoute] GetBoardsByWorkspaceIdQuery request)
+        [FromQuery] GetBoardsByWorkspaceIdQuery request)
     {
         var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAsync(
-        [FromRoute] Guid WorkspaceId,
-        [FromBody] CreateBoardCommandBody body)
+    public async Task<IActionResult> PostAsync([FromBody] CreateBoardCommand request)
     {
-        var request = new CreateBoardCommand()
-        {
-            WorkspaceId = WorkspaceId,
-            Title = body.Title,
-            Description = body.Description
-        };
-
         var response = await _mediator.Send(request);
         return response.ToActionResult();
     }
