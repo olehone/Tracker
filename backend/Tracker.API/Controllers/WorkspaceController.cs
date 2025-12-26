@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Auth.Register;
 using Tracker.Application.UseCases.Workspaces.GetWorkspaceById;
@@ -15,9 +16,13 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet("{Id:guid}")]
-    public async Task<IActionResult> GetAsync([FromRoute] GetWorkspaceByIdQuery request)
+    public async Task<IActionResult> GetAsync([FromRoute] GetByIdRequest request)
     {
-        var response = await mediator.Send(request);
+        var mediatorRequest = new GetWorkspaceByIdQuery()
+        {
+            Id = request.Id
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
@@ -29,9 +34,14 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceCommand request)
+    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {
-        var response = await mediator.Send(request);
+        var mediatorRequest = new CreateWorkspaceCommand()
+        {
+            Title = request.Title,
+            Description = request.Description
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 }
