@@ -6,31 +6,39 @@ using Tracker.Application.UseCases.Auth.Register;
 using Tracker.Application.UseCases.Auth.Refresh;
 using Microsoft.AspNetCore.Authorization;
 using Tracker.Application.UseCases.Auth.CurrentUser;
+using Tracker.API.Requests;
 
 namespace Tracker.API.Controllers;
 
 [Route("api/auth")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public AuthController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync([FromBody] RegisterUserCommand request)
+    public async Task<IActionResult> RegisterAsync([FromBody] RegisterUserRequest request)
     {
-        var response = await _mediator.Send(request);
+        var mediatorRequest = new RegisterUserCommand()
+        {
+            Email = request.Email,
+            Password = request.Password,
+            Username = request.Username,
+            FirstName = request.FirstName,
+            LastName = request.LastName
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync([FromBody] LoginUserCommand request)
+    public async Task<IActionResult> LoginAsync([FromBody] LoginUserRequest request)
     {
-        var response = await _mediator.Send(request);
+        var mediatorRequest = new LoginUserCommand()
+        {
+            Email = request.Email,
+            Password = request.Password
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
@@ -38,7 +46,11 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshUserTokenCommand request)
     {
-        var response = await _mediator.Send(request);
+        var mediatorRequest = new RefreshUserTokenCommand()
+        {
+            RefreshToken = request.RefreshToken
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
@@ -46,7 +58,7 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetCurrentUserAsync()
     {
-        var response = await _mediator.Send(new GetCurrentUserQuery());
+        var response = await mediator.Send(new GetCurrentUserQuery());
         return response.ToActionResult();
     }
 }

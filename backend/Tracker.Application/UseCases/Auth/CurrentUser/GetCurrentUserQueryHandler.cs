@@ -26,12 +26,10 @@ public class GetCurrentUserQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         User? user = await uow.UserRepository.GetByIdAsync(userId);
-        if (user == null)
-        {
-            return Result.FailureOf<UserDto>(AuthErrors.UserNotFound);
-        }
 
-        return user.ToDto();
+        return user is null
+            ? Error.NotFound("User")
+            : user.ToDto();
     }
 }
 

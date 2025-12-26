@@ -25,7 +25,7 @@ public sealed class LoginUserCommandHandler(
         User? user = await uow.UserRepository.GetByEmailAsync(request.Email);
         if (user is null)
         {
-            return AuthErrors.UserNotFound;
+            return Error.NotFound("User", "email");
         }
 
         bool verified = passwordHasher.Verify(request.Password, user.PasswordHash);

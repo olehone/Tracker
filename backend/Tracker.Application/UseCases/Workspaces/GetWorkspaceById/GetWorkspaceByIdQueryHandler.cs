@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.UseCases.Users.GetUserById;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
@@ -12,20 +11,15 @@ public sealed class GetWorkspaceByIdQueryHandler(
     : IRequestHandler<GetWorkspaceByIdQuery, Result<WorkspaceDto>>
 {
     public async Task<Result<WorkspaceDto>> Handle(
-        GetWorkspaceByIdQuery query,
+        GetWorkspaceByIdQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var workspace = await uow.WorkspaceRepository.GetByIdAsync(query.Id);
+        var workspace = await uow.WorkspaceRepository.GetByIdWithBoardsAsync(request.Id);
 
-        if (workspace == null)
-        {
-            return new Error(
-                "Workspace.NotFound",
-                ErrorType.NotFound,
-                "Workspace with this id is not found");
-        }
-        return workspace.ToDto();
+        return workspace is null
+            ? Error.NotFound("Workspace")
+            : workspace.ToDto();
     }
 }

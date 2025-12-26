@@ -1,5 +1,4 @@
-﻿using Tracker.Domain.Options;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Tracker.Application.UseCases.Auth.Refresh;
 

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Auth.Register;
 using Tracker.Application.UseCases.Workspaces.GetWorkspaceById;
@@ -10,37 +11,37 @@ namespace Tracker.API.Controllers;
 
 [Route("api/workspaces")]
 [ApiController]
-public class WorkspaceController : ControllerBase
+[Authorize]
+public class WorkspaceController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
 
-    public WorkspaceController(IMediator mediator)
+    [HttpGet("{Id:guid}")]
+    public async Task<IActionResult> GetAsync([FromRoute] GetByIdRequest request)
     {
-        _mediator = mediator;
-    }
-
-    [HttpGet("{id:guid}")]
-    [Authorize]
-    public async Task<IActionResult> GetAsync([FromRoute] Guid id)
-    {
-        var query = new GetWorkspaceByIdQuery() { Id = id };
-        var response = await _mediator.Send(query);
+        var mediatorRequest = new GetWorkspaceByIdQuery()
+        {
+            Id = request.Id
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> GetAsync()
     {
-        var response = await _mediator.Send(new GetWorkspacesQuery());
+        var response = await mediator.Send(new GetWorkspacesQuery());
         return response.ToActionResult();
     }
 
     [HttpPost]
-    [Authorize]
-    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceCommand request)
+    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {
-        var response = await _mediator.Send(request);
+        var mediatorRequest = new CreateWorkspaceCommand()
+        {
+            Title = request.Title,
+            Description = request.Description
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 }

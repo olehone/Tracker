@@ -6,7 +6,6 @@ using Tracker.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Should I put this in .Database using DbConnectionOptions?
 var connectionString = builder.Configuration["DbOptions:DefaultConnectionString"]!;
 DbMigrations.Initialize(connectionString);
 
