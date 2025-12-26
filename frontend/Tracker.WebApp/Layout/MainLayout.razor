@@ -20,7 +20,11 @@
 			<Authorized Context="auth">
 				<MudText Class="mr-4">
 					Hi, 
-					Welcome, @auth.User.FindFirst(ClaimTypes.Role)?.Value
+					Welcome, @auth.UsAr
+				</MudText>
+				<MudText Class="mr-4">
+					Hi, 
+					Good to see ya, @appState?.CurrentUser.FirstName
 				</MudText>
 				<MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@Logout">
 					Logout
