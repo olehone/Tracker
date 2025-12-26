@@ -7,8 +7,8 @@ using Tracker.Services.States;
 namespace Tracker.WebApp.Pages.Auth;
 public partial class Login
 {
-    [Inject] private IAuthService Auth { get; set; } = default!;
-    [Inject] private IAuthStateNotifier Notifier { get; set; } = default!;
+    [Inject] private IAuthService AuthService { get; set; } = default!;
+    [Inject] private IUserService UserService { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
     [CascadingParameter] private AppState? AppState { get; set; }
@@ -33,22 +33,21 @@ public partial class Login
 
         try
         {
-            await Auth.LoginAsync(loginModel);
+            await AuthService.LoginAsync(loginModel);
 
-            var currentUser = await Auth.GetCurrentUserAsync();
+            var currentUser = await UserService.GetCurrentUserAsync();
             if (AppState != null && currentUser != null)
             {
                 AppState.CurrentUser = currentUser;
             }
 
-            Notifier.NotifyUserAuthentication();
-            Navigation.NavigateTo("/", forceLoad: false);
+            Navigation.NavigateTo("/", forceLoad: true);
         }
         catch (HttpRequestException)
         {
             errorMessage = "Unable to connect to the server. Please try again.";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             errorMessage = "Invalid email or password. Please try again.";
         }

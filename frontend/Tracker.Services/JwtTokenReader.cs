@@ -1,21 +1,23 @@
 ﻿using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.Services;
 
 public sealed class JwtTokenReader : IJwtTokenReader
 {
+    private static readonly JwtSecurityTokenHandler Handler = new();
     public DateTime GetExpirationUtc(string jwt)
     {
-        var token = new JwtSecurityTokenHandler().ReadJwtToken(jwt);
+        var token = Handler.ReadJwtToken(jwt);
+        return token.ValidTo;
+    }
 
-        var exp = token.Claims
-            .First(c => c.Type == JwtRegisteredClaimNames.Exp)
-            .Value;
-
-        var seconds = long.Parse(exp, CultureInfo.InvariantCulture);
-        return DateTimeOffset.FromUnixTimeSeconds(seconds).UtcDateTime;
+    public List<Claim> ReadClaims(string token)
+    {
+        var jwt = Handler.ReadJwtToken(token);
+        return jwt.Claims.ToList();
     }
 }
 

@@ -5,22 +5,21 @@ using Tracker.Services.Abstraction;
 
 namespace Tracker.Services;
 
-public class CustomAuthStateProvider(IAuthStorage storage) 
+public class CustomAuthStateProvider
     : AuthenticationStateProvider, IAuthStateNotifier
 {
+    private readonly IAuthService _authService;
+    public CustomAuthStateProvider(IAuthService authService)
+    {
+        _authService = authService;
+        //_authService.OnLogin += NotifyUserAuthentication;
+        //_authService.OnLogout += NotifyUserLogout;
+    }
+
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var tokensDto = await storage.GetAsync();
-        if (tokensDto is null)
-        {
-            return Anonymous();
-        }
-
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(tokensDto.AccessToken);
-        var claims = new List<Claim>(jwt.Claims);
-        var identity = new ClaimsIdentity(claims, "jwt");
-
-        return new AuthenticationState(new ClaimsPrincipal(identity));
+        var principal = await _authService.GetPrincipalAsync();
+        return new AuthenticationState(principal);
     }
 
     public void NotifyUserAuthentication()
@@ -36,4 +35,5 @@ public class CustomAuthStateProvider(IAuthStorage storage)
 
     private static AuthenticationState Anonymous()
         => new(new ClaimsPrincipal(new ClaimsIdentity()));
+
 }

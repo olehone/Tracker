@@ -8,7 +8,7 @@ namespace Tracker.WebApp.Pages.Auth;
 public partial class Register
 {
     [Inject] private IAuthService Auth { get; set; } = default!;
-    [Inject] private IAuthStateNotifier Notifier { get; set; } = default!;
+    [Inject] private IUserService UserService { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
 
     [CascadingParameter] private AppState? AppState { get; set; }
@@ -30,7 +30,7 @@ public partial class Register
         }
         if (registerModel.Password!= secondPassword)
         {
-            errorMessage = "Passwords not the same";
+            errorMessage = "Passwords are not the same";
             return;
         }
         isLoading = true;
@@ -40,14 +40,12 @@ public partial class Register
         {
             await Auth.RegisterAsync(registerModel);
 
-            var currentUser = await Auth.GetCurrentUserAsync();
+            var currentUser = await UserService.GetCurrentUserAsync();
             if (AppState != null && currentUser != null)
             {
                 AppState.CurrentUser = currentUser;
             }
-
-            Notifier.NotifyUserAuthentication();
-            Navigation.NavigateTo("/", forceLoad: false);
+            Navigation.NavigateTo("/", forceLoad: true);
         }
         catch (HttpRequestException)
         {
