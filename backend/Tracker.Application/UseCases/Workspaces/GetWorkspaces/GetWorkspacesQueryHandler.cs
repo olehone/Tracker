@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 

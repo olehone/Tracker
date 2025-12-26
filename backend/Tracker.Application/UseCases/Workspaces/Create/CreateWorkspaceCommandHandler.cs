@@ -1,11 +1,8 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Options;
-using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
-using Tracker.Domain.Options;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Auth.Register;

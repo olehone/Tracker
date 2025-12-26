@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Results;
 
 namespace Tracker.Persistence.Repositories;
 

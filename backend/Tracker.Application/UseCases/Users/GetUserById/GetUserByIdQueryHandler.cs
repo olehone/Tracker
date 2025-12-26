@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.UseCases.Users.GetUserById;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;

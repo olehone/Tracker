@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItems.Move;
