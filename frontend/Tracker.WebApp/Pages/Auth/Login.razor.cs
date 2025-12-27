@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
-using Tracker.Services.States;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Auth;
 public partial class Login
@@ -41,7 +41,7 @@ public partial class Login
                 AppState.CurrentUser = currentUser;
             }
 
-            Navigation.NavigateTo("/", forceLoad: true);
+            Navigation.NavigateTo("/", forceLoad: false);
         }
         catch (HttpRequestException)
         {

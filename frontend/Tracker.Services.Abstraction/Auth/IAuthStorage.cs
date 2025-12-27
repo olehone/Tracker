@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Dtos;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Auth;
 
 public interface IAuthStorage
 {

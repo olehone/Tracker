@@ -1,4 +1,4 @@
-﻿namespace Tracker.Services.Abstraction;
+﻿namespace Tracker.Services.Abstraction.Auth;
 
 public interface IAuthStateNotifier
 {

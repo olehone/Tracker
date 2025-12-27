@@ -4,8 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Auth;
+using Tracker.Services.ApiClients;
+using Tracker.Services.Abstraction.Auth;
 
-namespace Tracker.Services.ApiClients;
+namespace Tracker.Services;
 
 public static class ServiceCollectionExtensions
 {
@@ -24,8 +27,10 @@ public static class ServiceCollectionExtensions
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
             });
         services.AddApiClientWithAuth<IUserApi>();
+        services.AddApiClientWithAuth<IWorkspaceApi>();
 
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IWorkspaceService, WorkspaceService>();
         return services;
     }
 

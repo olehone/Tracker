@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Auth;
 
 public class AuthHeaderHandler : DelegatingHandler
 {

@@ -2,8 +2,8 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
-using Tracker.Services.ApiClients;
-using Tracker.Services.States;
+using Tracker.WebApp.States;
+using Tracker.Services;
 using Tracker.WebApp;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

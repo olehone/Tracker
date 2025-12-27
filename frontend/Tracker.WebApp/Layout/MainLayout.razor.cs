@@ -1,7 +1,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction;
-using Tracker.Services.States;
+using Tracker.Services.Abstraction.Auth;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Layout;
 
@@ -15,7 +16,13 @@ public partial class MainLayout
     [Inject] IAuthService AuthService { get; set; } = default!;
     [Inject] IAuthStateNotifier AuthNotifier { get; set; } = default!;
 
-    void DrawerToggle()
+    private string Welcome()
+    {
+        var user = AppState.CurrentUser;
+
+        return $"Welcome{user}";
+    }
+    private void DrawerToggle()
     {
         _isDrawerOpen = !_isDrawerOpen;
     }
@@ -27,7 +34,6 @@ public partial class MainLayout
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
-        AuthNotifier.NotifyUserLogout();
         Nav.NavigateTo("/");
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 using Tracker.Services.ApiClients;
 
 namespace Tracker.Services;

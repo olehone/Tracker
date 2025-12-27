@@ -2,8 +2,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Auth;
 
 public class CustomAuthStateProvider
     : AuthenticationStateProvider, IAuthStateNotifier
@@ -12,8 +13,8 @@ public class CustomAuthStateProvider
     public CustomAuthStateProvider(IAuthService authService)
     {
         _authService = authService;
-        //_authService.OnLogin += NotifyUserAuthentication;
-        //_authService.OnLogout += NotifyUserLogout;
+        _authService.OnLogin += NotifyUserAuthentication;
+        _authService.OnLogout += NotifyUserLogout;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

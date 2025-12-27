@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Auth;
 
 public interface IJwtTokenReader
 {

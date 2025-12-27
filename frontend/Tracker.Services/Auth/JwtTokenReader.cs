@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Auth;
 
 public sealed class JwtTokenReader : IJwtTokenReader
 {
