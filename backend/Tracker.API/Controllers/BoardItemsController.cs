@@ -14,7 +14,7 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
 {
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateBoardItemRequest request)
+    public async Task<IActionResult> CreateBoardItemAsync([FromBody] CreateBoardItemRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
         {
@@ -27,7 +27,7 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("move")]
-    public async Task<IActionResult> Post([FromBody] MoveBoardItemCommand request)
+    public async Task<IActionResult> MoveBoardItemAsync([FromBody] MoveBoardItemCommand request)
     {
         var mediatorRequest = new MoveBoardItemCommand()
         {

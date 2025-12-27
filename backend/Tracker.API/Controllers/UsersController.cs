@@ -17,7 +17,7 @@ public class UserController(IMediator mediator) : ControllerBase
 
     [HttpGet("{Id:guid}")]
     [Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> GetAsync([FromRoute] GetByIdRequest request)
+    public async Task<IActionResult> GetUserByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetUserByIdQuery()
         {

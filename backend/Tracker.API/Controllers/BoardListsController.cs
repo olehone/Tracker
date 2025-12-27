@@ -14,7 +14,7 @@ namespace Tracker.API.Controllers;
 public class BoardListsController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateBoardListRequest request)
+    public async Task<IActionResult> CreateBoardListAsync([FromBody] CreateBoardListRequest request)
     {
         var mediatorRequest = new CreateBoardListCommand()
         {
@@ -27,7 +27,7 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("move")]
-    public async Task<IActionResult> Post([FromBody] MoveBoardListRequest request)
+    public async Task<IActionResult> MoveBoardListAsync([FromBody] MoveBoardListRequest request)
     {
         var mediatorRequest = new MoveBoardListCommand()
         {
