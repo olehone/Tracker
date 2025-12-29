@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Dtos;
 
-namespace Tracker.Services.States;
+namespace Tracker.WebApp.States;
 
 public class AppState
 {
@@ -14,7 +14,6 @@ public class AppState
             NotifyStateChanged();
         }
     }
-
     public event Action? OnChange;
     public void NotifyStateChanged() => OnChange?.Invoke();
 }

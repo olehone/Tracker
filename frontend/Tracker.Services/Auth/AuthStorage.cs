@@ -1,8 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Auth;
 
 public class AuthStorage : IAuthStorage
 {

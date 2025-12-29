@@ -1,0 +1,47 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Domain.Requests.Board
+@using Tracker.Services
+@using Tracker.Services.Abstraction
+
+<MudDialog>
+	<DialogContent>
+		<MudForm @ref="_form"
+				 Model="_request"
+				 @bind-IsValid="_isValid">
+
+			<MudTextField @bind-Value="_request.Title"
+						  For="@(() => _request.Title)"
+						  Label="Title"
+						  Required="true"
+						  Variant="Variant.Outlined" />
+
+			<MudTextField @bind-Value="_request.Description"
+						  For="@(() => _request.Description)"
+						  Label="Description"
+						  Variant="Variant.Outlined"
+						  Lines="3" />
+		</MudForm>
+	</DialogContent>
+
+	<DialogActions>
+		<MudButton OnClick="@Cancel">
+			Cancel
+		</MudButton>
+		<MudButton Disabled=@(_processing || !_isValid)
+				   OnClick=@Submit
+				   Variant="Variant.Filled"
+				   Color="Color.Primary">
+			@if (_processing)
+			{
+				<MudProgressCircular Class="ms-n1"
+									 Size="Size.Small"
+									 Indeterminate="true" />
+				<MudText Class="ms-2">Creating..</MudText>
+			}
+			else
+			{
+				<MudText>Create</MudText>
+			}
+		</MudButton>
+	</DialogActions>
+</MudDialog>

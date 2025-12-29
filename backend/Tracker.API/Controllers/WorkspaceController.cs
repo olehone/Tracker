@@ -16,7 +16,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet("{Id:guid}")]
-    public async Task<IActionResult> GetAsync([FromRoute] GetByIdRequest request)
+    public async Task<IActionResult> GetWorkspaceByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetWorkspaceByIdQuery()
         {
@@ -27,7 +27,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAsync()
+    public async Task<IActionResult> GetWorkspacesAsync()
     {
         var response = await mediator.Send(new GetWorkspacesQuery());
         return response.ToActionResult();

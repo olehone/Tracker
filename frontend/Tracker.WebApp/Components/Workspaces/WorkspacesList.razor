@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Entities
+@using Tracker.Services
+@using Tracker.WebApp.Components
+@using Microsoft.AspNetCore.Components;
+
+<AuthorizeView>
+	<Authorized>
+		<MudDivider Class="my-2" />
+
+		<MudText Typo=Typo.caption
+				 Class="ps-4">
+			Workspaces
+		</MudText>
+
+		@if (Workspaces is null)
+		{
+			@for (int i = 0; i < RandomWorkspaceCount(); i++)
+			{
+				<MudCardHeader Class="px-4 py-2">
+					<CardHeaderAvatar>
+						<MudSkeleton SkeletonType=SkeletonType.Circle
+									 Animation=Animation.Wave
+									 Width="24px"
+									 Height="24px" />
+					</CardHeaderAvatar>
+
+					<CardHeaderContent>
+						<MudSkeleton Animation=Animation.Wave
+									 Width=@RandomWidth()
+									 Height="20px" />
+					</CardHeaderContent>
+				</MudCardHeader>
+			}
+		}
+		else
+		{
+			@foreach (var ws in Workspaces)
+			{
+				<MudNavGroup Icon=@Icons.Material.Filled.Dashboard
+							 Title=@ws.Title>
+					<MudNavLink Icon=@Icons.Material.Filled.TableChart
+								Href=@($"/workspaces/{ws.Id}/overview")>
+						Overview
+					</MudNavLink>
+
+					<MudNavLink Icon=@Icons.Material.Filled.Person
+								Href=@($"/workspaces/{ws.Id}/members")>
+						Members
+					</MudNavLink>
+
+					<MudNavLink Icon=@Icons.Material.Filled.Settings
+								Href=@($"/workspaces/{ws.Id}/settings")>
+						Settings
+					</MudNavLink>
+				</MudNavGroup>
+			}
+		}
+	</Authorized>
+</AuthorizeView>

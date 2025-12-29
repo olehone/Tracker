@@ -6,7 +6,7 @@ using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Auth.CurrentUser;
+namespace Tracker.Application.UseCases.Users.Current;
 
 public class GetCurrentUserQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory,

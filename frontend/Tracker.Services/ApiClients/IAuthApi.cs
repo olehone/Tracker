@@ -14,7 +14,4 @@ public interface IAuthApi
     
     [Post("/api/auth/refresh-token")]
     Task<TokensDto?> RefreshTokenAsync(RefreshTokenRequest request);
-    
-    [Get("/api/auth/me")]
-    Task<UserDto?> GetCurrentUserAsync();
 }
