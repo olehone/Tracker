@@ -10,12 +10,12 @@ namespace Tracker.Services;
 public sealed class AuthService(
     IAuthApi api,
     IAuthStorage storage,
-    IJwtTokenReader jwtTokenReader) 
+    IJwtTokenReader jwtTokenReader)
     : IAuthService
 {
-
     public EventCallback OnLogin { get; set; }
     public EventCallback OnLogout { get; set; }
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
     public async Task LoginAsync(LoginUserRequest request)
     {
@@ -44,25 +44,49 @@ public sealed class AuthService(
             return null;
         }
 
-        if (jwtTokenReader.GetExpirationUtc(tokensDto.AccessToken) > DateTimeOffset.UtcNow.AddSeconds(30))
+        if (jwtTokenReader.GetExpirationUtc(tokensDto.AccessToken)
+            > DateTimeOffset.UtcNow.AddSeconds(30))
         {
             return tokensDto.AccessToken;
         }
-
-        var refreshed = await api.RefreshTokenAsync(new RefreshTokenRequest()
+        await _refreshLock.WaitAsync();
+        try
         {
-            RefreshToken = tokensDto.RefreshToken
-        });
+            tokensDto = await storage.GetAsync();
 
-        if (refreshed == null)
+            if (tokensDto is null)
+            {
+                return null;
+            }
+            if (jwtTokenReader.GetExpirationUtc(tokensDto.AccessToken)
+                > DateTimeOffset.UtcNow.AddSeconds(30))
+            {
+                return tokensDto.AccessToken;
+            }
+            var refreshed = await api.RefreshTokenAsync(new RefreshTokenRequest()
+            {
+                RefreshToken = tokensDto.RefreshToken
+            });
+
+            if (refreshed == null)
+            {
+                await LogoutAsync();
+                return null;
+            }
+
+            await storage.SetAsync(refreshed);
+
+            return refreshed.AccessToken;
+        }
+        catch (Exception)
         {
             await LogoutAsync();
             return null;
         }
-
-        await storage.SetAsync(refreshed);
-
-        return refreshed.AccessToken;
+        finally
+        {
+            _refreshLock.Release();
+        }
     }
 
     public async Task<ClaimsPrincipal> GetPrincipalAsync()
