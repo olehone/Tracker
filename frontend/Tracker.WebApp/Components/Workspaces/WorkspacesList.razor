@@ -16,7 +16,7 @@
 
 		@if (Workspaces is null)
 		{
-			@for (int i = 0; i < 3; i++)
+			@for (int i = 0; i < RandomWorkspaceCount(); i++)
 			{
 				<MudCardHeader Class="px-4 py-2">
 					<CardHeaderAvatar>
@@ -41,8 +41,8 @@
 				<MudNavGroup Icon=@Icons.Material.Filled.Dashboard
 							 Title=@ws.Title>
 					<MudNavLink Icon=@Icons.Material.Filled.TableChart
-								Href=@($"/workspaces/{ws.Id}")>
-						Boards
+								Href=@($"/workspaces/{ws.Id}/overview")>
+						Overview
 					</MudNavLink>
 
 					<MudNavLink Icon=@Icons.Material.Filled.Person

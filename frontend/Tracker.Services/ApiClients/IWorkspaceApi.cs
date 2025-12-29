@@ -1,6 +1,5 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Requests.Workspace;
 
 namespace Tracker.Services.ApiClients;

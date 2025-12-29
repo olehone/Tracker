@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Services;
 
-namespace Tracker.WebApp.Components;
+namespace Tracker.WebApp.Components.Workspaces;
 public partial class WorkspacesList
 {
-
     private bool isAuthenticated;
     private List<WorkspaceDto>? Workspaces = null;
     private readonly Random random = new Random();
@@ -20,6 +19,11 @@ public partial class WorkspacesList
     {
         int width = 30 + random.Next(0, 40);
         return $"{width}%";
+    }
+
+    private int RandomWorkspaceCount()
+    {
+        return 2 + random.Next(0, 3);
     }
 
     protected override async Task OnInitializedAsync()

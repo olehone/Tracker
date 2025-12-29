@@ -6,7 +6,7 @@ namespace Tracker.Services;
 
 public interface IWorkspaceService
 {
-    Task<WorkspaceDto> GetWorkspaceByIdAsync(GetByIdRequest request);
+    Task<WorkspaceDto> GetWorkspaceByIdAsync(Guid id);
     Task<List<WorkspaceDto>> GetWorkspacesAsync();
     Task<WorkspaceDto> CreateWorkspaceAsync(CreateWorkspaceRequest request);
 }

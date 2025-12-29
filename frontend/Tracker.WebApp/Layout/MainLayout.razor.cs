@@ -14,14 +14,6 @@ public partial class MainLayout
     private AppState AppState { get; set; } = default!;
     [Inject] NavigationManager Nav { get; set; } = default!;
     [Inject] IAuthService AuthService { get; set; } = default!;
-    [Inject] IAuthStateNotifier AuthNotifier { get; set; } = default!;
-
-    private string Welcome()
-    {
-        var user = AppState.CurrentUser;
-
-        return $"Welcome{user}";
-    }
     private void DrawerToggle()
     {
         _isDrawerOpen = !_isDrawerOpen;

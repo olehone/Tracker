@@ -1,0 +1,71 @@
+﻿@page "/workspaces/{WorkspaceId:guid}/overview"
+
+@using Microsoft.AspNetCore.Components
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Requests.Common
+@using Tracker.Services
+@using Tracker.WebApp.Components.Boards
+
+<MudGrid>
+	@if (Workspace is not null)
+	{
+		@foreach (var board in Workspace.Boards)
+		{
+			<MudItem xs="12"
+					 sm="6"
+					 lg="3">
+				<MudNavLink Href=@($"/boards/{board.Id}")
+							class="d-block">
+					<MudCard>
+						<MudCardMedia Height="70">
+						</MudCardMedia>
+
+						<MudCardContent>
+							<MudText Typo="Typo.h5">
+								@board.Title
+							</MudText>
+						</MudCardContent>
+					</MudCard>
+				</MudNavLink>
+			</MudItem>
+		}
+		<MudItem xs="12"
+				 sm="6"
+				 lg="3">
+			<MudButton Variant="Variant.Filled"
+					   Color="Color.Primary"
+					   OnClick=@OpenDialog
+					   FullWidth>
+				Create new board
+			</MudButton>
+		</MudItem>
+	}
+	else
+	{
+		@for (int i = 0; i < RandomBoardsCount(); i++)
+		{
+			<MudItem xs="12"
+					 sm="6"
+					 lg="3">
+				<MudCard>
+					<MudSkeleton SkeletonType="SkeletonType.Rectangle"
+								 Animation="Animation.Wave"
+								 Height="70px" />
+					<MudCardContent>
+						<MudText Typo="Typo.h5">
+							<MudSkeleton Animation="Animation.Wave"
+										 Width=@RandomWidth() />
+						</MudText>
+					</MudCardContent>
+				</MudCard>
+			</MudItem>
+		}
+	}
+</MudGrid>
+@if (Workspace is not null)
+{
+	<CreateBoardDialog @bind-ShowDialog=@_showDialog
+					   Workspace=@Workspace
+					   OnBoardCreated=@HandleBoardCreated />
+}
+

@@ -16,10 +16,13 @@
 		<MudText Typo=Typo.h6>Tracker</MudText>
 		<MudSpacer />
 		<AuthorizeView>
-			<Authorized Context="auth">
-				<MudText Class="mr-4">
-					Welcome, @AppState!.CurrentUser!.Username
-				</MudText>
+			<Authorized>
+				@if (AppState?.CurrentUser is not null)
+				{
+					<MudText class="mr-4">
+						Welcome, @AppState.CurrentUser.Username
+					</MudText>
+				}
 				<MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="@Logout">
 					Logout
 				</MudButton>
@@ -43,6 +46,9 @@
 		<NavMenu />
 	</MudDrawer>
 	<MudMainContent>
-		@Body
+		<MudContainer MaxWidth=@MaxWidth.Large
+					  Class="mt-4">
+			@Body
+		</MudContainer>
 	</MudMainContent>
 </MudLayout>
