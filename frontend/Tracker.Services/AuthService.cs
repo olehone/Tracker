@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
@@ -13,26 +14,26 @@ public sealed class AuthService(
     : IAuthService
 {
 
-    public event Action? OnLogin;
-    public event Action? OnLogout;
+    public EventCallback OnLogin { get; set; }
+    public EventCallback OnLogout { get; set; }
 
     public async Task LoginAsync(LoginUserRequest request)
     {
         var response = await api.LoginAsync(request);
         await storage.SetAsync(response);
-        OnLogin?.Invoke();
+        await OnLogin.InvokeAsync();
     }
     public async Task RegisterAsync(RegisterUserRequest request)
     {
         var response = await api.RegisterAsync(request);
         await storage.SetAsync(response);
-        OnLogin?.Invoke();
+        await OnLogin.InvokeAsync();
     }
 
     public async Task LogoutAsync()
     {
         await storage.ClearAsync();
-        OnLogout?.Invoke();
+        await OnLogout.InvokeAsync();
     }
 
     public async Task<string?> GetAccessTokenAsync()

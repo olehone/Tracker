@@ -1,13 +1,13 @@
 ﻿using System.Security.Claims;
-using Tracker.Domain.Dtos;
+using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 
 namespace Tracker.Services.Abstraction;
 
 public interface IAuthService
 {
-    public event Action? OnLogin;
-    public event Action? OnLogout;
+    EventCallback OnLogin { get; set; }
+    EventCallback OnLogout { get; set; }
     Task LoginAsync(LoginUserRequest request);
     Task RegisterAsync(RegisterUserRequest request);
     Task LogoutAsync();

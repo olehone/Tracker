@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
@@ -13,17 +12,11 @@ public partial class CreateBoardDialog
     private bool _processing = false;
     private CreateBoardRequest _request = new();
 
-    [Parameter]
-    public bool ShowDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public EventCallback<bool> ShowDialogChanged { get; set; }
-
-    [Parameter]
-    public WorkspaceDto? Workspace { get; set; }
-
-    [Parameter]
-    public EventCallback<BoardSummaryDto> OnBoardCreated { get; set; }
+    public WorkspaceDto Workspace { get; set; } = default!;
 
     [Inject]
     private IBoardService BoardService { get; set; } = default!;
@@ -31,18 +24,14 @@ public partial class CreateBoardDialog
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        if (ShowDialog && Workspace != null)
-        {
-            _request = new CreateBoardRequest { WorkspaceId = Workspace.Id };
-        }
+        _request = new CreateBoardRequest { WorkspaceId = Workspace.Id };
     }
 
-    private async Task Cancel()
+    private void Cancel()
     {
-        ShowDialog = false;
-        await ShowDialogChanged.InvokeAsync(false);
+        MudDialog.Cancel();
     }
 
     private async Task Submit()
@@ -60,13 +49,12 @@ public partial class CreateBoardDialog
 
         if (created is not null)
         {
-            await OnBoardCreated.InvokeAsync(created);
             Navigation.NavigateTo($"/boards/{created.Id}");
+            MudDialog.Close(DialogResult.Ok(created));
         }
-
-        _processing = false;
-        ShowDialog = false;
-        await ShowDialogChanged.InvokeAsync(false);
-        StateHasChanged();
+        else
+        {
+            _processing = false;
+        }
     }
 }

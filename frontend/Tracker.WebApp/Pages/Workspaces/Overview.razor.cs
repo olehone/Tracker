@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Services;
+using Tracker.WebApp.Components.Boards;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 public partial class Overview
 {
-    [Parameter]
+	[Parameter]
     public Guid WorkspaceId { get; set; }
 
     private WorkspaceDto? Workspace { get; set; } = null;
-    private bool _showDialog = false;
     private readonly Random random = new Random();
 
     [Inject]
@@ -18,9 +19,30 @@ public partial class Overview
     [Inject]
     private NavigationManager Nav { get; set; } = default!;
 
-    private void OpenDialog()
+    [Inject]
+    private IDialogService DialogService { get; set; } = default!;
+
+    private async Task OpenDialog()
     {
-        _showDialog = true;
+        var parameters = new DialogParameters
+        {
+            { "Workspace", Workspace }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateBoardDialog>("Create New Board", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is BoardSummaryDto board)
+        {
+            HandleBoardCreated(board);
+        }
     }
 
     private void HandleBoardCreated(BoardSummaryDto board)
@@ -40,7 +62,7 @@ public partial class Overview
         return 3 + random.Next(0, 3);
     }
 
-    private string GetBoardColorBackgroundStyle(BoardSummaryDto board)
+    private static string GetBoardColorBackgroundStyle(BoardSummaryDto board)
     {
         var hash = board.Id.GetHashCode();
         var hue = Math.Abs(hash % 360);

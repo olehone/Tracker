@@ -4,7 +4,6 @@
 @using Tracker.Domain.Dtos
 @using Tracker.Domain.Requests.Common
 @using Tracker.Services
-@using Tracker.WebApp.Components.Boards
 
 <MudGrid>
 	@if (Workspace is not null)
@@ -17,7 +16,7 @@
 				<MudNavLink Href=@($"/boards/{board.Id}")
 							class="d-block">
 					<MudCard>
-						<MudCardMedia Height="70">
+						<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(board)>
 						</MudCardMedia>
 
 						<MudCardContent>
@@ -34,8 +33,7 @@
 				 lg="3">
 			<MudButton Variant="Variant.Filled"
 					   Color="Color.Primary"
-					   OnClick=@OpenDialog
-					   FullWidth>
+					   OnClick=@OpenDialog>
 				Create new board
 			</MudButton>
 		</MudItem>
@@ -62,10 +60,3 @@
 		}
 	}
 </MudGrid>
-@if (Workspace is not null)
-{
-	<CreateBoardDialog @bind-ShowDialog=@_showDialog
-					   Workspace=@Workspace
-					   OnBoardCreated=@HandleBoardCreated />
-}
-

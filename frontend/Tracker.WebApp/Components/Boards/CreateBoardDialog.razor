@@ -3,7 +3,7 @@
 @using Tracker.Services
 @using Tracker.Services.Abstraction
 
-<MudDialog @bind-IsVisible="ShowDialog">
+<MudDialog>
 	<DialogContent>
 		<MudForm @ref="_form"
 				 Model="_request"
@@ -27,7 +27,6 @@
 		<MudButton OnClick="@Cancel">
 			Cancel
 		</MudButton>
-
 		<MudButton Disabled=@(_processing || !_isValid)
 				   OnClick=@Submit
 				   Variant="Variant.Filled"

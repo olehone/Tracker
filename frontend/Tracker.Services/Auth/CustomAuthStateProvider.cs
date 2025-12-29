@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
@@ -13,8 +14,8 @@ public class CustomAuthStateProvider
     public CustomAuthStateProvider(IAuthService authService)
     {
         _authService = authService;
-        _authService.OnLogin += NotifyUserAuthentication;
-        _authService.OnLogout += NotifyUserLogout;
+        _authService.OnLogin = EventCallback.Factory.Create(this, NotifyUserAuthentication);
+        _authService.OnLogout = EventCallback.Factory.Create(this, NotifyUserLogout);
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
