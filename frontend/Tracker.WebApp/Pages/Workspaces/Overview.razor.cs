@@ -7,7 +7,7 @@ using Tracker.WebApp.Components.Boards;
 namespace Tracker.WebApp.Pages.Workspaces;
 public partial class Overview
 {
-	[Parameter]
+    [Parameter]
     public Guid WorkspaceId { get; set; }
 
     private WorkspaceDto? Workspace { get; set; } = null;
@@ -15,10 +15,6 @@ public partial class Overview
 
     [Inject]
     private IWorkspaceService WorkspaceService { get; set; } = default!;
-
-    [Inject]
-    private NavigationManager Nav { get; set; } = default!;
-
     [Inject]
     private IDialogService DialogService { get; set; } = default!;
 
@@ -39,7 +35,7 @@ public partial class Overview
         var dialog = await DialogService.ShowAsync<CreateBoardDialog>("Create New Board", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is BoardSummaryDto board)
+        if (result is not null && !result.Canceled && result.Data is BoardSummaryDto board)
         {
             HandleBoardCreated(board);
         }

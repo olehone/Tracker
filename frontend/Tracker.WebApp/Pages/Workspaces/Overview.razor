@@ -13,14 +13,13 @@
 			<MudItem xs="12"
 					 sm="6"
 					 lg="3">
-				<MudNavLink Href=@($"/boards/{board.Id}")
-							class="d-block">
-					<MudCard>
+				<MudNavLink Href=@($"/boards/{board.Id}")>
+					<MudCard Elevation="2">
 						<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(board)>
 						</MudCardMedia>
 
 						<MudCardContent>
-							<MudText Typo="Typo.h5">
+							<MudText Typo="Typo.h5" Class="d-block w-100" Style=" max-height: 1.3em;overflow: hidden; "">
 								@board.Title
 							</MudText>
 						</MudCardContent>
@@ -28,15 +27,18 @@
 				</MudNavLink>
 			</MudItem>
 		}
-		<MudItem xs="12"
-				 sm="6"
-				 lg="3">
-			<MudButton Variant="Variant.Filled"
-					   Color="Color.Primary"
-					   OnClick=@OpenDialog>
-				Create new board
-			</MudButton>
+
+		<MudItem xs="12" sm="6" lg="3">
+			<MudCard Elevation=0>
+				<MudButton Variant="Variant.Outlined"
+						   Color="Color.Primary"
+						   OnClick=@OpenDialog
+						   Class="mx-4 my-2 ml-7 ">
+					Create new board
+				</MudButton>
+			</MudCard>
 		</MudItem>
+
 	}
 	else
 	{
@@ -45,7 +47,7 @@
 			<MudItem xs="12"
 					 sm="6"
 					 lg="3">
-				<MudCard>
+				<MudCard Class="h-100">
 					<MudSkeleton SkeletonType="SkeletonType.Rectangle"
 								 Animation="Animation.Wave"
 								 Height="70px" />
