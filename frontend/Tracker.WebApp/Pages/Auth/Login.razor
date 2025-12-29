@@ -12,7 +12,7 @@
 
 		<MudForm @ref=@form
 				 @bind-IsValid=@isSuccess
-			     Model=@loginModel>
+				 Model=@loginModel>
 			<MudStack Spacing="3">
 
 				<MudTextField T="string"
@@ -20,6 +20,7 @@
 							  Label="Email"
 							  For=@(() => loginModel.Email)
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="Email is required" />
 
 				<MudTextField T="string"
@@ -28,13 +29,17 @@
 							  For=@(() => loginModel.Password)
 							  InputType=InputType.Password
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="Password is required" />
 
-				@if (!string.IsNullOrEmpty(errorMessage))
+				@if (!(errorMessages is null or []))
 				{
-					<MudAlert Severity="Severity.Error" Dense="true">
-						@errorMessage
-					</MudAlert>
+					@foreach (var error in errorMessages)
+					{
+						<MudAlert Severity="Severity.Error" Dense="true">
+							@error
+						</MudAlert>
+					}
 				}
 
 				<MudButton OnClick=@HandleLogin

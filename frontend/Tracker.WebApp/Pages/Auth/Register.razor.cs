@@ -14,7 +14,7 @@ public partial class Register
     [CascadingParameter] private AppState? AppState { get; set; }
 
     private RegisterUserRequest registerModel = new();
-    private string? errorMessage;
+    private IReadOnlyList<string>? errorMessages;
     private string? secondPassword;
     private bool isLoading = false;
     private bool isSuccess = false;
@@ -28,13 +28,17 @@ public partial class Register
         {
             return;
         }
-        if (registerModel.Password!= secondPassword)
+        if (registerModel.Password != secondPassword)
         {
-            errorMessage = "Passwords are not the same";
+            errorMessages = ["Passwords are not the same"];
+            return;
+        }
+        if (IsEmailInvalid(registerModel.Email))
+        {
+            errorMessages = ["Wrong email format"];
             return;
         }
         isLoading = true;
-        errorMessage = null;
 
         try
         {
@@ -49,16 +53,52 @@ public partial class Register
         }
         catch (HttpRequestException)
         {
-            errorMessage = "Unable to connect to the server. Please try again.";
+            errorMessages = ["Unable to connect to the server. Please try again."];
+            StateHasChanged();
         }
-        catch (Exception ex)
+        catch (Refit.ValidationApiException ex)
         {
-            errorMessage = ex.Message;
-            Console.WriteLine(ex);
+            if (ex.Content is null)
+            {
+                errorMessages = ["Unknown error from server"];
+                return;
+            }
+            if (ex.Content.Errors.Count > 0)
+            {
+                errorMessages = ex.Content.Errors.SelectMany(error => error.Value).ToList();
+            }
+            else
+            {
+                var title = ex.Content.Title ?? "Unknown error from server";
+                errorMessages = [title];
+            }
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            errorMessages = ["Invalid email or password. Please try again."];
+            StateHasChanged();
         }
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private bool IsEmailInvalid(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return true;
+        }
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address != email;
+        }
+        catch
+        {
+            return true;
         }
     }
 }

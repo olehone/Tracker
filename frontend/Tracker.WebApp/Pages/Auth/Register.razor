@@ -19,17 +19,19 @@
 							  Label="First Name"
 							  For=@(() => registerModel.FirstName)
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="First name is required" />
 
 				<MudTextField T="string"
 							  @bind-Value=@registerModel.LastName
-							  Label="Last Name"/>
+							  Label="Last Name" />
 
 				<MudTextField T="string"
 							  @bind-Value=@registerModel.Email
 							  Label="Email"
 							  For=@(() => registerModel.Email)
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="Email is required" />
 
 				<MudTextField T="string"
@@ -37,6 +39,7 @@
 							  Label="Username"
 							  For=@(() => registerModel.Username)
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="Username is required" />
 
 				<MudTextField T="string"
@@ -45,6 +48,7 @@
 							  For=@(() => registerModel.Password)
 							  InputType=@InputType.Password
 							  Required="true"
+							  Immediate="true"
 							  RequiredError="Password is required" />
 
 				<MudTextField T="string"
@@ -53,13 +57,17 @@
 							  For=@(() => secondPassword)
 							  InputType=@InputType.Password
 							  Required="true"
-							  RequiredError="Repeat password is required"/>
+							  Immediate="true"
+							  RequiredError="Repeat password is required" />
 
-				@if (!string.IsNullOrEmpty(errorMessage))
+				@if (!(errorMessages is null or []))
 				{
-					<MudAlert Severity="Severity.Error" Dense="true">
-						@errorMessage
-					</MudAlert>
+					@foreach (var error in errorMessages)
+					{
+						<MudAlert Severity="Severity.Error" Dense="true">
+							@error
+						</MudAlert>
+					}
 				}
 
 				<MudButton OnClick=@HandleRegister
@@ -69,12 +77,13 @@
 						   Color=Color.Primary>
 					@if (isLoading)
 					{
-						<MudProgressCircular Size="Size.Small" Indeterminate />
-						<MudText>Signing in...</MudText>
+						<MudProgressCircular Size="Size.Small"
+											 Class="mx-3" />
+						<MudText>Signing up...</MudText>
 					}
 					else
 					{
-						<MudText>Sign in</MudText>
+						<MudText>Sign up</MudText>
 					}
 				</MudButton>
 			</MudStack>
