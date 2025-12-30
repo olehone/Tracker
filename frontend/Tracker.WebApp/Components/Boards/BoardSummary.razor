@@ -1,0 +1,18 @@
+@using Microsoft.AspNetCore.Components
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Requests.Common
+@using Tracker.Services
+
+<MudNavLink Href=@($"/boards/{Board.Id}")>
+	<MudCard Elevation="2">
+		<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(Board)>
+		</MudCardMedia>
+
+		<MudCardContent>
+			<MudText Typo="Typo.h5" Class="d-block w-100" Style=" max-height: 1.3em;overflow: hidden; " ">
+				@Board.Title
+			</MudText>
+		</MudCardContent>
+	</MudCard>
+</MudNavLink>
+

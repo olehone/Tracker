@@ -4,6 +4,7 @@
 @using Tracker.Domain.Dtos
 @using Tracker.Domain.Requests.Common
 @using Tracker.Services
+@using Tracker.WebApp.Components.Boards
 
 <MudGrid>
 	@if (Workspace is not null)
@@ -13,32 +14,14 @@
 			<MudItem xs="12"
 					 sm="6"
 					 lg="3">
-				<MudNavLink Href=@($"/boards/{board.Id}")>
-					<MudCard Elevation="2">
-						<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(board)>
-						</MudCardMedia>
-
-						<MudCardContent>
-							<MudText Typo="Typo.h5" Class="d-block w-100" Style=" max-height: 1.3em;overflow: hidden; "">
-								@board.Title
-							</MudText>
-						</MudCardContent>
-					</MudCard>
-				</MudNavLink>
+				<BoardSummary Board=board/>
 			</MudItem>
 		}
-
-		<MudItem xs="12" sm="6" lg="3">
-			<MudCard Elevation=0>
-				<MudButton Variant="Variant.Outlined"
-						   Color="Color.Primary"
-						   OnClick=@OpenDialog
-						   Class="mx-4 my-2 ml-7 ">
-					Create new board
-				</MudButton>
-			</MudCard>
+		<MudItem xs="12"
+				 sm="6"
+				 lg="3">
+			<CreateBoardButton Workspace=Workspace />
 		</MudItem>
-
 	}
 	else
 	{
@@ -47,17 +30,7 @@
 			<MudItem xs="12"
 					 sm="6"
 					 lg="3">
-				<MudCard Class="h-100">
-					<MudSkeleton SkeletonType="SkeletonType.Rectangle"
-								 Animation="Animation.Wave"
-								 Height="70px" />
-					<MudCardContent>
-						<MudText Typo="Typo.h5">
-							<MudSkeleton Animation="Animation.Wave"
-										 Width=@RandomWidth() />
-						</MudText>
-					</MudCardContent>
-				</MudCard>
+				<BoardSummarySkeleton />
 			</MudItem>
 		}
 	}

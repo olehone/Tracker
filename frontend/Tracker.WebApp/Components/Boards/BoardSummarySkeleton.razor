@@ -1,0 +1,16 @@
+@using Microsoft.AspNetCore.Components
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Requests.Common
+@using Tracker.Services
+
+<MudCard Class="h-100">
+	<MudSkeleton SkeletonType="SkeletonType.Rectangle"
+				 Animation="Animation.Wave"
+				 Height="70px" />
+	<MudCardContent>
+		<MudText Typo="Typo.h5">
+			<MudSkeleton Animation="Animation.Wave"
+						 Width=@RandomWidth() />
+		</MudText>
+	</MudCardContent>
+</MudCard>
