@@ -2,16 +2,24 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Auth;
+
 public partial class Login
 {
-    [Inject] private IAuthService AuthService { get; set; } = default!;
-    [Inject] private IUserService UserService { get; set; } = default!;
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject]
+    private IAuthService AuthService { get; set; } = null!;
 
-    [CascadingParameter] private AppState? AppState { get; set; }
+    [Inject]
+    private IUserService UserService { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = null!;
+
+    [CascadingParameter]
+    private AppState? AppState { get; set; }
 
     private LoginUserRequest loginModel = new();
     private IReadOnlyList<string>? errorMessages = [];
@@ -27,11 +35,13 @@ public partial class Login
         {
             return;
         }
-        if (IsEmailInvalid(loginModel.Email))
+
+        if (UiHelper.IsEmailInvalid(loginModel.Email))
         {
             errorMessages = ["Wrong email format"];
             return;
         }
+
         isLoading = true;
 
         try
@@ -57,6 +67,7 @@ public partial class Login
                 errorMessages = ["Unknown error from server"];
                 return;
             }
+
             if (ex.Content.Errors.Count > 0)
             {
                 errorMessages = ex.Content.Errors.SelectMany(error => error.Value).ToList();
@@ -76,23 +87,5 @@ public partial class Login
             isLoading = false;
             StateHasChanged();
         }
-    }
-
-    private bool IsEmailInvalid(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return true;
-        }
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address != email;
-        }
-        catch
-        {
-            return true;
-        }
-
     }
 }

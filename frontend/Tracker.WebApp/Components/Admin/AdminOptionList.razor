@@ -3,32 +3,32 @@
 @using Tracker.Domain.Entities
 @using Tracker.Services
 
-<AuthorizeView Roles="@Roles.Admin">
-	<Authorized>
-		<MudDivider Class="my-2" />
-		<MudText Typo=Typo.caption
-				 Align=Align.Center
-				 Class="ps-4">
-			Admin panel
-		</MudText>
+<AuthorizeView Roles=@Roles.Admin>
+    <Authorized>
+        <MudDivider Class="my-2"/>
+        <MudText Typo="Typo.caption"
+                 Align="Align.Center"
+                 Class="ps-4">
+            Admin panel
+        </MudText>
 
-		<MudNavGroup Icon=@Icons.Material.Filled.Settings
-					 Title="Settings"
-					 Expanded="true">
-			<MudNavLink Icon=@Icons.Material.Filled.Person
-						Href="/admin/users">
-				Users
-			</MudNavLink>
+        <MudNavGroup Icon=@Icons.Material.Filled.Settings
+                     Title="Settings"
+                     Expanded="true">
+            <MudNavLink Icon=@Icons.Material.Filled.Person
+                        Href="/admin/users">
+                Users
+            </MudNavLink>
 
-			<MudNavLink Icon=@Icons.Material.Filled.Dashboard
-						Href="/admin/workspaces">
-				Workspaces
-			</MudNavLink>
+            <MudNavLink Icon=@Icons.Material.Filled.Dashboard
+                        Href="/admin/workspaces">
+                Workspaces
+            </MudNavLink>
 
-			<MudNavLink Icon=@Icons.Material.Filled.AdminPanelSettings
-						Href="/admin/security">
-				Security
-			</MudNavLink>
-		</MudNavGroup>
-	</Authorized>
+            <MudNavLink Icon=@Icons.Material.Filled.AdminPanelSettings
+                        Href="/admin/security">
+                Security
+            </MudNavLink>
+        </MudNavGroup>
+    </Authorized>
 </AuthorizeView>

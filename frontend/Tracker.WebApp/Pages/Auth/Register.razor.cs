@@ -2,16 +2,21 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Auth;
+
 public partial class Register
 {
-    [Inject] private IAuthService Auth { get; set; } = default!;
-    [Inject] private IUserService UserService { get; set; } = default!;
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
-
     [CascadingParameter] private AppState? AppState { get; set; }
+    
+    [Inject]
+    private IAuthService Auth { get; set; } = null!;
+    [Inject] 
+    private IUserService UserService { get; set; } = null!;
+    [Inject] 
+    private NavigationManager Navigation { get; set; } = null!;
 
     private RegisterUserRequest registerModel = new();
     private IReadOnlyList<string>? errorMessages;
@@ -33,7 +38,7 @@ public partial class Register
             errorMessages = ["Passwords are not the same"];
             return;
         }
-        if (IsEmailInvalid(registerModel.Email))
+        if (UiHelper.IsEmailInvalid(registerModel.Email))
         {
             errorMessages = ["Wrong email format"];
             return;
@@ -82,23 +87,6 @@ public partial class Register
         finally
         {
             isLoading = false;
-        }
-    }
-
-    private bool IsEmailInvalid(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return true;
-        }
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address != email;
-        }
-        catch
-        {
-            return true;
         }
     }
 }

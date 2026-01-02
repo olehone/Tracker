@@ -3,21 +3,16 @@ using Tracker.Domain.Dtos;
 using Tracker.Services;
 
 namespace Tracker.WebApp.Pages.Workspaces;
+
 public partial class Overview
 {
     [Parameter]
     public Guid WorkspaceId { get; set; }
 
     private WorkspaceDto? Workspace { get; set; } = null;
-    private readonly Random random = new Random();
 
     [Inject]
     private IWorkspaceService WorkspaceService { get; set; } = default!;
-
-    private int RandomBoardsCount()
-    {
-        return 3 + random.Next(0, 3);
-    }
 
     protected override async Task OnInitializedAsync()
     {

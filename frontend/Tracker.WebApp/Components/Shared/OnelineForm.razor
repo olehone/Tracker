@@ -1,0 +1,43 @@
+<MudStack Row
+          Justify="Justify.SpaceBetween"
+          AlignItems="AlignItems.Center">
+
+    <MudTextField @bind-Value=@_value
+                  @onkeydown=@HandleKeys
+                  Immediate
+                  Typo=@Typo
+                  Disabled=@_processing
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense"
+                  Class="text-ellipsis"
+                  AutoFocus="true"/>
+
+    <MudStack Row
+              Spacing="2">
+
+        <MudButton Disabled=@_processing
+                   OnClick=@CompleteEdit
+                   Size="Size.Large"
+                   Variant="Variant.Filled"
+                   Color="Color.Success">
+
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1"
+                                     Size="Size.Small"
+                                     Indeterminate="true"/>
+            }
+            else
+            {
+                <MudIcon Icon=@Icons.Material.Filled.Check/>
+            }
+        </MudButton>
+
+        <MudIconButton Icon=@Icons.Material.Filled.Close
+                       Disabled=@_processing
+                       OnClick=@CancelEdit
+                       Size="Size.Large"
+                       Variant="Variant.Filled"
+                       Color="Color.Error"/>
+    </MudStack>
+</MudStack>

@@ -11,7 +11,7 @@ public interface IAuthApi
 
     [Post("/api/auth/login")]
     Task<TokensDto> LoginAsync(LoginUserRequest request);
-    
+
     [Post("/api/auth/refresh-token")]
     Task<TokensDto?> RefreshTokenAsync(RefreshTokenRequest request);
 }

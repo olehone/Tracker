@@ -1,6 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Domain.Requests.Workspace;
 using Tracker.Services.Abstraction;
 using Tracker.Services.ApiClients;
 

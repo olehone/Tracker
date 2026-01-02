@@ -23,6 +23,7 @@ public sealed class AuthService(
         await storage.SetAsync(response);
         await OnLogin.InvokeAsync();
     }
+
     public async Task RegisterAsync(RegisterUserRequest request)
     {
         var response = await api.RegisterAsync(request);
@@ -49,6 +50,7 @@ public sealed class AuthService(
         {
             return tokensDto.AccessToken;
         }
+
         await _refreshLock.WaitAsync();
         try
         {
@@ -58,11 +60,13 @@ public sealed class AuthService(
             {
                 return null;
             }
+
             if (jwtTokenReader.GetExpirationUtc(tokensDto.AccessToken)
                 > DateTimeOffset.UtcNow.AddSeconds(30))
             {
                 return tokensDto.AccessToken;
             }
+
             var refreshed = await api.RefreshTokenAsync(new RefreshTokenRequest()
             {
                 RefreshToken = tokensDto.RefreshToken
@@ -91,12 +95,12 @@ public sealed class AuthService(
 
     public async Task<ClaimsPrincipal> GetPrincipalAsync()
     {
-
         var accessToken = await GetAccessTokenAsync();
         if (accessToken is null)
         {
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
+
         var claims = jwtTokenReader.ReadClaims(accessToken);
         var identity = new ClaimsIdentity(claims, "jwt");
         return new ClaimsPrincipal(identity);

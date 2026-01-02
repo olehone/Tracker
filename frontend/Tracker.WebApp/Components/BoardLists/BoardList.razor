@@ -21,7 +21,7 @@
 		{
 			<MudDropZone T="BoardItemDto"
 						 Identifier=@List.Id.ToString()
-						 AllowReorder="true"
+						 AllowReorder
 						 Style="min-height: 60px;"
 						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
 		}
@@ -39,17 +39,3 @@
 	</MudStack>
 
 </MudPaper>
-
-@code {
-
-	[Parameter]
-	public required BoardListDto List { get; set; }
-	[Parameter]
-	public EventCallback<string> OnCreateItem { get; set; }
-
-	private async Task CreateNewItem(string title)
-	{
-		await OnCreateItem.InvokeAsync(title);
-	}
-
-}

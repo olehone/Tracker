@@ -7,4 +7,3 @@ public interface IJwtTokenReader
     List<Claim> ReadClaims(string token);
     DateTime GetExpirationUtc(string jwt);
 }
-

@@ -8,6 +8,7 @@ namespace Tracker.Services.Auth;
 public sealed class JwtTokenReader : IJwtTokenReader
 {
     private static readonly JwtSecurityTokenHandler Handler = new();
+
     public DateTime GetExpirationUtc(string jwt)
     {
         var token = Handler.ReadJwtToken(jwt);
@@ -20,4 +21,3 @@ public sealed class JwtTokenReader : IJwtTokenReader
         return jwt.Claims.ToList();
     }
 }
-

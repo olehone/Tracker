@@ -1,0 +1,20 @@
+<MudPaper Elevation="0"
+		  Class="pa-0 ma-2">
+
+	@if (_isAddingItem)
+	{
+		<OneLineForm AllowEmpty=false
+					 OnEditCanceled=@ClosePressed
+					 OnValueSaved=@SubmitNewItem
+					 Typo=@Typo />
+	}
+	else
+	{
+		<MudButton FullWidth
+				   Variant="Variant.Outlined"
+				   Color="Color.Primary"
+				   OnClick=@AddItemPressed>
+			@Title
+		</MudButton>
+	}
+</MudPaper>

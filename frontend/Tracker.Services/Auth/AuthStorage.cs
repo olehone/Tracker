@@ -20,5 +20,4 @@ public class AuthStorage : IAuthStorage
 
     public async Task ClearAsync()
         => await _storage.RemoveItemAsync(Key);
-  
 }
