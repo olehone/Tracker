@@ -9,4 +9,3 @@ public interface IBoardService
     Task<BoardFullDto> GetBoardByIdAsync(Guid id);
     Task<BoardSummaryDto> CreateBoardAsync(CreateBoardRequest request);
 }
-

@@ -1,0 +1,55 @@
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Requests.BoardItem
+@using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.Shared
+
+<MudPaper Elevation="5"
+		  Width="400px"
+		  Class="my-3 mx-2"
+		  Style="align-self: flex-start;">
+	<MudStack Spacing="1"
+			  Justify="Justify.FlexStart"
+			  Class="pa-1">
+		<MudToolBar Dense>
+			<MudText Typo="Typo.subtitle1"
+					 Class="text-ellipsis">
+				@List.Title
+			</MudText>
+		</MudToolBar>
+
+		@if (List.BoardItems.Count == 0)
+		{
+			<MudDropZone T="BoardItemDto"
+						 Identifier=@List.Id.ToString()
+						 AllowReorder="true"
+						 Style="min-height: 60px;"
+						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
+		}
+		else
+		{
+			<MudDropZone T="BoardItemDto"
+						 Identifier=@List.Id.ToString()
+						 AllowReorder
+						 Style="max-height: 400px; overflow-y: auto;"
+						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
+		}
+
+		<OnelineCreateButton Title="Add new item"
+							 OnCreate=@CreateNewItem />
+	</MudStack>
+
+</MudPaper>
+
+@code {
+
+	[Parameter]
+	public required BoardListDto List { get; set; }
+	[Parameter]
+	public EventCallback<string> OnCreateItem { get; set; }
+
+	private async Task CreateNewItem(string title)
+	{
+		await OnCreateItem.InvokeAsync(title);
+	}
+
+}

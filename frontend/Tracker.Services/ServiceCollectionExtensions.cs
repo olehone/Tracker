@@ -29,10 +29,14 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IUserApi>();
         services.AddApiClientWithAuth<IWorkspaceApi>();
         services.AddApiClientWithAuth<IBoardsApi>();
+        services.AddApiClientWithAuth<IBoardListApi>();
+        services.AddApiClientWithAuth<IBoardItemApi>();
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWorkspaceService, WorkspaceService>();
         services.AddScoped<IBoardService, BoardService>();
+        services.AddScoped<IBoardListService, BoardListService>();
+        services.AddScoped<IBoardItemService, BoardItemService>();
         return services;
     }
 

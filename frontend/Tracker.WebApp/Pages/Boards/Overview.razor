@@ -1,75 +1,106 @@
 ﻿@page "/boards/{BoardId:guid}"
-
-@using Microsoft.AspNetCore.Components
-@using System.ComponentModel.DataAnnotations
-@using MudBlazor.Utilities
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
 @using Tracker.Domain.Dtos
 @using Tracker.Domain.Requests.BoardItem
+@using Tracker.Domain.Requests.BoardList
 @using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.BoardItems
+@using Tracker.WebApp.Components.BoardLists
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
 
-@if (Board is not null)
-{
-	<MudDropContainer T="BoardItemDto"
-					  Items=@Items()
-					  ItemsSelector="@((item, column) => item.BoardListId.ToString() == column)"
-					  ItemDropped="ItemUpdated"
-					  Class="d-flex flex-row">
-		<ChildContent>
-			@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
+<MudPaper Class="ma-4 mud-height-full">
+
+	<MudStack Spacing="0"
+			  StretchItems="StretchItems.End"
+			  Class="mud-elevation-3"
+			  Style="height: 100%;">
+
+		<MudStack Row
+				  Spacing="0"
+				  Justify="Justify.FlexStart"
+				  AlignItems="AlignItems.Center"
+				  Class="mud-theme-secondary px-5 py-3 rounded-t">
+			@if (Board is null)
 			{
-				<MudPaper Elevation="0"
-						  Width="224px"
-						  MinHeight="400px"
-						  Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
-					<MudToolBar Gutters="false">
-						<MudText Typo="Typo.subtitle1">
-							@list.Position @list.Id
-						</MudText>
-						<MudSpacer />
-						<MudMenu Icon="@Icons.Material.Rounded.MoreHoriz"
-								 AnchorOrigin="Origin.BottomRight"
-								 TransformOrigin="Origin.TopRight"
-								 ListClass="d-flex flex-column">
-							<MudButton Size="Size.Small"
-									   Color="Color.Error"
-									   StartIcon="@Icons.Material.Outlined.Delete"
-									   OnClick="@(() => DeleteList(list))">
-								Delete section
-							</MudButton>
-						</MudMenu>
-					</MudToolBar>
-					<MudDropZone T="BoardItemDto" Identifier=@list.Id.ToString() Class="mud-height-full" AllowReorder="true" />
-				</MudPaper>
+				<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+							 Height="32px" />
 			}
+			else
+			{
+				<MudText Typo="Typo.h6"
+						 Class="text-ellipsis">
+					@Board.Title
+				</MudText>
+			}
+		</MudStack>
 
-		</ChildContent>
+		<MudStack StretchItems=StretchItems.None
+				  AlignItems="AlignItems.Start"
+				  Style="overflow-x: auto;">
+			@if (Board is not null)
+			{
+				<MudDropContainer @ref=@_container
+								  T=@BoardItemDto
+								  Items=@_items
+								  ItemsSelector="@((item, list) => item.BoardListId.ToString() == list)"
+								  ItemDropped="ItemDropped"
+								  Class="d-flex flex-row flex-nowrap">
+					<ChildContent>
+						@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
+						{
+							<BoardList List=@list
+									   OnCreateItem=@(title=> CreateItemForList(list, title)) />
+						}
+						<MudPaper Elevation="5"
+								  Width="400px"
+								  Style="align-self: flex-start;"
+								  Class="my-3 mx-2">
+							<OnelineCreateButton Title="Add new list"
+												 OnCreate=@CreateList />
+						</MudPaper>
+					</ChildContent>
 
-		<ItemRenderer>
-			<MudPaper Elevation="25"
-					  Class="pa-4 rounded-lg my-3">
-				Id:@context.Id	List: @context.BoardListId Position:@context.Position
-			</MudPaper>
-		</ItemRenderer>
-	</MudDropContainer>
-}
+					<ItemRenderer>
+						<BoardItem Item=@context/>
+					</ItemRenderer>
+				</MudDropContainer>
+			}
+		</MudStack>
+	</MudStack>
+</MudPaper>
+
+
 @code {
+
 	[Parameter]
 	public Guid BoardId { get; set; }
 
+	[Inject]
+	private IBoardService BoardService { get; set; } = null!;
+	[Inject]
+	private IBoardItemService BoardItemService { get; set; } = null!;
+	[Inject]
+	private IBoardListService BoardListService { get; set; } = null!;
+	[Inject]
+	private NavigationManager Navigation { get; set; } = null!;
+
 	public BoardFullDto? Board { get; set; }
-	private string errorMessage = string.Empty;
 
-	private MudDropContainer<BoardItemDto> container;
-	private List<BoardItemDto> items;
+	private MudDropContainer<BoardItemDto> _container = null!;
+	private List<BoardItemDto> _items = null!;
 
-	private bool _addSectionOpen;
 
-	[Inject]
-	private IBoardService BoardService { get; set; }
-	[Inject]
-	private IBoardItemService BoardItemService { get; set; }
 
-	private async Task ItemUpdated(MudItemDropInfo<BoardItemDto> item)
+	protected override async Task OnInitializedAsync()
+	{
+		Board = await BoardService.GetBoardByIdAsync(BoardId);
+		_items = Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList();
+		StateHasChanged();
+	}
+
+	private void ItemDropped(MudItemDropInfo<BoardItemDto> item)
 	{
 		if (item.Item is null)
 		{
@@ -83,30 +114,47 @@
 			Position = item.IndexInZone + 1
 		};
 
-		await BoardItemService.MoveBoardItemAsync(request);
 		RestructureItems(request);
+		_ = Task.Run(async () =>
+		{
+			try
+			{
+				await BoardItemService.MoveBoardItemAsync(request);
+			}
+			catch (Exception)
+			{
+				Navigation.Refresh();
+			}
+		});
 	}
 
 	private void RestructureItems(MoveBoardItemRequest request)
 	{
-		var item = Board?.BoardLists
+		if (Board is null)
+		{
+			return;
+		}
+		var item = Board.BoardLists
 			.SelectMany(bl => bl.BoardItems)
 			.FirstOrDefault(bi => bi.Id == request.BoardItemId);
 		if (item is null)
 		{
 			return;
 		}
-		var fromBoardList = Board?.BoardLists.FirstOrDefault(bl => bl.Id == item.BoardListId);
+
+		var fromBoardList = Board.BoardLists.FirstOrDefault(bl => bl.Id == item.BoardListId);
 		if (fromBoardList is null)
 		{
 			return;
 		}
+
 		if (item.BoardListId == request.ToBoardListId)
 		{
 			if (item.Position == request.Position)
 			{
 				return;
 			}
+
 			if (item.Position > request.Position)
 			{
 				ShiftItemsPosition(fromBoardList, +1, request.Position, item.Position - 1);
@@ -125,6 +173,7 @@
 			{
 				return;
 			}
+
 			fromBoardList.BoardItems.Remove(item);
 			ShiftItemsPosition(fromBoardList, -1, item.Position);
 			ShiftItemsPosition(toBoardList, +1, request.Position);
@@ -137,32 +186,34 @@
 	}
 
 
-	protected override async Task OnInitializedAsync()
-	{
-		Board = await BoardService.GetBoardByIdAsync(BoardId);
-		StateHasChanged();
-	}
-
-	private List<BoardItemDto> Items()
+	private async Task CreateList(string title)
 	{
 		if (Board is null)
 		{
-			return [];
+			return;
 		}
-		return Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList();
+		var request = new CreateBoardListRequest()
+		{
+			BoardId = Board.Id,
+			Title = title
+		};
+		var list = await BoardListService.CreateBoardListAsync(request);
+		Board.BoardLists.Add(list);
+		StateHasChanged();
 	}
 
-	private void AddTask()
+	private async Task CreateItemForList(BoardListDto list, string title)
 	{
-	}
-
-	private void DeleteList(BoardListDto list)
-	{
-	}
-
-	public void ChangeListPosition(Guid boardListId, int newPosition)
-	{
-
+		var request = new CreateBoardItemRequest
+		{
+			BoardListId = list.Id,
+			Title = title
+		};
+		var item = await BoardItemService.CreateBoardItemAsync(request);
+		list.BoardItems.Add(item);
+		_items.Add(item);
+		_container.Refresh();
+		StateHasChanged();
 	}
 
 
@@ -172,28 +223,34 @@
 		{
 			return;
 		}
+
 		if (list is null)
 		{
 			return;
 		}
+
 		foreach (var item in list.BoardItems.Where(bi => bi.Position >= from))
 		{
 			item.Position += delta;
 		}
 	}
+
 	public void ShiftItemsPosition(BoardListDto list, int delta, int from, int to)
 	{
 		if (Board is null)
 		{
 			return;
 		}
+
 		if (list is null)
 		{
 			return;
 		}
+
 		foreach (var item in list.BoardItems.Where(bi => bi.Position >= from && bi.Position <= to))
 		{
 			item.Position += delta;
 		}
 	}
+
 }

@@ -3,16 +3,19 @@
 @using Tracker.Domain.Requests.Common
 @using Tracker.Services
 
-<MudNavLink Href=@($"/boards/{Board.Id}")>
-	<MudCard Elevation="2">
-		<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(Board)>
-		</MudCardMedia>
+<a href=@($"/boards/{Board.Id}")>
 
-		<MudCardContent>
-			<MudText Typo="Typo.h5" Class="d-block w-100" Style=" max-height: 1.3em;overflow: hidden; " ">
-				@Board.Title
-			</MudText>
-		</MudCardContent>
-	</MudCard>
-</MudNavLink>
+    <MudCard Elevation="2">
+        <MudCardMedia Height="70"
+                      Style=@GetBoardColorBackgroundStyle(Board)>
+        </MudCardMedia>
+
+        <MudCardContent>
+            <MudText Typo="Typo.h5"
+                     Class="text-ellipsis">
+                @Board.Title
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+</a>
 

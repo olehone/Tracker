@@ -9,8 +9,8 @@ namespace Tracker.Services;
 public class BoardService(IBoardsApi api) : IBoardService
 {
     public Task<BoardSummaryDto> CreateBoardAsync(CreateBoardRequest request)
-    => api.CreateBoardAsync(request);
+        => api.CreateBoardAsync(request);
 
     public Task<BoardFullDto> GetBoardByIdAsync(Guid id)
-    => api.GetBoardByIdAsync(id);
+        => api.GetBoardByIdAsync(id);
 }
