@@ -1,9 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
-@using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@using Tracker.Services.Abstraction
-@using Tracker.WebApp.States
+
 
 <MudThemeProvider @bind-IsDarkMode=@_isDarkMode/>
 
@@ -25,25 +23,25 @@
                 }
                 <MudButton Variant="Variant.Text"
                            Color="Color.Inherit"
-                           OnClick="@Logout">
+                           OnClick=@Logout>
                     Logout
                 </MudButton>
             </Authorized>
             <NotAuthorized>
                 <MudButton Variant="Variant.Text"
                            Color="Color.Inherit"
-                           OnClick="@GoToLogin">
+                           OnClick=@GoToLogin>
                     Login
                 </MudButton>
                 <MudButton Variant="Variant.Text"
                            Color="Color.Inherit"
-                           OnClick="@GoToRegister">
+                           OnClick=@GoToRegister>
                     Register
                 </MudButton>
             </NotAuthorized>
         </AuthorizeView>
 
-        <MudToggleIconButton @bind-Toggled="_isDarkMode"
+        <MudToggleIconButton @bind-Toggled=@_isDarkMode
                              Icon=@Icons.Material.Outlined.WbSunny
                              ToggledIcon=@Icons.Material.Outlined.DarkMode
                              Color="Color.Inherit"/>

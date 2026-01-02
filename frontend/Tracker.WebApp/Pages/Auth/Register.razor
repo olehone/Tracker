@@ -1,8 +1,5 @@
 ﻿@page "/register"
 
-@using Microsoft.AspNetCore.Components.Routing
-@using Tracker.WebApp.Pages.Auth
-
 <MudContainer MaxWidth="MaxWidth.Small"
               Class="d-flex align-center justify-center"
               Style="min-height: 100vh;">
@@ -18,8 +15,8 @@
                               @bind-Value=@registerModel.FirstName
                               Label="First Name"
                               For=@(() => registerModel.FirstName)
-                              Required="true"
-                              Immediate="true"
+                              Required
+                              Immediate
                               RequiredError="First name is required"/>
 
                 <MudTextField T="string"
@@ -30,16 +27,16 @@
                               @bind-Value=@registerModel.Email
                               Label="Email"
                               For=@(() => registerModel.Email)
-                              Required="true"
-                              Immediate="true"
+                              Required
+                              Immediate
                               RequiredError="Email is required"/>
 
                 <MudTextField T="string"
                               @bind-Value=@registerModel.Username
                               Label="Username"
                               For=@(() => registerModel.Username)
-                              Required="true"
-                              Immediate="true"
+                              Required
+                              Immediate
                               RequiredError="Username is required"/>
 
                 <MudTextField T="string"
@@ -47,8 +44,8 @@
                               Label="Password"
                               For=@(() => registerModel.Password)
                               InputType=@InputType.Password
-                              Required="true"
-                              Immediate="true"
+                              Required
+                              Immediate
                               RequiredError="Password is required"/>
 
                 <MudTextField T="string"
@@ -56,8 +53,8 @@
                               Label="Repeat Password"
                               For=@(() => secondPassword)
                               InputType=@InputType.Password
-                              Required="true"
-                              Immediate="true"
+                              Required
+                              Immediate
                               RequiredError="Repeat password is required"/>
 
                 @if (!(errorMessages is null or []))
@@ -65,7 +62,7 @@
                     @foreach (var error in errorMessages)
                     {
                         <MudAlert Severity="Severity.Error"
-                                  Dense="true">
+                                  Dense>
                             @error
                         </MudAlert>
                     }
@@ -73,7 +70,7 @@
 
                 <MudButton OnClick=@HandleRegister
                            Disabled=@(isLoading || !isSuccess)
-                           FullWidth="true"
+                           FullWidth
                            Variant=Variant.Filled
                            Color=Color.Primary>
                     @if (isLoading)

@@ -1,13 +1,8 @@
 ﻿@page "/workspaces/{WorkspaceId:guid}/overview"
-@attribute [Authorize]
-
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components
-@using Tracker.Domain.Dtos
-@using Tracker.Domain.Requests.Common
-@using Tracker.Services
 @using Tracker.WebApp.Components.Boards
 @using Tracker.WebApp.Shared
+
+
 
 <MudPaper Class="ma-4 mud-height-full">
     <MudStack Spacing="0"
@@ -45,7 +40,7 @@
                         <MudItem xs="12"
                                  sm="6"
                                  lg="3">
-                            <BoardSummary Board="board"/>
+                            <BoardSummary Board=@board/>
                         </MudItem>
                     }
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Components.BoardLists;
+
 public partial class BoardList
 {
 
