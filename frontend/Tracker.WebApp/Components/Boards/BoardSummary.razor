@@ -1,0 +1,16 @@
+<a href=@($"/boards/{Board.Id}")>
+
+    <MudCard Elevation="2">
+        <MudCardMedia Height="70"
+                      Style=@GetBoardColorBackgroundStyle(Board)>
+        </MudCardMedia>
+
+        <MudCardContent>
+            <MudText Typo="Typo.h5"
+                     Class="text-ellipsis">
+                @Board.Title
+            </MudText>
+        </MudCardContent>
+    </MudCard>
+</a>
+

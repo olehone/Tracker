@@ -8,22 +8,19 @@ public partial class WorkspacesList
 {
     private bool isAuthenticated;
     private List<WorkspaceDto>? Workspaces = null;
-    private readonly Random random = new Random();
 
     [Inject]
     private IWorkspaceService WorkspaceService { get; set; } = default!;
     [Inject]
     private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
-    private string RandomWidth()
+    private static string NormalizeTitle(string title)
     {
-        int width = 30 + random.Next(0, 40);
-        return $"{width}%";
-    }
-
-    private int RandomWorkspaceCount()
-    {
-        return 2 + random.Next(0, 3);
+        if (title.Length < 30)
+        {
+            return title;
+        }
+        return title.Substring(0, 30) + "..";
     }
 
     protected override async Task OnInitializedAsync()

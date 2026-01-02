@@ -1,6 +1,4 @@
-﻿using Tracker.Domain.Entities;
-
-namespace Tracker.Domain.Dtos;
+﻿namespace Tracker.Domain.Dtos;
 
 public class BoardFullDto
 {

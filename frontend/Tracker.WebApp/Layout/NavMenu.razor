@@ -1,31 +1,26 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-@using Tracker.Domain.Dtos
-@using Tracker.Domain.Entities
-@using Tracker.Services
-@using Tracker.WebApp.Components.Admin
+﻿@using Tracker.WebApp.Components.Admin
 @using Tracker.WebApp.Components.Workspaces
 
-<MudPaper Width="250px"
-		  Class="py-3"
-		  Elevation="0">
-	<MudNavMenu Color=@Color.Primary
-				Bordered=true>
-		<MudNavLink Icon=@Icons.Material.Filled.Home
-					Href="/"
-					Match=NavLinkMatch.All>
-			Home
-		</MudNavLink>
+<MudPaper Class="py-3 mud-height-full"
+          Elevation="0">
+    <MudNavMenu Color=@Color.Primary
+                Bordered=true>
+        <MudNavLink Icon=@Icons.Material.Filled.Home
+                    Href="/"
+                    Match=NavLinkMatch.All>
+            Home
+        </MudNavLink>
 
-		<AdminOptionList/>
+        <AdminOptionList/>
 
-		<WorkspacesList />
+        <WorkspacesList/>
 
-		<MudDivider Class="my-2" />
+        <MudDivider Class="my-2"/>
 
-		<MudNavLink Icon=@Icons.Material.Filled.Info
-					Href="/about">
-			About
-		</MudNavLink>
-	</MudNavMenu>
+        <MudNavLink Icon=@Icons.Material.Filled.Info
+                    Href="/about">
+            About
+        </MudNavLink>
+    </MudNavMenu>
 </MudPaper>
 

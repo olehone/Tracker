@@ -1,0 +1,13 @@
+@using Tracker.WebApp.Shared
+
+<MudCard Class="h-100">
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
+                 Animation="Animation.Wave"
+                 Height="70px"/>
+    <MudCardContent>
+        <MudText Typo="Typo.h5">
+            <MudSkeleton Animation="Animation.Wave"
+                         Width=@UiHelper.RandomPercentTitleWidth()/>
+        </MudText>
+    </MudCardContent>
+</MudCard>

@@ -2,19 +2,27 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Auth;
+
 public partial class Login
 {
-    [Inject] private IAuthService AuthService { get; set; } = default!;
-    [Inject] private IUserService UserService { get; set; } = default!;
-    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject]
+    private IAuthService AuthService { get; set; } = null!;
 
-    [CascadingParameter] private AppState? AppState { get; set; }
+    [Inject]
+    private IUserService UserService { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = null!;
+
+    [CascadingParameter]
+    private AppState? AppState { get; set; }
 
     private LoginUserRequest loginModel = new();
-    private string? errorMessage;
+    private IReadOnlyList<string>? errorMessages = [];
     private bool isLoading = false;
     private bool isSuccess = false;
     private MudForm form;
@@ -28,8 +36,13 @@ public partial class Login
             return;
         }
 
+        if (UiHelper.IsEmailInvalid(loginModel.Email))
+        {
+            errorMessages = ["Wrong email format"];
+            return;
+        }
+
         isLoading = true;
-        errorMessage = null;
 
         try
         {
@@ -45,15 +58,34 @@ public partial class Login
         }
         catch (HttpRequestException)
         {
-            errorMessage = "Unable to connect to the server. Please try again.";
+            errorMessages = ["Unable to connect to the server. Please try again."];
+        }
+        catch (Refit.ValidationApiException ex)
+        {
+            if (ex.Content is null)
+            {
+                errorMessages = ["Unknown error from server"];
+                return;
+            }
+
+            if (ex.Content.Errors.Count > 0)
+            {
+                errorMessages = ex.Content.Errors.SelectMany(error => error.Value).ToList();
+            }
+            else
+            {
+                var title = ex.Content.Title ?? "Unknown error from server";
+                errorMessages = [title];
+            }
         }
         catch (Exception)
         {
-            errorMessage = "Invalid email or password. Please try again.";
+            errorMessages = ["Invalid email or password. Please try again."];
         }
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }

@@ -22,10 +22,7 @@ public static class AuthErrors
         ErrorType.Conflict,
         "Sorry, email or username was taken by someone else, try again");
 
-    public static readonly Error PasswordIsIncorrect = new(
-        LoginCode,
-        ErrorType.Validation,
-        "Password is incorrect");
+    public static readonly Error PasswordIsIncorrect = Error.Validation("Password is incorrect");
 
     public static readonly Error RefreshTokenNotFound = new(
         RefreshTokenCode,

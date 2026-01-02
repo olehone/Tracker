@@ -12,4 +12,3 @@ public interface IBoardsApi
     [Post("/api/boards/")]
     Task<BoardSummaryDto> CreateBoardAsync(CreateBoardRequest request);
 }
-

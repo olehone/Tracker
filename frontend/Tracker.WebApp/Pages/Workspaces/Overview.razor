@@ -1,62 +1,67 @@
 ﻿@page "/workspaces/{WorkspaceId:guid}/overview"
+@using Tracker.WebApp.Components.Boards
+@using Tracker.WebApp.Shared
 
-@using Microsoft.AspNetCore.Components
-@using Tracker.Domain.Dtos
-@using Tracker.Domain.Requests.Common
-@using Tracker.Services
 
-<MudGrid>
-	@if (Workspace is not null)
-	{
-		@foreach (var board in Workspace.Boards)
-		{
-			<MudItem xs="12"
-					 sm="6"
-					 lg="3">
-				<MudNavLink Href=@($"/boards/{board.Id}")
-							class="d-block">
-					<MudCard>
-						<MudCardMedia Height="70" Style=@GetBoardColorBackgroundStyle(board)>
-						</MudCardMedia>
 
-						<MudCardContent>
-							<MudText Typo="Typo.h5">
-								@board.Title
-							</MudText>
-						</MudCardContent>
-					</MudCard>
-				</MudNavLink>
-			</MudItem>
-		}
-		<MudItem xs="12"
-				 sm="6"
-				 lg="3">
-			<MudButton Variant="Variant.Filled"
-					   Color="Color.Primary"
-					   OnClick=@OpenDialog>
-				Create new board
-			</MudButton>
-		</MudItem>
-	}
-	else
-	{
-		@for (int i = 0; i < RandomBoardsCount(); i++)
-		{
-			<MudItem xs="12"
-					 sm="6"
-					 lg="3">
-				<MudCard>
-					<MudSkeleton SkeletonType="SkeletonType.Rectangle"
-								 Animation="Animation.Wave"
-								 Height="70px" />
-					<MudCardContent>
-						<MudText Typo="Typo.h5">
-							<MudSkeleton Animation="Animation.Wave"
-										 Width=@RandomWidth() />
-						</MudText>
-					</MudCardContent>
-				</MudCard>
-			</MudItem>
-		}
-	}
-</MudGrid>
+<MudPaper Class="ma-4 mud-height-full">
+    <MudStack Spacing="0"
+              StretchItems="StretchItems.End"
+              AlignItems="AlignItems.Stretch"
+              Class="mud-elevation-3"
+              Style="height: 100%;">
+
+        <MudStack Row
+                  Spacing="0"
+                  AlignItems="AlignItems.Center"
+                  Class="mud-theme-secondary px-5 py-3 rounded-t">
+            @if (Workspace is null)
+            {
+                <MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+                             Height="32px"/>
+            }
+            else
+            {
+                <MudText Color="Color.Inherit"
+                         Typo="Typo.h6"
+                         Class="text-ellipsis">
+                    @Workspace.Title
+                </MudText>
+            }
+        </MudStack>
+
+        <MudStack Class="mud-background pa-4"
+                  Style="overflow-y: auto;">
+            <MudGrid Spacing="3">
+                @if (Workspace is not null)
+                {
+                    @foreach (var board in Workspace.Boards)
+                    {
+                        <MudItem xs="12"
+                                 sm="6"
+                                 lg="3">
+                            <BoardSummary Board=@board/>
+                        </MudItem>
+                    }
+
+                    <MudItem xs="12"
+                             sm="6"
+                             lg="3">
+                        <CreateBoardButton Workspace="Workspace"/>
+                    </MudItem>
+                }
+                else
+                {
+                    @for (int i = 0; i < UiHelper.RandomItemCount(); i++)
+                    {
+                        <MudItem xs="12"
+                                 sm="6"
+                                 lg="3">
+                            <BoardSummarySkeleton/>
+                        </MudItem>
+                    }
+                }
+            </MudGrid>
+        </MudStack>
+    </MudStack>
+</MudPaper>

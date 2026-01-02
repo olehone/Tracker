@@ -1,1 +1,66 @@
-﻿
+﻿@page "/boards/{BoardId:guid}"
+
+@using Tracker.WebApp.Components.BoardItems
+@using Tracker.WebApp.Components.BoardLists
+@using Tracker.WebApp.Components.Shared
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Shared
+
+<MudPaper Class="ma-4 mud-height-full">
+	<MudStack Spacing="0"
+			  StretchItems="StretchItems.End"
+			  Class="mud-elevation-3"
+			  Style="height: 100%;">
+		<MudStack Row
+				  Spacing="0"
+				  Justify="Justify.FlexStart"
+				  AlignItems="AlignItems.Center"
+				  Class="mud-theme-secondary px-5 py-3 rounded-t">
+			@if (Board is null)
+			{
+				<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+							 Height="32px" />
+			}
+			else
+			{
+				<MudText Typo="Typo.h6"
+						 Class="text-ellipsis">
+					@Board.Title
+				</MudText>
+			}
+		</MudStack>
+
+		<MudStack StretchItems="StretchItems.None"
+				  AlignItems="AlignItems.Start"
+				  Style="overflow-x: auto;">
+			@if (Board is not null)
+			{
+				<MudDropContainer @ref=@_container
+								  T=@BoardItemDto
+								  Items=@_items
+								  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
+								  ItemDropped=@ItemDropped
+								  Class="d-flex flex-row flex-nowrap">
+					<ChildContent>
+						@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
+						{
+							<BoardList List=@list
+									   OnCreateItem=@(title=> CreateItemForList(list, title)) />
+						}
+						<MudPaper Elevation="5"
+								  Width="400px"
+								  Style="align-self: flex-start;"
+								  Class="my-3 mx-2">
+							<OneLineCreateButton Title="Add new list"
+												 OnCreate=@CreateList />
+						</MudPaper>
+					</ChildContent>
+
+					<ItemRenderer>
+						<BoardItem Item=@context />
+					</ItemRenderer>
+				</MudDropContainer>
+			}
+		</MudStack>
+	</MudStack>
+</MudPaper>
