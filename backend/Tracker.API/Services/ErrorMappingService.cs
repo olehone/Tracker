@@ -17,7 +17,7 @@ public static class ErrorMappingService
     public static IActionResult ResultToActionResult(Result response)
     {
         return response.IsSuccess
-            ? new OkResult()
+            ? new NoContentResult()
             : response.Error.ToProblemDetails();
 
     }

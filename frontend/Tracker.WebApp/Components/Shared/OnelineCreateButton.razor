@@ -1,9 +1,34 @@
-<MudPaper Elevation="0"
-		  Class="pa-0 ma-2">
+@if (IsWithFrame)
+{
+	<MudPaper Elevation="0"
+			  Class="pa-0 ma-2">
 
+		@if (_isAddingItem)
+		{
+			<OneLineForm AllowEmpty=false
+						 Size=@Size
+						 OnEditCanceled=@ClosePressed
+						 OnValueSaved=@SubmitNewItem
+						 Typo=@Typo />
+		}
+		else
+		{
+			<MudButton FullWidth
+					   Size=@Size
+					   Variant="Variant.Outlined"
+					   Color="Color.Primary"
+					   OnClick=@AddItemPressed>
+				@Title
+			</MudButton>
+		}
+	</MudPaper>
+}
+else
+{
 	@if (_isAddingItem)
 	{
 		<OneLineForm AllowEmpty=false
+					 Size=@Size
 					 OnEditCanceled=@ClosePressed
 					 OnValueSaved=@SubmitNewItem
 					 Typo=@Typo />
@@ -11,10 +36,11 @@
 	else
 	{
 		<MudButton FullWidth
+				   Size=@Size
 				   Variant="Variant.Outlined"
 				   Color="Color.Primary"
 				   OnClick=@AddItemPressed>
 			@Title
 		</MudButton>
 	}
-</MudPaper>
+}

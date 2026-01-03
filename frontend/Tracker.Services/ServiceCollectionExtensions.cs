@@ -16,9 +16,7 @@ public static class ServiceCollectionExtensions
     {
 
         services.AddOptions<ApiOptions>()
-            .BindConfiguration(ApiOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(ApiOptions.SectionName);
 
         services.AddRefitClient<IAuthApi>()
             .ConfigureHttpClient((serviceProvider, client) =>
@@ -26,6 +24,7 @@ public static class ServiceCollectionExtensions
                 var options = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
             });
+
         services.AddApiClientWithAuth<IUserApi>();
         services.AddApiClientWithAuth<IWorkspaceApi>();
         services.AddApiClientWithAuth<IBoardsApi>();

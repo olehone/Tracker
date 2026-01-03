@@ -1,0 +1,32 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<AuthorizeView>
+	<Authorized>
+		<MudDivider Class="my-2" />
+
+		<MudText Typo=Typo.caption
+				 Class="ps-4">
+			Workspaces
+		</MudText>
+
+		@if (Workspaces is null)
+		{
+			@for (int i = 0; i < UiHelper.RandomItemCount(); i++)
+			{
+				<WorkspaceNabGroupSkeleton />
+			}
+		}
+		else
+		{
+			@foreach (var workspace in Workspaces)
+			{
+				<WorkspaceNavGroup Workspace=@workspace />
+			}
+			<OneLineCreateButton Size="Size.Small"
+								 OnCreate=@CreateWorkspace
+								 Title="New workspace"/>
+		}
+	</Authorized>
+</AuthorizeView>

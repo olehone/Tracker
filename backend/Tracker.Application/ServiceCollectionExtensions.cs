@@ -3,7 +3,7 @@ using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Tracker.Domain.Options;
-using Tracker.Application.Behaviours;
+using Tracker.Application.Behaviors;
 
 namespace Tracker.Application;
 

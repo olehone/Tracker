@@ -10,7 +10,7 @@ public partial class CreateBoardDialog
     private MudForm? _form;
     private bool _isValid;
     private bool _processing = false;
-    private CreateBoardRequest _request = new();
+    //private CreateBoardRequest _request = new();
 
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
@@ -24,10 +24,10 @@ public partial class CreateBoardDialog
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
 
-    protected override void OnInitialized()
-    {
-        _request = new CreateBoardRequest { WorkspaceId = Workspace.Id };
-    }
+    //protected override void OnInitialized()
+    //{
+    //    _request = new CreateBoardRequest { WorkspaceId = Workspace.Id };
+    //}
 
     private void Cancel()
     {
@@ -45,16 +45,16 @@ public partial class CreateBoardDialog
             return;
         }
 
-        var created = await BoardService.CreateBoardAsync(_request);
+        //var created = await BoardService.CreateBoardAsync(_request);
 
-        if (created is not null)
-        {
-            Navigation.NavigateTo($"/boards/{created.Id}");
-            MudDialog.Close(DialogResult.Ok(created));
-        }
-        else
-        {
-            _processing = false;
-        }
+        //if (created is not null)
+        //{
+        //    Navigation.NavigateTo($"/boards/{created.Id}");
+        //    MudDialog.Close(DialogResult.Ok(created));
+        //}
+        //else
+        //{
+        //    _processing = false;
+        //}
     }
 }

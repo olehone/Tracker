@@ -20,15 +20,17 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddJwtBearerAndAuth();
-builder.Services.AddSwaggerAuth();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerAuth();
+}
 
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices();
-
 
 var app = builder.Build();
 
@@ -37,8 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("DevCorsPolicy");
 app.UseHttpsRedirection();
+app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

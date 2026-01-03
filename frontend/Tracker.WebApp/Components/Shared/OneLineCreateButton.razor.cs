@@ -8,7 +8,11 @@ public partial class OneLineCreateButton
     [Parameter]
     public string Title { get; set; } = "Add";
     [Parameter]
+    public Size Size { get; set; } = Size.Large;
+    [Parameter]
     public Typo Typo { get; set; } = Typo.inherit;
+    [Parameter]
+    public bool IsWithFrame { get; set; } = true;
     [Parameter]
     public required EventCallback<string> OnCreate { get; set; }
 

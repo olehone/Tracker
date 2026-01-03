@@ -6,30 +6,13 @@
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Shared
 
-<MudPaper Class="ma-4 mud-height-full">
-	<MudStack Spacing="0"
-			  StretchItems="StretchItems.End"
-			  Class="mud-elevation-3"
-			  Style="height: 100%;">
-		<MudStack Row
-				  Spacing="0"
-				  Justify="Justify.FlexStart"
-				  AlignItems="AlignItems.Center"
-				  Class="mud-theme-secondary px-5 py-3 rounded-t">
-			@if (Board is null)
-			{
-				<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
-							 Height="32px" />
-			}
-			else
-			{
-				<MudText Typo="Typo.h6"
-						 Class="text-ellipsis">
-					@Board.Title
-				</MudText>
-			}
-		</MudStack>
+<WorkWindow>
 
+	<Header>
+		<WindowHeader Title=@Board?.Title />
+	</Header>
+
+	<Body>
 		<MudStack StretchItems="StretchItems.None"
 				  AlignItems="AlignItems.Start"
 				  Style="overflow-x: auto;">
@@ -62,5 +45,5 @@
 				</MudDropContainer>
 			}
 		</MudStack>
-	</MudStack>
-</MudPaper>
+	</Body>
+</WorkWindow>

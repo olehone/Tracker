@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests.Board;
+using Tracker.Domain.Requests.BoardItem;
+using Tracker.Domain.Requests.Workspace;
 using Tracker.Services;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 
@@ -13,6 +17,8 @@ public partial class Overview
 
     [Inject]
     private IWorkspaceService WorkspaceService { get; set; } = default!;
+    [Inject]
+    private IBoardService BoardService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,5 +34,17 @@ public partial class Overview
             StateHasChanged();
             Workspace = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
         }
+    }
+
+    private async Task CreateBoard(string title)
+    {
+        var request = new CreateBoardRequest()
+        {
+            WorkspaceId = WorkspaceId,
+            Title = title
+        };
+        var board = await BoardService.CreateBoardAsync(request);
+        Workspace!.Boards.Add(board);
+        StateHasChanged();
     }
 }

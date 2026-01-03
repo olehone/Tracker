@@ -44,4 +44,14 @@ public static class UiHelper
             return true;
         }
     }
+
+    public static string ShortenText(string text, int length, string ellipsis= "..")
+    {
+        var ellipsisLength = ellipsis.Length;
+        if (text.Length < length)
+        {
+            return text;
+        }
+        return text.Substring(0, length-ellipsisLength) + ellipsis;
+    }
 }

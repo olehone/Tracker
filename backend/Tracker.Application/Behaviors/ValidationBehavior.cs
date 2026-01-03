@@ -2,7 +2,7 @@
 using MediatR;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.Behaviours;
+namespace Tracker.Application.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
