@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Models;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
@@ -21,7 +22,7 @@ public partial class Login
     [CascadingParameter]
     private AppState? AppState { get; set; }
 
-    private LoginUserRequest loginModel = new();
+    private LoginUserModel loginModel = new();
     private IReadOnlyList<string>? errorMessages = [];
     private bool isLoading = false;
     private bool isSuccess = false;
@@ -46,7 +47,7 @@ public partial class Login
 
         try
         {
-            await AuthService.LoginAsync(loginModel);
+            await AuthService.LoginAsync(ToRequest(loginModel));
 
             var currentUser = await UserService.GetCurrentUserAsync();
             if (AppState != null && currentUser != null)
@@ -87,5 +88,14 @@ public partial class Login
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private static LoginUserRequest ToRequest(LoginUserModel model)
+    {
+        return new LoginUserRequest()
+        {
+            Email = model.Email,
+            Password = model.Password
+        };
     }
 }

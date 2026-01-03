@@ -10,15 +10,15 @@ namespace Tracker.WebApp.Pages.Auth;
 public partial class Register
 {
     [CascadingParameter] private AppState? AppState { get; set; }
-    
+
     [Inject]
     private IAuthService Auth { get; set; } = null!;
-    [Inject] 
+    [Inject]
     private IUserService UserService { get; set; } = null!;
-    [Inject] 
+    [Inject]
     private NavigationManager Navigation { get; set; } = null!;
 
-    private RegisterUserRequest registerModel = new();
+    private RegisterUserModel registerModel = new();
     private IReadOnlyList<string>? errorMessages;
     private string? secondPassword;
     private bool isLoading = false;
@@ -44,10 +44,9 @@ public partial class Register
             return;
         }
         isLoading = true;
-
         try
         {
-            await Auth.RegisterAsync(registerModel);
+            await Auth.RegisterAsync(ToRequest(registerModel));
 
             var currentUser = await UserService.GetCurrentUserAsync();
             if (AppState != null && currentUser != null)
@@ -88,5 +87,17 @@ public partial class Register
         {
             isLoading = false;
         }
+    }
+
+    private static RegisterUserRequest ToRequest(RegisterUserModel model)
+    {
+        return new RegisterUserRequest()
+        {
+            Email = model.Email,
+            Password = model.Password,
+            Username = model.Username,
+            FirstName = model.FirstName,
+            LastName = model.LastName
+        };
     }
 }
