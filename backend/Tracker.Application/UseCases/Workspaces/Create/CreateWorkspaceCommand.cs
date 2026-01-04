@@ -2,7 +2,7 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Auth.Register;
+namespace Tracker.Application.UseCases.Workspaces.Create;
 
 public class CreateWorkspaceCommand : IRequest<Result<WorkspaceDto>>
 {

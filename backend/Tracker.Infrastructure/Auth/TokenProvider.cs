@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 
 namespace Tracker.Infrastructure.Auth;
 
-public class TokenProvider(IOptions<JwtOptions> options):ITokenProvider
+public class TokenProvider(IOptions<JwtOptions> options) : ITokenProvider
 {
     public string Create(User user)
     {
@@ -23,7 +23,7 @@ public class TokenProvider(IOptions<JwtOptions> options):ITokenProvider
                 [
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
+                    new Claim(ClaimTypes.Role, user.Role.ToString()),
                 ]),
             Expires = DateTime.UtcNow.AddMinutes(options.Value.ExpirationInMinutes),
             SigningCredentials = credential,

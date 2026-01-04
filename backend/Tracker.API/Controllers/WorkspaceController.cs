@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Auth.Register;
+using Tracker.Application.UseCases.Workspaces.Create;
 using Tracker.Application.UseCases.Workspaces.GetWorkspaceById;
 using Tracker.Application.UseCases.Workspaces.GetWorkspaces;
 

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
 
-namespace Tracker.Application.UseCases.Auth.Register;
+namespace Tracker.Application.UseCases.Workspaces.Create;
 
 public class CreateWorkspaceCommandValidator : AbstractValidator<CreateWorkspaceCommand>
 {

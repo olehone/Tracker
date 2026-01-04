@@ -5,7 +5,7 @@ using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Auth.Register;
+namespace Tracker.Application.UseCases.Workspaces.Create;
 
 public sealed class CreateWorkspaceCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory)

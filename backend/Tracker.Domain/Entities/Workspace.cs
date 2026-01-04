@@ -7,5 +7,6 @@ public class Workspace: BaseEntity
     public required string Title { get; set; }
     public string? Description { get; set; }
     public List<Board> Boards { get; set; } = [];
-
+    public WorkspaceSettings Settings { get; set; } = new();
+    public List<UserWorkspace> UserWorkspaces { get; set; } = [];
 }
