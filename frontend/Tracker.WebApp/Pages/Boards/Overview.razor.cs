@@ -204,4 +204,8 @@ public partial class Overview
         }
     }
 
+    private string PageTitle()
+    {
+        return Board?.Title ?? "Board";
+    }
 }

@@ -58,4 +58,9 @@ public partial class Overview
         Workspace!.Boards.Add(result.Value);
         StateHasChanged();
     }
+
+    private string PageTitle()
+    {
+        return Workspace?.Title ?? "Workspace";
+    }
 }
