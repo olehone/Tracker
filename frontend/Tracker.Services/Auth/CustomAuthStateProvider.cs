@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Abstraction.Entities;
 
 namespace Tracker.Services.Auth;
 

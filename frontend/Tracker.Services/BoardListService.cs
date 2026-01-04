@@ -1,16 +1,18 @@
-﻿using Refit;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardList;
-using Tracker.Services.Abstraction;
+using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Entities;
 
-public class BoardListService(IBoardListApi api) : IBoardListService
+public class BoardListService(IApiErrorHandler apiErrorHandler,IBoardListApi api) 
+    : IBoardListService
 {
-    public Task<BoardListDto> CreateBoardListAsync(CreateBoardListRequest request)
-        => api.CreateBoardListAsync(request);
+    public Task<Result<BoardListDto>> CreateBoardListAsync(CreateBoardListRequest request)
+        => apiErrorHandler.ExecuteAsync(request, api.CreateBoardListAsync);
 
-    public Task<ApiResponse<object>> MoveBoardListAsync(MoveBoardListRequest request)
-        => api.MoveBoardListAsync(request);
+    public Task<Result> MoveBoardListAsync(MoveBoardListRequest request)
+        => apiErrorHandler.ExecuteAsync(request, api.MoveBoardListAsync);
 }

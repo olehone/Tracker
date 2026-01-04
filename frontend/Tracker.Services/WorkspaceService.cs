@@ -1,8 +1,9 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
+using Tracker.Services.Abstraction.Entities;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Entities;
 
 public class WorkspaceService(IWorkspaceApi api) : IWorkspaceService
 {

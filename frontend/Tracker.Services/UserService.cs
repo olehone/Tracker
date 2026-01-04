@@ -1,8 +1,8 @@
 ﻿using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Entities;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Entities;
 
 public class UserService(
     IUserApi api)

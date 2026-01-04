@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
-using Tracker.Services.Abstraction;
 using Tracker.Services.Auth;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Entities;
+using Tracker.Services.Abstraction.Entities;
 
 namespace Tracker.Services;
 

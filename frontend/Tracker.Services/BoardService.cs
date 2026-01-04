@@ -1,15 +1,18 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Services.Abstraction;
+using Tracker.Domain.Requests.Common;
+using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Entities;
 
-public class BoardService(IBoardsApi api) : IBoardService
+public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IBoardService
 {
-    public Task<BoardSummaryDto> CreateBoardAsync(CreateBoardRequest request)
-        => api.CreateBoardAsync(request);
+    public Task<Result<BoardSummaryDto>> CreateBoardAsync(CreateBoardRequest request)
+        => apiErrorHandler.ExecuteAsync(request, api.CreateBoardAsync);
 
-    public Task<BoardFullDto> GetBoardByIdAsync(Guid id)
-        => api.GetBoardByIdAsync(id);
+    public Task<Result<BoardFullDto>> GetBoardByIdAsync(GetByIdRequest request)
+        => apiErrorHandler.ExecuteAsync(request, api.GetBoardByIdAsync);
 }

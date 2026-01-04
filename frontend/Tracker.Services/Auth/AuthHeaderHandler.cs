@@ -3,18 +3,13 @@ using Tracker.Services.Abstraction.Auth;
 
 namespace Tracker.Services.Auth;
 
-public class AuthHeaderHandler : DelegatingHandler
+public class AuthHeaderHandler(IAuthStorage authStorage) : DelegatingHandler
 {
-    private readonly IAuthStorage _authStorage;
-
-    public AuthHeaderHandler(IAuthStorage authStorage)
-        => _authStorage = authStorage;
-
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var tokensDto = await _authStorage.GetAsync();
+        var tokensDto = await authStorage.GetAsync();
         var token = tokensDto?.AccessToken;
         if (!string.IsNullOrWhiteSpace(token))
         {
