@@ -6,5 +6,5 @@ namespace Tracker.Services.ApiClients;
 public interface IUserApi
 {
     [Get("/api/users/me")]
-    Task<UserDto?> GetCurrentUserAsync();
+    Task<ApiResponse<UserDto>> GetCurrentUserAsync();
 }

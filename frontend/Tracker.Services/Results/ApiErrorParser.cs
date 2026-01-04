@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Refit;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Results;
 
 public static class ApiErrorParser
 {
