@@ -25,7 +25,7 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(request, api.LoginAsync);
         if (result.IsFailure)
         {
-            return result;
+            return result.Error;
         }
 
         await storage.SetAsync(result.Value);
@@ -43,7 +43,7 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(request, api.RegisterAsync);
         if (result.IsFailure)
         {
-            return result;
+            return result.Error;
         }
 
         await storage.SetAsync(result.Value);

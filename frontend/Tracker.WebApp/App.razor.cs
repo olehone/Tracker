@@ -1,26 +1,17 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.WebApp.Models;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp;
 
 public partial class App
 {
-    [Inject]
-    private AppState AppState { get; set; } = default!;
-
-    [Inject]
-    private IAuthService AuthService { get; set; } = default!;
-
-    [Inject]
-    private IUserService UserService { get; set; } = default!;
-
-    [Inject]
-    private NavigationManager Nav { get; set; } = default!;
-
-    [Inject]
-    private IWebAssemblyHostEnvironment Env { get; set; } = default!;
+    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private IAuthService AuthService { get; set; } = null!;
+    [Inject] private IUserService UserService { get; set; } = null!;
+    [Inject] private NavigationManager Nav { get; set; } = null!;
 
     private void RedirectToLogin()
     {
@@ -33,7 +24,12 @@ public partial class App
 
         if (principal.Identity?.IsAuthenticated == true)
         {
-            AppState.CurrentUser = await UserService.GetCurrentUserAsync();
+            var result = await UserService.GetCurrentUserAsync();
+            if (result.IsFailure)
+            {
+                return;
+            }
+            AppState.CurrentUser = result.Value;
         }
     }
 }

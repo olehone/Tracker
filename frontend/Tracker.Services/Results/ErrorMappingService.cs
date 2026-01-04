@@ -19,85 +19,82 @@ public static class ErrorMappingService
             HttpStatusCode.NotFound => MapResponseContent(content, ErrorType.NotFound),
             HttpStatusCode.Conflict => MapResponseContent(content, ErrorType.Conflict),
             _ when ((int)statusCode >= 500) => MapResponseContent(content, ErrorType.Server),
-            _ => new Error(statusCode.ToString(), ErrorType.Unknown)
+            _ => new Error(statusCode.ToString(), ErrorType.Unknown, "Unknown error")
         };
     }
 
     private static Error MapResponseContent(string? content, ErrorType errorType)
     {
+        if (errorType is ErrorType.Validation)
+        {
+            return MapValidationResponseContent(content);
+        }
+
         var description = TryExtractProblemDetails(content) ?? GetDefaultDescription(errorType);
         return new Error(errorType.ToString(), errorType, description);
     }
 
-    public static Error MapException(Exception exception)
+    public static Error MapHttpRequestException(HttpRequestException exception)
     {
-        if (exception is HttpRequestException)
-        {
-            return new Error(
-                "Network.Connection",
-                ErrorType.Network,
-                GetDefaultDescription(ErrorType.Network)
-                );
-        }
-
-        if (exception is ValidationApiException validationException)
-        {
-            return MapValidationException(validationException);
-        }
-
-        if (exception is ApiException apiException)
-        {
-            return apiException.StatusCode switch
-            {
-                HttpStatusCode.NotFound
-                    => MapApiException(apiException, ErrorType.NotFound),
-
-                HttpStatusCode.Conflict
-                    => MapApiException(apiException, ErrorType.Conflict),
-
-                HttpStatusCode.Unauthorized
-                    => MapApiException(apiException, ErrorType.Unauthorized),
-
-                HttpStatusCode.BadRequest
-                    => MapApiException(apiException, ErrorType.Validation),
-
-                _ => MapApiException(apiException, ErrorType.Server)
-
-            };
-        }
-        return Error.Unknown;
+        return new Error(
+            "Network.Connection",
+            ErrorType.Network,
+            GetDefaultDescription(ErrorType.Network)
+            );
     }
 
-    private static Error MapValidationException(ValidationApiException ex)
+    private static Error MapValidationResponseContent(string? content)
     {
-        if (ex.Content?.Errors != null && ex.Content.Errors.Count > 0)
+        const string Code = "Validation";
+        if (string.IsNullOrWhiteSpace(content))
         {
-            var details = ex.Content.Errors
-                .SelectMany(kvp => kvp.Value)
-                .ToArray();
-
             return new Error(
-                "Validation",
+                Code,
                 ErrorType.Validation,
-                ex.Content.Title ?? GetDefaultDescription(ErrorType.Validation),
-                details);
+                GetDefaultDescription(ErrorType.Validation));
         }
 
-        return new Error(
-            "Validation",
-            ErrorType.Validation,
-            ex.Content?.Title ?? GetDefaultDescription(ErrorType.Validation));
-    }
+        try
+        {
+            using var doc = JsonDocument.Parse(content);
+            var root = doc.RootElement;
 
-    private static Error MapApiException(ApiException ex, ErrorType errorType)
-    {
-        var description = TryExtractProblemDetails(ex.Content)
-            ?? GetDefaultDescription(errorType);
+            var title = root.TryGetProperty("title", out var titleProp)
+                ? titleProp.GetString()
+                : GetDefaultDescription(ErrorType.Validation);
 
-        return new Error(
-            ex.StatusCode.ToString(),
-            errorType,
-            description);
+            if (root.TryGetProperty("errors", out var errorsProp) &&
+                errorsProp.ValueKind == JsonValueKind.Object)
+            {
+                var details = errorsProp
+                    .EnumerateObject()
+                    .SelectMany(p =>
+                        p.Value.ValueKind == JsonValueKind.Array
+                            ? p.Value.EnumerateArray().Select(v => v.GetString())
+                            : Array.Empty<string?>())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Cast<string>()
+                    .ToArray();
+
+                return new Error(
+                    Code,
+                    ErrorType.Validation,
+                    title ?? GetDefaultDescription(ErrorType.Validation),
+                    details);
+            }
+
+            return new Error(
+                Code,
+                ErrorType.Validation,
+                title ?? GetDefaultDescription(ErrorType.Validation));
+        }
+        catch
+        {
+            return new Error(
+                Code,
+                ErrorType.Validation,
+                GetDefaultDescription(ErrorType.Validation));
+        }
     }
 
     private static string? TryExtractProblemDetails(string? content)
@@ -119,6 +116,7 @@ public static class ErrorMappingService
             return null;
         }
     }
+
     private static string GetDefaultDescription(ErrorType errorType)
     {
         return errorType switch

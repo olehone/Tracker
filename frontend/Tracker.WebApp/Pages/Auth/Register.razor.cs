@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
-using Tracker.Services.Abstraction;
+using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.WebApp.Models;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
@@ -11,12 +13,9 @@ public partial class Register
 {
     [CascadingParameter] private AppState? AppState { get; set; }
 
-    [Inject]
-    private IAuthService Auth { get; set; } = null!;
-    [Inject]
-    private IUserService UserService { get; set; } = null!;
-    [Inject]
-    private NavigationManager Navigation { get; set; } = null!;
+    [Inject] private IAuthService Auth { get; set; } = null!;
+    [Inject] private IUserService UserService { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     private RegisterUserModel registerModel = new();
     private IReadOnlyList<string>? errorMessages;
@@ -44,49 +43,46 @@ public partial class Register
             return;
         }
         isLoading = true;
-        try
-        {
-            await Auth.RegisterAsync(ToRequest(registerModel));
 
-            var currentUser = await UserService.GetCurrentUserAsync();
-            if (AppState != null && currentUser != null)
-            {
-                AppState.CurrentUser = currentUser;
-            }
-            Navigation.NavigateTo("/", forceLoad: false);
-        }
-        catch (HttpRequestException)
+        var result = await Auth.RegisterAsync(ToRequest(registerModel));
+        if (NotifyIfError(result))
         {
-            errorMessages = ["Unable to connect to the server. Please try again."];
-            StateHasChanged();
+            return;
         }
-        catch (Refit.ValidationApiException ex)
+
+        var userResult = await UserService.GetCurrentUserAsync();
+        if (NotifyIfError(userResult))
         {
-            if (ex.Content is null)
+            return;
+        }
+        if (AppState != null && userResult.IsSuccess)
+        {
+            AppState.CurrentUser = userResult.Value;
+        }
+
+        Navigation.NavigateTo("/", forceLoad: false);
+
+    }
+
+    private bool NotifyIfError(Result result)
+    {
+        if (result.IsFailure)
+        {
+            var error = result.Error!;
+
+            if (error.Type == ErrorType.Validation)
             {
-                errorMessages = ["Unknown error from server"];
-                return;
-            }
-            if (ex.Content.Errors.Count > 0)
-            {
-                errorMessages = ex.Content.Errors.SelectMany(error => error.Value).ToList();
+                errorMessages = error.Details;
             }
             else
             {
-                var title = ex.Content.Title ?? "Unknown error from server";
-                errorMessages = [title];
+                errorMessages = [error.Description];
             }
-            StateHasChanged();
+            return true;
         }
-        catch (Exception)
-        {
-            errorMessages = ["Invalid email or password. Please try again."];
-            StateHasChanged();
-        }
-        finally
-        {
-            isLoading = false;
-        }
+        isLoading = false;
+        StateHasChanged();
+        return false;
     }
 
     private static RegisterUserRequest ToRequest(RegisterUserModel model)

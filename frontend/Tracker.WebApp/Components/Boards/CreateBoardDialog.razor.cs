@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Entities;
 
 namespace Tracker.WebApp.Components.Boards;
 public partial class CreateBoardDialog
@@ -13,16 +13,13 @@ public partial class CreateBoardDialog
     //private CreateBoardRequest _request = new();
 
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; } = default!;
+    private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter]
-    public WorkspaceDto Workspace { get; set; } = default!;
+    public WorkspaceDto Workspace { get; set; } = null!;
 
-    [Inject]
-    private IBoardService BoardService { get; set; } = default!;
-
-    [Inject]
-    private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private IBoardService BoardService { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     //protected override void OnInitialized()
     //{

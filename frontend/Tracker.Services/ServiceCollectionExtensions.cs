@@ -8,6 +8,8 @@ using Tracker.Services.ApiClients;
 using Tracker.Services.Abstraction.Auth;
 using Tracker.Services.Entities;
 using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction.Results;
+using Tracker.Services.Results;
 
 namespace Tracker.Services;
 
@@ -16,6 +18,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApiAndServices(this IServiceCollection services)
     {
 
+        services.AddScoped<IApiErrorHandler, ApiErrorHandler>();
         services.AddOptions<ApiOptions>()
             .BindConfiguration(ApiOptions.SectionName);
 

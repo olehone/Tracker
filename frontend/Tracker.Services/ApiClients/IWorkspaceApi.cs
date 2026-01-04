@@ -6,11 +6,11 @@ namespace Tracker.Services.ApiClients;
 
 public interface IWorkspaceApi
 {
-    [Get("/api/workspaces/{id}")]
-    Task<ApiResponse<WorkspaceDto>> GetWorkspaceByIdAsync(Guid id);
-
     [Get("/api/workspaces/")]
     Task<ApiResponse<List<WorkspaceDto>>> GetWorkspacesAsync();
+
+    [Get("/api/workspaces/{id}")]
+    Task<ApiResponse<WorkspaceDto>> GetWorkspaceByIdAsync(Guid id);
 
     [Post("/api/workspaces/")]
     Task<ApiResponse<WorkspaceDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);

@@ -2,19 +2,18 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
-using Tracker.Services;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Workspaces;
 
 public partial class WorkspacesNavList : IAsyncDisposable
 {
+    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+
     private bool isAuthenticated;
     private List<WorkspaceDto>? Workspaces = null;
-
-    [Inject]
-    private IWorkspaceService WorkspaceService { get; set; } = default!;
-    [Inject]
-    private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,8 +27,12 @@ public partial class WorkspacesNavList : IAsyncDisposable
         {
             Title = title
         };
-        var workspace = await WorkspaceService.CreateWorkspaceAsync(request);
-        Workspaces!.Add(workspace);
+        var result = await WorkspaceService.CreateWorkspaceAsync(request);
+        if (result.IsFailure)
+        {
+            return;
+        }
+        Workspaces!.Add(result.Value);
         StateHasChanged();
     }
 
@@ -37,24 +40,22 @@ public partial class WorkspacesNavList : IAsyncDisposable
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-
-        Workspaces = isAuthenticated
-            ? await WorkspaceService.GetWorkspacesAsync()
-            : null;
-    }
-    private async void OnAuthStateChanged(Task<AuthenticationState> task)
-    {
-        var authState = await task;
-        var isAuth = authState.User.Identity?.IsAuthenticated == true;
-        if (isAuth)
-        {
-            Workspaces = await WorkspaceService.GetWorkspacesAsync();
-        }
-        else
+        if (!isAuthenticated)
         {
             Workspaces = null;
         }
 
+        var result = await WorkspaceService.GetWorkspacesAsync();
+        if (result.IsFailure)
+        {
+            return;
+        }
+        Workspaces = result.Value;
+    }
+
+    private async void OnAuthStateChanged(Task<AuthenticationState> task)
+    {
+        await LoadWorkspacesIfAuthenticatedAsync();
         await InvokeAsync(StateHasChanged);
     }
 
