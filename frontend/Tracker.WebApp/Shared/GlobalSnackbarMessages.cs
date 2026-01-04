@@ -11,6 +11,7 @@ public class GlobalSnackbarMessages(ISnackbar SnackbarService) : IErrorNotifier
         {
             return false;
         }
+
         var error = result.Error!;
         NotifyActionError(error);
 
@@ -20,7 +21,7 @@ public class GlobalSnackbarMessages(ISnackbar SnackbarService) : IErrorNotifier
     // Validation errors is handled by forms
     public void NotifyActionError(Error error)
     {
-        if (error.Type is ErrorType.Validation|| error.Type is ErrorType.Network)
+        if (error.Type is ErrorType.Validation || error.Type is ErrorType.Network)
         {
             return;
         }
@@ -38,7 +39,7 @@ public class GlobalSnackbarMessages(ISnackbar SnackbarService) : IErrorNotifier
 
         if (error.Type is ErrorType.Network)
         {
-            SnackbarService.Add(error.Description!, Severity.Warning, networkConfig, key: "offline");
+            SnackbarService.Add(error.Description!, Severity.Warning, networkConfig, "offline");
         }
     }
 }

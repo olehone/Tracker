@@ -8,15 +8,21 @@ using Tracker.Services.ApiClients;
 
 namespace Tracker.Services.Entities;
 
-public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi api) 
+public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi api)
     : IWorkspaceService
 {
     public Task<Result<List<WorkspaceDto>>> GetWorkspacesAsync()
-        => apiErrorHandler.ExecuteAsync(api.GetWorkspacesAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(api.GetWorkspacesAsync);
+    }
 
     public Task<Result<WorkspaceDto>> GetWorkspaceByIdAsync(GetByIdRequest request)
-        => apiErrorHandler.ExecuteAsync(request.Id, api.GetWorkspaceByIdAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(request.Id, api.GetWorkspaceByIdAsync);
+    }
 
     public Task<Result<WorkspaceDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request)
-        => apiErrorHandler.ExecuteAsync(request, api.CreateWorkspaceAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.CreateWorkspaceAsync);
+    }
 }

@@ -16,9 +16,9 @@ public sealed class AuthService(
     IJwtTokenReader jwtTokenReader)
     : IAuthService
 {
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
     public EventCallback OnLogin { get; set; }
     public EventCallback OnLogout { get; set; }
-    private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
     public async Task<Result> LoginAsync(LoginUserRequest request)
     {
@@ -63,6 +63,19 @@ public sealed class AuthService(
         return Result.Success();
     }
 
+    public async Task<ClaimsPrincipal> GetPrincipalAsync()
+    {
+        var accessToken = await GetAccessTokenAsync();
+        if (accessToken is null)
+        {
+            return new ClaimsPrincipal(new ClaimsIdentity());
+        }
+
+        var claims = jwtTokenReader.ReadClaims(accessToken);
+        var identity = new ClaimsIdentity(claims, "jwt");
+        return new ClaimsPrincipal(identity);
+    }
+
     private async Task<string?> GetAccessTokenAsync()
     {
         var tokensDto = await storage.GetAsync();
@@ -92,7 +105,8 @@ public sealed class AuthService(
             {
                 return tokensDto.AccessToken;
             }
-            var request = new RefreshTokenRequest()
+
+            var request = new RefreshTokenRequest
             {
                 RefreshToken = tokensDto.RefreshToken
             };
@@ -118,18 +132,5 @@ public sealed class AuthService(
         {
             _refreshLock.Release();
         }
-    }
-
-    public async Task<ClaimsPrincipal> GetPrincipalAsync()
-    {
-        var accessToken = await GetAccessTokenAsync();
-        if (accessToken is null)
-        {
-            return new ClaimsPrincipal(new ClaimsIdentity());
-        }
-
-        var claims = jwtTokenReader.ReadClaims(accessToken);
-        var identity = new ClaimsIdentity(claims, "jwt");
-        return new ClaimsPrincipal(identity);
     }
 }

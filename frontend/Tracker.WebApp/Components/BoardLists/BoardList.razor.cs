@@ -5,7 +5,6 @@ namespace Tracker.WebApp.Components.BoardLists;
 
 public partial class BoardList
 {
-
     [Parameter]
     public required BoardListDto List { get; set; }
     [Parameter]
@@ -15,5 +14,4 @@ public partial class BoardList
     {
         await OnCreateItem.InvokeAsync(title);
     }
-
 }

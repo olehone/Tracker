@@ -12,6 +12,7 @@ public class UserService(
     : IUserService
 {
     public async Task<Result<UserDto>> GetCurrentUserAsync()
-        => await apiErrorHandler.ExecuteAsync(api.GetCurrentUserAsync);
-    
+    {
+        return await apiErrorHandler.ExecuteAsync(api.GetCurrentUserAsync);
+    }
 }

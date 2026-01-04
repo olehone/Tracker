@@ -11,6 +11,12 @@ namespace Tracker.WebApp.Pages.Auth;
 
 public partial class Login
 {
+    private readonly LoginUserModel _loginModel = new();
+    private IReadOnlyList<string>? _errorMessages = [];
+    private MudForm _form;
+    private bool _isLoading;
+    private bool _isSuccess;
+
     [CascadingParameter]
     private AppState? AppState { get; set; }
 
@@ -18,31 +24,24 @@ public partial class Login
     [Inject] private IUserService UserService { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
-
-    private LoginUserModel loginModel = new();
-    private IReadOnlyList<string>? errorMessages = [];
-    private bool isLoading = false;
-    private bool isSuccess = false;
-    private MudForm form;
-
     private async Task HandleLogin()
     {
-        await form!.Validate();
+        await _form!.Validate();
 
-        if (!form.IsValid)
+        if (!_form.IsValid)
         {
             return;
         }
 
-        if (UiHelper.IsEmailInvalid(loginModel.Email))
+        if (UiHelper.IsEmailInvalid(_loginModel.Email))
         {
-            errorMessages = ["Wrong email format"];
+            _errorMessages = ["Wrong email format"];
             return;
         }
 
-        isLoading = true;
+        _isLoading = true;
 
-        var result = await AuthService.LoginAsync(ToRequest(loginModel));
+        var result = await AuthService.LoginAsync(ToRequest(_loginModel));
         if (NotifyIfError(result))
         {
             return;
@@ -53,13 +52,13 @@ public partial class Login
         {
             return;
         }
+
         if (AppState != null && userResult.IsSuccess)
         {
             AppState.CurrentUser = userResult.Value;
         }
 
-        Navigation.NavigateTo("/", forceLoad: false);
-
+        Navigation.NavigateTo("/", false);
     }
 
     private bool NotifyIfError(Result result)
@@ -70,24 +69,26 @@ public partial class Login
 
             if (error.Type == ErrorType.Validation)
             {
-                errorMessages = error.Details;
+                _errorMessages = error.Details;
             }
             else
             {
-                errorMessages = [error.Description];
+                _errorMessages = [error.Description];
             }
-            isLoading = false;
+
+            _isLoading = false;
             StateHasChanged();
             return true;
         }
-        isLoading = false;
+
+        _isLoading = false;
         StateHasChanged();
         return false;
     }
 
     private static LoginUserRequest ToRequest(LoginUserModel model)
     {
-        return new LoginUserRequest()
+        return new LoginUserRequest
         {
             Email = model.Email,
             Password = model.Password

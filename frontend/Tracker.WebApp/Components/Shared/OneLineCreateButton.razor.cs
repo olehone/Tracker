@@ -5,6 +5,7 @@ namespace Tracker.WebApp.Components.Shared;
 
 public partial class OneLineCreateButton
 {
+    private bool _isAddingItem;
     [Parameter]
     public string Title { get; set; } = "Add";
     [Parameter]
@@ -15,8 +16,6 @@ public partial class OneLineCreateButton
     public bool IsWithFrame { get; set; } = true;
     [Parameter]
     public required EventCallback<string> OnCreate { get; set; }
-
-    private bool _isAddingItem = false;
 
     private void AddItemPressed()
     {
@@ -33,5 +32,4 @@ public partial class OneLineCreateButton
     {
         _isAddingItem = false;
     }
-
 }

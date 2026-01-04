@@ -1,5 +1,4 @@
-﻿using Refit;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Domain.Results;
 

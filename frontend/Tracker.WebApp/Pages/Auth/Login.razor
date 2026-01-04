@@ -9,31 +9,31 @@
               Class="pa-8"
               Style="width: 100%; max-width: 400px;">
 
-        <MudForm @ref=@form
-                 @bind-IsValid=@isSuccess
-                 Model=@loginModel>
+        <MudForm @ref=@_form
+                 @bind-IsValid=@_isSuccess
+                 Model=@_loginModel>
             <MudStack Spacing="3">
 
                 <MudTextField T="string"
-                              @bind-Value=@loginModel.Email
+                              @bind-Value=@_loginModel.Email
                               Label="Email"
-                              For=@(() => loginModel.Email)
+                              For=@(() => _loginModel.Email)
                               Required
                               Immediate
                               RequiredError="Email is required"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@loginModel.Password
+                              @bind-Value=@_loginModel.Password
                               Label="Password"
-                              For=@(() => loginModel.Password)
+                              For=@(() => _loginModel.Password)
                               InputType="InputType.Password"
                               Required
                               Immediate
                               RequiredError="Password is required"/>
 
-                @if (!(errorMessages is null or []))
+                @if (!(_errorMessages is null or []))
                 {
-                    @foreach (var error in errorMessages)
+                    @foreach (var error in _errorMessages)
                     {
                         <MudAlert Severity="Severity.Error"
                                   Dense>
@@ -43,11 +43,11 @@
                 }
 
                 <MudButton OnClick=@HandleLogin
-                           Disabled=@(isLoading || !isSuccess)
+                           Disabled=@(_isLoading || !_isSuccess)
                            FullWidth
                            Variant=Variant.Filled
                            Color=Color.Primary>
-                    @if (isLoading)
+                    @if (_isLoading)
                     {
                         <MudProgressCircular Size="Size.Small"
                                              Indeterminate/>

@@ -1,13 +1,9 @@
 ﻿@page "/{*Path}"
 
 <PageTitle>Not found</PageTitle>
-<MudPaper Class="ma-4 pa-4" Elevation="0">
-	<MudAlert Severity="Severity.Error">
-		Sorry, there's nothing at address @Path
-	</MudAlert>
+<MudPaper Class="ma-4 pa-4"
+          Elevation="0">
+    <MudAlert Severity="Severity.Error">
+        Sorry, there's nothing at address @Path
+    </MudAlert>
 </MudPaper>
-
-@code {
-	[Parameter]
-	public string Path { get; set; } = null!;
-}

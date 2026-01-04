@@ -10,14 +10,22 @@ public class AuthStorage : IAuthStorage
     private readonly ILocalStorageService _storage;
 
     public AuthStorage(ILocalStorageService storage)
-        => _storage = storage;
+    {
+        _storage = storage;
+    }
 
     public async Task<TokensDto?> GetAsync()
-        => await _storage.GetItemAsync<TokensDto?>(Key);
+    {
+        return await _storage.GetItemAsync<TokensDto?>(Key);
+    }
 
     public async Task SetAsync(TokensDto session)
-        => await _storage.SetItemAsync(Key, session);
+    {
+        await _storage.SetItemAsync(Key, session);
+    }
 
     public async Task ClearAsync()
-        => await _storage.RemoveItemAsync(Key);
+    {
+        await _storage.RemoveItemAsync(Key);
+    }
 }

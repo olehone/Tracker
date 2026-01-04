@@ -18,12 +18,6 @@ public class CustomAuthStateProvider
         _authService.OnLogout = EventCallback.Factory.Create(this, NotifyUserLogout);
     }
 
-    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-    {
-        var principal = await _authService.GetPrincipalAsync();
-        return new AuthenticationState(principal);
-    }
-
     public void NotifyUserAuthentication()
     {
         var authState = GetAuthenticationStateAsync();
@@ -35,6 +29,14 @@ public class CustomAuthStateProvider
         NotifyAuthenticationStateChanged(Task.FromResult(Anonymous()));
     }
 
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var principal = await _authService.GetPrincipalAsync();
+        return new AuthenticationState(principal);
+    }
+
     private static AuthenticationState Anonymous()
-        => new(new ClaimsPrincipal(new ClaimsIdentity()));
+    {
+        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+    }
 }

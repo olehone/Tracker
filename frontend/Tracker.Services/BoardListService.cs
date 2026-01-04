@@ -7,12 +7,16 @@ using Tracker.Services.ApiClients;
 
 namespace Tracker.Services.Entities;
 
-public class BoardListService(IApiErrorHandler apiErrorHandler,IBoardListApi api) 
+public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi api)
     : IBoardListService
 {
     public Task<Result<BoardListDto>> CreateBoardListAsync(CreateBoardListRequest request)
-        => apiErrorHandler.ExecuteAsync(request, api.CreateBoardListAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.CreateBoardListAsync);
+    }
 
     public Task<Result> MoveBoardListAsync(MoveBoardListRequest request)
-        => apiErrorHandler.ExecuteAsync(request, api.MoveBoardListAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.MoveBoardListAsync);
+    }
 }

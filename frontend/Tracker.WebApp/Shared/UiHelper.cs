@@ -1,8 +1,10 @@
-﻿namespace Tracker.WebApp.Shared;
+﻿using System.Net.Mail;
+
+namespace Tracker.WebApp.Shared;
 
 public static class UiHelper
 {
-    private static readonly Random Random = new Random();
+    private static readonly Random Random = new();
 
     public static int RandomItemCount()
     {
@@ -11,19 +13,19 @@ public static class UiHelper
 
     public static string RandomPercentTitleWidth()
     {
-        int width = 30 + Random.Next(0, 40);
+        var width = 30 + Random.Next(0, 40);
         return $"{width}%";
     }
 
     public static string RandomPixelTitleWidth()
     {
-        int width = 100 + Random.Next(0, 100);
+        var width = 100 + Random.Next(0, 100);
         return $"{width}px";
     }
 
     public static string RandomDescriptionWidth()
     {
-        int width = 10 + Random.Next(0, 20);
+        var width = 10 + Random.Next(0, 20);
         return $"{width}%";
     }
 
@@ -36,7 +38,7 @@ public static class UiHelper
 
         try
         {
-            var addr = new System.Net.Mail.MailAddress(email);
+            var addr = new MailAddress(email);
             return addr.Address != email;
         }
         catch
@@ -45,13 +47,14 @@ public static class UiHelper
         }
     }
 
-    public static string ShortenText(string text, int length, string ellipsis= "..")
+    public static string ShortenText(string text, int length, string ellipsis = "..")
     {
         var ellipsisLength = ellipsis.Length;
         if (text.Length < length)
         {
             return text;
         }
-        return text.Substring(0, length-ellipsisLength) + ellipsis;
+
+        return text.Substring(0, length - ellipsisLength) + ellipsis;
     }
 }

@@ -18,7 +18,7 @@ public static class ErrorMappingService
             HttpStatusCode.Unauthorized => MapResponseContent(content, ErrorType.Unauthorized),
             HttpStatusCode.NotFound => MapResponseContent(content, ErrorType.NotFound),
             HttpStatusCode.Conflict => MapResponseContent(content, ErrorType.Conflict),
-            _ when ((int)statusCode >= 500) => MapResponseContent(content, ErrorType.Server),
+            _ when (int)statusCode >= 500 => MapResponseContent(content, ErrorType.Server),
             _ => new Error(statusCode.ToString(), ErrorType.Unknown, "Unknown error")
         };
     }
@@ -40,7 +40,7 @@ public static class ErrorMappingService
             "Network.Connection",
             ErrorType.Network,
             GetDefaultDescription(ErrorType.Network)
-            );
+        );
     }
 
     private static Error MapValidationResponseContent(string? content)
@@ -130,5 +130,4 @@ public static class ErrorMappingService
             _ => "An error occurred"
         };
     }
-
 }

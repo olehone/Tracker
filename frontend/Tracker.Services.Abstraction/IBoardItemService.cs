@@ -1,5 +1,4 @@
-﻿using Refit;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Results;
 
@@ -10,4 +9,3 @@ public interface IBoardItemService
     public Task<Result<BoardItemDto>> CreateBoardItemAsync(CreateBoardItemRequest request);
     public Task<Result> MoveBoardItemAsync(MoveBoardItemRequest request);
 }
-

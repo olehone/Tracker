@@ -9,59 +9,59 @@
               Class="pa-8"
               Style="width: 100%; max-width: 400px;">
 
-        <MudForm @ref=@form
-                 @bind-IsValid=@isSuccess
-                 Model=@registerModel>
+        <MudForm @ref=@_form
+                 @bind-IsValid=@_isSuccess
+                 Model=@_registerModel>
             <MudStack Spacing="3">
                 <MudTextField T="string"
-                              @bind-Value=@registerModel.FirstName
+                              @bind-Value=@_registerModel.FirstName
                               Label="First Name"
-                              For=@(() => registerModel.FirstName)
+                              For=@(() => _registerModel.FirstName)
                               Required
                               Immediate
                               RequiredError="First name is required"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@registerModel.LastName
+                              @bind-Value=@_registerModel.LastName
                               Label="Last Name"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@registerModel.Email
+                              @bind-Value=@_registerModel.Email
                               Label="Email"
-                              For=@(() => registerModel.Email)
+                              For=@(() => _registerModel.Email)
                               Required
                               Immediate
                               RequiredError="Email is required"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@registerModel.Username
+                              @bind-Value=@_registerModel.Username
                               Label="Username"
-                              For=@(() => registerModel.Username)
+                              For=@(() => _registerModel.Username)
                               Required
                               Immediate
                               RequiredError="Username is required"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@registerModel.Password
+                              @bind-Value=@_registerModel.Password
                               Label="Password"
-                              For=@(() => registerModel.Password)
+                              For=@(() => _registerModel.Password)
                               InputType=@InputType.Password
                               Required
                               Immediate
                               RequiredError="Password is required"/>
 
                 <MudTextField T="string"
-                              @bind-Value=@secondPassword
+                              @bind-Value=@_secondPassword
                               Label="Repeat Password"
-                              For=@(() => secondPassword)
+                              For=@(() => _secondPassword)
                               InputType=@InputType.Password
                               Required
                               Immediate
                               RequiredError="Repeat password is required"/>
 
-                @if (!(errorMessages is null or []))
+                @if (!(_errorMessages is null or []))
                 {
-                    @foreach (var error in errorMessages)
+                    @foreach (var error in _errorMessages)
                     {
                         <MudAlert Severity="Severity.Error"
                                   Dense>
@@ -71,11 +71,11 @@
                 }
 
                 <MudButton OnClick=@HandleRegister
-                           Disabled=@(isLoading || !isSuccess)
+                           Disabled=@(_isLoading || !_isSuccess)
                            FullWidth
                            Variant=Variant.Filled
                            Color=Color.Primary>
-                    @if (isLoading)
+                    @if (_isLoading)
                     {
                         <MudProgressCircular Size="Size.Small"
                                              Class="mx-3"/>
