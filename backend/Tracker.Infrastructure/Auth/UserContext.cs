@@ -9,7 +9,7 @@ public class UserContext(IHttpContextAccessor httpContextAccessor)
 {
     public string GetUserEmail()
     {
-        return httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email    ) ??
+        return httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email) ??
             httpContextAccessor.HttpContext?.User.FindFirstValue("email") ??
             throw new InvalidOperationException("User is not authenticated");
     }

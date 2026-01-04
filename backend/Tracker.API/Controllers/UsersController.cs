@@ -6,7 +6,6 @@ using Tracker.API.Services;
 using Tracker.Application.UseCases.Users.GetUserById;
 using Tracker.Application.UseCases.Users.SearchUsersByUsername;
 using Tracker.Application.UseCases.Users.Current;
-using Tracker.Domain.Entities;
 
 namespace Tracker.API.Controllers;
 
@@ -16,7 +15,7 @@ public class UserController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet("{Id:guid}")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     public async Task<IActionResult> GetUserByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetUserByIdQuery()

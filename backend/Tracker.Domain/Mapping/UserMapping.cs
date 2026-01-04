@@ -12,7 +12,7 @@ public static class UserMapping
             Id = user.Id,
             Email = user.Email,
             Username = user.Username,
-            Role = user.Role,
+            Role = user.Role.ToString(),
             FirstName = user.FirstName,
             LastName = user.LastName ?? "",
         };
