@@ -15,18 +15,21 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _dbSet
+            .AsNoTracking()
             .AnyAsync(user => user.Email == email);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _dbSet
+            .AsNoTracking()
             .FirstOrDefaultAsync(user => user.Email == email);
     }
 
     public async Task<List<User>> SearchByUsernamePartAsync(string username, int skip, int take)
     {
         return await _dbSet
+            .AsNoTracking()
             .Where(u => u.Username.StartsWith(username))
             .OrderBy(u => u.Username)
             .Skip(skip)
@@ -37,6 +40,7 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
     public async Task<bool> UsernameExistsAsync(string username)
     {
         return await _dbSet
+            .AsNoTracking()
             .AnyAsync(user => user.Username == username);
     }
 }
