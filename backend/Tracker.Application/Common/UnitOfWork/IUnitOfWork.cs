@@ -7,7 +7,9 @@ public interface IUnitOfWork : IAsyncDisposable
 {
     IUserRepository UserRepository { get; }
     IWorkspaceRepository WorkspaceRepository{ get; }
+    IUserWorkspaceRepository UserWorkspaceRepository { get; }
     IBoardRepository BoardRepository{ get; }
+    IUserBoardRepository UserBoardRepository { get; }
     IBoardListRepository BoardListRepository{ get; }
     IBoardItemRepository BoardItemRepository{ get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }

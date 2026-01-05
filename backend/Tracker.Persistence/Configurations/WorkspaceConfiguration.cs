@@ -16,10 +16,20 @@ public class WorkspaceConfiguration : IEntityTypeConfiguration<Workspace>
             .IsRequired();
 
         builder.HasMany(w => w.Boards)
-            .WithOne(w=> w.Workspace)
+            .WithOne(w => w.Workspace)
             .HasForeignKey(b => b.WorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.OwnsOne(w => w.Settings);
+        builder.OwnsOne(w => w.Settings, settings =>
+        {
+            settings.Property(s => s.Visibility)
+                .HasColumnName("Visibility");
+
+            settings.Property(s => s.MinCreateBoardRole)
+                .HasColumnName("MinCreateBoardRole");
+
+            settings.Property(s => s.MinChangeBoardRole)
+                .HasColumnName("MinChangeBoardRole");
+        });
     }
 }

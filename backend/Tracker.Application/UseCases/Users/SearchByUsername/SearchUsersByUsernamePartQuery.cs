@@ -2,7 +2,7 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Users.SearchUsersByUsername;
+namespace Tracker.Application.UseCases.Users.SearchByUsername;
 
 public class SearchUsersByUsernamePartQuery() : IRequest<Result<List<UserDto>>>
 {

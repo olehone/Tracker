@@ -1,8 +1,9 @@
-﻿using Tracker.Domain.Enums;
+﻿using Tracker.Domain.Entities.Common;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Domain.Entities;
 
-public class UserWorkspace
+public class UserWorkspace : BaseEntity
 {
     public required Guid UserId { get; set; }
     public required Guid WorkspaceId { get; set; }

@@ -1,9 +1,10 @@
 ﻿CREATE TABLE [dbo].[UserBoards] (
+    [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [UserId] UNIQUEIDENTIFIER NOT NULL,
     [BoardId] UNIQUEIDENTIFIER NOT NULL,
     [Role] INT NOT NULL,
     
-    CONSTRAINT PK_UserBoards PRIMARY KEY ([UserId], [BoardId]),
+    CONSTRAINT UQ_UserBoards UNIQUE ([UserId], [BoardId]),
 
     CONSTRAINT FK_UserBoards_Users
         FOREIGN KEY (UserId)

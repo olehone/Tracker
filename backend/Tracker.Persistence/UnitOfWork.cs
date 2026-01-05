@@ -12,7 +12,9 @@ internal class UnitOfWork : IUnitOfWork
 
     private IUserRepository _userRepository = null!;
     private IWorkspaceRepository _workspaceRepository = null!;
+    private IUserWorkspaceRepository _userWorkspaceRepository = null!;
     private IBoardRepository _boardRepository = null!;
+    private IUserBoardRepository _userBoardRepository = null!;
     private IBoardListRepository _boardListRepository = null!;
     private IBoardItemRepository _boardItemRepository = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
@@ -21,8 +23,12 @@ internal class UnitOfWork : IUnitOfWork
         => _userRepository ??= new UserRepository(_dbContext);
     public IWorkspaceRepository WorkspaceRepository 
         => _workspaceRepository ??= new WorkspaceRepository(_dbContext);
+    public IUserWorkspaceRepository UserWorkspaceRepository
+    => _userWorkspaceRepository ??= new UserWorkspaceRepository(_dbContext);
     public IBoardRepository BoardRepository
         => _boardRepository ??= new BoardRepository(_dbContext);
+    public IUserBoardRepository UserBoardRepository
+        => _userBoardRepository ??= new UserBoardRepository(_dbContext);
     public IBoardListRepository BoardListRepository
     => _boardListRepository ??= new BoardListRepository(_dbContext);
     public IBoardItemRepository BoardItemRepository

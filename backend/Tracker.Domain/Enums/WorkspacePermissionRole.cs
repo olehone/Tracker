@@ -7,5 +7,5 @@ public enum WorkspacePermissionRole
     Member = 20,
     Admin = 30,
     Owner = 40,
-    None = 100
+    None = 100,
 }

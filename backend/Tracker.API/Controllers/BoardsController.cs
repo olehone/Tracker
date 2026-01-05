@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
-using Tracker.Application.UseCases.Boards.GetBoardById;
-using Tracker.Application.UseCases.Boards.GetBoardsByWorkspaceId;
+using Tracker.Application.UseCases.Boards.GetById;
+using Tracker.Application.UseCases.Boards.GetByWorkspaceId;
 
 namespace Tracker.API.Controllers;
 

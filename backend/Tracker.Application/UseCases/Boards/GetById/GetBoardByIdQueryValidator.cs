@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using Tracker.Application.UseCases.Boards.GetBoardById;
+using Tracker.Application.UseCases.Boards.GetById;
 
-namespace Tracker.Application.UseCases.Boards.GetBoardById;
+namespace Tracker.Application.UseCases.Boards.GetById;
 
 public class GetBoardByIdQueryValidator : AbstractValidator<GetBoardByIdQuery>
 {

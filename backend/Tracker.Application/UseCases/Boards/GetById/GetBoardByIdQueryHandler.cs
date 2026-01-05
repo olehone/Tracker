@@ -4,7 +4,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Boards.GetBoardById;
+namespace Tracker.Application.UseCases.Boards.GetById;
 
 public class GetBoardByIdQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory)

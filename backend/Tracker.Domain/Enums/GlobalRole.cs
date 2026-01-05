@@ -4,5 +4,5 @@ public enum GlobalRole
 {
     User = 10,
     Admin = 20,
-    Owner = 30
+    Owner = 30,
 }

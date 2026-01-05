@@ -1,9 +1,10 @@
 ﻿CREATE TABLE [dbo].[UserWorkspaces] (
+    [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [UserId] UNIQUEIDENTIFIER NOT NULL,
     [WorkspaceId] UNIQUEIDENTIFIER NOT NULL,
     [Role] INT NOT NULL,
     
-    CONSTRAINT PK_UserWorkspacess PRIMARY KEY ([UserId], [WorkspaceId]),
+    CONSTRAINT UQ_UserWorkspacess UNIQUE ([UserId], [WorkspaceId]),
 
     CONSTRAINT FK_UserWorkspaces_Users
         FOREIGN KEY (UserId)

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Tracker.Application.UseCases.Boards.GetBoardsByWorkspaceId;
+namespace Tracker.Application.UseCases.Boards.GetByWorkspaceId;
 
 public class GetBoardsByWorkspaceIdQueryValidator 
     : AbstractValidator<GetBoardsByWorkspaceIdQuery>

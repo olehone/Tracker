@@ -30,14 +30,14 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Workspace>> GetByUserIdAndQueryWithPublicAsync(Guid userId,
-        string query, int skip, int take)
+    public async Task<IReadOnlyList<Workspace>> SearchByTitleWithUserIdAsync(
+        Guid userId, string title, int skip, int take)
     {
-        var normalizedQuery = query.Trim().ToLower();
+        var normalizedTitle = title.Trim().ToLower();
 
         return await _dbSet
             .AsNoTracking()
-            .Where(w => w.Title.ToLower().Contains(normalizedQuery) &&
+            .Where(w => w.Title.ToLower().Contains(normalizedTitle) &&
             (
                 w.UserWorkspaces.Any(uw => uw.UserId == userId) ||
                 w.Settings.Visibility == WorkspaceVisibility.Public

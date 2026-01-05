@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Workspaces.Create;
-using Tracker.Application.UseCases.Workspaces.GetWorkspaceById;
-using Tracker.Application.UseCases.Workspaces.GetWorkspaces;
+using Tracker.Application.UseCases.Workspaces.GetById;
+using Tracker.Application.UseCases.Workspaces.GetAll;
+using Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
 
 namespace Tracker.API.Controllers;
 
@@ -26,10 +27,18 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [HttpGet("/all")]
+    [Authorize(Roles = "Admin,Owner")]
+    public async Task<IActionResult> GetAllWorkspacesAsync()
+    {
+        var response = await mediator.Send(new GetAllWorkspacesQuery());
+        return response.ToActionResult();
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetWorkspacesAsync()
     {
-        var response = await mediator.Send(new GetWorkspacesQuery());
+        var response = await mediator.Send(new GetWorkspacesForCurrentUserQuery());
         return response.ToActionResult();
     }
 

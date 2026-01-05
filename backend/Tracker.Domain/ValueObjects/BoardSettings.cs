@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Enums;
 
-namespace Tracker.Domain.Entities;
+namespace Tracker.Domain.ValueObjects;
 
 public class BoardSettings
 {
@@ -8,11 +8,10 @@ public class BoardSettings
         = BoardVisibility.Private;
     public BoardPermissionRole MinCreateItemRole { get; set; } 
         = BoardPermissionRole.Member;
-    public BoardPermissionRole MinMoveItemRole { get; set; } 
+    public BoardPermissionRole MinChangeItemRole { get; set; } 
         = BoardPermissionRole.Member;
     public BoardPermissionRole MinCreateListRole { get; set; } 
         = BoardPermissionRole.Admin;
-    public BoardPermissionRole MinMoveListRole { get; set; } 
+    public BoardPermissionRole MinChangeListRole { get; set; } 
         = BoardPermissionRole.Admin;
-
 }

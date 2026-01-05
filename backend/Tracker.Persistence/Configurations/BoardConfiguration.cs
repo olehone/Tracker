@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Persistence.Configurations;
 
@@ -19,6 +20,22 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
             .WithOne(bl => bl.Board)
             .HasForeignKey(bl => bl.BoardId);
 
-        builder.OwnsOne(b => b.Settings);
+        builder.OwnsOne(b => b.Settings, settings =>
+        {
+            settings.Property(s => s.Visibility)
+                .HasColumnName("Visibility");
+
+            settings.Property(s => s.MinCreateItemRole)
+                .HasColumnName("MinCreateItemRole");
+
+            settings.Property(s => s.MinChangeItemRole)
+                .HasColumnName("MinChangeItemRole");
+
+            settings.Property(s => s.MinCreateListRole)
+                .HasColumnName("MinCreateListRole");
+
+            settings.Property(s => s.MinChangeListRole)
+                .HasColumnName("MinChangeListRole");
+        });
     }
 }

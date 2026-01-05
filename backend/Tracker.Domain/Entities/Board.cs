@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Entities.Common;
+using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Domain.Entities;
 

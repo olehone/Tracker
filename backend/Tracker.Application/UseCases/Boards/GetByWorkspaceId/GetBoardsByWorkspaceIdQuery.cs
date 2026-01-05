@@ -2,7 +2,7 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Boards.GetBoardsByWorkspaceId;
+namespace Tracker.Application.UseCases.Boards.GetByWorkspaceId;
 
 public class GetBoardsByWorkspaceIdQuery : IRequest<Result<List<BoardSummaryDto>>>
 {

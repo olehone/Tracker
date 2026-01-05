@@ -8,5 +8,5 @@ public enum BoardPermissionRole
     Member = 30,
     Admin = 40,
     Owner = 50,
-    None = 100
+    None = 100,
 }

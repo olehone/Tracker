@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
 
-namespace Tracker.Application.UseCases.Users.SearchUsersByUsername;
+namespace Tracker.Application.UseCases.Workspaces.SearchByTitle;
 
-public class SearchUsersByUsernamePartQueryValidator : AbstractValidator<SearchUsersByUsernamePartQuery>
+public class SearchWorkspacesByTitleQueryValidator : AbstractValidator<SearchWorkspacesByTitleQuery>
 {
-
-    public SearchUsersByUsernamePartQueryValidator()
+    public SearchWorkspacesByTitleQueryValidator()
     {
-        RuleFor(x => x.Username)
+        RuleFor(x => x.Title)
             .NotEmpty()
             .MinimumLength(3);
 
@@ -18,7 +17,5 @@ public class SearchUsersByUsernamePartQueryValidator : AbstractValidator<SearchU
         RuleFor(x => x.Page)
             .NotEmpty()
             .GreaterThanOrEqualTo(0);
-
     }
-
 }
