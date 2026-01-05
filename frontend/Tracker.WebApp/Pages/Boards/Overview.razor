@@ -1,50 +1,49 @@
 ﻿@page "/boards/{BoardId:guid}"
 
+@using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.BoardItems
 @using Tracker.WebApp.Components.BoardLists
 @using Tracker.WebApp.Components.Shared
-@using Tracker.Domain.Dtos
-@using Tracker.WebApp.Shared
 
 <PageTitle>@PageTitle()</PageTitle>
 <WorkWindow>
 
-	<Header>
+    <Header>
 		<WindowHeader Title=@Board?.Title />
-	</Header>
+    </Header>
 
-	<Body>
-		<MudStack StretchItems="StretchItems.None"
-				  AlignItems="AlignItems.Start"
-				  Style="overflow-x: auto;">
-			@if (Board is not null)
-			{
-				<MudDropContainer @ref=@_container
-								  T=@BoardItemDto
-								  Items=@_items
-								  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
-								  ItemDropped=@ItemDropped
-								  Class="d-flex flex-row flex-nowrap">
-					<ChildContent>
-						@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
-						{
-							<BoardList List=@list
-									   OnCreateItem=@(title=> CreateItemForList(list, title)) />
-						}
-						<MudPaper Elevation="5"
-								  Width="400px"
-								  Style="align-self: flex-start;"
-								  Class="my-3 mx-2">
-							<OneLineCreateButton Title="Add new list"
-												 OnCreate=@CreateList />
-						</MudPaper>
-					</ChildContent>
+    <Body>
+    <MudStack StretchItems="StretchItems.None"
+              AlignItems="AlignItems.Start"
+              Style="overflow-x: auto;">
+        @if (Board is not null)
+        {
+            <MudDropContainer @ref=@_container
+                              T=@BoardItemDto
+                              Items=@_items
+                              ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
+                              ItemDropped=@ItemDropped
+                              Class="d-flex flex-row flex-nowrap">
+                <ChildContent>
+                    @foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
+                    {
+                        <BoardList List=@list
+                                   OnCreateItem=@(title => CreateItemForList(list, title))/>
+                    }
+                    <MudPaper Elevation="5"
+                              Width="400px"
+                              Style="align-self: flex-start;"
+                              Class="my-3 mx-2">
+                        <OneLineCreateButton Title="Add new list"
+                                             OnCreate=@CreateList/>
+                    </MudPaper>
+                </ChildContent>
 
-					<ItemRenderer>
-						<BoardItem Item=@context />
-					</ItemRenderer>
-				</MudDropContainer>
-			}
-		</MudStack>
-	</Body>
+                <ItemRenderer>
+                    <BoardItem Item=@context/>
+                </ItemRenderer>
+            </MudDropContainer>
+        }
+    </MudStack>
+    </Body>
 </WorkWindow>

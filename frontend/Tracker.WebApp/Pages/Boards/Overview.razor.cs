@@ -4,12 +4,13 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction.Entities;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Boards;
 
 public partial class Overview
 {
+    private MudDropContainer<BoardItemDto> _container = null!;
+    private List<BoardItemDto> _items = null!;
     [Parameter]
     public Guid BoardId { get; set; }
 
@@ -19,9 +20,6 @@ public partial class Overview
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     public BoardFullDto? Board { get; set; }
-
-    private MudDropContainer<BoardItemDto> _container = null!;
-    private List<BoardItemDto> _items = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,7 +44,7 @@ public partial class Overview
             return;
         }
 
-        var request = new MoveBoardItemRequest()
+        var request = new MoveBoardItemRequest
         {
             ToBoardListId = Guid.Parse(item.DropzoneIdentifier),
             BoardItemId = item.Item.Id,
@@ -73,6 +71,7 @@ public partial class Overview
         {
             return;
         }
+
         var item = Board.BoardLists
             .SelectMany(bl => bl.BoardItems)
             .FirstOrDefault(bi => bi.Id == request.BoardItemId);
@@ -131,7 +130,8 @@ public partial class Overview
         {
             return;
         }
-        var request = new CreateBoardListRequest()
+
+        var request = new CreateBoardListRequest
         {
             BoardId = Board.Id,
             Title = title

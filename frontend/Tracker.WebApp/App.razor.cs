@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction.Entities;
-using Tracker.WebApp.Models;
-using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp;
@@ -15,7 +13,7 @@ public partial class App
 
     private void RedirectToLogin()
     {
-        Nav.NavigateTo($"/login", forceLoad: false);
+        Nav.NavigateTo("/login", false);
     }
 
     protected override async Task OnInitializedAsync()
@@ -29,6 +27,7 @@ public partial class App
             {
                 return;
             }
+
             AppState.CurrentUser = result.Value;
         }
     }

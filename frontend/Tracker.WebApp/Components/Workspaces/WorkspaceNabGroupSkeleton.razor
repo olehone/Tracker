@@ -1,16 +1,14 @@
-@using Microsoft.AspNetCore.Components.Authorization
 @using Tracker.WebApp.Shared
-
 <MudCardHeader Class="px-4 py-2">
     <CardHeaderAvatar>
-        <MudSkeleton SkeletonType=SkeletonType.Circle
-                     Animation=Animation.Wave
+        <MudSkeleton SkeletonType="SkeletonType.Circle"
+                     Animation="Animation.Wave"
                      Width="24px"
                      Height="24px"/>
     </CardHeaderAvatar>
 
     <CardHeaderContent>
-        <MudSkeleton Animation=Animation.Wave
+        <MudSkeleton Animation="Animation.Wave"
                      Width=@UiHelper.RandomPercentTitleWidth()
                      Height="20px"/>
     </CardHeaderContent>

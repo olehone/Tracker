@@ -11,40 +11,44 @@ namespace Tracker.WebApp.Pages.Auth;
 
 public partial class Register
 {
-    [CascadingParameter] private AppState? AppState { get; set; }
+    private readonly RegisterUserModel _registerModel = new();
+    private IReadOnlyList<string>? _errorMessages;
+    private MudForm _form;
+    private bool _isLoading;
+    private bool _isSuccess;
+    private string? _secondPassword;
+
+    [CascadingParameter]
+    private AppState? AppState { get; set; }
 
     [Inject] private IAuthService Auth { get; set; } = null!;
     [Inject] private IUserService UserService { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
-    private RegisterUserModel registerModel = new();
-    private IReadOnlyList<string>? errorMessages;
-    private string? secondPassword;
-    private bool isLoading = false;
-    private bool isSuccess = false;
-    private MudForm form;
-
     private async Task HandleRegister()
     {
-        await form!.Validate();
+        await _form!.Validate();
 
-        if (!form.IsValid)
+        if (!_form.IsValid)
         {
             return;
         }
-        if (registerModel.Password != secondPassword)
-        {
-            errorMessages = ["Passwords are not the same"];
-            return;
-        }
-        if (UiHelper.IsEmailInvalid(registerModel.Email))
-        {
-            errorMessages = ["Wrong email format"];
-            return;
-        }
-        isLoading = true;
 
-        var result = await Auth.RegisterAsync(ToRequest(registerModel));
+        if (_registerModel.Password != _secondPassword)
+        {
+            _errorMessages = ["Passwords are not the same"];
+            return;
+        }
+
+        if (UiHelper.IsEmailInvalid(_registerModel.Email))
+        {
+            _errorMessages = ["Wrong email format"];
+            return;
+        }
+
+        _isLoading = true;
+
+        var result = await Auth.RegisterAsync(ToRequest(_registerModel));
         if (NotifyIfError(result))
         {
             return;
@@ -55,13 +59,13 @@ public partial class Register
         {
             return;
         }
+
         if (AppState != null && userResult.IsSuccess)
         {
             AppState.CurrentUser = userResult.Value;
         }
 
-        Navigation.NavigateTo("/", forceLoad: false);
-
+        Navigation.NavigateTo("/", false);
     }
 
     private bool NotifyIfError(Result result)
@@ -72,22 +76,24 @@ public partial class Register
 
             if (error.Type == ErrorType.Validation)
             {
-                errorMessages = error.Details;
+                _errorMessages = error.Details;
             }
             else
             {
-                errorMessages = [error.Description];
+                _errorMessages = [error.Description];
             }
+
             return true;
         }
-        isLoading = false;
+
+        _isLoading = false;
         StateHasChanged();
         return false;
     }
 
     private static RegisterUserRequest ToRequest(RegisterUserModel model)
     {
-        return new RegisterUserRequest()
+        return new RegisterUserRequest
         {
             Email = model.Email,
             Password = model.Password,

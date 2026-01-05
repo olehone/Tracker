@@ -16,12 +16,12 @@
 			<MudGrid Spacing="3">
 				@if (Workspace is null)
 				{
-					@for (int i = 0; i < UiHelper.RandomItemCount(); i++)
+                @for (var i = 0; i < UiHelper.RandomItemCount(); i++)
 					{
 						<MudItem xs="12"
 								 sm="6"
 								 lg="3">
-							<BoardSummarySkeleton />
+                        <BoardSummarySkeleton/>
 						</MudItem>
 					}
 				}
@@ -40,7 +40,7 @@
 							 sm="6"
 							 lg="3">
 						<OneLineCreateButton IsWithFrame="false"
-											 OnCreate=@CreateBoard />
+                                         OnCreate=@CreateBoard/>
 					</MudItem>
 				}
 			</MudGrid>

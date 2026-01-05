@@ -3,17 +3,21 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Services.Abstraction.Entities;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Workspaces;
 
 public partial class WorkspacesNavList : IAsyncDisposable
 {
+    private bool _isAuthenticated;
+    private List<WorkspaceDto>? Workspaces;
     [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
 
-    private bool isAuthenticated;
-    private List<WorkspaceDto>? Workspaces = null;
+    public async ValueTask DisposeAsync()
+    {
+        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
+        await Task.CompletedTask;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,7 +27,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
 
     private async Task CreateWorkspace(string title)
     {
-        var request = new CreateWorkspaceRequest()
+        var request = new CreateWorkspaceRequest
         {
             Title = title
         };
@@ -32,6 +36,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         {
             return;
         }
+
         Workspaces!.Add(result.Value);
         StateHasChanged();
     }
@@ -39,8 +44,8 @@ public partial class WorkspacesNavList : IAsyncDisposable
     private async Task LoadWorkspacesIfAuthenticatedAsync()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-        if (!isAuthenticated)
+        _isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+        if (!_isAuthenticated)
         {
             Workspaces = null;
         }
@@ -50,6 +55,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         {
             return;
         }
+
         Workspaces = result.Value;
     }
 
@@ -57,11 +63,5 @@ public partial class WorkspacesNavList : IAsyncDisposable
     {
         await LoadWorkspacesIfAuthenticatedAsync();
         await InvokeAsync(StateHasChanged);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
-        await Task.CompletedTask;
     }
 }

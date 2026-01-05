@@ -11,8 +11,12 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
     : IBoardItemService
 {
     public Task<Result<BoardItemDto>> CreateBoardItemAsync(CreateBoardItemRequest request)
-        => apiErrorHandler.ExecuteAsync(request, api.CreateBoardItemAsync);
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.CreateBoardItemAsync);
+    }
 
-    public  Task<Result> MoveBoardItemAsync(MoveBoardItemRequest request)
-        => apiErrorHandler.ExecuteAsync(request, api.MoveBoardItemAsync);
+    public Task<Result> MoveBoardItemAsync(MoveBoardItemRequest request)
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.MoveBoardItemAsync);
+    }
 }

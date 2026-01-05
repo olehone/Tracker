@@ -1,14 +1,14 @@
-﻿using Refit;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Refit;
 using Tracker.Domain.Options;
-using Tracker.Services.Auth;
-using Tracker.Services.ApiClients;
 using Tracker.Services.Abstraction.Auth;
-using Tracker.Services.Entities;
 using Tracker.Services.Abstraction.Entities;
 using Tracker.Services.Abstraction.Results;
+using Tracker.Services.ApiClients;
+using Tracker.Services.Auth;
+using Tracker.Services.Entities;
 using Tracker.Services.Results;
 
 namespace Tracker.Services;
@@ -17,7 +17,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiAndServices(this IServiceCollection services)
     {
-
         services.AddScoped<IApiErrorHandler, ApiErrorHandler>();
         services.AddOptions<ApiOptions>()
             .BindConfiguration(ApiOptions.SectionName);
@@ -60,7 +59,7 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddApiClientWithAuth<TInterface>(this IServiceCollection services)
-    where TInterface : class
+        where TInterface : class
     {
         services.AddRefitClient<TInterface>()
             .ConfigureHttpClient((sp, client) =>
@@ -72,5 +71,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
 }

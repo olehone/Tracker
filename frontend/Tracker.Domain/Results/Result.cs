@@ -8,7 +8,7 @@ public class Result
 
     public Result(bool isSuccess, Error error)
     {
-        if (isSuccess && error!= Error.None ||
+        if (isSuccess && error != Error.None ||
             !isSuccess && error == Error.None)
         {
             throw new ArgumentException("Invalid error", nameof(error));
@@ -19,7 +19,7 @@ public class Result
     }
 
     public static Result Success() => new(true, Error.None);
-    public static Result<TValue> SuccessOf<TValue>(TValue value) => 
+    public static Result<TValue> SuccessOf<TValue>(TValue value) =>
         new(value, true, Error.None);
 
     public static Result Failure(Error error) => new(false, error);
@@ -29,10 +29,10 @@ public class Result
     public static implicit operator Result(Error error) => Failure(error);
 }
 
-public class Result<TValue>: Result
+public class Result<TValue> : Result
 {
     private readonly TValue? _value;
-    
+
     public Result(TValue? value, bool isSuccess, Error error)
         : base(isSuccess, error)
     {
@@ -40,9 +40,9 @@ public class Result<TValue>: Result
     }
 
     public TValue Value => IsSuccess
-        ? _value! :
-        throw new InvalidOperationException("Can't call Value at failed result");
+        ? _value!
+        : throw new InvalidOperationException("Can't call Value at failed result");
 
     public static implicit operator Result<TValue>(TValue value) => SuccessOf(value);
-    public static implicit operator Result<TValue>(Error error) => FailureOf<TValue>(error); 
+    public static implicit operator Result<TValue>(Error error) => FailureOf<TValue>(error);
 }

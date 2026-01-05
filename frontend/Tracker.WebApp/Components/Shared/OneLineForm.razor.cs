@@ -6,25 +6,21 @@ namespace Tracker.WebApp.Components.Shared;
 
 public partial class OneLineForm
 {
+    private bool _processing;
+    private string? _value;
+
     [Parameter]
     public string? Value { get; set; }
-
     [Parameter]
-    public bool AllowEmpty { get; set; } = false;
+    public bool AllowEmpty { get; set; }
     [Parameter]
     public Size Size { get; set; } = Size.Large;
-
     [Parameter]
     public Typo Typo { get; set; } = Typo.inherit;
-
     [Parameter]
     public EventCallback<string> OnValueSaved { get; set; }
-
     [Parameter]
     public EventCallback<string> OnEditCanceled { get; set; }
-
-    private string? _value;
-    private bool _processing;
 
     protected override void OnParametersSet()
     {
@@ -32,12 +28,16 @@ public partial class OneLineForm
     }
 
     private bool IsInputInvalid()
-        => !AllowEmpty && string.IsNullOrWhiteSpace(_value);
+    {
+        return !AllowEmpty && string.IsNullOrWhiteSpace(_value);
+    }
 
     private async Task CompleteEdit()
     {
         if (IsInputInvalid())
+        {
             return;
+        }
 
         _processing = true;
         await OnValueSaved.InvokeAsync(_value);
