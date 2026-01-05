@@ -1,12 +1,12 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
+using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Entities;
 
 public interface IBoardListService
 {
-    public Task<BoardListDto> CreateBoardListAsync(CreateBoardListRequest request);
-    public Task<ApiResponse<object>> MoveBoardListAsync(MoveBoardListRequest request);
+    public Task<Result<BoardListDto>> CreateBoardListAsync(CreateBoardListRequest request);
+    public Task<Result> MoveBoardListAsync(MoveBoardListRequest request);
 }

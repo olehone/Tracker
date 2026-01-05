@@ -9,8 +9,7 @@ public partial class CreateBoardButton
     [Parameter]
     public required WorkspaceDto Workspace { get; set; }
 
-    [Inject]
-    private IDialogService DialogService { get; set; } = default!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private async Task OpenDialog()
     {

@@ -46,6 +46,7 @@ public static class BoardsMapping
         return new BoardItemDto()
         {
             Id = boardItem.Id,
+            BoardListId = boardItem.BoardListId,
             Position = boardItem.Position,
             Title = boardItem.Title,
             Description = boardItem.Description,

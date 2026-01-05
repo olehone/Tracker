@@ -1,0 +1,27 @@
+@using Tracker.WebApp.Components.Boards
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<MudStack Row
+		  Spacing="0"
+		  AlignItems="AlignItems.Center"
+		  Class="mud-theme-secondary px-5 py-3 rounded-t">
+	@if (Title is null)
+	{
+		<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+					 Height="32px" />
+	}
+	else
+	{
+		<MudText Color="Color.Inherit"
+				 Typo="Typo.h6"
+				 Class="text-ellipsis">
+			@Title
+		</MudText>
+	}
+</MudStack>
+
+@code{
+	[Parameter]
+	public required string Title { get; set; }
+}

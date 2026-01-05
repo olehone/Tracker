@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
-using Tracker.Services;
+using Tracker.Domain.Requests.Board;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 
@@ -9,14 +11,19 @@ public partial class Overview
     [Parameter]
     public Guid WorkspaceId { get; set; }
 
-    private WorkspaceDto? Workspace { get; set; } = null;
+    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] private IBoardService BoardService { get; set; } = null!;
 
-    [Inject]
-    private IWorkspaceService WorkspaceService { get; set; } = default!;
+    private WorkspaceDto? Workspace { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
-        Workspace = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+        var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+        if (result.IsFailure)
+        {
+            return;
+        }
+        Workspace = result.Value;
         StateHasChanged();
     }
 
@@ -26,7 +33,34 @@ public partial class Overview
         {
             Workspace = null;
             StateHasChanged();
-            Workspace = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+            var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+            if (result.IsFailure)
+            {
+                return;
+            }
+            Workspace = result.Value;
         }
+    }
+
+    private async Task CreateBoard(string title)
+    {
+        var request = new CreateBoardRequest()
+        {
+            WorkspaceId = WorkspaceId,
+            Title = title
+        };
+        var result = await BoardService.CreateBoardAsync(request);
+        if (result.IsFailure)
+        {
+            return;
+        }
+
+        Workspace!.Boards.Add(result.Value);
+        StateHasChanged();
+    }
+
+    private string PageTitle()
+    {
+        return Workspace?.Title ?? "Workspace";
     }
 }

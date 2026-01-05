@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tracker.Domain.Options;
-using Tracker.Services.Abstraction;
 using Tracker.Services.Auth;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Entities;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction.Results;
+using Tracker.Services.Results;
 
 namespace Tracker.Services;
 
@@ -15,10 +18,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApiAndServices(this IServiceCollection services)
     {
 
+        services.AddScoped<IApiErrorHandler, ApiErrorHandler>();
         services.AddOptions<ApiOptions>()
-            .BindConfiguration(ApiOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
+            .BindConfiguration(ApiOptions.SectionName);
 
         services.AddRefitClient<IAuthApi>()
             .ConfigureHttpClient((serviceProvider, client) =>
@@ -26,6 +28,7 @@ public static class ServiceCollectionExtensions
                 var options = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
             });
+
         services.AddApiClientWithAuth<IUserApi>();
         services.AddApiClientWithAuth<IWorkspaceApi>();
         services.AddApiClientWithAuth<IBoardsApi>();

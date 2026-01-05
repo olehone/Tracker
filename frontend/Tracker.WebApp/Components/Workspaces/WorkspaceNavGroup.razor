@@ -1,0 +1,32 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Shared
+
+<MudNavGroup Icon=@Icons.Material.Filled.Dashboard
+			 Title=@Title()>
+
+	<MudNavLink Icon=@Icons.Material.Filled.TableChart
+				Href=@($"/workspaces/{Workspace.Id}/overview")>
+		Overview
+	</MudNavLink>
+
+	<MudNavLink Icon=@Icons.Material.Filled.Person
+				Href=@($"/workspaces/{Workspace.Id}/members")>
+		Members
+	</MudNavLink>
+
+	<MudNavLink Icon=@Icons.Material.Filled.Settings
+				Href=@($"/workspaces/{Workspace.Id}/settings")>
+		Settings
+	</MudNavLink>
+</MudNavGroup>
+
+@code {
+	[Parameter]
+	public required WorkspaceDto Workspace { get; set; }
+
+	private string Title()
+	{
+		return UiHelper.ShortenText(@Workspace.Title, 30);
+	}
+}

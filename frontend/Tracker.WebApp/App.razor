@@ -1,39 +1,38 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.WebApp.Pages
 
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
 <CascadingAuthenticationState>
-    <CascadingValue Value=@AppState>
-        <Router AppAssembly=@typeof(App).Assembly>
-            <Found Context="routeData">
-                <AuthorizeRouteView RouteData=@routeData
-                                    DefaultLayout=@typeof(MainLayout)>
-                    <NotAuthorized>
-                        @if (context?.User?.Identity?.IsAuthenticated == true)
-                        {
-                            <MudAlert Severity="Severity.Error">
-                                You do not have access to this resource.
-                            </MudAlert>
-                        }
-                        else
-                        {
-                            RedirectToLogin();
-                        }
-                    </NotAuthorized>
-                </AuthorizeRouteView>
-                <FocusOnNavigate RouteData=@routeData
-                                 Selector="h1"/>
-            </Found>
-            <NotFound>
-                <PageTitle>Not found</PageTitle>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <MudAlert Severity="Severity.Error">
-                        Sorry, there's nothing at this address
-                    </MudAlert>
-                </LayoutView>
-            </NotFound>
-        </Router>
-    </CascadingValue>
+	<CascadingValue Value=@AppState>
+		<Router AppAssembly=@typeof(App).Assembly>
+			<Found Context="routeData">
+				<AuthorizeRouteView RouteData=@routeData
+									DefaultLayout=@typeof(MainLayout)>
+					<NotAuthorized>
+						@if (context?.User?.Identity?.IsAuthenticated == true)
+						{
+							<MudAlert Severity="Severity.Error">
+								You do not have access to this resource.
+							</MudAlert>
+						}
+						else
+						{
+							RedirectToLogin();
+						}
+					</NotAuthorized>
+				</AuthorizeRouteView>
+				<FocusOnNavigate RouteData=@routeData
+								 Selector="h1" />
+			</Found>
+			<NotFound>
+				<PageTitle>Not found</PageTitle>
+				<LayoutView Layout="@typeof(MainLayout)">
+					<NotFound />
+				</LayoutView>
+			</NotFound>
+		</Router>
+	</CascadingValue>
 </CascadingAuthenticationState>

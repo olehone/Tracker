@@ -1,0 +1,18 @@
+﻿<MudPaper Class="ma-4 mud-height-full">
+	<MudStack Spacing="0"
+			  StretchItems="StretchItems.End"
+			  AlignItems="AlignItems.Stretch"
+			  Class="mud-elevation-3"
+			  Style="height: 100%;">
+		@Header
+
+		@Body
+	</MudStack>
+</MudPaper>
+
+@code {
+	[Parameter]
+	public required RenderFragment Header { get; set; }
+	[Parameter]
+	public required RenderFragment Body { get; set; }
+}

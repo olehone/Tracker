@@ -1,12 +1,13 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
+using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Entities;
 
 public interface IBoardItemService
 {
-    public Task<BoardItemDto> CreateBoardItemAsync(CreateBoardItemRequest request);
-    public Task<ApiResponse<object>> MoveBoardItemAsync(MoveBoardItemRequest request);
+    public Task<Result<BoardItemDto>> CreateBoardItemAsync(CreateBoardItemRequest request);
+    public Task<Result> MoveBoardItemAsync(MoveBoardItemRequest request);
 }
 

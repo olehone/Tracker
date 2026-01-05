@@ -39,7 +39,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         var mediatorRequest = new CreateWorkspaceCommand()
         {
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description ?? string.Empty
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

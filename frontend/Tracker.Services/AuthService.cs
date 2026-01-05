@@ -1,13 +1,16 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
-using Tracker.Services.Abstraction;
+using Tracker.Domain.Results;
 using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Entities;
 
 public sealed class AuthService(
+    IApiErrorHandler apiErrorHandler,
     IAuthApi api,
     IAuthStorage storage,
     IJwtTokenReader jwtTokenReader)
@@ -17,27 +20,50 @@ public sealed class AuthService(
     public EventCallback OnLogout { get; set; }
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
-    public async Task LoginAsync(LoginUserRequest request)
+    public async Task<Result> LoginAsync(LoginUserRequest request)
     {
-        var response = await api.LoginAsync(request);
-        await storage.SetAsync(response);
-        await OnLogin.InvokeAsync();
+        var result = await apiErrorHandler.ExecuteAsync(request, api.LoginAsync);
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        await storage.SetAsync(result.Value);
+
+        if (OnLogin.HasDelegate)
+        {
+            await OnLogin.InvokeAsync();
+        }
+
+        return Result.Success();
     }
 
-    public async Task RegisterAsync(RegisterUserRequest request)
+    public async Task<Result> RegisterAsync(RegisterUserRequest request)
     {
-        var response = await api.RegisterAsync(request);
-        await storage.SetAsync(response);
-        await OnLogin.InvokeAsync();
+        var result = await apiErrorHandler.ExecuteAsync(request, api.RegisterAsync);
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        await storage.SetAsync(result.Value);
+
+        if (OnLogin.HasDelegate)
+        {
+            await OnLogin.InvokeAsync();
+        }
+
+        return Result.Success();
     }
 
-    public async Task LogoutAsync()
+    public async Task<Result> LogoutAsync()
     {
         await storage.ClearAsync();
         await OnLogout.InvokeAsync();
+        return Result.Success();
     }
 
-    public async Task<string?> GetAccessTokenAsync()
+    private async Task<string?> GetAccessTokenAsync()
     {
         var tokensDto = await storage.GetAsync();
         if (tokensDto is null)
@@ -51,9 +77,9 @@ public sealed class AuthService(
             return tokensDto.AccessToken;
         }
 
-        await _refreshLock.WaitAsync();
         try
         {
+            await _refreshLock.WaitAsync();
             tokensDto = await storage.GetAsync();
 
             if (tokensDto is null)
@@ -66,21 +92,22 @@ public sealed class AuthService(
             {
                 return tokensDto.AccessToken;
             }
-
-            var refreshed = await api.RefreshTokenAsync(new RefreshTokenRequest()
+            var request = new RefreshTokenRequest()
             {
                 RefreshToken = tokensDto.RefreshToken
-            });
+            };
 
-            if (refreshed == null)
+            var result = await apiErrorHandler.ExecuteAsync(request, api.RefreshTokenAsync);
+
+            if (result == null || result.IsFailure)
             {
                 await LogoutAsync();
                 return null;
             }
 
-            await storage.SetAsync(refreshed);
+            await storage.SetAsync(result.Value);
 
-            return refreshed.AccessToken;
+            return result.Value.AccessToken;
         }
         catch (Exception)
         {

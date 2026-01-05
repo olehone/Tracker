@@ -4,5 +4,6 @@ public static class PersistenceErrors
 {
     public static readonly Error UniqueViolation = new(
         "Persistence.SaveChangesAsync",
-        ErrorType.UniqueViolation);
+        ErrorType.UniqueViolation,
+        "Unique key violation!");
 }

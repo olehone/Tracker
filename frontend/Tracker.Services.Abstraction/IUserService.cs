@@ -1,8 +1,9 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Entities;
 
 public interface IUserService
 {
-    Task<UserDto?> GetCurrentUserAsync();
+    Task<Result<UserDto>> GetCurrentUserAsync();
 }

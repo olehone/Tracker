@@ -7,8 +7,8 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardsApi
 {
     [Get("/api/boards/{id}")]
-    Task<BoardFullDto> GetBoardByIdAsync(Guid id);
+    Task<ApiResponse<BoardFullDto>> GetBoardByIdAsync(Guid id);
 
     [Post("/api/boards/")]
-    Task<BoardSummaryDto> CreateBoardAsync(CreateBoardRequest request);
+    Task<ApiResponse<BoardSummaryDto>> CreateBoardAsync(CreateBoardRequest request);
 }
