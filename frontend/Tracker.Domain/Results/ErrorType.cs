@@ -6,7 +6,8 @@ public enum ErrorType
     Validation,
     NotFound,
     Conflict,
-    Unauthorized,
+    Unauthenticated,
+    Forbidden,
     Network,
     Server,
     Unknown

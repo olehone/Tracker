@@ -31,11 +31,19 @@ public static class AuthErrors
 
     public static readonly Error RefreshTokenExpired = new(
         RefreshTokenCode,
-        ErrorType.Unauthorized,
+        ErrorType.Unauthenticated,
         "Refresh token is expired");
 
-    public static readonly Error CurrentUserIsNotAuthenticated = new(
+    public static readonly Error Unauthenticated = new(
         CurrentUserCode,
-        ErrorType.Unauthorized,
-        "Current user is not authenticated");
+        ErrorType.Unauthenticated,
+        "You are not logged in");
+
+
+    public static Error Forbidden(string? reason = null) =>  new(
+        CurrentUserCode,
+        ErrorType.Forbidden,
+        reason ??"You do not have permission to perform this action");
+
+
 }
