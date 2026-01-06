@@ -7,7 +7,7 @@ namespace Tracker.WebApp.Components.Workspaces;
 public partial class WorkspaceNavGroup
 {
     [Parameter]
-    public required WorkspaceDto Workspace { get; set; }
+    public required WorkspaceSummaryDto Workspace { get; set; }
 
     private string Title()
     {

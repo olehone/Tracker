@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 using Tracker.WebApp.Models;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;

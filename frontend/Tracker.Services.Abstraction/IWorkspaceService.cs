@@ -3,11 +3,11 @@ using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction.Entities;
+namespace Tracker.Services.Abstraction;
 
 public interface IWorkspaceService
 {
-    Task<Result<List<WorkspaceDto>>> GetWorkspacesAsync();
-    Task<Result<WorkspaceDto>> GetWorkspaceByIdAsync(GetByIdRequest request);
-    Task<Result<WorkspaceDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);
+    Task<Result<WorkspaceFullDto>> GetWorkspaceByIdAsync(GetByIdRequest request);
+    Task<Result<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync();
+    Task<Result<WorkspaceSummaryDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);
 }

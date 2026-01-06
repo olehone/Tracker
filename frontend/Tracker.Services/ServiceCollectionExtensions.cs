@@ -4,11 +4,11 @@ using Microsoft.Extensions.Options;
 using Refit;
 using Tracker.Domain.Options;
 using Tracker.Services.Abstraction.Auth;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Auth;
-using Tracker.Services.Entities;
+using Tracker.Services;
 using Tracker.Services.Results;
 
 namespace Tracker.Services;

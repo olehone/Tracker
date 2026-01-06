@@ -3,7 +3,7 @@ using Tracker.Domain.Requests.Board;
 using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction.Entities;
+namespace Tracker.Services.Abstraction;
 
 public interface IBoardService
 {

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction.Auth;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services.Entities;
+namespace Tracker.Services;
 
 public sealed class AuthService(
     IApiErrorHandler apiErrorHandler,

@@ -88,7 +88,9 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
             var result = await apiCall(request);
             if (!result.IsSuccessStatusCode)
             {
-                return ErrorMappingService.MapApiResponse(result);
+                var error = ErrorMappingService.MapApiResponse(result);
+                errorNotifier.NotifyActionError(error);
+                return error;
             }
 
             return Result.SuccessOf(result.Content!);

@@ -2,14 +2,14 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Components.Workspaces;
 
 public partial class WorkspacesNavList : IAsyncDisposable
 {
     private bool _isAuthenticated;
-    private List<WorkspaceDto>? Workspaces;
+    private List<WorkspaceSummaryDto>? Workspaces;
     [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
     [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
 
@@ -50,7 +50,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
             Workspaces = null;
         }
 
-        var result = await WorkspaceService.GetWorkspacesAsync();
+        var result = await WorkspaceService.GetWorkspacesForCurrentUserAsync();
         if (result.IsFailure)
         {
             return;
