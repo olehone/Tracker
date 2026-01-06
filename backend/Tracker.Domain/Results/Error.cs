@@ -14,9 +14,9 @@ public sealed record Error(
     public static Error Validation(params string[] messages)
         => new("Validation", ErrorType.Validation, "Validation failed", messages);
 
-    public static Error NotFound(string entityName, string propertyName = "id")
-        => new($"{entityName}.NotFound",
-            ErrorType.NotFound,
-            $"{entityName} with this {propertyName} not found");
+    public static Error NotFound(string entityName, string propertyName = "id") => new(
+        $"{entityName}.NotFound",
+        ErrorType.NotFound,
+        $"{entityName} with this {propertyName} not found");
 
 }

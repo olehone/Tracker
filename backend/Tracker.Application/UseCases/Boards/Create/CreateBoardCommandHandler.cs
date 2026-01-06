@@ -18,7 +18,7 @@ public sealed class CreateBoardCommandHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var workspace = await uow.WorkspaceRepository.GetByIdAsync(request.WorkspaceId);
-        
+
         if (workspace is null)
         {
             return Error.NotFound("Workspace");

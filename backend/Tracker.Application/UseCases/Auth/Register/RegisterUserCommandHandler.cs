@@ -4,6 +4,7 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Options;
 using Tracker.Domain.Results;
 
@@ -36,7 +37,7 @@ public sealed class RegisterUserCommandHandler(
             Email = request.Email,
             PasswordHash = passwordHasher.Hash(request.Password),
             Username = request.Username,
-            Role = Roles.User,
+            Role = GlobalRole.User,
             FirstName = request.FirstName,
             LastName = request.LastName
         };

@@ -14,6 +14,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     public async Task<List<Board>> GetAllByWorkspaceIdAsync(Guid workspaceId)
     {
         return await _dbSet
+            .AsNoTracking()
             .Where(b => b.WorkspaceId == workspaceId)
             .ToListAsync();
     }
@@ -21,6 +22,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     public async Task<Board?> GetByIdWithListsAndItemsAsync(Guid id)
     {
         return await _dbSet
+            .AsNoTracking()
             .Include(b => b.BoardLists
                 .OrderBy(bl => bl.Position))
                 .ThenInclude(bl => bl.BoardItems

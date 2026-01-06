@@ -11,11 +11,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ApplicationDefinition Include="Scripts\007-Change-Role-From-String-To-Enum.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Scripts\005-Create-Workspaces-And-Boards.sql" />
     <EmbeddedResource Include="Scripts\004-Add-Role-Constrains.sql" />
     <EmbeddedResource Include="Scripts\003-Add-Role-Column.sql" />
     <EmbeddedResource Include="Scripts\001-Create-User.sql" />
     <EmbeddedResource Include="Scripts\002-Add-Refresh-Tokens.sql" />
+    <EmbeddedResource Include="Scripts\006-Add-RoleEnum-To-User.sql" />
+    <EmbeddedResource Include="Scripts\008-Add-UserBoard-Relation.sql" />
+    <EmbeddedResource Include="Scripts\009-Add-UserWorkspace-Relation.sql" />
+    <EmbeddedResource Include="Scripts\011-Add-Workspace-Settings.sql" />
+    <EmbeddedResource Include="Scripts\010-Add-Board-Settings.sql" />
+    <EmbeddedResource Include="Scripts\007-Change-Role-From-String-To-Enum.sql" />
   </ItemGroup>
 
   <ItemGroup>

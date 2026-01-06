@@ -1,0 +1,32 @@
+﻿using MediatR;
+using Tracker.Application.Common.Auth;
+using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Dtos;
+using Tracker.Domain.Mapping;
+using Tracker.Domain.Results;
+
+namespace Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
+
+public sealed class GetWorkspacesForCurrentUserQueryHandler(
+    IUserContext userContext,
+    IUnitOfWorkFactory unitOfWorkFactory)
+    : IRequestHandler<GetWorkspacesForCurrentUserQuery, Result<List<WorkspaceDto>>>
+{
+    public async Task<Result<List<WorkspaceDto>>> Handle(
+        GetWorkspacesForCurrentUserQuery request,
+        CancellationToken cancellationToken)
+    {
+        if (!userContext.IsAuthenticated())
+        {
+            return Result.FailureOf<List<WorkspaceDto>>(AuthErrors.Unauthenticated);
+        }
+        var userId = userContext.GetUserId();
+
+        await using var uow = unitOfWorkFactory.Create();
+        var workspaces = await uow.WorkspaceRepository.GetByUserIdAsync(userId);
+
+        return workspaces is null
+            ? Error.NotFound("Workspaces", "user")
+            : workspaces.Select(workspace => workspace.ToDto()).ToList();
+    }
+}

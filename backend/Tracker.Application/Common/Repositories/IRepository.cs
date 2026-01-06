@@ -1,6 +1,8 @@
-﻿namespace Tracker.Application.Common.Repositories;
+﻿using Tracker.Domain.Entities.Common;
 
-public interface IRepository<TEntity, TId> where TEntity : class
+namespace Tracker.Application.Common.Repositories;
+
+public interface IRepository<TEntity, TId> where TEntity : BaseEntity
 {
     Task<TEntity?> GetByIdAsync(TId id);
     Task<IReadOnlyList<TEntity>> GetAllAsync();

@@ -15,7 +15,8 @@ public static class ErrorMappingService
         return statusCode switch
         {
             HttpStatusCode.BadRequest => MapResponseContent(content, ErrorType.Validation),
-            HttpStatusCode.Unauthorized => MapResponseContent(content, ErrorType.Unauthorized),
+            HttpStatusCode.Unauthorized => MapResponseContent(content, ErrorType.Unauthenticated),
+            HttpStatusCode.Forbidden => MapResponseContent(content, ErrorType.Forbidden),
             HttpStatusCode.NotFound => MapResponseContent(content, ErrorType.NotFound),
             HttpStatusCode.Conflict => MapResponseContent(content, ErrorType.Conflict),
             _ when (int)statusCode >= 500 => MapResponseContent(content, ErrorType.Server),
@@ -124,7 +125,8 @@ public static class ErrorMappingService
             ErrorType.Validation => "Validation failed",
             ErrorType.NotFound => "Resource not found",
             ErrorType.Conflict => "A conflict occurred",
-            ErrorType.Unauthorized => "You are not authorized",
+            ErrorType.Unauthenticated => "You are not logged in",
+            ErrorType.Forbidden => "You do not have permission to perform this action",
             ErrorType.Network => "Unable to connect to the server",
             ErrorType.Server => "Server error occurred",
             _ => "An error occurred"
