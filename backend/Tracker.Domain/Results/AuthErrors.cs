@@ -40,10 +40,10 @@ public static class AuthErrors
         "You are not logged in");
 
 
-    public static Error Forbidden(string? reason = null) =>  new(
+    public static Error Forbidden(string? reason = null) => new(
         CurrentUserCode,
         ErrorType.Forbidden,
-        reason ??"You do not have permission to perform this action");
+        reason ?? "You do not have permission to perform this action");
 
 
 }

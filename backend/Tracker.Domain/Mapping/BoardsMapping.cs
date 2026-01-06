@@ -14,13 +14,16 @@ public static class BoardsMapping
         };
     }
 
-    public static BoardFullDto ToFullDto(this Board board)
+    public static BoardFullDto ToFullDto(this Board board, 
+        BoardPermissionsDto permissions)
     {
         return new BoardFullDto()
         {
             Id = board.Id,
             Title = board.Title,
-            Description = board.Description,
+            Description = board.Description ?? string.Empty,
+            Visibility = board.Visibility,
+            Permissions = permissions,
             BoardLists = board.BoardLists
                               .Select(boardList => boardList.ToDto())
                               .ToList()
@@ -34,7 +37,7 @@ public static class BoardsMapping
             Id = boardList.Id,
             Position = boardList.Position,
             Title = boardList.Title,
-            Description = boardList.Description,
+            Description = boardList.Description ?? string.Empty,
             BoardItems = boardList.BoardItems
                                   .Select(boardItem => boardItem.ToDto())
                                   .ToList()
@@ -49,7 +52,7 @@ public static class BoardsMapping
             BoardListId = boardItem.BoardListId,
             Position = boardItem.Position,
             Title = boardItem.Title,
-            Description = boardItem.Description,
+            Description = boardItem.Description ?? string.Empty,
         };
     }
 }
