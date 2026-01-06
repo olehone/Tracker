@@ -2,11 +2,11 @@
 using Tracker.Domain.Requests.Board;
 using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Results;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services.Entities;
+namespace Tracker.Services;
 
 public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IBoardService
 {

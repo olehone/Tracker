@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction.Entities;
+namespace Tracker.Services.Abstraction;
 
 public interface IAuthService
 {

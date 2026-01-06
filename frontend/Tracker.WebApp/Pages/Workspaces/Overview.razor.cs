@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 
@@ -13,7 +14,7 @@ public partial class Overview
     [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
     [Inject] private IBoardService BoardService { get; set; } = null!;
 
-    private WorkspaceDto? Workspace { get; set; }
+    private WorkspaceFullDto? Workspace { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,5 +64,10 @@ public partial class Overview
     private string PageTitle()
     {
         return Workspace?.Title ?? "Workspace";
+    }
+
+    private bool CanCreateBoard()
+    {
+        return Workspace?.Permissions.CanCreateBoardRole ?? false;
     }
 }

@@ -1,9 +1,8 @@
 ﻿namespace Tracker.Domain.Dtos;
 
-public class WorkspaceDto
+public class WorkspaceSummaryDto
 {
     public required Guid Id { get; set; }
     public required string Title { get; set; }
-    public string? Description { get; set; }
-    public List<BoardSummaryDto> Boards { get; set; } = [];
+    public required string Description { get; set; }
 }

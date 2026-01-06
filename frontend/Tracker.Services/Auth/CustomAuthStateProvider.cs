@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Services.Abstraction.Auth;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.Services.Auth;
 

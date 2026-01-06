@@ -6,12 +6,12 @@ namespace Tracker.Services.ApiClients;
 
 public interface IWorkspaceApi
 {
-    [Get("/api/workspaces/")]
-    Task<ApiResponse<List<WorkspaceDto>>> GetWorkspacesAsync();
 
     [Get("/api/workspaces/{id}")]
-    Task<ApiResponse<WorkspaceDto>> GetWorkspaceByIdAsync(Guid id);
+    Task<ApiResponse<WorkspaceFullDto>> GetWorkspaceByIdAsync(Guid id);
+    [Get("/api/workspaces/")]
+    Task<ApiResponse<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync();
 
     [Post("/api/workspaces/")]
-    Task<ApiResponse<WorkspaceDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);
+    Task<ApiResponse<WorkspaceSummaryDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);
 }

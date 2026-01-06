@@ -10,15 +10,15 @@ namespace Tracker.Application.UseCases.Workspaces.SearchByTitle;
 public sealed class SearchWorkspacesByTitleQueryHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<SearchWorkspacesByTitleQuery, Result<List<WorkspaceDto>>>
+    : IRequestHandler<SearchWorkspacesByTitleQuery, Result<List<WorkspaceSummaryDto>>>
 {
-    public async Task<Result<List<WorkspaceDto>>> Handle(
+    public async Task<Result<List<WorkspaceSummaryDto>>> Handle(
         SearchWorkspacesByTitleQuery request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
         {
-            return Result.FailureOf<List<WorkspaceDto>>(AuthErrors.Unauthenticated);
+            return AuthErrors.Unauthenticated;
         }
         var userId = userContext.GetUserId();
 
@@ -26,10 +26,10 @@ public sealed class SearchWorkspacesByTitleQueryHandler(
 
         int skip = (request.Page - 1) * request.AmountInPage;
         var workspaces = await uow.WorkspaceRepository
-            .SearchByTitleWithUserIdAsync(userId, request.Title, skip, request.AmountInPage);
+            .SearchByTitleAndUserAsync(userId, request.Title, skip, request.AmountInPage);
 
         return workspaces is null
             ? Error.NotFound("Workspaces", "title")
-            : workspaces.Select(workspace => workspace.ToDto()).ToList();
+            : workspaces.Select(workspace => workspace.ToSummaryDto()).ToList();
     }
 }

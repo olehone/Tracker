@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Entities.Common;
+using Tracker.Domain.Enums;
 using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Domain.Entities;
@@ -10,6 +11,8 @@ public class Board : BaseEntity
     public string? Description { get; set; }
     public Workspace Workspace { get; set; } = null!;
     public List<BoardList> BoardLists { get; set; } = [];
-    public BoardSettings Settings { get; set; } = new();
+    public BoardVisibility Visibility { get; set; }
+        = BoardVisibility.Workspace;
+    public BoardPermissionRoles PermissionRoles { get; set; } = new();
     public List<UserBoard> UserBoards { get; set; } = [];
 }

@@ -3,7 +3,7 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Pages.Boards;
 

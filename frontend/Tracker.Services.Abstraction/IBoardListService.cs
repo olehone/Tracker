@@ -2,7 +2,7 @@
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction.Entities;
+namespace Tracker.Services.Abstraction;
 
 public interface IBoardListService
 {

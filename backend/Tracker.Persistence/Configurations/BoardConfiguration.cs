@@ -16,15 +16,15 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
         builder.Property(b => b.Title)
             .IsRequired();
 
+        builder.Property(b => b.Visibility)
+            .IsRequired();
+
         builder.HasMany(b => b.BoardLists)
             .WithOne(bl => bl.Board)
             .HasForeignKey(bl => bl.BoardId);
 
-        builder.OwnsOne(b => b.Settings, settings =>
+        builder.OwnsOne(b => b.PermissionRoles, settings =>
         {
-            settings.Property(s => s.Visibility)
-                .HasColumnName("Visibility");
-
             settings.Property(s => s.MinCreateItemRole)
                 .HasColumnName("MinCreateItemRole");
 

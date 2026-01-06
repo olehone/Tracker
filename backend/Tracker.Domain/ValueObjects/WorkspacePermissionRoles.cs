@@ -2,10 +2,8 @@
 
 namespace Tracker.Domain.ValueObjects;
 
-public class WorkspaceSettings
+public class WorkspacePermissionRoles
 {
-    public WorkspaceVisibility Visibility { get; set; } 
-        = WorkspaceVisibility.Private;
     public WorkspacePermissionRole MinCreateBoardRole { get; set; } 
         = WorkspacePermissionRole.Admin;
     public WorkspacePermissionRole MinChangeBoardRole { get; set; } 

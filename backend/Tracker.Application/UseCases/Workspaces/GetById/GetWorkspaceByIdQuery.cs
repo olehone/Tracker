@@ -4,7 +4,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Workspaces.GetById;
 
-public class GetWorkspaceByIdQuery : IRequest<Result<WorkspaceDto>>
+public class GetWorkspaceByIdQuery : IRequest<Result<WorkspaceFullDto>>
 {
     public Guid Id { get; set; }
 }

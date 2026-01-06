@@ -2,10 +2,8 @@
 
 namespace Tracker.Domain.ValueObjects;
 
-public class BoardSettings
+public class BoardPermissionRoles
 {
-    public BoardVisibility Visibility { get; set; } 
-        = BoardVisibility.Private;
     public BoardPermissionRole MinCreateItemRole { get; set; } 
         = BoardPermissionRole.Member;
     public BoardPermissionRole MinChangeItemRole { get; set; } 

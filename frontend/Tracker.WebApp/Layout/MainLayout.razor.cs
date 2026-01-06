@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Tracker.Services.Abstraction.Entities;
+using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Layout;

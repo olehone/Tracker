@@ -2,7 +2,7 @@
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction.Entities;
+namespace Tracker.Services.Abstraction;
 
 public interface IBoardItemService
 {

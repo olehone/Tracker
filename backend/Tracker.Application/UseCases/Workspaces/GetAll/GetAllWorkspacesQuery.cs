@@ -4,6 +4,6 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Workspaces.GetAll;
 
-public class GetAllWorkspacesQuery : IRequest<Result<List<WorkspaceDto>>>
+public class GetAllWorkspacesQuery : IRequest<Result<List<WorkspaceSummaryDto>>>
 {
 }

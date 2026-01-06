@@ -2,6 +2,7 @@
 
 public enum UserBoardRole
 {
+    None = 1,
     Observer = 20,
     Member = 30,
     Admin = 40,

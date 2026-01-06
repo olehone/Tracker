@@ -11,21 +11,21 @@ namespace Tracker.Application.UseCases.Workspaces.GetAll;
 public sealed class GetAllWorkspacesQueryHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetAllWorkspacesQuery, Result<List<WorkspaceDto>>>
+    : IRequestHandler<GetAllWorkspacesQuery, Result<List<WorkspaceSummaryDto>>>
 {
-    public async Task<Result<List<WorkspaceDto>>> Handle(
+    public async Task<Result<List<WorkspaceSummaryDto>>> Handle(
         GetAllWorkspacesQuery request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
         {
-            return Result.FailureOf<List<WorkspaceDto>>(AuthErrors.Unauthenticated);
+            return AuthErrors.Unauthenticated;
         }
 
         var userRole = userContext.GetUserRole();
-        if (userRole.IsFailure || userRole.Value < GlobalRole.Admin)
+        if (userRole < GlobalRole.Admin)
         {
-            return Result.FailureOf<List<WorkspaceDto>>(AuthErrors.Forbidden());
+            return AuthErrors.Forbidden();
         }
 
         await using var uow = unitOfWorkFactory.Create();
@@ -34,6 +34,6 @@ public sealed class GetAllWorkspacesQueryHandler(
 
         return workspaces is null
             ? Error.Unknown
-            : workspaces.Select(workspace => workspace.ToDto()).ToList();
+            : workspaces.Select(workspace => workspace.ToSummaryDto()).ToList();
     }
 }

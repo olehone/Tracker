@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Tracker.Application.Common.Auth;
 using Tracker.Domain.Enums;
-using Tracker.Domain.Results;
 
 namespace Tracker.Infrastructure.Auth;
 
@@ -26,7 +25,7 @@ public class UserContext(IHttpContextAccessor httpContextAccessor)
         return Guid.Parse(idClaim);
     }
 
-    public Result<GlobalRole> GetUserRole()
+    public GlobalRole GetUserRole()
     {
         var roleClaim =
             httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role) ??
@@ -34,12 +33,12 @@ public class UserContext(IHttpContextAccessor httpContextAccessor)
 
         if (roleClaim is null)
         {
-            return Error.Unknown;
+            return GlobalRole.None;
         }
 
         if (!Enum.TryParse<GlobalRole>(roleClaim, ignoreCase: true, out var globalRole))
         {
-            return Error.Unknown;
+            return GlobalRole.None;
         }
 
         return globalRole;
