@@ -1,5 +1,4 @@
-﻿using System;
-using Tracker.Domain.Entities;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.ValueObjects;
 
@@ -7,55 +6,64 @@ namespace Tracker.Application.UseCases.Workspaces;
 
 public static class WorkspacePolicy
 {
-    public static bool IsActionAllowedGlobalRole(GlobalRole globalRole, 
-        WorkspaceAction workspaceAction)
+    public static WorkspacePermissionsDto GetPermissions(WorkspacePermissionRoles permissionRoles,
+        UserWorkspaceRole workspaceRole,
+        GlobalRole globalRole = GlobalRole.None)
     {
         if (globalRole >= GlobalRole.Admin)
+        {
+            return WorkspacePermissionsDto.All;
+        }
+
+        return new WorkspacePermissionsDto()
+        {
+            CanCreateBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
+            CanChangeBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
+        };
+    }
+
+    public static bool CanAnonView(WorkspaceVisibility visibility)
+    {
+        if (visibility <= WorkspaceVisibility.Public)
         {
             return true;
         }
         return false;
     }
-
-    public static bool IsActionAllowedAnonymous(WorkspaceSettings workspaceSettings, 
-        WorkspaceAction action)
+    public static bool CanView(GlobalRole globalRole,
+        WorkspaceVisibility visibility,
+        UserWorkspaceRole workspaceRole)
     {
-        if (action == WorkspaceAction.ViewWorkspace &&
-        workspaceSettings.Visibility == WorkspaceVisibility.Public)
-        {
-            return true;
-        }
-        var minRole = MinRoleForAction(workspaceSettings, action);
-        return minRole == WorkspacePermissionRole.Any;
-    }
-
-    public static bool IsActionAllowed(UserWorkspace workspaceMembership,
-        WorkspaceSettings workspaceSettings,
-        WorkspaceAction action)
-    {
-        if (action == WorkspaceAction.ViewWorkspace)
+        if (globalRole >= GlobalRole.Admin)
         {
             return true;
         }
 
-        var minRole = MinRoleForAction(workspaceSettings, action);
-        var userRole = MapUserRoleToPermission(workspaceMembership?.Role);
+        if (visibility == WorkspaceVisibility.Public)
+        {
+            return true;
+        }
 
-        return userRole >= minRole;
+        if (workspaceRole >= UserWorkspaceRole.None)
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    private static WorkspacePermissionRole MinRoleForAction(WorkspaceSettings workspaceSettings,
+    public static bool IsActionAllowed(WorkspacePermissionsDto permissions,
         WorkspaceAction action)
     {
         return action switch
         {
-            WorkspaceAction.CreateBoard => workspaceSettings.MinCreateBoardRole,
-            WorkspaceAction.ChangeBoard => workspaceSettings.MinChangeBoardRole,
-            _ => WorkspacePermissionRole.None
+            WorkspaceAction.CreateBoard => permissions.CanCreateBoard,
+            WorkspaceAction.ChangeBoard => permissions.CanChangeBoard,
+            _ => false
         };
     }
 
-    private static WorkspacePermissionRole MapUserRoleToPermission(UserWorkspaceRole? userWorkspaceRole)
+    private static WorkspacePermissionRole MapUserRoleToPermission(UserWorkspaceRole userWorkspaceRole)
     {
         return userWorkspaceRole switch
         {

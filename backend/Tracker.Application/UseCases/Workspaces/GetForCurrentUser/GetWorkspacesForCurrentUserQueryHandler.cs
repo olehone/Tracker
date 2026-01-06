@@ -10,23 +10,23 @@ namespace Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
 public sealed class GetWorkspacesForCurrentUserQueryHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetWorkspacesForCurrentUserQuery, Result<List<WorkspaceDto>>>
+    : IRequestHandler<GetWorkspacesForCurrentUserQuery, Result<List<WorkspaceSummaryDto>>>
 {
-    public async Task<Result<List<WorkspaceDto>>> Handle(
+    public async Task<Result<List<WorkspaceSummaryDto>>> Handle(
         GetWorkspacesForCurrentUserQuery request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
         {
-            return Result.FailureOf<List<WorkspaceDto>>(AuthErrors.Unauthenticated);
+            return AuthErrors.Unauthenticated;
         }
         var userId = userContext.GetUserId();
 
         await using var uow = unitOfWorkFactory.Create();
-        var workspaces = await uow.WorkspaceRepository.GetByUserIdAsync(userId);
+        var workspaces = await uow.WorkspaceRepository.GetByUserAsync(userId);
 
         return workspaces is null
             ? Error.NotFound("Workspaces", "user")
-            : workspaces.Select(workspace => workspace.ToDto()).ToList();
+            : workspaces.Select(workspace => workspace.ToSummaryDto()).ToList();
     }
 }

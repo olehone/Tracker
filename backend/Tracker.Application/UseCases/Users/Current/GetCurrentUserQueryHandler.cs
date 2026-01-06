@@ -17,10 +17,11 @@ public class GetCurrentUserQueryHandler(
         GetCurrentUserQuery request, 
         CancellationToken cancellationToken)
     {
-        Guid userId = userContext.GetUserId();
+        var userId = userContext.GetUserId();
+
         await using var uow = unitOfWorkFactory.Create();
 
-        User? user = await uow.UserRepository.GetByIdAsync(userId);
+        var user = await uow.UserRepository.GetByIdAsync(userId);
 
         return user is null
             ? Error.NotFound("User")

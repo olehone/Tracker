@@ -4,6 +4,6 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
 
-public class GetWorkspacesForCurrentUserQuery : IRequest<Result<List<WorkspaceDto>>>
+public class GetWorkspacesForCurrentUserQuery : IRequest<Result<List<WorkspaceSummaryDto>>>
 {
 }

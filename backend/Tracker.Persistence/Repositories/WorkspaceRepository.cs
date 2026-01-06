@@ -22,7 +22,7 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IReadOnlyList<Workspace>> GetByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId)
     {
         return await _dbSet
             .AsNoTracking()
@@ -30,7 +30,7 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Workspace>> SearchByTitleWithUserIdAsync(
+    public async Task<IReadOnlyList<Workspace>> SearchByTitleAndUserAsync(
         Guid userId, string title, int skip, int take)
     {
         var normalizedTitle = title.Trim().ToLower();
@@ -40,7 +40,7 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .Where(w => w.Title.ToLower().Contains(normalizedTitle) &&
             (
                 w.UserWorkspaces.Any(uw => uw.UserId == userId) ||
-                w.Settings.Visibility == WorkspaceVisibility.Public
+                w.Visibility == WorkspaceVisibility.Public
             ))
             .OrderByDescending(w => w.UserWorkspaces.Any(uw => uw.UserId == userId))
             .ThenBy(w => w.Title)

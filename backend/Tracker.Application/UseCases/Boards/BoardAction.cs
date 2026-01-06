@@ -2,9 +2,8 @@
 
 public enum BoardAction
 {
-    ViewBoard = 1,
-    CreateItem = 2,
-    ChangeItem = 3,
-    CreateList = 4,
-    ChangeList = 5,
+    CreateItem = 1,
+    ChangeItem = 2,
+    CreateList = 3,
+    ChangeList = 4,
 }

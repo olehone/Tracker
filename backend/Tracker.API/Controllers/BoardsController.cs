@@ -5,7 +5,6 @@ using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Boards.GetById;
-using Tracker.Application.UseCases.Boards.GetByWorkspaceId;
 
 namespace Tracker.API.Controllers;
 
@@ -18,15 +17,6 @@ public class BoardsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetBoardByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetBoardByIdQuery() { Id = request.Id };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllBoardsInWorkspaceAsync(
-        [FromQuery] GetByIdRequest request)
-    {
-        var mediatorRequest = new GetBoardsByWorkspaceIdQuery() { WorkspaceId = request.Id };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }

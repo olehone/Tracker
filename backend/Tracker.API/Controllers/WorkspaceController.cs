@@ -36,7 +36,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetWorkspacesAsync()
+    public async Task<IActionResult> GetWorkspacesForCurrentUserAsync()
     {
         var response = await mediator.Send(new GetWorkspacesForCurrentUserQuery());
         return response.ToActionResult();

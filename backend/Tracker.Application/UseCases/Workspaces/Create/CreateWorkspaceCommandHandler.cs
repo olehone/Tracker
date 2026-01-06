@@ -12,17 +12,17 @@ namespace Tracker.Application.UseCases.Workspaces.Create;
 public sealed class CreateWorkspaceCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext)
-    : IRequestHandler<CreateWorkspaceCommand, Result<WorkspaceDto>>
+    : IRequestHandler<CreateWorkspaceCommand, Result<WorkspaceFullDto>>
 {
-    public async Task<Result<WorkspaceDto>> Handle(
+    public async Task<Result<WorkspaceFullDto>> Handle(
         CreateWorkspaceCommand request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
         {
-            return Result.FailureOf<WorkspaceDto>(AuthErrors.Unauthenticated);
+            return AuthErrors.Unauthenticated;
         }
-        Guid userId = userContext.GetUserId();
+        var userId = userContext.GetUserId();
 
         await using var uow = unitOfWorkFactory.Create();
         var workspace = new Workspace
@@ -43,8 +43,11 @@ public sealed class CreateWorkspaceCommandHandler(
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 
+        var permissions = WorkspacePolicy
+            .GetPermissions(workspace.PermissionRoles, userWorkspace.Role);
+
         return sc.IsFailure
             ? Error.Unknown
-            : workspace.ToDto();
+            : workspace.ToFullDto(permissions);
     }
 }

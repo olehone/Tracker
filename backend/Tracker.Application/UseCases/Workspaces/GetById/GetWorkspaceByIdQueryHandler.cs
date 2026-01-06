@@ -10,11 +10,9 @@ namespace Tracker.Application.UseCases.Workspaces.GetById;
 public sealed class GetWorkspaceByIdQueryHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetWorkspaceByIdQuery, Result<WorkspaceDto>>
+    : IRequestHandler<GetWorkspaceByIdQuery, Result<WorkspaceFullDto>>
 {
-    private const WorkspaceAction action = WorkspaceAction.ViewWorkspace;
-
-    public async Task<Result<WorkspaceDto>> Handle(
+    public async Task<Result<WorkspaceFullDto>> Handle(
         GetWorkspaceByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,34 +27,25 @@ public sealed class GetWorkspaceByIdQueryHandler(
 
         if (!userContext.IsAuthenticated())
         {
-            if (WorkspacePolicy.IsActionAllowedAnonymous(workspace.Settings, action))
+            if (WorkspacePolicy.CanAnonView(workspace.Visibility))
             {
-                return workspace.ToDto();
+                return workspace.ToFullDto(WorkspacePermissionsDto.None);
             }
-            return Result.FailureOf<WorkspaceDto>(AuthErrors.Unauthenticated);
-        }
-
-        var globalRole = userContext.GetUserRole();
-        if (globalRole.IsSuccess &&
-            WorkspacePolicy.IsActionAllowedGlobalRole(globalRole.Value, action))
-        {
-            return workspace.ToDto();
+            return AuthErrors.Forbidden();
         }
 
         var userId = userContext.GetUserId();
-        var userWorkspace = await uow.UserWorkspaceRepository
-            .GetByUserAndWorkspaceIds(userId, workspace.Id);
-        if (userWorkspace is null)
-        {
-            return Result.FailureOf<WorkspaceDto>(AuthErrors
-                .Forbidden("You are not member of this workspace"));
-        }
+        var userRole = userContext.GetUserRole();
+        var workspaceRole = await uow.UserWorkspaceRepository
+            .GetRole(userId, workspace.Id);
 
-        var isAllowed = WorkspacePolicy.IsActionAllowed(userWorkspace, 
-            workspace.Settings, action);
-        return isAllowed
-            ? workspace.ToDto()
-            : Result.FailureOf<WorkspaceDto>(AuthErrors
-            .Forbidden("You are not allowed to do this"));
+        if (WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
+        {
+            return AuthErrors.Forbidden("You are not member of this workspace");
+        }
+        var workspacePolicy = WorkspacePolicy
+            .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
+
+        return workspace.ToFullDto(workspacePolicy);
     }
 }
