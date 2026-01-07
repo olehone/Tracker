@@ -2,6 +2,8 @@
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Enums;
+using Tracker.Domain.Results;
+using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Persistence.Repositories;
 
@@ -11,6 +13,41 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
     public WorkspaceRepository(ApplicationDbContext applicationDbContext)
         : base(applicationDbContext)
     {
+    }
+    public new async Task<Workspace?> GetByIdAsync(Guid id)
+    {
+        return await _dbSet
+           .Include(x => x.PermissionRoles)
+           .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+
+    public async Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles)
+    {
+        var updated = await _dbSet
+            .Where(w => w.Id == id)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(w => w.PermissionRoles, permissionRoles));
+        if (updated == 0)
+        {
+            return Error.NotFound("Workspace");
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ChangeVisibility(Guid id, WorkspaceVisibility visibility)
+    {
+        var updated = await _dbSet
+             .Where(w => w.Id == id)
+             .ExecuteUpdateAsync(u => u
+                 .SetProperty(w => w.Visibility, visibility));
+        if (updated == 0)
+        {
+            return Error.NotFound("Workspace");
+        }
+
+        return Result.Success();
     }
 
     public async Task<Workspace?> GetByIdWithBoardsAsync(Guid id)

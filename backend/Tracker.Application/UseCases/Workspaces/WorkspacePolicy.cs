@@ -52,6 +52,20 @@ public static class WorkspacePolicy
         return false;
     }
 
+    public static bool CanChangeSettings(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole)
+    {
+        if (globalRole >= GlobalRole.Admin)
+        {
+            return true;
+        }
+        if (workspaceRole >= UserWorkspaceRole.Admin)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public static bool IsActionAllowed(WorkspacePermissionsDto permissions,
         WorkspaceAction action)
     {

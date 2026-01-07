@@ -1,5 +1,7 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
+using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Domain.Mapping;
 
@@ -11,7 +13,7 @@ public static class WorkspaceMapping
         {
             Id = workspace.Id,
             Title = workspace.Title,
-            Description = workspace.Description,
+            Description = workspace.Description ?? string.Empty,
         };
     }
 
@@ -28,6 +30,17 @@ public static class WorkspaceMapping
             Boards = workspace.Boards
                               .Select(board => board.ToSummaryDto())
                               .ToList()
+        };
+    }
+
+    public static WorkspaceSettingsDto ToSettingsDto(this Workspace workspace,
+        bool CanChange = false)
+    {
+        return new WorkspaceSettingsDto
+        {
+            CanChangeSettings = CanChange,
+            Visibility = workspace.Visibility,
+            PermissionRoles = workspace.PermissionRoles,
         };
     }
 }

@@ -39,7 +39,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
         var workspaceRole = await uow.UserWorkspaceRepository
             .GetRole(userId, workspace.Id);
 
-        if (WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
+        if (!WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
         {
             return AuthErrors.Forbidden("You are not member of this workspace");
         }
