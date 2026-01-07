@@ -21,6 +21,14 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public new void Update(Workspace workspace)
+    {
+        _dbSet.Attach(workspace);
+        _dbContext.Entry(workspace).Property(w => w.Title).IsModified = true;
+        _dbContext.Entry(workspace).Property(w => w.Description).IsModified = true;
+        _dbContext.Entry(workspace).Property(w => w.Visibility).IsModified = true;
+        _dbContext.Entry(workspace).Reference(w => w.PermissionRoles).IsModified = true;
+    }
 
     public async Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles)
     {

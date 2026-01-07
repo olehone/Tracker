@@ -8,8 +8,6 @@ using Tracker.Application.UseCases.Workspaces.Create;
 using Tracker.Application.UseCases.Workspaces.GetAll;
 using Tracker.Application.UseCases.Workspaces.GetById;
 using Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
-using Tracker.Application.UseCases.Workspaces.GetSettings;
-using Tracker.Domain.Enums;
 
 namespace Tracker.API.Controllers;
 
@@ -30,25 +28,15 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpGet("{Id:guid}/settings")]
-    public async Task<IActionResult> GetWorkspaceSettingsAsync([FromRoute] GetByIdRequest request)
-    {
-        var mediatorRequest = new GetWorkspaceSettingsQuery()
-        {
-            WorkspaceId = request.Id
-        };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
     [HttpPut("{Id:guid}/settings")]
     public async Task<IActionResult> ChangeWorkspaceSettingsAsync([FromRoute] GetByIdRequest workspaceId,
-        [FromBody] ChangeWorkspaceSettingsRequest request)
+        [FromBody] UpdateWorkspaceBodyRequest request)
     {
-        var mediatorRequest = new ChangeWorkspaceSettingsCommand()
+        var mediatorRequest = new UpdateWorkspaceCommand()
         {
             WorkspaceId = workspaceId.Id,
-            CanChangeSettings = request.CanChangeSettings,
+            Title = request.Title,
+            Description = request.Description,
             Visibility = request.Visibility,
             PermissionRoles = request.PermissionRoles,
         };

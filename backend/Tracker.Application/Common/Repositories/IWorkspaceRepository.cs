@@ -11,6 +11,4 @@ public interface IWorkspaceRepository : IRepository<Workspace, Guid>
     Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId);
     Task<IReadOnlyList<Workspace>> SearchByTitleAndUserAsync(
         Guid userId, string title, int skip, int take);
-    Task<Result> ChangeVisibility(Guid id, WorkspaceVisibility visibility);
-    Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles);
 }

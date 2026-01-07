@@ -1,19 +1,17 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Domain.Dtos;
-using Tracker.Domain.Mapping;
+using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Workspaces.GetSettings;
+namespace Tracker.Application.UseCases.Workspaces.ChangeSettings;
 
-public class GetWorkspaceSettingsQueryHandler(
+public class UpdateWorkspaceCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetWorkspaceSettingsQuery, Result<WorkspaceSettingsDto>>
+    : IRequestHandler<UpdateWorkspaceCommand, Result>
 {
-    public async Task<Result<WorkspaceSettingsDto>> Handle(
-        GetWorkspaceSettingsQuery request,
+    public async Task<Result> Handle(UpdateWorkspaceCommand request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
@@ -24,6 +22,7 @@ public class GetWorkspaceSettingsQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
         var workspace = await uow.WorkspaceRepository
             .GetByIdAsync(request.WorkspaceId);
+
         if (workspace is null)
         {
             return Error.NotFound("Workspace");
@@ -39,7 +38,21 @@ public class GetWorkspaceSettingsQueryHandler(
         {
             return AuthErrors.Forbidden();
         }
+        var newWorkspace = new Workspace
+        {
+            Id = request.WorkspaceId,
+            Title = request.Title,
+            Description = request.Description,
+            Visibility = request.Visibility,
+            PermissionRoles = request.PermissionRoles,
+        };
 
-        return workspace.ToSettingsDto(canChange);
+        uow.WorkspaceRepository.Update(newWorkspace);
+        var result = await uow.SaveChangesAsync();
+        if (result.IsFailure)
+        {
+            return result;
+        }
+        return Result.Success();
     }
 }

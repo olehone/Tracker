@@ -32,15 +32,4 @@ public static class WorkspaceMapping
                               .ToList()
         };
     }
-
-    public static WorkspaceSettingsDto ToSettingsDto(this Workspace workspace,
-        bool CanChange = false)
-    {
-        return new WorkspaceSettingsDto
-        {
-            CanChangeSettings = CanChange,
-            Visibility = workspace.Visibility,
-            PermissionRoles = workspace.PermissionRoles,
-        };
-    }
 }

@@ -5,10 +5,11 @@ using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Application.UseCases.Workspaces.ChangeSettings;
 
-public class ChangeWorkspaceSettingsCommand : IRequest<Result>
+public class UpdateWorkspaceCommand : IRequest<Result>
 {
     public required Guid WorkspaceId { get; set; }
-    public required bool CanChangeSettings { get; set; }
+    public required string Title { get; set; }
+    public required string Description { get; set; }
     public required WorkspaceVisibility Visibility { get; set; }
     public required WorkspacePermissionRoles PermissionRoles { get; set; }
 }
