@@ -4,7 +4,7 @@ using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Workspaces.ChangeSettings;
+namespace Tracker.Application.UseCases.Workspaces.Update;
 
 public class UpdateWorkspaceCommandHandler(
     IUserContext userContext,
@@ -48,7 +48,7 @@ public class UpdateWorkspaceCommandHandler(
         };
 
         uow.WorkspaceRepository.Update(newWorkspace);
-        var result = await uow.SaveChangesAsync();
+        var result = await uow.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)
         {
             return result;

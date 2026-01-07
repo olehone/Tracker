@@ -1,4 +1,4 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿namespace Tracker.Domain.Enums;
 
 public enum GlobalRole
 {

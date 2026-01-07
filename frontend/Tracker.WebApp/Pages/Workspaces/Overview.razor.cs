@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 
@@ -68,6 +67,7 @@ public partial class Overview
 
     private bool CanCreateBoard()
     {
-        return Workspace?.Permissions.CanCreateBoardRole ?? false;
+        return Workspace?.Permissions.CanCreateBoard ?? false;
     }
+
 }

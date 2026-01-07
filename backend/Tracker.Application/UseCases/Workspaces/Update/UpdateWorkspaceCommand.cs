@@ -3,7 +3,7 @@ using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 using Tracker.Domain.ValueObjects;
 
-namespace Tracker.Application.UseCases.Workspaces.ChangeSettings;
+namespace Tracker.Application.UseCases.Workspaces.Update;
 
 public class UpdateWorkspaceCommand : IRequest<Result>
 {

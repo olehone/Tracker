@@ -1,4 +1,4 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Shared;
 

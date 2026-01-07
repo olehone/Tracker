@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Workspaces.ChangeSettings;
+using Tracker.Application.UseCases.Workspaces.Update;
 using Tracker.Application.UseCases.Workspaces.Create;
 using Tracker.Application.UseCases.Workspaces.GetAll;
 using Tracker.Application.UseCases.Workspaces.GetById;
@@ -29,7 +29,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{Id:guid}/settings")]
-    public async Task<IActionResult> ChangeWorkspaceSettingsAsync([FromRoute] GetByIdRequest workspaceId,
+    public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest workspaceId,
         [FromBody] UpdateWorkspaceBodyRequest request)
     {
         var mediatorRequest = new UpdateWorkspaceCommand()

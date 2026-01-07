@@ -1,7 +1,11 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
+
+namespace Tracker.Domain.Dtos;
 
 public class BoardSummaryDto
 {
     public required Guid Id { get; set; }
     public required string Title { get; set; }
+    public required bool IsParticipating { get; set; }
+    public required BoardVisibility Visibility { get; set; }
 }

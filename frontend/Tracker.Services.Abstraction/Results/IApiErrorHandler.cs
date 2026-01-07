@@ -13,4 +13,7 @@ public interface IApiErrorHandler
 
     Task<Result<TResponse>> ExecuteAsync<TRequest, TResponse>(TRequest request, Func<TRequest,
         Task<ApiResponse<TResponse>>> apiCall);
+    Task<Result> ExecuteAsync<TId, TRequest>(TId idRequest, TRequest request, 
+        Func<TId, TRequest, Task<ApiResponse<object>>> apiCall);
+
 }

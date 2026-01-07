@@ -26,6 +26,7 @@ public static class WorkspaceMapping
             Title = workspace.Title,
             Description = workspace.Description ?? string.Empty,
             Visibility = workspace.Visibility,
+            PermissionRoles = workspace.PermissionRoles,
             Permissions = permissions,
             Boards = workspace.Boards
                               .Select(board => board.ToSummaryDto())

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Refit;
 using Tracker.Domain.Options;
-using Tracker.Services.Abstraction.Auth;
+using Tracker.Services;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Auth;
-using Tracker.Services;
 using Tracker.Services.Results;
 
 namespace Tracker.Services;
@@ -59,9 +60,18 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddApiClientWithAuth<TInterface>(this IServiceCollection services)
-        where TInterface : class
+    where TInterface : class
     {
-        services.AddRefitClient<TInterface>()
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            // No JsonStringEnumConverter — keep enums numeric
+        };
+
+        services.AddRefitClient<TInterface>(new RefitSettings
+        {
+            ContentSerializer = new SystemTextJsonContentSerializer(jsonOptions)
+        })
             .ConfigureHttpClient((sp, client) =>
             {
                 var options = sp.GetRequiredService<IOptions<ApiOptions>>().Value;
@@ -71,4 +81,17 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+    //public static IServiceCollection AddApiClientWithAuth<TInterface>(this IServiceCollection services)
+    //    where TInterface : class
+    //{
+    //    services.AddRefitClient<TInterface>()
+    //        .ConfigureHttpClient((sp, client) =>
+    //        {
+    //            var options = sp.GetRequiredService<IOptions<ApiOptions>>().Value;
+    //            client.BaseAddress = new Uri(options.ApiBaseUrl);
+    //        })
+    //        .AddHttpMessageHandler<AuthHeaderHandler>();
+
+    //    return services;
+    //}
 }

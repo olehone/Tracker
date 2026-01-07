@@ -1,4 +1,6 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
+
+namespace Tracker.Domain.Dtos;
 
 public class UserDto
 {

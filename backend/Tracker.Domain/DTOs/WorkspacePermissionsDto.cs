@@ -6,17 +6,17 @@ public class WorkspacePermissionsDto
     {
         CanCreateBoard = false,
         CanChangeBoard = false,
-        CanChangeSettings = false,
+        CanChangeWorkspace = false,
     };
 
     public static readonly WorkspacePermissionsDto All = new()
     {
         CanCreateBoard = true,
         CanChangeBoard = true,
-        CanChangeSettings = true,
+        CanChangeWorkspace = true,
     };
 
     public required bool CanCreateBoard { get; set; }
     public required bool CanChangeBoard { get; set; }
-    public required bool CanChangeSettings { get; set; }
+    public required bool CanChangeWorkspace { get; set; }
 }

@@ -1,16 +1,30 @@
+@using Tracker.WebApp.Shared
 <a href=@($"/boards/{Board.Id}")>
+	<MudCard Elevation="2">
+		<MudCardMedia Height="70"
+					  Style=@GetBoardColorBackgroundStyle(Board)>
+		</MudCardMedia>
 
-    <MudCard Elevation="2">
-        <MudCardMedia Height="70"
-                      Style=@GetBoardColorBackgroundStyle(Board)>
-        </MudCardMedia>
+		<MudCardContent>
+			<MudStack Row
+					  Justify="Justify.SpaceBetween">
 
-        <MudCardContent>
-            <MudText Typo="Typo.h5"
-                     Class="text-ellipsis">
-                @Board.Title
-            </MudText>
-        </MudCardContent>
-    </MudCard>
+				<MudText Typo="Typo.h5"
+						 Class="text-ellipsis">
+					@Board.Title
+				</MudText>
+
+				<MudStack Row>
+					<BoardVisibilityIcon Visibility=@Board.Visibility/>
+					@if (Board.IsParticipating)
+					{
+						<MudTooltip Text="You are member of this board">
+							<MudIcon Icon="@Icons.Material.Outlined.Star" Color="Color.Warning" />
+						</MudTooltip>
+					}
+				</MudStack>
+			</MudStack>
+		</MudCardContent>
+	</MudCard>
 </a>
 
