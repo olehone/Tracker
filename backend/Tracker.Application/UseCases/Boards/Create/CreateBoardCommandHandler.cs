@@ -75,8 +75,10 @@ public sealed class CreateBoardCommandHandler(
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 
+        var boardDto = board.ToSummaryDto();
+        boardDto.IsParticipating = true;
         return sc.IsFailure
             ? Error.Unknown
-            : board.ToSummaryDto();
+            : boardDto;
     }
 }

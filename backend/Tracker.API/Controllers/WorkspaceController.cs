@@ -13,7 +13,6 @@ namespace Tracker.API.Controllers;
 
 [Route("api/workspaces")]
 [ApiController]
-[Authorize]
 public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
@@ -28,9 +27,10 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
     [HttpPut("{Id:guid}/settings")]
     public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest workspaceId,
-        [FromBody] UpdateWorkspaceBodyRequest request)
+            [FromBody] UpdateWorkspaceBodyRequest request)
     {
         var mediatorRequest = new UpdateWorkspaceCommand()
         {
@@ -52,6 +52,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetWorkspacesForCurrentUserAsync()
     {
@@ -59,6 +60,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {

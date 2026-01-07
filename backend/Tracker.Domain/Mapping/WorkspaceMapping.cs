@@ -18,7 +18,8 @@ public static class WorkspaceMapping
     }
 
     public static WorkspaceFullDto ToFullDto(this Workspace workspace,
-        WorkspacePermissionsDto permissions)
+        WorkspacePermissionsDto permissions,
+        IReadOnlyList<Board> boards)
     {
         return new WorkspaceFullDto
         {
@@ -28,9 +29,7 @@ public static class WorkspaceMapping
             Visibility = workspace.Visibility,
             PermissionRoles = workspace.PermissionRoles,
             Permissions = permissions,
-            Boards = workspace.Boards
-                              .Select(board => board.ToSummaryDto())
-                              .ToList()
+            Boards = boards.Select(b => b.ToSummaryDto()).ToList()
         };
     }
 }

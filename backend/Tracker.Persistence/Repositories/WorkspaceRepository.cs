@@ -17,6 +17,7 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
     public new async Task<Workspace?> GetByIdAsync(Guid id)
     {
         return await _dbSet
+           .AsNoTracking()
            .Include(x => x.PermissionRoles)
            .FirstOrDefaultAsync(x => x.Id == id);
     }
@@ -56,15 +57,6 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         }
 
         return Result.Success();
-    }
-
-    public async Task<Workspace?> GetByIdWithBoardsAsync(Guid id)
-    {
-        return await _dbSet
-            .AsNoTracking()
-            .Include(w => w.Boards)
-            .Where(w => w.Id == id)
-            .FirstOrDefaultAsync();
     }
 
     public async Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId)

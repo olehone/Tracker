@@ -53,6 +53,22 @@ public static class WorkspacePolicy
         return false;
     }
 
+    public static bool CanViewAllBoards(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole)
+    {
+        if (globalRole >= GlobalRole.Admin)
+        {
+            return true;
+        }
+
+        if (workspaceRole >= UserWorkspaceRole.Admin)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool CanChangeSettings(GlobalRole globalRole,
         UserWorkspaceRole workspaceRole)
     {

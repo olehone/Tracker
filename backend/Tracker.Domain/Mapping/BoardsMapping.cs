@@ -7,10 +7,12 @@ public static class BoardsMapping
 {
     public static BoardSummaryDto ToSummaryDto(this Board board)
     {
-        return new BoardSummaryDto()
+        return new BoardSummaryDto
         {
             Id = board.Id,
-            Title = board.Title
+            Title = board.Title,
+            IsParticipating = false,
+            Visibility = board.Visibility
         };
     }
 
