@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Boards;
 
@@ -10,8 +11,6 @@ public partial class BoardSummary
 
     private static string GetBoardColorBackgroundStyle(BoardSummaryDto board)
     {
-        var hash = board.Id.GetHashCode();
-        var hue = Math.Abs(hash % 360);
-        return $"background:hsl({hue}, 60%, 55%);";
+        return UiHelper.GetColorByString(board.Id.ToString());
     }
 }

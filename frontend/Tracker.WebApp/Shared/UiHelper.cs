@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using MudBlazor;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using static MudBlazor.CategoryTypes;
 
@@ -59,5 +60,12 @@ public static class UiHelper
         }
 
         return text.Substring(0, length - ellipsisLength) + ellipsis;
+    }
+
+    public static string GetColorByString(string value)
+    {
+        var hash = value.GetHashCode();
+        var hue = Math.Abs(hash % 360);
+        return $"background:hsl({hue}, 60%, 55%);";
     }
 }
