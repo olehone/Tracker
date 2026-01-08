@@ -1,0 +1,24 @@
+@using FluentValidation
+@using MudBlazor
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.Domain.Requests.Workspace
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<MudSelect Value=@Value
+		   ValueChanged=@ValueChanged
+		   Label="Choose workspace visibility"
+		   Variant="Variant.Outlined">
+	<MudSelectItem Value=@WorkspaceVisibility.Public>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Public /> Public
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspaceVisibility.Private>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Lock /> Private
+		</MudStack>
+	</MudSelectItem>
+</MudSelect>

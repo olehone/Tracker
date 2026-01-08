@@ -5,6 +5,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Domain.ValueObjects;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 public partial class Settings
@@ -13,7 +14,7 @@ public partial class Settings
     public Guid WorkspaceId { get; set; }
 
     [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
-
+    [Inject] IResultNotifier Notifier { get; set; } = null!;
     private WorkspaceFullDto? Workspace { get; set; }
     private UpdateWorkspaceRequest? model;
     private UpdateWorkspaceRequestValidator validator = new();
@@ -26,6 +27,13 @@ public partial class Settings
         await LoadWorkspace();
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Workspace == null || Workspace.Id != WorkspaceId)
+        {
+            await LoadWorkspace();
+        }
+    }
     private async Task LoadWorkspace()
     {
         isLoading = true;
@@ -49,6 +57,7 @@ public partial class Settings
                     MinChangeBoardRole = Workspace.PermissionRoles.MinChangeBoardRole,
                 }
             };
+            StateHasChanged();
         }
         finally
         {
@@ -70,22 +79,23 @@ public partial class Settings
         }
 
         isSubmitting = true;
-        try
-        {
-            var result = await WorkspaceService.UpdateAsync(WorkspaceId, model);
-            if (result.IsFailure)
-            {
-                return;
-            }
-        }
-        finally
-        {
-            isSubmitting = false;
-        }
+
+        var result = await WorkspaceService.UpdateAsync(WorkspaceId, model);
+        Notifier.Notify(result);
+        isSubmitting = false;
     }
     private string PageTitle()
     {
         return Workspace?.Title ?? "Workspace";
+    }
+
+    private bool IsDisabled()
+    {
+        if (Workspace is null)
+        {
+            return false;
+        }
+        return !Workspace.Permissions.CanChangeWorkspace;
     }
 
     public class UpdateWorkspaceRequestValidator : AbstractValidator<UpdateWorkspaceRequest>

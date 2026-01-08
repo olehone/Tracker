@@ -28,7 +28,11 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         _dbContext.Entry(workspace).Property(w => w.Title).IsModified = true;
         _dbContext.Entry(workspace).Property(w => w.Description).IsModified = true;
         _dbContext.Entry(workspace).Property(w => w.Visibility).IsModified = true;
-        _dbContext.Entry(workspace).Reference(w => w.PermissionRoles).IsModified = true;
+        var permissionRoles = _dbContext.Entry(workspace).Reference(w => w.PermissionRoles).TargetEntry;
+        if (permissionRoles is not null)
+        {
+            permissionRoles.State = EntityState.Modified;
+        }
     }
 
     public async Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles)
