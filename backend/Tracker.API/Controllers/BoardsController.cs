@@ -6,7 +6,6 @@ using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Boards.GetById;
 using Tracker.Application.UseCases.Boards.Update;
-using Tracker.Application.UseCases.Workspaces.Update;
 
 namespace Tracker.API.Controllers;
 
@@ -37,7 +36,6 @@ public class BoardsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [Authorize]
     [HttpPut("{Id:guid}/settings")]
     public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest boardId,
             [FromBody] UpdateBoardBodyRequest request)
