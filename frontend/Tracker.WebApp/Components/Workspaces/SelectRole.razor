@@ -1,0 +1,49 @@
+@using FluentValidation
+@using MudBlazor
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.Domain.Requests.Workspace
+@using Tracker.Domain.ValueObjects
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<MudSelect Value=@Value
+           ValueChanged=@ValueChanged
+		   Label=@Label
+		   Variant="Variant.Outlined">
+	<MudSelectItem Value=@WorkspacePermissionRole.Any>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Public /> Anyone
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspacePermissionRole.Observer>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Hail /> Observers and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspacePermissionRole.Member>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Group /> Members and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspacePermissionRole.Admin>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Groups /> Admin and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspacePermissionRole.Owner>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Person /> Owner only
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@WorkspacePermissionRole.None>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.PersonOff /> Nobody
+		</MudStack>
+	</MudSelectItem>
+</MudSelect>

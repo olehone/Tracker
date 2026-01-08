@@ -2,6 +2,7 @@
 
 public class WorkspacePermissionsDto
 {
-    public required bool CanCreateBoardRole { get; set; }
-    public required bool CanChangeBoardRole { get; set; }
+    public required bool CanChangeWorkspace { get; set; }
+    public required bool CanCreateBoard { get; set; }
+    public required bool CanChangeBoard { get; set; }
 }

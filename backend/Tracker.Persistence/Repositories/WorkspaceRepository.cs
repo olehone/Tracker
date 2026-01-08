@@ -2,6 +2,8 @@
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Enums;
+using Tracker.Domain.Results;
+using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Persistence.Repositories;
 
@@ -13,13 +15,53 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
     {
     }
 
-    public async Task<Workspace?> GetByIdWithBoardsAsync(Guid id)
+    public new async Task<Workspace?> GetByIdAsync(Guid id)
     {
         return await _dbSet
-            .AsNoTracking()
-            .Include(w => w.Boards)
+           .AsNoTracking()
+           .Include(x => x.PermissionRoles)
+           .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public new void Update(Workspace workspace)
+    {
+        _dbSet.Attach(workspace);
+        _dbContext.Entry(workspace).Property(w => w.Title).IsModified = true;
+        _dbContext.Entry(workspace).Property(w => w.Description).IsModified = true;
+        _dbContext.Entry(workspace).Property(w => w.Visibility).IsModified = true;
+        var permissionRoles = _dbContext.Entry(workspace).Reference(w => w.PermissionRoles).TargetEntry;
+        if (permissionRoles is not null)
+        {
+            permissionRoles.State = EntityState.Modified;
+        }
+    }
+
+    public async Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles)
+    {
+        var updated = await _dbSet
             .Where(w => w.Id == id)
-            .FirstOrDefaultAsync();
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(w => w.PermissionRoles, permissionRoles));
+        if (updated == 0)
+        {
+            return Error.NotFound("Workspace");
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ChangeVisibility(Guid id, WorkspaceVisibility visibility)
+    {
+        var updated = await _dbSet
+             .Where(w => w.Id == id)
+             .ExecuteUpdateAsync(u => u
+                 .SetProperty(w => w.Visibility, visibility));
+        if (updated == 0)
+        {
+            return Error.NotFound("Workspace");
+        }
+
+        return Result.Success();
     }
 
     public async Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId)

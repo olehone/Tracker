@@ -1,6 +1,69 @@
 ﻿@page "/workspaces/{WorkspaceId:guid}/settings"
+@using Tracker.WebApp.Components.Workspaces
 
+<PageTitle>@PageTitle() settings</PageTitle>
 
+<MudContainer MaxWidth=MaxWidth.Small>
+	<MudPaper Elevation="5"
+			  Class="my-5 pa-4">
 
+		@if (isLoading)
+		{
+			<MudProgressCircular Indeterminate
+								 Color="Color.Primary" />
+		}
+		else if (model != null)
+		{
 
+			<MudText Typo="Typo.h5" Class="mb-4">Edit Workspace</MudText>
+
+			<MudForm @ref=@_form
+					 Model=@model
+					 Validation=@validator
+					 ValidationDelay="300"
+					 Disabled=@IsDisabled()>
+				<MudTextField @bind-Value=@model.Title
+							  Label="Title"
+							  Required
+							  Variant="Variant.Outlined" />
+
+				<MudTextField @bind-Value=@model.Description
+							  Label="Description"
+							  Lines="3"
+							  Variant="Variant.Outlined" />
+
+				<SelectVisibility @bind-value=@model.Visibility />
+
+				<SelectRole @bind-value=@model.PermissionRoles.MinCreateBoardRole
+							Label="Who can create boards" />
+
+				<SelectRole @bind-value=@model.PermissionRoles.MinChangeBoardRole
+							Label="Who can do everything with boards" />
+
+				<MudButton Disabled=@isSubmitting
+						   OnClick=@Submit
+						   Variant="Variant.Filled"
+						   Color="Color.Primary"
+						   Class="mt-4">
+					@if (isSubmitting)
+					{
+						<MudProgressCircular Size="Size.Medium"
+											 Indeterminate
+											 Color="Color.Inherit" />
+
+						<MudText> Updating...</MudText>
+					}
+					else
+					{
+						<MudText>Save</MudText>
+					}
+				</MudButton>
+			</MudForm>
+		}
+		else
+		{
+			<MudText>Workspace not found.</MudText>
+		}
+	</MudPaper>
+</MudContainer>
 

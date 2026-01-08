@@ -1,4 +1,7 @@
 ﻿using System.Net.Mail;
+using MudBlazor;
+using Tracker.Domain.Enums;
+using static MudBlazor.CategoryTypes;
 
 namespace Tracker.WebApp.Shared;
 

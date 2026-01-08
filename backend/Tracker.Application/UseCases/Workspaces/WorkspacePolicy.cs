@@ -19,6 +19,7 @@ public static class WorkspacePolicy
         {
             CanCreateBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
             CanChangeBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
+            CanChangeWorkspace = CanChangeSettings(globalRole, workspaceRole),
         };
     }
 
@@ -49,6 +50,20 @@ public static class WorkspacePolicy
             return true;
         }
 
+        return false;
+    }
+
+    public static bool CanChangeSettings(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole)
+    {
+        if (globalRole >= GlobalRole.Admin)
+        {
+            return true;
+        }
+        if (workspaceRole >= UserWorkspaceRole.Admin)
+        {
+            return true;
+        }
         return false;
     }
 

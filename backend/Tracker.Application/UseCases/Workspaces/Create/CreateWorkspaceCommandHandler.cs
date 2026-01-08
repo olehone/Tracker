@@ -48,6 +48,6 @@ public sealed class CreateWorkspaceCommandHandler(
 
         return sc.IsFailure
             ? Error.Unknown
-            : workspace.ToFullDto(permissions);
+            : workspace.ToFullDto(permissions, []);
     }
 }

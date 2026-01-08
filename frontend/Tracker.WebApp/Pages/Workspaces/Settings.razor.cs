@@ -1,7 +1,11 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.Board;
+using Tracker.Domain.Requests.Workspace;
+using Tracker.Domain.ValueObjects;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 public partial class Settings
@@ -9,29 +13,32 @@ public partial class Settings
     [Parameter]
     public Guid WorkspaceId { get; set; }
 
-    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
-    [Inject] private IBoardService BoardService { get; set; } = null!;
-
+    [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] IResultNotifier Notifier { get; set; } = null!;
     private WorkspaceFullDto? Workspace { get; set; }
+    private UpdateWorkspaceRequest? model;
+    private UpdateWorkspaceRequestValidator validator = new();
+    private MudForm? _form;
+    private bool isLoading = true;
+    private bool isSubmitting = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
-        if (result.IsFailure)
-        {
-            return;
-        }
-
-        Workspace = result.Value;
-        StateHasChanged();
+        await LoadWorkspace();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         if (Workspace == null || Workspace.Id != WorkspaceId)
         {
-            Workspace = null;
-            StateHasChanged();
+            await LoadWorkspace();
+        }
+    }
+    private async Task LoadWorkspace()
+    {
+        isLoading = true;
+        try
+        {
             var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
             if (result.IsFailure)
             {
@@ -39,28 +46,74 @@ public partial class Settings
             }
 
             Workspace = result.Value;
+            model = new UpdateWorkspaceRequest
+            {
+                Title = Workspace.Title,
+                Description = Workspace.Description,
+                Visibility = Workspace.Visibility,
+                PermissionRoles = new WorkspacePermissionRoles
+                {
+                    MinCreateBoardRole = Workspace.PermissionRoles.MinCreateBoardRole,
+                    MinChangeBoardRole = Workspace.PermissionRoles.MinChangeBoardRole,
+                }
+            };
+            StateHasChanged();
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
-    private async Task CreateBoard(string title)
+    private async Task Submit()
     {
-        var request = new CreateBoardRequest
-        {
-            WorkspaceId = WorkspaceId,
-            Title = title
-        };
-        var result = await BoardService.CreateBoardAsync(request);
-        if (result.IsFailure)
+        if (_form is null || model is null)
         {
             return;
         }
 
-        Workspace!.Boards.Add(result.Value);
-        StateHasChanged();
-    }
+        await _form.Validate();
+        if (!_form.IsValid)
+        {
+            return;
+        }
 
+        isSubmitting = true;
+
+        var result = await WorkspaceService.UpdateAsync(WorkspaceId, model);
+        Notifier.Notify(result);
+        isSubmitting = false;
+    }
     private string PageTitle()
     {
         return Workspace?.Title ?? "Workspace";
+    }
+
+    private bool IsDisabled()
+    {
+        if (Workspace is null)
+        {
+            return false;
+        }
+        return !Workspace.Permissions.CanChangeWorkspace;
+    }
+
+    public class UpdateWorkspaceRequestValidator : AbstractValidator<UpdateWorkspaceRequest>
+    {
+        public UpdateWorkspaceRequestValidator()
+        {
+            RuleFor(x => x.Title)
+                .NotEmpty().WithMessage("Title is required")
+                .MaximumLength(100).WithMessage("Title can't exceed 100 characters");
+
+            RuleFor(x => x.Description)
+                .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
+
+            RuleFor(x => x.Visibility)
+                .IsInEnum().WithMessage("Invalid visibility");
+
+            RuleFor(x => x.PermissionRoles)
+                .NotNull().WithMessage("Permission roles are required");
+        }
     }
 }

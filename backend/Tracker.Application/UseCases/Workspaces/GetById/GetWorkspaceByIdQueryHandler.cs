@@ -1,7 +1,10 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -19,7 +22,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var workspace = await uow.WorkspaceRepository
-            .GetByIdWithBoardsAsync(request.Id);
+            .GetByIdAsync(request.Id);
         if (workspace is null)
         {
             return Error.NotFound("Workspace");
@@ -29,7 +32,8 @@ public sealed class GetWorkspaceByIdQueryHandler(
         {
             if (WorkspacePolicy.CanAnonView(workspace.Visibility))
             {
-                return workspace.ToFullDto(WorkspacePermissionsDto.None);
+                var publicBoards = await uow.BoardRepository.GetPublicByWorkspaceAsync(request.Id);
+                return workspace.ToFullDto(WorkspacePermissionsDto.None, publicBoards);
             }
             return AuthErrors.Forbidden();
         }
@@ -39,13 +43,52 @@ public sealed class GetWorkspaceByIdQueryHandler(
         var workspaceRole = await uow.UserWorkspaceRepository
             .GetRole(userId, workspace.Id);
 
-        if (WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
+        if (!WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
         {
-            return AuthErrors.Forbidden("You are not member of this workspace");
+            return AuthErrors.Forbidden();
         }
-        var workspacePolicy = WorkspacePolicy
-            .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
 
-        return workspace.ToFullDto(workspacePolicy);
+        var boards = await uow.BoardRepository
+            .GetByWorkspaceAndUserAsync(request.Id, userId);
+
+        return ToDtoWithParticipating(workspace, 
+            boards, 
+            userId,
+            userRole,
+            workspaceRole);
+    }
+
+    public static WorkspaceFullDto ToDtoWithParticipating(Workspace workspace,
+        IReadOnlyList<Board> boards,
+        Guid userId,
+        GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole
+        )
+    {
+        return new WorkspaceFullDto
+        {
+            Id = workspace.Id,
+            Title = workspace.Title,
+            Description = workspace.Description ?? string.Empty,
+            Visibility = workspace.Visibility,
+            PermissionRoles = workspace.PermissionRoles,
+            Permissions = WorkspacePolicy
+                .GetPermissions(workspace.PermissionRoles, workspaceRole, globalRole),
+            // Select only boards that user can view
+            // Use separate method to not mix permission logic
+            Boards = boards
+                .Where(b => BoardPolicy.CanView(globalRole, b.Visibility, workspaceRole, b.UserBoards
+                    .FirstOrDefault(ub=> ub.UserId == userId)?.Role ?? UserBoardRole.None))
+                .Select(b => new BoardSummaryDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    IsParticipating = b.UserBoards.Any(ub => ub.UserId == userId),
+                    Visibility = b.Visibility
+                })
+                .OrderBy(b=> b.IsParticipating)
+                .ThenByDescending(b=> b.Visibility)
+                .ToList()
+        };
     }
 }

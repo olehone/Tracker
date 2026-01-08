@@ -16,6 +16,11 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
         return apiErrorHandler.ExecuteAsync(request.Id, api.GetWorkspaceByIdAsync);
     }
 
+    public Task<Result> UpdateAsync(GetByIdRequest id, UpdateWorkspaceRequest request)
+    {
+        return apiErrorHandler.ExecuteAsync(id.Id, request, api.UpdateAsync);
+    }
+
     public Task<Result<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync()
     {
         return apiErrorHandler.ExecuteAsync(api.GetWorkspacesForCurrentUserAsync);
@@ -25,5 +30,4 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
     {
         return apiErrorHandler.ExecuteAsync(request, api.CreateWorkspaceAsync);
     }
-
 }

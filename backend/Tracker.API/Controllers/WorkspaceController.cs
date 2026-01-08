@@ -3,16 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
+using Tracker.Application.UseCases.Workspaces.Update;
 using Tracker.Application.UseCases.Workspaces.Create;
-using Tracker.Application.UseCases.Workspaces.GetById;
 using Tracker.Application.UseCases.Workspaces.GetAll;
+using Tracker.Application.UseCases.Workspaces.GetById;
 using Tracker.Application.UseCases.Workspaces.GetForCurrentUser;
 
 namespace Tracker.API.Controllers;
 
 [Route("api/workspaces")]
 [ApiController]
-[Authorize]
 public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
@@ -27,6 +27,23 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
+    [HttpPut("{Id:guid}/settings")]
+    public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest workspaceId,
+            [FromBody] UpdateWorkspaceBodyRequest request)
+    {
+        var mediatorRequest = new UpdateWorkspaceCommand()
+        {
+            WorkspaceId = workspaceId.Id,
+            Title = request.Title,
+            Description = request.Description,
+            Visibility = request.Visibility,
+            PermissionRoles = request.PermissionRoles,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
     [HttpGet("/all")]
     [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetAllWorkspacesAsync()
@@ -35,6 +52,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetWorkspacesForCurrentUserAsync()
     {
@@ -42,6 +60,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {

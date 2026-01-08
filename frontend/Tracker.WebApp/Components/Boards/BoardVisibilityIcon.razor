@@ -1,0 +1,27 @@
+    @using Tracker.Domain.Enums
+@using Tracker.WebApp.Shared
+
+@if (Visibility is null)
+{
+	<MudTooltip Text="Error">
+        <MudIcon Icon=@Icons.Material.Outlined.Error />
+	</MudTooltip>
+}
+else if (Visibility == BoardVisibility.Public)
+{
+    <MudTooltip Text="This board is public">
+        <MudIcon Icon=@Icons.Material.Outlined.Public />
+    </MudTooltip>
+}
+else if (Visibility == BoardVisibility.Workspace)
+{
+    <MudTooltip Text="Board visible only to workspace members">
+        <MudIcon Icon=@Icons.Material.Filled.Dashboard />
+    </MudTooltip>
+}
+else if (Visibility == BoardVisibility.Private) 
+{
+    <MudTooltip Text="Board is private">
+        <MudIcon Icon=@Icons.Material.Outlined.LockOpen />
+    </MudTooltip>
+}

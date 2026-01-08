@@ -48,6 +48,18 @@ public static class ErrorMappingService
                 }
             }),
 
+            ErrorType.Unauthenticated => new UnauthorizedObjectResult(new ProblemDetails
+                {
+                    Title = error.Description,
+                    Status = StatusCodes.Status401Unauthorized
+                }),
+
+            ErrorType.Forbidden => new ObjectResult(new ProblemDetails
+            {
+                Title = error.Description,
+                Status = StatusCodes.Status403Forbidden
+            }),
+
             ErrorType.NotFound => new NotFoundObjectResult(new ProblemDetails
             {
                 Title = error.Description,

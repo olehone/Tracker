@@ -3,8 +3,20 @@ using Tracker.Domain.Results;
 
 namespace Tracker.WebApp.Shared;
 
-public class GlobalSnackbarMessages(ISnackbar SnackbarService) : IErrorNotifier
+public class GlobalSnackbarMessages(ISnackbar SnackbarService) : IErrorNotifier, IResultNotifier
 {
+    public void Notify(Result result, string? successMessage = null)
+    {
+        if (result.IsSuccess)
+        {
+            SnackbarService.Add(successMessage ?? "Operation succeed", Severity.Success);
+        }
+        else
+        {
+            SnackbarService.Add(result.Error.Description ?? "Operation failed", Severity.Error);
+        }
+    }
+
     public bool NotifyIfError(Result result)
     {
         if (result.IsSuccess)

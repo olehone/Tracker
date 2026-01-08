@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<AppState>();
         services.AddScoped<IErrorNotifier, GlobalSnackbarMessages>();
+        services.AddScoped<IResultNotifier, GlobalSnackbarMessages>();
         services.AddBlazoredLocalStorage();
         services.AddMudServices(config =>
         {
