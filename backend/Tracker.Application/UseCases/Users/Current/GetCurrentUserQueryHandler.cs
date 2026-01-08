@@ -17,6 +17,11 @@ public class GetCurrentUserQueryHandler(
         GetCurrentUserQuery request, 
         CancellationToken cancellationToken)
     {
+        if (!userContext.IsAuthenticated())
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
         var userId = userContext.GetUserId();
 
         await using var uow = unitOfWorkFactory.Create();
