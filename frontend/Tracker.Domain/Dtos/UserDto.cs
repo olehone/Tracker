@@ -10,4 +10,6 @@ public class UserDto
     public required GlobalRole Role { get; set; }
     public required string FirstName { get; set; }
     public string? LastName { get; set; }
+
+    public string? AvatarUrl { get; set; }
 }
