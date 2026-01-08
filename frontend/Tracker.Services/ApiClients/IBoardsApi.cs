@@ -10,7 +10,7 @@ public interface IBoardsApi
     [Get("/api/boards/{id}")]
     Task<ApiResponse<BoardFullDto>> GetBoardByIdAsync(Guid id);
 
-    [Put("/api/workspaces/{id}/settings")]
+    [Put("/api/boards/{id}/settings")]
     Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateBoardRequest request);
 
     [Post("/api/boards/")]

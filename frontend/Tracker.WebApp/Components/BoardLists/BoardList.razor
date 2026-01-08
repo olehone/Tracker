@@ -31,9 +31,11 @@
 						 Style="max-height: 400px; overflow-y: auto;"
 						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
 		}
-
-		<OneLineCreateButton Title="Add new item"
-							 OnCreate=@CreateNewItem />
+		@if (CanAddItem)
+		{
+			<OneLineCreateButton Title="Add new item"
+								 OnCreate=@CreateNewItem />
+		}
 	</MudStack>
 
 </MudPaper>
