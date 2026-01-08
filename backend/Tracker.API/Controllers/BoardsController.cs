@@ -12,9 +12,11 @@ namespace Tracker.API.Controllers;
 
 [Route("api/boards")]
 [ApiController]
+[Authorize]
 public class BoardsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{Id:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetBoardByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetBoardByIdQuery() { Id = request.Id };
@@ -23,7 +25,6 @@ public class BoardsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize]
     public async Task<IActionResult> CreateBoardAsync([FromBody] CreateBoardRequest request)
     {
         var mediatorRequest = new CreateBoardCommand()
@@ -38,7 +39,6 @@ public class BoardsController(IMediator mediator) : ControllerBase
 
     [Authorize]
     [HttpPut("{Id:guid}/settings")]
-    [Authorize]
     public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest boardId,
             [FromBody] UpdateBoardBodyRequest request)
     {

@@ -11,11 +11,11 @@ namespace Tracker.API.Controllers;
 
 [Route("api/users")]
 [ApiController]
+[Authorize]
 public class UserController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet("{Id:guid}")]
-    [Authorize]
     public async Task<IActionResult> GetUserByIdAsync([FromRoute] GetByIdRequest request)
     {
         var mediatorRequest = new GetUserByIdQuery()
@@ -41,7 +41,6 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("me")]
-    [Authorize]
     public async Task<IActionResult> GetCurrentUserAsync()
     {
         var response = await mediator.Send(new GetCurrentUserQuery());
