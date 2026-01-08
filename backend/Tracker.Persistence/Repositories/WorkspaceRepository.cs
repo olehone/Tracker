@@ -14,6 +14,7 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         : base(applicationDbContext)
     {
     }
+
     public new async Task<Workspace?> GetByIdAsync(Guid id)
     {
         return await _dbSet

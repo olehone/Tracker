@@ -12,7 +12,7 @@ public class Board : BaseEntity
     public Workspace Workspace { get; set; } = null!;
     public List<BoardList> BoardLists { get; set; } = [];
     public BoardVisibility Visibility { get; set; }
-        = BoardVisibility.Public;
+        = BoardVisibility.Private;
     public BoardPermissionRoles PermissionRoles { get; set; } = new();
     public List<UserBoard> UserBoards { get; set; } = [];
 }

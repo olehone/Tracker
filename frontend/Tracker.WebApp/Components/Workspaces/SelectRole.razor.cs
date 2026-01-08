@@ -6,7 +6,6 @@ public partial class SelectRole
 {
     [Parameter]
     public WorkspacePermissionRole Value { get; set; }
-
     [Parameter]
     public EventCallback<WorkspacePermissionRole> ValueChanged { get; set; }
     [Parameter]

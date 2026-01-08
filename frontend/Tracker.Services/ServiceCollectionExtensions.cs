@@ -65,7 +65,6 @@ public static class ServiceCollectionExtensions
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            // No JsonStringEnumConverter — keep enums numeric
         };
 
         services.AddRefitClient<TInterface>(new RefitSettings
@@ -81,17 +80,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    //public static IServiceCollection AddApiClientWithAuth<TInterface>(this IServiceCollection services)
-    //    where TInterface : class
-    //{
-    //    services.AddRefitClient<TInterface>()
-    //        .ConfigureHttpClient((sp, client) =>
-    //        {
-    //            var options = sp.GetRequiredService<IOptions<ApiOptions>>().Value;
-    //            client.BaseAddress = new Uri(options.ApiBaseUrl);
-    //        })
-    //        .AddHttpMessageHandler<AuthHeaderHandler>();
-
-    //    return services;
-    //}
 }

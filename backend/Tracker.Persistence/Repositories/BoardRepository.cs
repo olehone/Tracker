@@ -11,6 +11,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
         : base(applicationDbContext)
     {
     }
+
     public async Task<Board?> GetByIdWithListsAndItemsAsync(Guid id)
     {
         return await _dbSet

@@ -6,7 +6,6 @@ public partial class SelectVisibility
 {
     [Parameter]
     public WorkspaceVisibility Value { get; set; }
-
     [Parameter]
     public EventCallback<WorkspaceVisibility> ValueChanged { get; set; }
     [Parameter]
