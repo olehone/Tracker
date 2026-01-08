@@ -1,4 +1,6 @@
-﻿using Tracker.Domain.Dtos;
+﻿using System.Runtime.InteropServices;
+using Tracker.Application.UseCases.Workspaces;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.ValueObjects;
 
@@ -17,8 +19,9 @@ public static class BoardPolicy
             return BoardPermissionsDto.All;
         }
 
-        return new BoardPermissionsDto()
+        return new BoardPermissionsDto
         {
+            CanChangeBoard = CanChangeSettings(globalRole, workspaceRole, boardRole),
             CanCreateItem = permissionRoles.MinCreateItemRole >= MapUserRoleToPermission(boardRole),
             CanChangeItem = permissionRoles.MinChangeItemRole >= MapUserRoleToPermission(boardRole),
             CanCreateList = permissionRoles.MinCreateListRole >= MapUserRoleToPermission(boardRole),
@@ -67,6 +70,30 @@ public static class BoardPolicy
             }
             return false;
         }
+        return false;
+    }
+
+    public static bool CanChangeSettings(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole,
+        UserBoardRole boardRole,
+        WorkspacePermissionsDto? workspacePermissions = null)
+    {
+        if (globalRole >= GlobalRole.Admin)
+        {
+            return true;
+        }
+
+        if (workspacePermissions is not null &&
+            WorkspacePolicy.IsActionAllowed(workspacePermissions, WorkspaceAction.ChangeBoard))
+        {
+            return true;
+        }
+
+        if (boardRole <= UserBoardRole.Admin)
+        {
+            return true;
+        }
+
         return false;
     }
 

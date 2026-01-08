@@ -72,9 +72,10 @@ public static class WorkspacePolicy
     {
         return action switch
         {
-            WorkspaceAction.CreateBoard => permissions.CanCreateBoard,
             WorkspaceAction.ChangeBoard => permissions.CanChangeBoard,
-            _ => false
+            WorkspaceAction.CreateBoard => permissions.CanCreateBoard,
+            WorkspaceAction.ChangeWorkspace => permissions.CanChangeWorkspace,
+            _ => false,
         };
     }
 

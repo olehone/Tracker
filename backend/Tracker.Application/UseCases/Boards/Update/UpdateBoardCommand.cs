@@ -1,15 +1,15 @@
-﻿using Tracker.Domain.Enums;
+﻿using MediatR;
+using Tracker.Domain.Enums;
+using Tracker.Domain.Results;
 using Tracker.Domain.ValueObjects;
 
-namespace Tracker.Domain.Dtos;
+namespace Tracker.Application.UseCases.Boards.Update;
 
-public class BoardFullDto
+public class UpdateBoardCommand : IRequest<Result>
 {
-    public required Guid Id { get; set; }
+    public Guid BoardId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required BoardVisibility Visibility { get; set; }
     public required BoardPermissionRoles PermissionRoles { get; set; }
-    public required BoardPermissionsDto Permissions { get; set; }
-    public required List<BoardListDto> BoardLists { get; set; }
 }

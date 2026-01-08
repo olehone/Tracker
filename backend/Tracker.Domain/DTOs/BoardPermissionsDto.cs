@@ -4,6 +4,7 @@ public class BoardPermissionsDto
 {
     public static readonly BoardPermissionsDto None = new()
     {
+        CanChangeBoard = false,
         CanCreateItem = false,
         CanChangeItem = false,
         CanCreateList = false,
@@ -12,12 +13,14 @@ public class BoardPermissionsDto
 
     public static readonly BoardPermissionsDto All = new()
     {
+        CanChangeBoard = true,
         CanCreateItem = true,
         CanChangeItem = true,
         CanCreateList = true,
         CanChangeList = true,
     };
 
+    public required bool CanChangeBoard { get; set; }
     public required bool CanCreateItem { get; set; }
     public required bool CanChangeItem { get; set; }
     public required bool CanCreateList { get; set; }

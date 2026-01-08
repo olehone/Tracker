@@ -4,37 +4,37 @@
            ValueChanged=@ValueChanged
 		   Label=@Label
 		   Variant="Variant.Outlined">
-	<MudSelectItem Value=@WorkspacePermissionRole.Any>
+	<MudSelectItem Value=@BoardPermissionRole.Any>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Public /> Anyone
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@WorkspacePermissionRole.Observer>
+	<MudSelectItem Value=@BoardPermissionRole.Observer>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Hail /> Observers and higher
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@WorkspacePermissionRole.Member>
+	<MudSelectItem Value=@BoardPermissionRole.Member>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Group /> Members and higher
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@WorkspacePermissionRole.Admin>
+	<MudSelectItem Value=@BoardPermissionRole.Admin>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Groups /> Admin and higher
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@WorkspacePermissionRole.Owner>
+	<MudSelectItem Value=@BoardPermissionRole.Owner>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Person /> Owner only
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@WorkspacePermissionRole.None>
+	<MudSelectItem Value=@BoardPermissionRole.None>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.PersonOff /> Nobody
 		</MudStack>

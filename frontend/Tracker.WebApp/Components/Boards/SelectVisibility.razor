@@ -1,0 +1,30 @@
+@using FluentValidation
+@using MudBlazor
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.Domain.Requests.Workspace
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<MudSelect Value=@Value
+		   ValueChanged=@ValueChanged
+		   Label="Choose board visibility"
+		   Variant="Variant.Outlined">
+	<MudSelectItem Value=@BoardVisibility.Public>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Public /> Public
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardVisibility.Workspace>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Dashboard /> Board visible to workspace members
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardVisibility.Private>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Lock /> Private
+		</MudStack>
+	</MudSelectItem>
+</MudSelect>

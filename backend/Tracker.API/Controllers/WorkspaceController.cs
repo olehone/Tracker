@@ -32,7 +32,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest workspaceId,
             [FromBody] UpdateWorkspaceBodyRequest request)
     {
-        var mediatorRequest = new UpdateWorkspaceCommand()
+        var mediatorRequest = new UpdateWorkspaceCommand
         {
             WorkspaceId = workspaceId.Id,
             Title = request.Title,

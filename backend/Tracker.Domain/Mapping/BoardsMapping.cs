@@ -19,13 +19,14 @@ public static class BoardsMapping
     public static BoardFullDto ToFullDto(this Board board, 
         BoardPermissionsDto permissions)
     {
-        return new BoardFullDto()
+        return new BoardFullDto
         {
             Id = board.Id,
             Title = board.Title,
             Description = board.Description ?? string.Empty,
             Visibility = board.Visibility,
             Permissions = permissions,
+            PermissionRoles = board.PermissionRoles,
             BoardLists = board.BoardLists
                               .Select(boardList => boardList.ToDto())
                               .ToList()
