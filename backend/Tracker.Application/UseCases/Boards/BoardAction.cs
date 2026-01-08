@@ -2,8 +2,9 @@
 
 public enum BoardAction
 {
-    CreateItem = 1,
-    ChangeItem = 2,
-    CreateList = 3,
-    ChangeList = 4,
+    ChangeBoard = 1,
+    CreateItem = 2,
+    ChangeItem = 3,
+    CreateList = 4,
+    ChangeList = 5,
 }

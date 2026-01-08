@@ -1,5 +1,5 @@
-﻿using Tracker.Domain.Entities;
-using Tracker.Domain.Enums;
+﻿using Tracker.Domain.Enums;
+using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Domain.Dtos;
 
@@ -10,5 +10,6 @@ public class BoardFullDto
     public required string Description { get; set; }
     public required BoardVisibility Visibility { get; set; }
     public required BoardPermissionsDto Permissions { get; set; }
+    public required BoardPermissionRoles PermissionRoles { get; set; }
     public required List<BoardListDto> BoardLists { get; set; }
 }

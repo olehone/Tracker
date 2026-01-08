@@ -20,8 +20,21 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                 .OrderBy(bl => bl.Position))
                 .ThenInclude(bl => bl.BoardItems
                     .OrderBy(bi => bi.Position))
-            .Where(b => b.Id == id)
-            .FirstOrDefaultAsync();
+            .Include(b => b.PermissionRoles)
+            .FirstOrDefaultAsync(b => b.Id == id);
+    }
+
+    public new void Update(Board board)
+    {
+        _dbSet.Attach(board);
+        _dbContext.Entry(board).Property(b => b.Title).IsModified = true;
+        _dbContext.Entry(board).Property(b => b.Description).IsModified = true;
+        _dbContext.Entry(board).Property(b => b.Visibility).IsModified = true;
+        var permissionRoles = _dbContext.Entry(board).Reference(b => b.PermissionRoles).TargetEntry;
+        if (permissionRoles is not null)
+        {
+            permissionRoles.State = EntityState.Modified;
+        }
     }
 
     public async Task<IReadOnlyList<Board>> GetPublicByWorkspaceAsync(Guid workspaceId)

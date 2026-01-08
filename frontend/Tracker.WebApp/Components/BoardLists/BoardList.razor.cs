@@ -6,6 +6,8 @@ namespace Tracker.WebApp.Components.BoardLists;
 public partial class BoardList
 {
     [Parameter]
+    public required bool CanAddItem { get; set; }
+    [Parameter]
     public required BoardListDto List { get; set; }
     [Parameter]
     public EventCallback<string> OnCreateItem { get; set; }

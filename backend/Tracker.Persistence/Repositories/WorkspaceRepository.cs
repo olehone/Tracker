@@ -36,34 +36,6 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         }
     }
 
-    public async Task<Result> ChangePermissionRoles(Guid id, WorkspacePermissionRoles permissionRoles)
-    {
-        var updated = await _dbSet
-            .Where(w => w.Id == id)
-            .ExecuteUpdateAsync(u => u
-                .SetProperty(w => w.PermissionRoles, permissionRoles));
-        if (updated == 0)
-        {
-            return Error.NotFound("Workspace");
-        }
-
-        return Result.Success();
-    }
-
-    public async Task<Result> ChangeVisibility(Guid id, WorkspaceVisibility visibility)
-    {
-        var updated = await _dbSet
-             .Where(w => w.Id == id)
-             .ExecuteUpdateAsync(u => u
-                 .SetProperty(w => w.Visibility, visibility));
-        if (updated == 0)
-        {
-            return Error.NotFound("Workspace");
-        }
-
-        return Result.Success();
-    }
-
     public async Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId)
     {
         return await _dbSet
