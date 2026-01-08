@@ -11,11 +11,6 @@ public partial class App
     [Inject] private IUserService UserService { get; set; } = null!;
     [Inject] private NavigationManager Nav { get; set; } = null!;
 
-    private void RedirectToLogin()
-    {
-        Nav.NavigateTo("/login", false);
-    }
-
     protected override async Task OnInitializedAsync()
     {
         var principal = await AuthService.GetPrincipalAsync();
@@ -29,6 +24,12 @@ public partial class App
             }
 
             AppState.CurrentUser = result.Value;
+            StateHasChanged();
         }
+    }
+
+    public void RedirectToLogin()
+    {
+        Nav.NavigateTo("/login");
     }
 }
