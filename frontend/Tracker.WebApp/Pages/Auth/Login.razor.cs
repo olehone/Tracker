@@ -42,6 +42,7 @@ public partial class Login
         _isLoading = true;
 
         var result = await AuthService.LoginAsync(ToRequest(_loginModel));
+        _isLoading = false;
         if (NotifyIfError(result))
         {
             return;

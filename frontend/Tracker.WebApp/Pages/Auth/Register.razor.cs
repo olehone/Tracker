@@ -49,6 +49,7 @@ public partial class Register
         _isLoading = true;
 
         var result = await Auth.RegisterAsync(ToRequest(_registerModel));
+        _isLoading = false;
         if (NotifyIfError(result))
         {
             return;
