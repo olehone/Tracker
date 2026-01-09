@@ -4,7 +4,7 @@
 @using Tracker.WebApp.Shared
 
 
-<AuthorizeView Roles=@Roles()>
+<AuthorizeView Policy="AdminOrHigher">
 	<Authorized>
 		<MudDivider Class="my-2" />
 		<MudText Typo="Typo.caption"
@@ -33,12 +33,3 @@
 		</MudNavGroup>
 	</Authorized>
 </AuthorizeView>
-
-@code {
-	private const GlobalRole minRole = GlobalRole.Admin;
-
-	private string Roles()
-	{
-		return GlobalRoleExtensions.WithHigher(minRole);
-	}
-}

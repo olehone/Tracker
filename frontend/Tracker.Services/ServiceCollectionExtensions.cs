@@ -1,10 +1,11 @@
-﻿using System.Text.Json;
+﻿using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Refit;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Options;
-using Tracker.Services;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
 using Tracker.Services.Abstraction.Results;
@@ -54,7 +55,21 @@ public static class ServiceCollectionExtensions
             (CustomAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
 
         services.AddScoped<AuthHeaderHandler>();
-        services.AddAuthorizationCore();
+        services.AddAuthorizationCore(options =>
+        {
+            options.AddPolicy("AdminOrHigher", policy =>
+                policy.RequireAssertion(ctx =>
+                {
+                    var roleClaim = ctx.User.FindFirst(ClaimTypes.Role) ??
+                        ctx.User.FindFirst("role");
+
+                    var role = Enum.TryParse(roleClaim?.Value, true, out GlobalRole value)
+                        ? value
+                        : GlobalRole.None;
+
+                    return role >= GlobalRole.Admin;
+                }));
+        });
 
         return services;
     }
