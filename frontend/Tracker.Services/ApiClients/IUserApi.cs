@@ -7,4 +7,8 @@ public interface IUserApi
 {
     [Get("/api/users/me")]
     Task<ApiResponse<UserDto>> GetCurrentUserAsync();
+
+    [Get("/api/users/{id}")]
+    Task<ApiResponse<UserDto>> GetUserByIdAsync(Guid id);
+
 }

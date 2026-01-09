@@ -1,14 +1,5 @@
 ﻿<MudDialog>
 	<DialogContent>
-		@if (IsDisabled())
-		{
-			<MudText Typo="Typo.h5" Class="mb-4">Board info</MudText>
-		}
-		else
-		{
-			<MudText Typo="Typo.h5" Class="mb-4">Edit Board</MudText>
-		}
-
 		<MudForm @ref=@_form
 				 Model=@model
 				 Validation=@validator
@@ -63,5 +54,3 @@
 		</MudButton>
 	</DialogActions>
 </MudDialog>
-
-

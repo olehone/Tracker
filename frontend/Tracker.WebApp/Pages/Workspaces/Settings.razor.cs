@@ -15,9 +15,9 @@ public partial class Settings
 
     [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
     [Inject] IResultNotifier Notifier { get; set; } = null!;
+
     private WorkspaceFullDto? Workspace { get; set; }
     private UpdateWorkspaceRequest? model;
-    private UpdateWorkspaceRequestValidator validator = new();
     private MudForm? _form;
     private bool isLoading = true;
     private bool isSubmitting = false;
@@ -96,24 +96,5 @@ public partial class Settings
             return false;
         }
         return !Workspace.Permissions.CanChangeWorkspace;
-    }
-
-    public class UpdateWorkspaceRequestValidator : AbstractValidator<UpdateWorkspaceRequest>
-    {
-        public UpdateWorkspaceRequestValidator()
-        {
-            RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .MaximumLength(100).WithMessage("Title can't exceed 100 characters");
-
-            RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
-
-            RuleFor(x => x.Visibility)
-                .IsInEnum().WithMessage("Invalid visibility");
-
-            RuleFor(x => x.PermissionRoles)
-                .NotNull().WithMessage("Permission roles are required");
-        }
     }
 }

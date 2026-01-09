@@ -1,0 +1,50 @@
+﻿@page "/users/{UserId:guid}"
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+
+@if (User is not null)
+{
+	<MudContainer MaxWidth="MaxWidth.Medium">
+		<WorkWindow Elevation=0>
+
+			<Header>
+				<MudGrid>
+					<MudItem xs=12
+							 sm="4">
+						<BigUserAvatar User=@User />
+					</MudItem>
+
+					<MudItem xs="12"
+							 sm="8">
+						<UserInfo User=@User />
+					</MudItem>
+				</MudGrid>
+			</Header>
+
+			<Body>
+				<MudTabs Position="Position.Top"
+						 Outlined
+						 Rounded
+						 Centered
+						 Border
+						 ApplyEffectsToContainer
+						 Class="mt-8"
+						 PanelClass="pa-6">
+					<div style="max-height:500px; overflow-y:auto;">
+						<MudTabPanel Text="Workspaces">
+							@* Placeholders for now *@
+							@for (int i = 0; i < 50; i++)
+							{
+								<MudText>Text number @i</MudText>
+							}
+						</MudTabPanel>
+
+						<MudTabPanel Text="Boards">
+							Some content too
+						</MudTabPanel>
+					</div>
+				</MudTabs>
+			</Body>
+		</WorkWindow>
+	</MudContainer>
+}
