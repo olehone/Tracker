@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Workspaces.Create;
 using Tracker.Application.UseCases.Workspaces.GetAll;
 using Tracker.Application.UseCases.Workspaces.GetById;
@@ -51,7 +50,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetWorkspacesAsync(
         [FromQuery] PaginatedSearchRequest request)
     {
-        var mediatorRequest = new Get()
+        var mediatorRequest = new GetWorkspacesQuery()
         {
             SearchQuery = request.SearchQuery,
             Page = request.Page,
@@ -61,7 +60,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpGet]
+    [HttpGet("my")]
     public async Task<IActionResult> GetWorkspacesForCurrentUserAsync()
     {
         var response = await mediator.Send(new GetWorkspacesForCurrentUserQuery());

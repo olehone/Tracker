@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Users.GetById;
-using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.Current;
+using Tracker.Application.UseCases.Users.GetAll;
+using Tracker.Application.UseCases.Users.GetById;
+using Tracker.Application.UseCases.Workspaces.GetAllForUser;
+using Tracker.Application.UseCases.Workspaces.GetMutual;
 
 namespace Tracker.API.Controllers;
 
@@ -21,6 +23,39 @@ public class UserController(IMediator mediator) : ControllerBase
         var mediatorRequest = new GetUserByIdQuery()
         {
             Id = request.Id
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpGet("{Id:guid}/workspaces")]
+    public async Task<IActionResult> GetMutualWorkspacesAsync(
+        [FromRoute] Guid id,
+        [FromQuery] PaginatedSearchRequest request)
+    {
+        var mediatorRequest = new GetMutualWorkspacesQuery()
+        {
+            TargetUserId = id,
+            SearchQuery = request.SearchQuery,
+            Page = request.Page,
+            AmountInPage = request.AmountInPage
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpGet("{Id:guid}/workspaces/all")]
+    [Authorize(Roles = "Admin,Owner")]
+    public async Task<IActionResult> GetAllUserWorkspacesAsync(
+        [FromRoute] Guid id,
+        [FromQuery] PaginatedSearchRequest request)
+    {
+        var mediatorRequest = new GetAllWorkspacesByUserQuery()
+        {
+            Id = id,
+            SearchQuery = request.SearchQuery,
+            Page = request.Page,
+            AmountInPage = request.AmountInPage
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

@@ -2,10 +2,10 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Workspaces.GetMutual;
+namespace Tracker.Application.UseCases.Workspaces.GetAllForUser;
 
-public class GetMutualWorkspacesQuery
+public class GetAllWorkspacesByUserQuery
     : PaginatedSearch, IRequest<Result<Paginated<WorkspaceSummaryDto>>>
 {
-    public required Guid TargetUserId { get; set; }
+    public required Guid Id { get; set; }
 }

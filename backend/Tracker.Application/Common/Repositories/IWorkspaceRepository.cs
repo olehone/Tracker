@@ -5,8 +5,8 @@ namespace Tracker.Application.Common.Repositories;
 public interface IWorkspaceRepository : IRepository<Workspace, Guid>
 {
     Task<IReadOnlyList<Workspace>> GetByUserAsync(Guid userId);
-    Task<int> CountAsync(string? title = null,  Guid ? userId = null);
-    Task<List<Workspace>> GetAsync(
+    Task<int> CountAllAsync(string? title = null,  Guid ? userId = null);
+    Task<List<Workspace>> GetAllAsync(
         int skip, int take, string? title = null, Guid? userId = null);
     Task<int> CountMutualAsync(Guid targetUserId, Guid searchingUserId, string? title = null);
     Task<List<Workspace>> GetMutualAsync(

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Tracker.Application.UseCases.Workspaces.GetAllMutual;
+namespace Tracker.Application.UseCases.Workspaces.GetMutual;
 
 public class GetMutualWorkspacesQueryValidator
     : PaginatedSearchValidator<GetMutualWorkspacesQuery>

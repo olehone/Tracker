@@ -1,6 +1,6 @@
 ﻿namespace Tracker.Application.UseCases.Workspaces.GetAll;
 
-public class GetMutualWorkspacesQueryValidator
+public class GetWorkspacesQueryValidator
     : PaginatedSearchValidator<GetWorkspacesQuery>
 {
 }

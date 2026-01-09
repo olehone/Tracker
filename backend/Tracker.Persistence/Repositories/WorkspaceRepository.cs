@@ -59,13 +59,13 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         return query;
     }
 
-    public async Task<int> CountAsync(string? title = null, Guid? userId = null)
+    public async Task<int> CountAllAsync(string? title = null, Guid? userId = null)
     {
         return await SearchByTitleAndUserAsync(userId, title)
             .CountAsync();
     }
 
-    public async Task<List<Workspace>> GetAsync(
+    public async Task<List<Workspace>> GetAllAsync(
         int skip, int take, string? title = null, Guid? userId = null)
     {
         return await SearchByTitleAndUserAsync(userId, title)

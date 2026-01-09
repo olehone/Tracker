@@ -5,7 +5,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Workspaces.GetAllMutual;
+namespace Tracker.Application.UseCases.Workspaces.GetMutual;
 
 public sealed class GetMutualWorkspacesQueryHandler(
     IUserContext userContext,
