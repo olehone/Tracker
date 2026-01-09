@@ -8,9 +8,13 @@ public partial class BoardSummary
 {
     [Parameter]
     public required BoardSummaryDto Board { get; set; }
-
-    private static string GetBoardColorBackgroundStyle(BoardSummaryDto board)
+    private string? _customColor;
+    private string CustomColor
     {
-        return UiHelper.GetColorByString(board.Id.ToString());
+        get
+        {
+            _customColor ??= UiHelper.GetColorByString(Board.Id);
+            return _customColor;
+        }
     }
 }
