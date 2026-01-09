@@ -1,7 +1,5 @@
 ﻿using System.Net.Mail;
-using MudBlazor;
-using Tracker.Domain.Enums;
-using static MudBlazor.CategoryTypes;
+using System.Security.Cryptography;
 
 namespace Tracker.WebApp.Shared;
 
@@ -58,6 +56,13 @@ public static class UiHelper
             return text;
         }
 
-        return text.Substring(0, length - ellipsisLength) + ellipsis;
+        return string.Concat(text.AsSpan(0, length - ellipsisLength), ellipsis);
+    }
+
+    public static string GetColorByString(Guid id)
+    {
+        var bytes = SHA256.HashData(id.ToByteArray());
+        var hue = bytes[0] % 360;
+        return $"background:hsl({hue}, 60%, 55%);";
     }
 }

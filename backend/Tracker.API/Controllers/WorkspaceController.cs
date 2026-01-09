@@ -13,7 +13,7 @@ namespace Tracker.API.Controllers;
 
 [Route("api/workspaces")]
 [ApiController]
-    [Authorize]
+[Authorize]
 public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 

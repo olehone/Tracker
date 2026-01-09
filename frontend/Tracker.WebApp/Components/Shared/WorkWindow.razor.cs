@@ -8,4 +8,6 @@ public partial class WorkWindow
     public required RenderFragment Header { get; set; }
     [Parameter]
     public required RenderFragment Body { get; set; }
+    [Parameter]
+    public int Elevation { get; set; } = 3;
 }

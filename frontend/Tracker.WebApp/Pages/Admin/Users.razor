@@ -1,0 +1,38 @@
+﻿@page "/admin/users"
+
+@using Microsoft.AspNetCore.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.Domain.Dtos
+
+@attribute [Authorize(Policy = "AdminOrHigher")]
+
+<MudContainer MaxWidth="MaxWidth.Large"
+			  Class="mt-4">
+	<ServerLoadingTable TItem=@UserDto
+						@ref=@_table
+						DataProvider=@LoadUsers>
+
+		<Toolbar>
+			<MudText Typo="Typo.h6">Users</MudText>
+			<MudSpacer />
+			<MudTextField T="string"
+						  ValueChanged=@(s => OnSearchChanged(s))
+						  TextUpdateSuppression="false"
+						  Placeholder="Search username"
+						  DebounceInterval="300"
+						  Adornment="Adornment.Start"
+						  AdornmentIcon="@Icons.Material.Filled.Search" />
+		</Toolbar>
+
+		<Header>
+			<MudTh>Username</MudTh>
+			<MudTh>Email</MudTh>
+		</Header>
+
+		<Row Context="user">
+			<MudTd>@user.Username</MudTd>
+			<MudTd>@user.Email</MudTd>
+		</Row>
+
+	</ServerLoadingTable>
+</MudContainer>

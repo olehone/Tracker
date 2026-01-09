@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿    using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;

@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Components;
-using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Layout;
 
-public partial class MainLayout
+public partial class MainLayout : IDisposable
 {
     private bool _isDarkMode;
     private bool _isDrawerOpen = true;
@@ -12,11 +11,16 @@ public partial class MainLayout
     [CascadingParameter]
     private AppState AppState { get; set; } = null!;
 
-    [Inject]
-    private NavigationManager Nav { get; set; } = null!;
-    [Inject]
-    private IAuthService AuthService { get; set; } = null!;
+    [Inject] private NavigationManager Nav { get; set; } = null!;
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
 
+    void IDisposable.Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
     private void DrawerToggle()
     {
         _isDrawerOpen = !_isDrawerOpen;
@@ -32,9 +36,4 @@ public partial class MainLayout
         Nav.NavigateTo("/register");
     }
 
-    private async Task Logout()
-    {
-        await AuthService.LogoutAsync();
-        Nav.NavigateTo("/");
-    }
 }

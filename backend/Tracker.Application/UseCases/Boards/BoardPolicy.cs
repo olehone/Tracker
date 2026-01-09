@@ -22,10 +22,10 @@ public static class BoardPolicy
         return new BoardPermissionsDto
         {
             CanChangeBoard = CanChangeSettings(globalRole, workspaceRole, boardRole),
-            CanCreateItem = permissionRoles.MinCreateItemRole >= MapUserRoleToPermission(boardRole),
-            CanChangeItem = permissionRoles.MinChangeItemRole >= MapUserRoleToPermission(boardRole),
-            CanCreateList = permissionRoles.MinCreateListRole >= MapUserRoleToPermission(boardRole),
-            CanChangeList = permissionRoles.MinChangeListRole >= MapUserRoleToPermission(boardRole),
+            CanCreateItem = MapUserRoleToPermission(boardRole) >= permissionRoles.MinCreateItemRole,
+            CanChangeItem = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeItemRole,
+            CanCreateList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinCreateListRole,
+            CanChangeList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeListRole,
         };
     }
 

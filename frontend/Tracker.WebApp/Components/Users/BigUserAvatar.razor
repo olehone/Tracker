@@ -1,0 +1,17 @@
+@using Tracker.WebApp.Components.Shared
+
+<MudTooltip Text="Click to change">
+	<MudAvatar Style=@($"width:160px;height:160px;font-size:72px; {CustomColor}")
+			   Variant="Variant.Outlined">
+		@if (User.AvatarUrl is null)
+		{
+			@FirstLetter()
+		}
+		else
+		{
+			<MudImage Src=@User.AvatarUrl
+					  Alt="Profile picture" />
+		}
+	</MudAvatar>
+</MudTooltip>
+

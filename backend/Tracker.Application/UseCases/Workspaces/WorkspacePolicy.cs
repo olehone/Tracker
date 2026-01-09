@@ -17,8 +17,8 @@ public static class WorkspacePolicy
 
         return new WorkspacePermissionsDto()
         {
-            CanCreateBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
-            CanChangeBoard = permissionRoles.MinCreateBoardRole >= MapUserRoleToPermission(workspaceRole),
+            CanCreateBoard = MapUserRoleToPermission(workspaceRole) >= permissionRoles.MinCreateBoardRole,
+            CanChangeBoard = MapUserRoleToPermission(workspaceRole) >= permissionRoles.MinCreateBoardRole,
             CanChangeWorkspace = CanChangeSettings(globalRole, workspaceRole),
         };
     }

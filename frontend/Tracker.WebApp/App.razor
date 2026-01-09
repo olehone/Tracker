@@ -9,24 +9,19 @@
 	<CascadingValue Value=@AppState>
 		<Router AppAssembly=@typeof(App).Assembly>
 			<Found Context="routeData">
-				@* <AuthorizeRouteView RouteData=@routeData
+				<AuthorizeRouteView RouteData=@routeData
 									DefaultLayout=@typeof(MainLayout)>
 					<NotAuthorized>
 						@if (context?.User?.Identity?.IsAuthenticated == true)
 						{
-							<MudAlert Severity="Severity.Error">
-								You do not have access to this resource.
-							</MudAlert>
+							<p>You do not have access to this resource.</p>
 						}
 						else
 						{
 							RedirectToLogin();
 						}
 					</NotAuthorized>
-				</AuthorizeRouteView> *@
-				<RouteView RouteData=@routeData DefaultLayout=@typeof(MainLayout) />
-				<FocusOnNavigate RouteData=@routeData
-								 Selector="h1" />
+				</AuthorizeRouteView>
 			</Found>
 			<NotFound>
 				<LayoutView Layout="@typeof(MainLayout)">

@@ -6,6 +6,7 @@ public interface IUserRepository : IRepository<User, Guid>
 {
     Task<bool> EmailExistsAsync(string email);
     Task<bool> UsernameExistsAsync(string username);
-    Task<List<User>> SearchByUsernamePartAsync(string username, int skip, int take);
+    Task<int> CountAsync(string? username);
+    Task<List<User>> GetAsync(string? username, int skip, int take);
     Task<User?> GetByEmailAsync(string email);
 }

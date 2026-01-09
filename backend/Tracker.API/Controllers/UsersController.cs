@@ -27,12 +27,12 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetUserByUsernameAsync(
-        [FromQuery] SearchByFieldPartRequest request)
+    public async Task<IActionResult> GetUsersAsync(
+        [FromQuery] PaginatedSearchRequest request)
     {
-        var mediatorRequest = new SearchUsersByUsernamePartQuery()
+        var mediatorRequest = new GetUsersQuery()
         {
-            Username = request.SearchQuery,
+            SearchQuery = request.SearchQuery,
             Page = request.Page,
             AmountInPage = request.AmountInPage
         };

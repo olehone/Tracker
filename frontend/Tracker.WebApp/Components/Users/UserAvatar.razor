@@ -1,0 +1,52 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Shared
+
+<MudMenu AnchorOrigin="Origin.BottomRight"
+		 TransformOrigin="Origin.TopRight"
+		 Disabled=@Disabled()>
+
+	<ActivatorContent>
+		@if (User.AvatarUrl is null)
+		{
+			<MudAvatar Style=@CustomColor
+					   Variant="Variant.Outlined">
+				@FirstLetter()
+			</MudAvatar>
+		}
+		else
+		{
+			<MudAvatar>
+				<MudImage Src=@User.AvatarUrl></MudImage>
+			</MudAvatar>
+		}
+	</ActivatorContent>
+
+	<ChildContent>
+		<MudStack Spacing="1"
+				  Style="max-width:100px width:100px">
+			<MudText Typo="Typo.body1"
+					 Class="px-2">
+				@UiHelper.ShortenText(User.Username, 50)
+			</MudText>
+
+			<MudDivider Class="w-50" />
+
+			<MudStack Spacing="0"
+					  AlignItems="AlignItems.Center">
+
+				<MudButton OnClick=@Profile>
+					<MudIcon Icon=@Icons.Material.Filled.Person />
+					Profile
+				</MudButton>
+
+				<MudButton OnClick=@Logout
+						   IconColor="Color.Error">
+					<MudIcon Icon=@Icons.Material.Filled.Logout />
+					Logout
+				</MudButton>
+			</MudStack>
+		</MudStack>
+	</ChildContent>
+</MudMenu>
+
+

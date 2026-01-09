@@ -5,16 +5,17 @@ namespace Tracker.Domain.Mapping;
 
 public static class UserMapping
 {
-    public static UserDto ToDto(this User user)
+    public static UserDto ToDto(this User user, string? avatarUrl = null)
     {
         return new UserDto()
         {
             Id = user.Id,
             Email = user.Email,
             Username = user.Username,
-            Role = user.Role.ToString(),
+            Role = user.Role,
             FirstName = user.FirstName,
             LastName = user.LastName ?? "",
+            AvatarUrl = avatarUrl,
         };
     }
 }

@@ -1,5 +1,8 @@
 ﻿@page "/workspaces/{WorkspaceId:guid}/settings"
+@using Microsoft.AspNetCore.Authorization
 @using Tracker.WebApp.Components.Workspaces
+
+@attribute [Authorize]
 
 <PageTitle>@PageTitle() settings</PageTitle>
 
@@ -19,17 +22,22 @@
 
 			<MudForm @ref=@_form
 					 Model=@model
-					 Validation=@validator
 					 ValidationDelay="300"
 					 Disabled=@IsDisabled()>
 				<MudTextField @bind-Value=@model.Title
 							  Label="Title"
+							  Counter="100"
+							  MaxLength="100"
 							  Required
+							  DebounceInterval="300"
 							  Variant="Variant.Outlined" />
 
 				<MudTextField @bind-Value=@model.Description
 							  Label="Description"
+							  Counter="500"
+							  MaxLength="500"
 							  Lines="3"
+							  DebounceInterval="300"
 							  Variant="Variant.Outlined" />
 
 				<SelectVisibility @bind-value=@model.Visibility />
