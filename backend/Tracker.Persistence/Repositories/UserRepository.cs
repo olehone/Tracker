@@ -26,11 +26,31 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
             .FirstOrDefaultAsync(user => user.Email == email);
     }
 
-    public async Task<List<User>> SearchByUsernamePartAsync(string username, int skip, int take)
+    private IQueryable<User> ApplyUsernameFilter(string? username)
     {
-        return await _dbSet
-            .AsNoTracking()
-            .Where(u => u.Username.StartsWith(username))
+        var query = _dbSet.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(username))
+        {
+            query = query.Where(u =>
+                EF.Functions.Like(u.Username, $"%{username}%"));
+        }
+
+        return query;
+    }
+
+    public async Task<int> CountAsync(string? username)
+    {
+        return await ApplyUsernameFilter(username)
+            .CountAsync();
+    }
+
+    public async Task<List<User>> GetAsync(
+        string? username,
+        int skip,
+        int take)
+    {
+        return await ApplyUsernameFilter(username)
             .OrderBy(u => u.Username)
             .Skip(skip)
             .Take(take)
