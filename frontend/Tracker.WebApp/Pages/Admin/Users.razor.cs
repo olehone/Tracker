@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
@@ -10,6 +11,7 @@ public partial class Users
 {
     [Inject] IUserService UserService { get; set; } = null!;
     [Inject] IErrorNotifier ErrorNotifier { get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     private ServerLoadingTable<UserDto>? _table;
 

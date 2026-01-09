@@ -31,6 +31,7 @@
 			<MudTh>Email</MudTh>
 			<MudTh>Name</MudTh>
 			<MudTh>Role</MudTh>
+			<MudTh>Profile</MudTh>
 		</Header>
 
 		<Row Context="User">
@@ -42,14 +43,19 @@
 				</MudTd>
 
 				<MudTd>
-					<a href=@($"/users/{User!.Id}")>
-						@User.Username
-					</a>
+					@User.Username
 				</MudTd>
 				<MudTd>@User.Email</MudTd>
 				<MudTd>@User.FirstName @User.LastName</MudTd>
 				<MudTd>
 					<RoleChip Role=@User.Role />
+				</MudTd>
+				<MudTd>
+					<a href=@($"/users/{User!.Id}")>
+						<MudIcon Icon="@Icons.Material.Filled.OpenInNew"
+								 Size="Size.Small"
+								 Color="Color.Primary" />
+					</a>
 				</MudTd>
 			}
 		</Row>
