@@ -5,7 +5,7 @@ using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Components.Shared;
 
-public partial class ServerLoadingTable <TItem>
+public partial class ServerLoadingTable<TItem>
 {
     private MudTable<TItem>? _table;
 

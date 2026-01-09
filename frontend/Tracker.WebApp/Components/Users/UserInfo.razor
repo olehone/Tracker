@@ -4,7 +4,7 @@
 <MudStack>
 	<MudStack Row Justify="Justify.SpaceBetween">
 		<MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
-		<MudText>@User.Role</MudText>
+		<RoleChip Role=@User.Role/>
 	</MudStack>
 	<MudText Typo="Typo.h5">@User.Username</MudText>
 	<MudText>@User.Email</MudText>
