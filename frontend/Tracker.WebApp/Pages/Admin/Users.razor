@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Tracker.WebApp.Components.Shared
 @using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Users
 
 @attribute [Authorize(Policy = "AdminOrHigher")]
 
@@ -19,19 +20,38 @@
 						  ValueChanged=@(s => OnSearchChanged(s))
 						  TextUpdateSuppression="false"
 						  Placeholder="Search username"
-						  DebounceInterval="300"
+						  DebounceInterval="500"
 						  Adornment="Adornment.Start"
 						  AdornmentIcon="@Icons.Material.Filled.Search" />
 		</Toolbar>
 
 		<Header>
+			<MudTh>Avatar</MudTh>
 			<MudTh>Username</MudTh>
 			<MudTh>Email</MudTh>
+			<MudTh>Name</MudTh>
+			<MudTh>Role</MudTh>
 		</Header>
 
-		<Row Context="user">
-			<MudTd>@user.Username</MudTd>
-			<MudTd>@user.Email</MudTd>
+		<Row Context="User">
+			@if (User is not null)
+			{
+				<MudTd>
+					<UserAvatar User=@User
+								Size="Size.Small" />
+				</MudTd>
+
+				<MudTd>
+					<a href=@($"/users/{User!.Id}")>
+						@User.Username
+					</a>
+				</MudTd>
+				<MudTd>@User.Email</MudTd>
+				<MudTd>@User.FirstName @User.LastName</MudTd>
+				<MudTd>
+					<RoleChip Role=@User.Role />
+				</MudTd>
+			}
 		</Row>
 
 	</ServerLoadingTable>

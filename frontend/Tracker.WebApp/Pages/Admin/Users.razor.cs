@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
-using Tracker.Services.ApiClients;
 using Tracker.WebApp.Components.Shared;
 using Tracker.WebApp.Shared;
 
@@ -28,7 +27,6 @@ public partial class Users
         }
         return result.Value;
     }
-
 
     private void OnSearchChanged(string search)
     {

@@ -1,0 +1,38 @@
+@using Tracker.Domain.Enums
+
+@if (Role is GlobalRole.User)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Default"
+			 Icon=@Icons.Material.Filled.Group>
+		User
+	</MudChip>
+}
+else if (Role is GlobalRole.Admin)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Info"
+			 Icon=@Icons.Material.Filled.Groups>
+		Admin
+	</MudChip>
+}
+else if (Role is GlobalRole.Owner)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Success"
+			 Icon=@Icons.Material.Filled.Person>
+		Owner
+	</MudChip>
+}
+else
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Error"
+			 Icon=@Icons.Material.Filled.Error>
+		Error
+	</MudChip>
+}
