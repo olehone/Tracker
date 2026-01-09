@@ -45,7 +45,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpGet("/all")]
+    [HttpGet("all")]
     [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetAllWorkspacesAsync()
     {

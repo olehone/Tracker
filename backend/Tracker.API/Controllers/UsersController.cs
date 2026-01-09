@@ -26,7 +26,8 @@ public class UserController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpGet()]
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetUsersAsync(
         [FromQuery] PaginatedSearchRequest request)
     {

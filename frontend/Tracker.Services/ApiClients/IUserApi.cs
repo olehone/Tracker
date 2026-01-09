@@ -13,6 +13,6 @@ public interface IUserApi
     [Get("/api/users/{id}")]
     Task<ApiResponse<UserDto>> GetUserByIdAsync(Guid id);
 
-    [Get("/api/users")]
+    [Get("/api/users/all")]
     Task<ApiResponse<Paginated<UserDto>>> GetUsersAsync([Query] PaginatedSearchRequest request);
 }
