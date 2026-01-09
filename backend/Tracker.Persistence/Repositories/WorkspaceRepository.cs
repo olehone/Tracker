@@ -59,14 +59,14 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
         return query;
     }
 
-    public async Task<int> CountAsync(Guid? userId = null, string? title = null)
+    public async Task<int> CountAsync(string? title = null, Guid? userId = null)
     {
         return await SearchByTitleAndUserAsync(userId, title)
             .CountAsync();
     }
 
     public async Task<List<Workspace>> GetAsync(
-        int skip, int take, Guid? userId = null, string? title = null)
+        int skip, int take, string? title = null, Guid? userId = null)
     {
         return await SearchByTitleAndUserAsync(userId, title)
             .Skip(skip)
@@ -74,11 +74,24 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .ToListAsync();
     }
 
+    private IQueryable<Workspace> SearchByTitleAndUsersAsync(
+        Guid targetUserId, Guid searchingUserId, string? title = null)
+    {
+        return SearchByTitleAndUserAsync(targetUserId, title)
+            .Where(w => w.UserWorkspaces.Any(uw => uw.UserId == searchingUserId));
+    }
+
+    public async Task<int> CountMutualAsync(
+        Guid targetUserId, Guid searchingUserId, string? title = null)
+    {
+        return await SearchByTitleAndUsersAsync(targetUserId, searchingUserId, title)
+            .CountAsync();
+    }
+
     public async Task<List<Workspace>> GetMutualAsync(
         Guid targetUserId, Guid searchingUserId, int skip, int take, string? title = null)
     {
-        return await SearchByTitleAndUserAsync(targetUserId, title)
-            .Where(w => w.UserWorkspaces.Any(uw => uw.UserId == searchingUserId))
+        return await SearchByTitleAndUsersAsync(targetUserId, searchingUserId, title)
             .Skip(skip)
             .Take(take)
             .ToListAsync();
