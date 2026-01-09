@@ -42,11 +42,18 @@
 								Size="Size.Small" />
 				</MudTd>
 
-				<MudTd>
+				<MudTd Class="text-ellipsis"
+					   Style="max-width:20vw">
 					@User.Username
 				</MudTd>
-				<MudTd>@User.Email</MudTd>
-				<MudTd>@User.FirstName @User.LastName</MudTd>
+				<MudTd Class="text-ellipsis"
+					   Style="max-width:20vw">
+					@User.Email
+				</MudTd>
+				<MudTd Class="text-ellipsis"
+					   Style="max-width:20vw">
+					@User.FirstName @User.LastName
+				</MudTd>
 				<MudTd>
 					<RoleChip Role=@User.Role />
 				</MudTd>

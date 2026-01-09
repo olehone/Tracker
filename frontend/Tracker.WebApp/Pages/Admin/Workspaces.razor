@@ -1,7 +1,60 @@
 ﻿@page "/admin/workspaces"
+
 @using Microsoft.AspNetCore.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Workspaces
 
-@attribute [Authorize(Policy ="AdminOrHigher")]
+@attribute [Authorize(Policy = "AdminOrHigher")]
 
-<h3>Workspaces</h3>
+<MudContainer MaxWidth="MaxWidth.Large"
+			  Class="mt-4">
+	<ServerLoadingTable TItem=@WorkspaceSummaryDto
+						@ref=@_table
+						DataProvider=@LoadWorkspaces>
 
+		<Toolbar>
+			<MudText Typo="Typo.h6">Users</MudText>
+			<MudSpacer />
+			<MudTextField T="string"
+						  ValueChanged=@(s => OnSearchChanged(s))
+						  TextUpdateSuppression="false"
+						  Placeholder="Search title"
+						  DebounceInterval="500"
+						  Adornment="Adornment.Start"
+						  AdornmentIcon="@Icons.Material.Filled.Search" />
+		</Toolbar>
+
+		<Header>
+			<MudTh>Title</MudTh>
+			<MudTh>Description</MudTh>
+			<MudTh>Visibility</MudTh>
+			<MudTh>Link</MudTh>
+		</Header>
+
+		<Row Context="Workspace">
+			@if (Workspace is not null)
+			{
+				<MudTd Class="text-ellipsis"
+					   Style="max-width:15vw">
+					@Workspace.Title
+				</MudTd>
+				<MudTd Class="text-ellipsis"
+					   Style="max-width:35vw">
+					@Workspace.Description
+				</MudTd>
+				<MudTd>
+					<VisibilityChip Visibility=@Workspace.Visibility />
+				</MudTd>
+				<MudTd>
+					<a href=@($"/workspaces/{Workspace!.Id}/overview")>
+						<MudIcon Icon="@Icons.Material.Filled.OpenInNew"
+								 Size="Size.Small"
+								 Color="Color.Primary" />
+					</a>
+				</MudTd>
+			}
+		</Row>
+
+	</ServerLoadingTable>
+</MudContainer>

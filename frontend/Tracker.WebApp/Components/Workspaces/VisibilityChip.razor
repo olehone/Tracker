@@ -1,0 +1,29 @@
+@using Tracker.Domain.Enums
+
+@if (Visibility is WorkspaceVisibility.Public)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Default"
+			 Icon=@Icons.Material.Filled.Public>
+		Public
+	</MudChip>
+}
+else if (Visibility is WorkspaceVisibility.Private)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Default"
+			 Icon=@Icons.Material.Filled.Lock>
+		Private
+	</MudChip>
+}
+else
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Error"
+			 Icon=@Icons.Material.Filled.Error>
+		Error
+	</MudChip>
+}
