@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using Microsoft.AspNetCore.Mvc;
 using Refit;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
@@ -15,4 +16,12 @@ public interface IUserApi
 
     [Get("/api/users/all")]
     Task<ApiResponse<Paginated<UserDto>>> GetUsersAsync([Query] PaginatedSearchRequest request);
+
+    [Get("/api/users/{id}/workspaces/all")]
+    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetAllUserWorkspacesAsync([FromRoute] Guid id,
+        [FromQuery] PaginatedSearchRequest request);
+
+    [Get("/api/users/{id}/workspaces")]
+    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync([FromRoute] Guid id,
+        [FromQuery] PaginatedSearchRequest request);
 }

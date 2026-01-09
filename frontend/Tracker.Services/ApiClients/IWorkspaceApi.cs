@@ -1,4 +1,5 @@
 ﻿using Refit;
+using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
 
@@ -13,7 +14,10 @@ public interface IWorkspaceApi
     [Put("/api/workspaces/{id}/settings")]
     Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateWorkspaceRequest request);
 
-    [Get("/api/workspaces/")]
+    [Get("/api/workspaces/all")]
+    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetWorkspacesAsync([Query] PaginatedSearchRequest request);
+
+    [Get("/api/workspaces/my")]
     Task<ApiResponse<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync();
 
     [Post("/api/workspaces/")]
