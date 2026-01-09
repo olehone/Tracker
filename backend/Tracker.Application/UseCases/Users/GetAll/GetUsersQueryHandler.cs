@@ -17,10 +17,15 @@ public sealed class GetUsersQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         int skip = (request.Page - 1) * request.AmountInPage;
-        var users = await uow.UserRepository
-            .GetAsync(request.SearchQuery, skip, request.AmountInPage);
         var count = await uow.UserRepository
             .CountAsync(request.SearchQuery);
+        if (count == 0)
+        {
+            return Paginated<UserDto>.Empty();
+        }
+
+        var users = await uow.UserRepository
+            .GetAsync(request.SearchQuery, skip, request.AmountInPage);
 
         var userDtos = users.Select(user => user.ToDto()).ToList();
 

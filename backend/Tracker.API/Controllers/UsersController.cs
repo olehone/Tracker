@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Users.GetUserById;
+using Tracker.Application.UseCases.Users.GetById;
 using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.Current;
 
