@@ -1,4 +1,4 @@
-﻿namespace Tracker.Application.UseCases.Users.SearchByUsername;
+﻿namespace Tracker.Application.UseCases.Users.GetAll;
 
 public class GetUsersQueryValidator
     : PaginatedSearchValidator<GetUsersQuery>

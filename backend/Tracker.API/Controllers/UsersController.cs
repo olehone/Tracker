@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Users.GetUserById;
-using Tracker.Application.UseCases.Users.SearchByUsername;
+using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.Current;
 
 namespace Tracker.API.Controllers;
