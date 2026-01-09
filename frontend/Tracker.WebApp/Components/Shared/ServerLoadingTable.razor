@@ -1,0 +1,28 @@
+﻿@typeparam TItem
+@using MudBlazor
+
+<MudTable T="TItem"
+          ServerData="LoadServerData"
+          Dense="true"
+          Hover="true"
+          @ref="_table">
+
+    <ToolBarContent>
+        @Toolbar
+    </ToolBarContent>
+
+    <HeaderContent>
+        @Header
+    </HeaderContent>
+
+    <RowTemplate>
+        @Row(context)
+    </RowTemplate>
+
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+
+</MudTable>
+
+

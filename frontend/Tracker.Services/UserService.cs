@@ -1,4 +1,6 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Requests;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -15,6 +17,11 @@ public class UserService(
     public async Task<Result<UserDto>> GetCurrentUserAsync()
     {
         return await apiErrorHandler.ExecuteAsync(api.GetCurrentUserAsync);
+    }
+
+    public async Task<Result<Paginated<UserDto>>> GetUsersAsync(PaginatedSearchRequest request)
+    {
+        return await apiErrorHandler.ExecuteAsync(request, api.GetUsersAsync);
     }
 
     public async Task<Result<UserDto>> GetUserByIdAsync(GetByIdRequest request)
