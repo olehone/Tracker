@@ -13,7 +13,7 @@ public partial class Register
 {
     private readonly RegisterUserModel _registerModel = new();
     private IReadOnlyList<string>? _errorMessages;
-    private MudForm _form;
+    private MudForm _form = null!;
     private bool _isLoading;
     private bool _isSuccess;
     private string? _secondPassword;
