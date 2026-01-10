@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Users;
 
-public partial class BigUserAvatar
+public partial class UserAvatarSmall
 {
     [Parameter]
-
-    public required UserDto User { get; set; }
+    public required UserDto User { get; set; } = null!;
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
 
     private string CustomColor
     {
@@ -18,8 +20,14 @@ public partial class BigUserAvatar
             return _customColor;
         }
     }
+
     private string? _customColor;
 
+    public string GetUserColor()
+    {
+        var value = UiHelper.GetColorByString(User!.Id);
+        return value;
+    }
 
     private char FirstLetter()
     {

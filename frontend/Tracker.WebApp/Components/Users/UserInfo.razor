@@ -1,12 +1,24 @@
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 
-<MudStack>
-	<MudStack Row Justify="Justify.SpaceBetween">
-		<MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
-		<RoleChip Role=@User.Role/>
-	</MudStack>
-	<MudText Typo="Typo.h5">@User.Username</MudText>
-	<MudText>@User.Email</MudText>
-</MudStack>
+<MudGrid>
+	<MudItem xs=12
+			 sm="4">
+		<UserAvatarBig User=@User />
+	</MudItem>
+
+	<MudItem xs="12"
+			 sm="8">
+		<MudStack>
+			<MudStack Row Justify="Justify.SpaceBetween">
+				<MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
+
+				<UserGlobalRoleChip Role=@User.Role />
+			</MudStack>
+			<MudText Typo="Typo.h5">@User.Username</MudText>
+
+			<MudText>@User.Email</MudText>
+		</MudStack>
+	</MudItem>
+</MudGrid>
 

@@ -4,7 +4,7 @@ using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Components.Users;
 
-public partial class UserProfileAvatar
+public partial class UserAvatarOwnClickable
 {
     [Parameter]
     public UserDto User { get; set; } = null!;

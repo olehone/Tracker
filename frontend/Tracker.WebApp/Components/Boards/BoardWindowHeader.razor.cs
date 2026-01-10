@@ -18,13 +18,13 @@ public partial class BoardWindowHeader
     {
         var parameters = new DialogParameters
         {
-            { nameof(SettingsDialog.Board), Board }
+            { nameof(BoardSettingsDialog.Board), Board }
         };
         var settingsTitle = Board.Permissions.CanChangeBoard
             ? "Board settings"
             : "Board information";
 
-        var dialog = await DialogService.ShowAsync<SettingsDialog>(
+        var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
             settingsTitle,
             parameters,
             new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
