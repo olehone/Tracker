@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Workspaces
+
+<MudTable T=@WorkspaceSummaryDto
+		  ServerData=@LoadServerData
+		  FixedFooter
+		  Dense
+		  Hover
+		  Height=@Height
+		  @ref=@_table>
+
+	<ToolBarContent>
+		@if (Title is not null)
+		{
+			<MudText Typo="Typo.h6">@Title</MudText>
+			<MudSpacer />
+			<MudTextField T="string"
+						  ValueChanged=@(s => SetSearch(s))
+						  TextUpdateSuppression="false"
+						  Variant="Variant.Text"
+						  Placeholder="Search title"
+						  DebounceInterval="500"
+						  Adornment="Adornment.Start"
+						  AdornmentIcon="@Icons.Material.Filled.Search" />
+		}
+		else
+		{
+			<MudTextField T="string"
+						  ValueChanged=@(s => SetSearch(s))
+						  TextUpdateSuppression="false"
+						  Variant="Variant.Outlined"
+						  Placeholder="Search title"
+						  DebounceInterval="500"
+						  Adornment="Adornment.Start"
+						  AdornmentIcon="@Icons.Material.Filled.Search" />
+		}
+	</ToolBarContent>
+
+	<HeaderContent>
+
+
+		<MudTh>Title</MudTh>
+		<MudTh>Description</MudTh>
+		<MudTh>Visibility</MudTh>
+		<MudTh>Link</MudTh>
+	</HeaderContent>
+
+	<RowTemplate>
+		@if (context is not null)
+		{
+			<MudTd Class="text-ellipsis"
+				   Style="max-width:100px">
+				@context.Title
+			</MudTd>
+			<MudTd Class="text-ellipsis"
+				   Style="max-width:200px">
+				@context.Description
+			</MudTd>
+			<MudTd Style="width:70px">
+				<VisibilityChip Visibility=@context.Visibility />
+			</MudTd>
+			<MudTd Style="width:20px">
+				<a href=@($"/workspaces/{context!.Id}/overview")>
+					<MudIcon Icon="@Icons.Material.Filled.OpenInNew"
+							 Size="Size.Small"
+							 Color="Color.Primary" />
+				</a>
+			</MudTd>
+		}
+	</RowTemplate>
+
+	<PagerContent>
+		<MudTablePager />
+	</PagerContent>
+</MudTable>
+
