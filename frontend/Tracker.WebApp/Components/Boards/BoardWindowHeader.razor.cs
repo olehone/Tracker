@@ -42,6 +42,58 @@ public partial class BoardWindowHeader
         }
     }
 
+    private async Task OpenListsSwapMenu()
+    {
+        var parameters = new DialogParameters
+        {
+            { nameof(BoardMembersDialog.Board), Board }
+        };
+        var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
+            "Lists",
+            parameters,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+        );
+
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        if (result.Data is true)
+        {
+            await ReloadBoard();
+        }
+    }
+
+    private async Task OpenMembers()
+    {
+        var parameters = new DialogParameters
+        {
+            { nameof(BoardMembersDialog.Board), Board }
+        };
+        var settingsTitle = Board.Permissions.CanChangeBoard
+            ? "Board settings"
+            : "Board information";
+
+        var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
+            settingsTitle,
+            parameters,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+        );
+
+        var result = await dialog.Result;
+        if(result is null || result.Canceled)
+        {
+            return;
+        }
+
+        if (result.Data is true)
+        {
+            await ReloadBoard();
+        }
+    }
+
     private async Task ReloadBoard()
     {
         var result = await BoardService.GetBoardByIdAsync(Board.Id);
