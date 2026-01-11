@@ -13,7 +13,7 @@ public partial class BoardSummary
     {
         get
         {
-            _customColor ??= UiHelper.GetColorByString(Board.Id);
+            _customColor ??= UiHelper.GetColorById(Board.Id);
             return _customColor;
         }
     }

@@ -10,15 +10,7 @@
 <WorkWindow>
 
 	<Header>
-		@if (Board is null)
-		{
-			<BoardWindowHeaderSkeleton />
-		}
-		else
-		{
-			<BoardWindowHeader Board=@Board />
-
-		}
+		<BoardWindowHeader />
 	</Header>
 
 	<Body>
@@ -27,35 +19,7 @@
 				  Style="overflow-x: auto;">
 			@if (Board is not null)
 			{
-				<MudDropContainer @ref=@_container
-								  T=@BoardItemDto
-								  Items=@_items
-								  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
-								  ItemDropped=@ItemDropped
-								  Class="d-flex flex-row flex-nowrap">
-					<ChildContent>
-						@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
-						{
-							<BoardList CanAddItem=@Board.Permissions.CanCreateItem
-									   List=@list
-									   OnCreateItem=@(title => CreateItemForList(list, title)) />
-						}
-						@if (Board.Permissions.CanCreateList)
-						{
-							<MudPaper Elevation="5"
-									  Width="400px"
-									  Style="align-self: flex-start;"
-									  Class="my-3 mx-2">
-								<OneLineCreateButton Title="Add new list"
-													 OnCreate=@CreateList />
-							</MudPaper>
-						}
-					</ChildContent>
-
-					<ItemRenderer>
-						<BoardItem Item=@context />
-					</ItemRenderer>
-				</MudDropContainer>
+				<BoardLists />
 			}
 		</MudStack>
 	</Body>

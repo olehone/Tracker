@@ -4,12 +4,11 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Domain.ValueObjects;
-using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardSettingsDialog
+public partial class BoardSettingsDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
@@ -17,34 +16,37 @@ public partial class BoardSettingsDialog
     [Parameter]
     public required BoardFullDto Board { get; set; }
 
-    [Inject] IBoardService BoardService { get; set; } = null!;
-    [Inject] IResultNotifier Notifier { get; set; } = null!;
+    [Inject] private BoardState BoardState { get; set; } = null!;
 
     private MudForm? _form;
     private UpdateBoardRequest model = null!;
     private readonly UpdateBoardRequestValidator validator = new();
     private bool isSubmitting = false;
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        model = new UpdateBoardRequest
+        BoardState.OnChange += StateHasChanged;
+
+        if (BoardState.CurrentBoard != null)
         {
-            Title = Board.Title,
-            Description = Board.Description,
-            Visibility = Board.Visibility,
-            PermissionRoles = new BoardPermissionRoles
+            model = new UpdateBoardRequest
             {
-                MinCreateItemRole = Board.PermissionRoles.MinCreateItemRole,
-                MinChangeItemRole = Board.PermissionRoles.MinChangeItemRole,
-                MinCreateListRole = Board.PermissionRoles.MinCreateListRole,
-                MinChangeListRole = Board.PermissionRoles.MinChangeListRole,
-            }
-        };
+                Title = BoardState.CurrentBoard.Title,
+                Description = BoardState.CurrentBoard.Description,
+                Visibility = BoardState.CurrentBoard.Visibility,
+                PermissionRoles = new BoardPermissionRoles
+                {
+                    MinCreateItemRole = BoardState.CurrentBoard.PermissionRoles.MinCreateItemRole,
+                    MinChangeItemRole = BoardState.CurrentBoard.PermissionRoles.MinChangeItemRole,
+                    MinCreateListRole = BoardState.CurrentBoard.PermissionRoles.MinCreateListRole,
+                    MinChangeListRole = BoardState.CurrentBoard.PermissionRoles.MinChangeListRole,
+                }
+            };
+        }
     }
 
     private async Task Submit()
     {
-
         if (_form is null || model is null)
         {
             return;
@@ -57,26 +59,26 @@ public partial class BoardSettingsDialog
         }
 
         isSubmitting = true;
+        StateHasChanged();
 
-        var result = await BoardService.UpdateAsync(Board.Id, model);
-        Notifier.Notify(result);
+        var success = await BoardState.UpdateBoardAsync(model);
+
         isSubmitting = false;
 
-        if (result.IsSuccess)
+        if (success)
         {
             MudDialog.Close(DialogResult.Ok(true));
         }
     }
 
+    private void Cancel() => MudDialog.Cancel();
 
-    private void Cancel()
-    {
-        MudDialog.Cancel();
-    }
+    private bool IsDisabled() =>
+        BoardState.CurrentBoard?.Permissions.CanChangeBoard != true;
 
-    private bool IsDisabled()
+    void IDisposable.Dispose()
     {
-        return !Board.Permissions.CanChangeBoard;
+        BoardState.OnChange -= StateHasChanged;
     }
 
     public class UpdateBoardRequestValidator : AbstractValidator<UpdateBoardRequest>

@@ -14,12 +14,12 @@ public partial class MainLayout : IDisposable
     [Inject] private NavigationManager Nav { get; set; } = null!;
     protected override void OnInitialized()
     {
-        AppState.OnChange += StateHasChanged;
+        AppState.OnUserChange += StateHasChanged;
     }
 
     void IDisposable.Dispose()
     {
-        AppState.OnChange -= StateHasChanged;
+        AppState.OnUserChange -= StateHasChanged;
     }
     private void DrawerToggle()
     {

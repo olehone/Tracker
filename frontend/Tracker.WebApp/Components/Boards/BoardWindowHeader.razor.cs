@@ -1,106 +1,77 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Services;
-using Tracker.Services.Abstraction;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardWindowHeader
+public partial class BoardWindowHeader : IDisposable
 {
-    [Parameter]
-    public required BoardFullDto Board { get; set; }
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private BoardState BoardState { get; set; } = null!;
 
-    [Inject] IDialogService DialogService { get; set; } = null!;
-    [Inject] IBoardService BoardService { get; set; } = null!;
+    private BoardFullDto? Board => BoardState.CurrentBoard;
+
+    protected override void OnInitialized()
+    {
+        BoardState.OnChange += StateHasChanged;
+    }
 
     private async Task OpenSettings()
     {
-        var parameters = new DialogParameters
+        if (Board == null)
         {
-            { nameof(BoardSettingsDialog.Board), Board }
-        };
+            return;
+        }
+
         var settingsTitle = Board.Permissions.CanChangeBoard
             ? "Board settings"
             : "Board information";
 
         var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
             settingsTitle,
-            parameters,
             new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
         );
 
-        var result = await dialog.Result;
-        if(result is null || result.Canceled)
-        {
-            return;
-        }
-
-        if (result.Data is true)
-        {
-            await ReloadBoard();
-        }
+        await dialog.Result;
     }
 
     private async Task OpenListsSwapMenu()
     {
-        var parameters = new DialogParameters
-        {
-            { nameof(BoardMembersDialog.Board), Board }
-        };
-        var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
-            "Lists",
-            parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
-        );
-
-        var result = await dialog.Result;
-        if (result is null || result.Canceled)
+        if (Board == null)
         {
             return;
         }
 
-        if (result.Data is true)
-        {
-            await ReloadBoard();
-        }
+        var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
+            "Lists",
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+        );
+
+        await dialog.Result;
     }
 
     private async Task OpenMembers()
     {
-        var parameters = new DialogParameters
+        if (Board == null)
         {
-            { nameof(BoardMembersDialog.Board), Board }
-        };
+            return;
+        }
+
         var settingsTitle = Board.Permissions.CanChangeBoard
             ? "Board settings"
             : "Board information";
 
         var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
             settingsTitle,
-            parameters,
             new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
         );
 
-        var result = await dialog.Result;
-        if(result is null || result.Canceled)
-        {
-            return;
-        }
-
-        if (result.Data is true)
-        {
-            await ReloadBoard();
-        }
+        await dialog.Result;
     }
 
-    private async Task ReloadBoard()
+    public void Dispose()
     {
-        var result = await BoardService.GetBoardByIdAsync(Board.Id);
-        if (result.IsSuccess)
-        {
-            Board = result.Value;
-        }
+        BoardState.OnChange -= StateHasChanged;
     }
-
 }

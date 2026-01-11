@@ -59,7 +59,7 @@ public static class UiHelper
         return string.Concat(text.AsSpan(0, length - ellipsisLength), ellipsis);
     }
 
-    public static string GetColorByString(Guid id)
+    public static string GetColorById(Guid id)
     {
         var bytes = SHA256.HashData(id.ToByteArray());
         var hue = bytes[0] % 360;
