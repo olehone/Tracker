@@ -25,7 +25,7 @@ public class ChangeUserRoleCommandHandler(
             return Error.NotFound("Board");
         }
 
-        var user = await uow.UserRepository.GetByIdAsync(request.BoardId);
+        var user = await uow.UserRepository.GetByIdAsync(request.UserId);
         if (user is null)
         {
             return Error.NotFound("User");

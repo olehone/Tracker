@@ -120,6 +120,7 @@ public static class BoardPolicy
             BoardAction.ChangeItem => permissions.CanChangeItem,
             BoardAction.CreateList => permissions.CanCreateList,
             BoardAction.ChangeList => permissions.CanChangeList,
+            BoardAction.ChangeBoard => permissions.CanChangeBoard,
             _ => false
         };
     }
