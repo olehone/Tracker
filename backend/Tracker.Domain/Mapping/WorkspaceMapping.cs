@@ -1,7 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Enums;
-using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Domain.Mapping;
 
@@ -14,6 +12,7 @@ public static class WorkspaceMapping
             Id = workspace.Id,
             Title = workspace.Title,
             Description = workspace.Description ?? string.Empty,
+            Visibility = workspace.Visibility,
         };
     }
 

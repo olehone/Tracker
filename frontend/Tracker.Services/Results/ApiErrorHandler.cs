@@ -104,13 +104,13 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
     // With id and request without response
     // Result ApiCall(Guid id, Request request)
     public async Task<Result> ExecuteAsync<TId, TRequest>(
-        TId id,
+        TId idRequest,
         TRequest request,
         Func<TId, TRequest, Task<ApiResponse<object>>> apiCall)
     {
         try
         {
-            var result = await apiCall(id, request);
+            var result = await apiCall(idRequest, request);
             if (!result.IsSuccessStatusCode)
             {
                 var error = ErrorMappingService.MapApiResponse(result);
@@ -126,4 +126,28 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
         }
     }
 
+    // With id and request with response
+    // Result<Object> ApiCall(Guid id, Request request)
+    public async Task<Result<TResponse>> ExecuteAsync<TId, TRequest, TResponse>(
+        TId idRequest,
+        TRequest request,
+        Func<TId, TRequest, Task<ApiResponse<TResponse>>> apiCall)
+    {
+        try
+        {
+            var result = await apiCall(idRequest, request);
+            if (!result.IsSuccessStatusCode)
+            {
+                var error = ErrorMappingService.MapApiResponse(result);
+                errorNotifier.NotifyActionError(error);
+                return error;
+            }
+
+            return Result.SuccessOf(result.Content!);
+        }
+        catch (HttpRequestException ex)
+        {
+            return ErrorMappingService.MapHttpRequestException(ex);
+        }
+    }
 }

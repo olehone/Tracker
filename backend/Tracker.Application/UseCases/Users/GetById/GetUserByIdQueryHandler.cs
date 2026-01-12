@@ -4,7 +4,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Users.GetUserById;
+namespace Tracker.Application.UseCases.Users.GetById;
 
 public sealed class GetUserByIdQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory)

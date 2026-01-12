@@ -4,6 +4,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Workspaces.GetAll;
 
-public class GetAllWorkspacesQuery : IRequest<Result<List<WorkspaceSummaryDto>>>
+public class GetWorkspacesQuery
+    : PaginatedSearch, IRequest<Result<Paginated<WorkspaceSummaryDto>>>
 {
 }

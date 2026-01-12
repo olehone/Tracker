@@ -1,7 +1,16 @@
 ﻿@page "/admin/workspaces"
+
 @using Microsoft.AspNetCore.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Workspaces
 
-@attribute [Authorize(Policy ="AdminOrHigher")]
+@attribute [Authorize(Policy = "AdminOrHigher")]
 
-<h3>Workspaces</h3>
-
+<MudContainer MaxWidth="MaxWidth.Large"
+			  Class="mt-4"
+			  Style="height:100%">
+	<WorkspaceList LoadWorkspaces=@LoadWorkspaces
+				   Title="Workspaces"
+				   Height="70vh"/>
+</MudContainer>

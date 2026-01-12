@@ -26,7 +26,7 @@ public sealed class SearchWorkspacesByTitleQueryHandler(
 
         int skip = (request.Page - 1) * request.AmountInPage;
         var workspaces = await uow.WorkspaceRepository
-            .SearchByTitleAndUserAsync(userId, request.Title, skip, request.AmountInPage);
+            .GetAllAsync(skip, request.AmountInPage, request.Title, userId);
 
         return workspaces is null
             ? Error.NotFound("Workspaces", "title")

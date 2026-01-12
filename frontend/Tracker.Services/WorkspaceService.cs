@@ -1,4 +1,5 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Tracker.API.Requests;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Domain.Results;
@@ -29,5 +30,10 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
     public Task<Result<WorkspaceSummaryDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request)
     {
         return apiErrorHandler.ExecuteAsync(request, api.CreateWorkspaceAsync);
+    }
+
+    public Task<Result<Paginated<WorkspaceSummaryDto>>> GetWorkspacesAsync(PaginatedSearchRequest request)
+    {
+        return apiErrorHandler.ExecuteAsync(request, api.GetWorkspacesAsync);
     }
 }

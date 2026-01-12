@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Users.SearchByUsername;
+namespace Tracker.Application.UseCases.Users.GetAll;
 
 public sealed class GetUsersQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory)
@@ -18,10 +17,15 @@ public sealed class GetUsersQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         int skip = (request.Page - 1) * request.AmountInPage;
-        var users = await uow.UserRepository
-            .GetAsync(request.SearchQuery, skip, request.AmountInPage);
         var count = await uow.UserRepository
             .CountAsync(request.SearchQuery);
+        if (count == 0)
+        {
+            return Paginated<UserDto>.Empty();
+        }
+
+        var users = await uow.UserRepository
+            .GetAsync(request.SearchQuery, skip, request.AmountInPage);
 
         var userDtos = users.Select(user => user.ToDto()).ToList();
 

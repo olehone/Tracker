@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
@@ -21,11 +20,7 @@ public partial class Users
         var result = await UserService.GetUsersAsync(request);
         if (ErrorNotifier.NotifyIfError(result))
         {
-            return new Paginated<UserDto>
-            {
-                Items = [],
-                TotalCount = 0,
-            };
+            return Paginated<UserDto>.Empty();
         }
         return result.Value;
     }

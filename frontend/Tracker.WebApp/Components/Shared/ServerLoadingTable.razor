@@ -2,27 +2,25 @@
 @using MudBlazor
 
 <MudTable T="TItem"
-          ServerData="LoadServerData"
-          Dense
-          Hover
-          @ref="_table">
+		  ServerData="LoadServerData"
+		  Dense
+		  Hover
+		  @ref="_table">
 
-    <ToolBarContent>
-        @Toolbar
-    </ToolBarContent>
+	<ToolBarContent>
+		@Toolbar
+	</ToolBarContent>
 
-    <HeaderContent>
-        @Header
-    </HeaderContent>
+	<HeaderContent>
+		@Header
+	</HeaderContent>
 
-    <RowTemplate>
-        @Row(context)
-    </RowTemplate>
+	<RowTemplate>
+		@Row(context)
+	</RowTemplate>
 
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
+	<PagerContent>
+		<MudTablePager />
+	</PagerContent>
 
 </MudTable>
-
-

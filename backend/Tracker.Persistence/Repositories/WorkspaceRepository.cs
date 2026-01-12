@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Enums;
-using Tracker.Domain.Results;
-using Tracker.Domain.ValueObjects;
 
 namespace Tracker.Persistence.Repositories;
 
@@ -44,20 +41,57 @@ public class WorkspaceRepository : Repository<Workspace, Guid>, IWorkspaceReposi
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<Workspace>> SearchByTitleAndUserAsync(
-        Guid userId, string title, int skip, int take)
+    private IQueryable<Workspace> SearchByTitleAndUserAsync(
+        Guid? userId, string? title)
     {
-        var normalizedTitle = title.Trim().ToLower();
+        var query = _dbSet
+            .AsNoTracking();
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            query = query.Where(w => EF.Functions.Like(w.Title, $"%{title}%"))
+                .OrderBy(w => w.Title);
+        }
+        if (userId is not null)
+        {
+            query = query.Where(w =>
+                    w.UserWorkspaces.Any(uw => uw.UserId == userId));
+        }
+        return query;
+    }
 
-        return await _dbSet
-            .AsNoTracking()
-            .Where(w => w.Title.ToLower().Contains(normalizedTitle) &&
-            (
-                w.UserWorkspaces.Any(uw => uw.UserId == userId) ||
-                w.Visibility == WorkspaceVisibility.Public
-            ))
-            .OrderByDescending(w => w.UserWorkspaces.Any(uw => uw.UserId == userId))
-            .ThenBy(w => w.Title)
+    public async Task<int> CountAllAsync(string? title = null, Guid? userId = null)
+    {
+        return await SearchByTitleAndUserAsync(userId, title)
+            .CountAsync();
+    }
+
+    public async Task<List<Workspace>> GetAllAsync(
+        int skip, int take, string? title = null, Guid? userId = null)
+    {
+        return await SearchByTitleAndUserAsync(userId, title)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+    }
+
+    private IQueryable<Workspace> SearchByTitleAndUsersAsync(
+        Guid targetUserId, Guid searchingUserId, string? title = null)
+    {
+        return SearchByTitleAndUserAsync(targetUserId, title)
+            .Where(w => w.UserWorkspaces.Any(uw => uw.UserId == searchingUserId));
+    }
+
+    public async Task<int> CountMutualAsync(
+        Guid targetUserId, Guid searchingUserId, string? title = null)
+    {
+        return await SearchByTitleAndUsersAsync(targetUserId, searchingUserId, title)
+            .CountAsync();
+    }
+
+    public async Task<List<Workspace>> GetMutualAsync(
+        Guid targetUserId, Guid searchingUserId, int skip, int take, string? title = null)
+    {
+        return await SearchByTitleAndUsersAsync(targetUserId, searchingUserId, title)
             .Skip(skip)
             .Take(take)
             .ToListAsync();

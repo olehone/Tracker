@@ -1,4 +1,4 @@
-﻿    using MediatR;
+﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
@@ -51,8 +51,8 @@ public sealed class GetWorkspaceByIdQueryHandler(
         var boards = await uow.BoardRepository
             .GetByWorkspaceAndUserAsync(request.Id, userId);
 
-        return ToDtoWithParticipating(workspace, 
-            boards, 
+        return ToDtoWithParticipating(workspace,
+            boards,
             userId,
             userRole,
             workspaceRole);
@@ -78,7 +78,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
             // Use separate method to not mix permission logic
             Boards = boards
                 .Where(b => BoardPolicy.CanView(globalRole, b.Visibility, workspaceRole, b.UserBoards
-                    .FirstOrDefault(ub=> ub.UserId == userId)?.Role ?? UserBoardRole.None))
+                    .FirstOrDefault(ub => ub.UserId == userId)?.Role ?? UserBoardRole.None))
                 .Select(b => new BoardSummaryDto
                 {
                     Id = b.Id,
@@ -86,8 +86,8 @@ public sealed class GetWorkspaceByIdQueryHandler(
                     IsParticipating = b.UserBoards.Any(ub => ub.UserId == userId),
                     Visibility = b.Visibility
                 })
-                .OrderBy(b=> b.IsParticipating)
-                .ThenByDescending(b=> b.Visibility)
+                .OrderBy(b => b.IsParticipating)
+                .ThenByDescending(b => b.Visibility)
                 .ToList()
         };
     }
