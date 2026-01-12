@@ -38,6 +38,20 @@ public static class BoardPolicy
         return false;
     }
 
+    public static bool CanChangeOwner(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole,
+        UserBoardRole boardRole)
+    {
+        if (globalRole >= GlobalRole.Admin ||
+            workspaceRole >= UserWorkspaceRole.Admin ||
+            boardRole == UserBoardRole.Owner)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool CanView(GlobalRole globalRole,
         BoardVisibility visibility,
         UserWorkspaceRole workspaceRole,

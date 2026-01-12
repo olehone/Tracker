@@ -13,16 +13,16 @@ public class UserWorkspaceRepository : Repository<UserWorkspace, Guid>, IUserWor
     {
     }
 
-    public async Task<UserWorkspace?> GetByUserAndWorkspace(Guid userId, Guid workspaceId)
+    public async Task<UserWorkspace?> GetByUserAndWorkspaceAsync(Guid userId, Guid workspaceId)
     {
         return await _dbSet
             .AsNoTracking()
             .FirstOrDefaultAsync(uw => uw.UserId == userId && uw.WorkspaceId == workspaceId);
     }
 
-    public async Task<UserWorkspaceRole> GetRole(Guid userId, Guid workspaceId)
+    public async Task<UserWorkspaceRole> GetRoleAsync(Guid userId, Guid workspaceId)
     {
-        var userWorkspace = await GetByUserAndWorkspace(userId, workspaceId);
+        var userWorkspace = await GetByUserAndWorkspaceAsync(userId, workspaceId);
         if (userWorkspace is null)
         {
             return UserWorkspaceRole.None;

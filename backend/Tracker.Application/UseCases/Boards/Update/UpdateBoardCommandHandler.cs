@@ -39,9 +39,9 @@ public class UpdateBoardCommandHandler(
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
         var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRole(userId, board.WorkspaceId);
+            .GetRoleAsync(userId, board.WorkspaceId);
         var boardRole = await uow.UserBoardRepository
-            .GetRole(userId, request.BoardId);
+            .GetRoleAsync(userId, request.BoardId);
         
         var workspacePermissions = WorkspacePolicy
             .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);

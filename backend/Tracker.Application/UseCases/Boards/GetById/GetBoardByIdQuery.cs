@@ -6,5 +6,5 @@ namespace Tracker.Application.UseCases.Boards.GetById;
 
 public class GetBoardByIdQuery : IRequest<Result<BoardFullDto>>
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; set; }
 }

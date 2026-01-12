@@ -36,9 +36,9 @@ public class GetBoardByIdQueryHandler(
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
         var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRole(userId, board.WorkspaceId);
+            .GetRoleAsync(userId, board.WorkspaceId);
         var boardRole = await uow.UserBoardRepository
-            .GetRole(userId, board.Id);
+            .GetRoleAsync(userId, board.Id);
 
         var permissions = BoardPolicy
             .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
