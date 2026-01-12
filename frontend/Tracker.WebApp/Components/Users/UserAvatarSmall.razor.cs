@@ -16,7 +16,7 @@ public partial class UserAvatarSmall
     {
         get
         {
-            _customColor ??= UiHelper.GetColorByString(User.Id);
+            _customColor ??= UiHelper.GetColorById(User.Id);
             return _customColor;
         }
     }
@@ -25,7 +25,7 @@ public partial class UserAvatarSmall
 
     public string GetUserColor()
     {
-        var value = UiHelper.GetColorByString(User!.Id);
+        var value = UiHelper.GetColorById(User!.Id);
         return value;
     }
 

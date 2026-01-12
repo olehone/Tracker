@@ -6,7 +6,7 @@
 <MudSnackbarProvider />
 
 <CascadingAuthenticationState>
-	<CascadingValue Value=@AppState>
+	<CascadingValue Value=@UserState>
 		<Router AppAssembly=@typeof(App).Assembly>
 			<Found Context="routeData">
 				<AuthorizeRouteView RouteData=@routeData

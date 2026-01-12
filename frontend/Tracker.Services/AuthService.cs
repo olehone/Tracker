@@ -76,7 +76,7 @@ public sealed class AuthService(
         return new ClaimsPrincipal(identity);
     }
 
-    private async Task<string?> GetAccessTokenAsync()
+    public async Task<string?> GetAccessTokenAsync()
     {
         var tokensDto = await storage.GetAsync();
         if (tokensDto is null)

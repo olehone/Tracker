@@ -14,7 +14,7 @@ public partial class UserAvatarBig
     {
         get
         {
-            _customColor ??= UiHelper.GetColorByString(User.Id);
+            _customColor ??= UiHelper.GetColorById(User.Id);
             return _customColor;
         }
     }

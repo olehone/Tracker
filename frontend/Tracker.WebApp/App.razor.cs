@@ -6,7 +6,7 @@ namespace Tracker.WebApp;
 
 public partial class App
 {
-    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private UserState UserState { get; set; } = null!;
     [Inject] private IAuthService AuthService { get; set; } = null!;
     [Inject] private IUserService UserService { get; set; } = null!;
     [Inject] private NavigationManager Nav { get; set; } = null!;
@@ -23,7 +23,7 @@ public partial class App
                 return;
             }
 
-            AppState.CurrentUser = result.Value;
+            UserState.CurrentUser = result.Value;
             StateHasChanged();
         }
     }

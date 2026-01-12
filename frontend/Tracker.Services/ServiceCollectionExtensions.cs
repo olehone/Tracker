@@ -54,7 +54,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthStateNotifier>(sp =>
             (CustomAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
 
-        services.AddScoped<AuthHeaderHandler>();
+        services.AddTransient<AuthHeaderHandler>();
         services.AddAuthorizationCore(options =>
         {
             options.AddPolicy("AdminOrHigher", policy =>

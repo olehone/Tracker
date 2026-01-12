@@ -12,7 +12,7 @@ public partial class Users
     [Inject] IErrorNotifier ErrorNotifier { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
-    private ServerLoadingTable<UserDto>? _table;
+    private ServerLoadingTable<UserDto>? _table = null!;
 
     private async Task<Paginated<UserDto>> LoadUsers(
         PaginatedSearchRequest request)

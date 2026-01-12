@@ -1,16 +1,15 @@
 ﻿using System.Net.Http.Headers;
-using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.Services.Auth;
 
-public class AuthHeaderHandler(IAuthStorage authStorage) : DelegatingHandler
+public class AuthHeaderHandler(IAuthService authService) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var tokensDto = await authStorage.GetAsync();
-        var token = tokensDto?.AccessToken;
+        var token = await authService.GetAccessTokenAsync();
         if (!string.IsNullOrWhiteSpace(token))
         {
             request.Headers.Authorization =

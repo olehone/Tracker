@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMudBlazorServices(this IServiceCollection services)
     {
         services.AddScoped<AppState>();
+        services.AddScoped<BoardState>();
         services.AddScoped<IErrorNotifier, GlobalSnackbarMessages>();
         services.AddScoped<IResultNotifier, GlobalSnackbarMessages>();
         services.AddBlazoredLocalStorage();

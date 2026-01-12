@@ -12,5 +12,6 @@ public interface IAuthService
     Task<Result> LoginAsync(LoginUserRequest request);
     Task<Result> RegisterAsync(RegisterUserRequest request);
     Task<Result> LogoutAsync();
+    Task<string?> GetAccessTokenAsync();
     Task<ClaimsPrincipal> GetPrincipalAsync();
 }

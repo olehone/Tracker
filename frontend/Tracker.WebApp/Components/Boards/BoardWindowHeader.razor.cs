@@ -1,54 +1,77 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Services;
-using Tracker.Services.Abstraction;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardWindowHeader
+public partial class BoardWindowHeader : IDisposable
 {
-    [Parameter]
-    public required BoardFullDto Board { get; set; }
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private BoardState BoardState { get; set; } = null!;
 
-    [Inject] IDialogService DialogService { get; set; } = null!;
-    [Inject] IBoardService BoardService { get; set; } = null!;
+    private BoardFullDto? Board => BoardState.CurrentBoard;
+
+    protected override void OnInitialized()
+    {
+        BoardState.OnChange += StateHasChanged;
+    }
 
     private async Task OpenSettings()
     {
-        var parameters = new DialogParameters
+        if (Board == null)
         {
-            { nameof(BoardSettingsDialog.Board), Board }
-        };
+            return;
+        }
+
         var settingsTitle = Board.Permissions.CanChangeBoard
             ? "Board settings"
             : "Board information";
 
         var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
             settingsTitle,
-            parameters,
             new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
         );
 
-        var result = await dialog.Result;
-        if(result is null || result.Canceled)
+        await dialog.Result;
+    }
+
+    private async Task OpenListsSwapMenu()
+    {
+        if (Board == null)
         {
             return;
         }
 
-        if (result.Data is true)
-        {
-            await ReloadBoard();
-        }
+        var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
+            $"Move lists of {Board.Title}",
+            new DialogOptions {CloseButton = true}
+        );
+
+        await dialog.Result;
     }
 
-    private async Task ReloadBoard()
+    private async Task OpenMembers()
     {
-        var result = await BoardService.GetBoardByIdAsync(Board.Id);
-        if (result.IsSuccess)
+        if (Board == null)
         {
-            Board = result.Value;
+            return;
         }
+
+        var settingsTitle = Board.Permissions.CanChangeBoard
+            ? "Board settings"
+            : "Board information";
+
+        var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
+            settingsTitle,
+            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+        );
+
+        await dialog.Result;
     }
 
+    public void Dispose()
+    {
+        BoardState.OnChange -= StateHasChanged;
+    }
 }
