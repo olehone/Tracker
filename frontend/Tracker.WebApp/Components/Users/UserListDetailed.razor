@@ -1,58 +1,69 @@
 @using Microsoft.AspNetCore.Authorization
 @using Tracker.WebApp.Components.Shared
 @using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.Workspaces
+@using Tracker.WebApp.Components.Users
 
-<MudTable T=@WorkspaceSummaryDto
+<MudTable T=@UserDto
 		  ServerData=@LoadServerData
 		  FixedFooter
 		  Dense
 		  Hover
-		  Height=@Height
 		  @ref=@_table>
 
 	<ToolBarContent>
-		@if (Title is not null)
-		{
-			<MudText Typo="Typo.h6">@Title</MudText>
-			<MudSpacer />
-		}
+		<MudText Typo="Typo.h6">Users</MudText>
+		<MudSpacer />
 		<MudTextField T="string"
 					  ValueChanged=@(s => SetSearch(s))
 					  TextUpdateSuppression="false"
-					  Variant=@SearchVariant
-					  Placeholder="Search title"
+					  Placeholder="Search username"
 					  DebounceInterval="500"
 					  Adornment="Adornment.Start"
 					  AdornmentIcon="@Icons.Material.Filled.Search" />
+
+
+
+
 	</ToolBarContent>
 
 	<HeaderContent>
-		<MudTh>Title</MudTh>
-		<MudTh>Description</MudTh>
-		<MudTh>Visibility</MudTh>
-		<MudTh>Link</MudTh>
+		<MudTh>Avatar</MudTh>
+		<MudTh>Username</MudTh>
+		<MudTh>Email</MudTh>
+		<MudTh>Name</MudTh>
+		<MudTh>Role</MudTh>
+		<MudTh>Profile</MudTh>
 	</HeaderContent>
 
 	<RowTemplate>
 		@if (context is not null)
 		{
-			<MudTd Class="text-ellipsis"
-				   Style="max-width:100px">
-				@context.Title
+			<MudTd>
+				<UserAvatarSmall User=@context
+								 Size="Size.Small" />
 			</MudTd>
 
 			<MudTd Class="text-ellipsis"
-				   Style="max-width:200px">
-				@context.Description
+				   Style="max-width:20vw">
+				@context.Username
 			</MudTd>
 
-			<MudTd Style="width:70px">
-				<WorkspaceVisibilityChip Visibility=@context.Visibility />
+			<MudTd Class="text-ellipsis"
+				   Style="max-width:20vw">
+				@context.Email
 			</MudTd>
 
-			<MudTd Style="width:20px">
-				<a href=@($"/workspaces/{context!.Id}/overview")>
+			<MudTd Class="text-ellipsis"
+				   Style="max-width:20vw">
+				@context.FirstName @context.LastName
+			</MudTd>
+
+			<MudTd>
+				<UserGlobalRoleChip Role=@context.Role />
+			</MudTd>
+
+			<MudTd>
+				<a href=@($"/users/{context!.Id}")>
 					<MudIcon Icon="@Icons.Material.Filled.OpenInNew"
 							 Size="Size.Small"
 							 Color="Color.Primary" />
@@ -60,9 +71,7 @@
 			</MudTd>
 		}
 	</RowTemplate>
-
 	<PagerContent>
 		<MudTablePager />
 	</PagerContent>
 </MudTable>
-

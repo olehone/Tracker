@@ -3,26 +3,20 @@ using MudBlazor;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 
-namespace Tracker.WebApp.Components.Workspaces;
+namespace Tracker.WebApp.Components.Users;
 
-public partial class WorkspaceList
+public partial class UserListDetailed
 {
     [Parameter, EditorRequired]
-    public Func<PaginatedSearchRequest, Task<Paginated<WorkspaceSummaryDto>>> LoadWorkspaces { get; set; }
+    public Func<PaginatedSearchRequest, Task<Paginated<UserDto>>> LoadUsers { get; set; }
     [Parameter]
     public string? Title { get; set; }
-    [Parameter]
-    public string? Height { get; set; }
 
-    private Variant SearchVariant => Title is null 
-        ? Variant.Outlined 
-        : Variant.Text;
-    
-    private MudTable<WorkspaceSummaryDto>? _table;
+    private MudTable<UserDto>? _table;
 
     private string? _search;
 
-    private async Task<TableData<WorkspaceSummaryDto>> LoadServerData(
+    private async Task<TableData<UserDto>> LoadServerData(
         TableState state,
         CancellationToken cancellationToken)
     {
@@ -33,9 +27,9 @@ public partial class WorkspaceList
             AmountInPage = state.PageSize
         };
 
-        var result = await LoadWorkspaces(request);
+        var result = await LoadUsers(request);
 
-        return new TableData<WorkspaceSummaryDto>
+        return new TableData<UserDto>
         {
             TotalItems = result.TotalCount,
             Items = result.Items

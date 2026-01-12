@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.Users;
-public partial class SelectRole
+
+public partial class UserGlobalRoleSelect
 {
     [Parameter]
     public GlobalRole Value { get; set; }

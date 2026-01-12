@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.Boards;
-public partial class SelectRole
+public partial class BoardVisibilitySelect
 {
     [Parameter]
-    public BoardPermissionRole Value { get; set; }
+    public BoardVisibility Value { get; set; }
     [Parameter]
-    public EventCallback<BoardPermissionRole> ValueChanged { get; set; }
+    public EventCallback<BoardVisibility> ValueChanged { get; set; }
     [Parameter]
     public required string Label { get; set; }
 }

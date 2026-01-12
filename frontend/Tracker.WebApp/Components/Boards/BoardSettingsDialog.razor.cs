@@ -8,7 +8,8 @@ using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Boards;
-public partial class SettingsDialog
+
+public partial class BoardSettingsDialog
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;

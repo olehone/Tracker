@@ -15,18 +15,18 @@
 						  Lines="3"
 						  Variant="Variant.Outlined" />
 
-			<SelectVisibility @bind-value=@model.Visibility />
+			<BoardVisibilitySelect @bind-value=@model.Visibility />
 
-			<SelectRole @bind-value=@model.PermissionRoles.MinCreateListRole
+			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
 						Label="Who can create lists" />
 
-			<SelectRole @bind-value=@model.PermissionRoles.MinChangeListRole
+			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
 						Label="Who can change lists" />
 
-			<SelectRole @bind-value=@model.PermissionRoles.MinCreateItemRole
+			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
 						Label="Who can create items" />
 
-			<SelectRole @bind-value=@model.PermissionRoles.MinChangeItemRole
+			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
 						Label="Who can change items" />
 
 
