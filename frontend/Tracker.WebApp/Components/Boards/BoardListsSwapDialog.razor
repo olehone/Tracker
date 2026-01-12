@@ -1,7 +1,7 @@
 ﻿@using Tracker.WebApp.Components.BoardLists
 @using Tracker.Domain.Dtos
 
-<MudDialog>
+<MudDialog >
 	<DialogContent>
 		<MudDropContainer T=@BoardListDto
 						  Items=@Lists
@@ -12,26 +12,15 @@
 				<MudDropZone T=@BoardListDto
 							 Identifier="List drop zone"
 							 AllowReorder
-							 Class="rounded mud-background-gray pa-6 ma-8 flex-grow-1">
-					<MudText Typo="Typo.h6"
-							 Class="mb-4">
-						@BoardState.CurrentBoard?.Title
-					</MudText>
+							 Class="rounded mud-background-gray pa-3 ma-0 flex-grow-1">
 				</MudDropZone>
 			</ChildContent>
 			<ItemRenderer>
 				<MudPaper Elevation="25"
 						  Class="pa-4 my-4">
 					@context.Title
-					@context.Position
 				</MudPaper>
 			</ItemRenderer>
 		</MudDropContainer>
-
 	</DialogContent>
-	<DialogActions>
-		<MudButton OnClick="Cancel">Cancel</MudButton>
-
-		<MudButton Color="Color.Primary" OnClick="Submit">OK</MudButton>
-	</DialogActions>
 </MudDialog>

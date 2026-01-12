@@ -34,7 +34,5 @@ public partial class BoardListsSwapDialog
         );
     }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
-
-    private void Cancel() => MudDialog.Cancel();
+    private void Cancel() => MudDialog.Close(DialogResult.Ok(true));
 }

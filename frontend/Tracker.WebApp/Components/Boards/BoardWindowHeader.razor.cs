@@ -44,8 +44,8 @@ public partial class BoardWindowHeader : IDisposable
         }
 
         var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
-            "Lists",
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            $"Move lists of {Board.Title}",
+            new DialogOptions {CloseButton = true}
         );
 
         await dialog.Result;
