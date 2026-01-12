@@ -5,7 +5,7 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardLists
+public partial class BoardOverview
 {
     private MudDropContainer<BoardItemDto> _container = null!;
 
