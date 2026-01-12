@@ -300,7 +300,6 @@ public class BoardState(
         }
     }
 
-
     private static void ShiftLists(BoardFullDto board, int newPosition, int oldPosition)
     {
         foreach (var l in board.BoardLists)
