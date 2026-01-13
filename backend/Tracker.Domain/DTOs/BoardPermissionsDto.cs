@@ -9,6 +9,7 @@ public class BoardPermissionsDto
         CanChangeItem = false,
         CanCreateList = false,
         CanChangeList = false,
+        CanChangeOwner = false,
     };
 
     public static readonly BoardPermissionsDto All = new()
@@ -18,6 +19,7 @@ public class BoardPermissionsDto
         CanChangeItem = true,
         CanCreateList = true,
         CanChangeList = true,
+        CanChangeOwner = true,
     };
 
     public required bool CanChangeBoard { get; set; }
@@ -25,4 +27,5 @@ public class BoardPermissionsDto
     public required bool CanChangeItem { get; set; }
     public required bool CanCreateList { get; set; }
     public required bool CanChangeList { get; set; }
+    public required bool CanChangeOwner { get; set; }
 }

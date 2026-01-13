@@ -5,7 +5,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardUsers.Change;
 
-public class ChangeUserRoleCommand : IRequest<Result<BoardUserDto>>
+public class ChangeUserRoleCommand : IRequest<Result>
 {
     public required Guid BoardId { get; set; }
     public required Guid UserId { get; set; }

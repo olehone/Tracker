@@ -11,10 +11,10 @@ namespace Tracker.Application.UseCases.BoardUsers.Get;
 public class GetUsersByBoardIdQueryHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetUsersByBoardIdQuery, Result<List<BoardUserDto>>>
+    : IRequestHandler<SearchToAddByBoardIdQuery, Result<List<BoardUserDto>>>
 {
     public async Task<Result<List<BoardUserDto>>> Handle(
-        GetUsersByBoardIdQuery request,
+        SearchToAddByBoardIdQuery request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();

@@ -55,7 +55,7 @@ public class ChangeUserRoleCommandHandler(
 
         if (request.Role == UserBoardRole.Owner)
         {
-            if (!BoardPolicy.CanChangeOwner(userRole, workspaceRole, boardRole))
+            if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeOwner))
             {
                 return AuthErrors.Forbidden();
             }
