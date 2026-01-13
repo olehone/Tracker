@@ -15,10 +15,10 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardsUsersController(IMediator mediator) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetUsersByBoardAsync(Guid boardId)
+    [HttpGet("{Id:guid}")]
+    public async Task<IActionResult> GetUsersByBoardAsync([FromRoute] GetByIdRequest request)
     {
-        var mediatorRequest = new GetUsersByBoardIdQuery { BoardId = boardId };
+        var mediatorRequest = new SearchToAddByBoardIdQuery { BoardId = request.Id };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
@@ -50,7 +50,8 @@ public class BoardsUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> RemoveUserFromBoard([FromBody] RemoveUserFromBoardRequest request)
+    public async Task<IActionResult> RemoveUserFromBoardAsync(
+        [FromBody] RemoveUserFromBoardRequest request)
     {
         var mediatorRequest = new RemoveUserFromBoardCommand
         {
