@@ -21,7 +21,7 @@ public class BoardUserService(IApiErrorHandler apiErrorHandler, IBoardUserApi ap
         return apiErrorHandler.ExecuteAsync(request, api.AddUserToBoardAsync);
     }
 
-    public Task<Result<BoardUserDto>> ChangeUserRoleAsync(ChangeUserBoardRequest request)
+    public Task<Result> ChangeUserRoleAsync(ChangeUserBoardRequest request)
     {
         return apiErrorHandler.ExecuteAsync(request, api.ChangeUserRoleAsync);
     }

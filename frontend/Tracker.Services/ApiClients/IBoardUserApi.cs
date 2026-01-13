@@ -11,7 +11,7 @@ public interface IBoardUserApi
     [Post("/api/boards-users")]
     Task<ApiResponse<BoardUserDto>> AddUserToBoardAsync(AddUserToBoardRequest request);
     [Put("/api/boards-users")]
-    Task<ApiResponse<BoardUserDto>> ChangeUserRoleAsync(ChangeUserBoardRequest request);
+    Task<ApiResponse<object>> ChangeUserRoleAsync(ChangeUserBoardRequest request);
     [Delete("/api/boards-users")]
     Task<ApiResponse<object>> RemoveUserFromBoardAsync(RemoveUserFromBoardRequest request);
 }

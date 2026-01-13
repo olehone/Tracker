@@ -1,10 +1,10 @@
 @using Tracker.Domain.Enums
 
+
 <MudSelect Value=@Value
 		   ValueChanged=@ValueChanged
-		   Label=@Label
 		   Dense
-		   Variant="Variant.Outlined">
+		   Variant="Variant.Text">
 	<MudSelectItem Value=@UserBoardRole.Observer>
 		<MudStack Row>
 			<MudIcon Icon=@Icons.Material.Filled.Visibility /> Observer
@@ -22,8 +22,4 @@
 			<MudIcon Icon=@Icons.Material.Filled.AdminPanelSettings /> Admin
 		</MudStack>
 	</MudSelectItem>
-	@if (Owner is not null)
-	{
-		@Owner
-	}
 </MudSelect>

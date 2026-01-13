@@ -1,15 +1,12 @@
-using System.Net.Http;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Components.Users;
 using Tracker.WebApp.States;
-using static MudBlazor.CategoryTypes;
 
-namespace Tracker.WebApp.Components.Boards;
+namespace Tracker.WebApp.Components.BoardUsers;
 
 public partial class BoardMembersDialog
 {
@@ -21,9 +18,9 @@ public partial class BoardMembersDialog
     public required UserBoardRole CurrentUserRole { get; set; }
 
     [Inject] private BoardState BoardState { get; set; } = null!;
-    [Inject] IBoardUserService BoardUserService { get; set; } = null!;
-    [Inject] IUserService UserService { get; set; } = null!;
-    [Inject] IDialogService DialogService { get; set; } = null!;
+    [Inject] private IBoardUserService BoardUserService { get; set; } = null!;
+    [Inject] private IUserService UserService { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private List<BoardUserDto> _members = [];
     private bool _isLoading = true;
@@ -75,6 +72,11 @@ public partial class BoardMembersDialog
         return _members.Any(u => u.User.Id == user.Id);
     }
 
+    private static bool IsMemberDisabled(BoardUserDto user)
+    {
+        return user.Role == UserBoardRole.Owner;
+    }
+
     private async Task AddUser()
     {
         if (_selectedUser is null)
@@ -91,7 +93,7 @@ public partial class BoardMembersDialog
         var result = await BoardUserService.AddUserToBoardAsync(request);
         if (result.IsSuccess)
         {
-            await LoadMembers();
+            _members.Add(result.Value);
         }
     }
 
@@ -99,7 +101,6 @@ public partial class BoardMembersDialog
     {
         if (newRole == UserBoardRole.Owner)
         {
-            await ShowTransferOwnershipDialog(member);
             return;
         }
 
@@ -118,7 +119,7 @@ public partial class BoardMembersDialog
 
     private async Task ShowTransferOwnershipDialog(BoardUserDto member)
     {
-        if (CurrentUserRole != UserBoardRole.Owner)
+        if (!Board.Permissions.CanChangeOwner)
         {
             return;
         }
@@ -179,32 +180,13 @@ public partial class BoardMembersDialog
         }
     }
 
-    private string GetRoleIcon(UserBoardRole role)
-    {
-        return role switch
-        {
-            UserBoardRole.Owner => Icons.Material.Filled.Star,
-            UserBoardRole.Admin => Icons.Material.Filled.AdminPanelSettings,
-            UserBoardRole.Member => Icons.Material.Filled.Person,
-            UserBoardRole.Observer => Icons.Material.Filled.Visibility,
-            _ => Icons.Material.Filled.PersonOff
-        };
-    }
-
-    private Color GetRoleColor(UserBoardRole role)
-    {
-        return role switch
-        {
-            UserBoardRole.Owner => Color.Warning,
-            UserBoardRole.Admin => Color.Error,
-            UserBoardRole.Member => Color.Primary,
-            UserBoardRole.Observer => Color.Info,
-            _ => Color.Default
-        };
-    }
-
     private bool CanChangeMembers()
     {
         return Board.Permissions.CanChangeBoard;
+    }
+
+    private bool CanChangeMember(BoardUserDto member)
+    {
+        return CanChangeMembers() && member.Role != UserBoardRole.Owner;
     }
 }

@@ -9,6 +9,6 @@ public interface IBoardUserService
 {
     Task<Result<List<BoardUserDto>>> GetUsersByBoardAsync(GetByIdRequest request);
     Task<Result<BoardUserDto>> AddUserToBoardAsync(AddUserToBoardRequest request);
-    Task<Result<BoardUserDto>> ChangeUserRoleAsync(ChangeUserBoardRequest request);
+    Task<Result> ChangeUserRoleAsync(ChangeUserBoardRequest request);
     Task<Result> RemoveUserFromBoardAsync(RemoveUserFromBoardRequest request);
 }

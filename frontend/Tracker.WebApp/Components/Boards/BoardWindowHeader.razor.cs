@@ -60,7 +60,7 @@ public partial class BoardWindowHeader : IDisposable
 
         var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
             "Members",
-            new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true }
+            new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true }
         );
 
         await dialog.Result;

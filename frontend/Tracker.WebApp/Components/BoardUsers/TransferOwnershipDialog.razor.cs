@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Tracker.WebApp.Components.Boards;
+namespace Tracker.WebApp.Components.BoardUsers;
+
 public partial class TransferOwnershipDialog
 {
     [CascadingParameter]
