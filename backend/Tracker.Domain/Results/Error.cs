@@ -19,4 +19,9 @@ public sealed record Error(
         ErrorType.NotFound,
         $"{entityName} with this {propertyName} not found");
 
+    public static Error AlreadyExists(string memberType, string containerType, string memberName) => new(
+        $"{containerType}.{memberType}.AlreadyMember",
+        ErrorType.Conflict,
+        $"{memberName} is already a member of this {containerType}");
+
 }

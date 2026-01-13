@@ -27,11 +27,16 @@ else
 			{
 				<MudTooltip Text="Move lists">
 					<MudIconButton Icon=@Icons.Material.Filled.SwapHoriz
-								   OnClick=@OpenListsSwapMenu />
+								   OnClick=@OpenListsSwap />
 				</MudTooltip>
 			}
 			@if (Board.Permissions.CanChangeBoard)
 			{
+				<MudTooltip Text="Members">
+					<MudIconButton Icon=@Icons.Material.Outlined.People
+								   OnClick=@OpenMembers />
+				</MudTooltip>
+
 				<MudTooltip Text="Settings">
 					<MudIconButton Icon=@Icons.Material.Outlined.Settings
 								   OnClick=@OpenSettings />

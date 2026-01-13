@@ -32,6 +32,13 @@ public class AddUserToBoardCommandHandler(
             return Error.NotFound("User");
         }
 
+        var userBoard = await uow.UserBoardRepository
+            .GetByUserAndBoardAsync(request.UserId, request.BoardId);
+        if (userBoard is not null)
+        {
+            return Error.AlreadyExists("User", "Board", user.Username);
+        }
+
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
         var workspaceRole = await uow.UserWorkspaceRepository

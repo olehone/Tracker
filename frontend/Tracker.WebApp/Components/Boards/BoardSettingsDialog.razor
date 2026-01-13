@@ -17,19 +17,17 @@
 
 			<BoardVisibilitySelect @bind-value=@model.Visibility />
 
-			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
+			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
 						Label="Who can create lists" />
 
-			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
+			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
 						Label="Who can change lists" />
 
-			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
+			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
 						Label="Who can create items" />
 
-			<BoardRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
+			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
 						Label="Who can change items" />
-
-
 		</MudForm>
 	</DialogContent>
 	<DialogActions>

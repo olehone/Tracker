@@ -1,42 +1,29 @@
 @using Tracker.Domain.Enums
 
 <MudSelect Value=@Value
-           ValueChanged=@ValueChanged
+		   ValueChanged=@ValueChanged
 		   Label=@Label
+		   Dense
 		   Variant="Variant.Outlined">
-	<MudSelectItem Value=@BoardPermissionRole.Any>
+	<MudSelectItem Value=@UserBoardRole.Observer>
 		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.Public /> Anyone
+			<MudIcon Icon=@Icons.Material.Filled.Visibility /> Observer
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@BoardPermissionRole.Observer>
+	<MudSelectItem Value=@UserBoardRole.Member>
 		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.Hail /> Observers and higher
+			<MudIcon Icon=@Icons.Material.Filled.Person /> Member
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@BoardPermissionRole.Member>
+	<MudSelectItem Value=@UserBoardRole.Admin>
 		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.Group /> Members and higher
+			<MudIcon Icon=@Icons.Material.Filled.AdminPanelSettings /> Admin
 		</MudStack>
 	</MudSelectItem>
-
-	<MudSelectItem Value=@BoardPermissionRole.Admin>
-		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.Groups /> Admin and higher
-		</MudStack>
-	</MudSelectItem>
-
-	<MudSelectItem Value=@BoardPermissionRole.Owner>
-		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.Person /> Owner only
-		</MudStack>
-	</MudSelectItem>
-
-	<MudSelectItem Value=@BoardPermissionRole.None>
-		<MudStack Row>
-			<MudIcon Icon=@Icons.Material.Filled.PersonOff /> Nobody
-		</MudStack>
-	</MudSelectItem>
+	@if (Owner is not null)
+	{
+		@Owner
+	}
 </MudSelect>

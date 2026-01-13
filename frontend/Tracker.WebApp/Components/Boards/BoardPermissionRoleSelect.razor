@@ -1,0 +1,42 @@
+@using Tracker.Domain.Enums
+
+<MudSelect Value=@Value
+           ValueChanged=@ValueChanged
+		   Label=@Label
+		   Variant="Variant.Outlined">
+	<MudSelectItem Value=@BoardPermissionRole.Any>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Public /> Anyone
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardPermissionRole.Observer>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Visibility /> Observers and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardPermissionRole.Member>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Person /> Members and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardPermissionRole.Admin>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.AdminPanelSettings /> Admin and higher
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardPermissionRole.Owner>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Star /> Owner only
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@BoardPermissionRole.None>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.PersonOff /> Nobody
+		</MudStack>
+	</MudSelectItem>
+</MudSelect>

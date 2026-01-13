@@ -1,5 +1,123 @@
-﻿<MudDialog>
-	<DialogContent>
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.Users
+@using static MudBlazor.CategoryTypes
 
+<MudDialog>
+	<DialogContent>
+		<MudStack Spacing="3">
+			@if (CanChangeMembers())
+			{
+				<MudPaper Elevation="0" Class="pa-4">
+					<MudGrid>
+						<MudItem xs="12" md="8">
+							<MudAutocomplete T=@UserDto
+											 @bind-Value=@_selectedUser
+											 ResetValueOnEmptyText
+											 Label="Search users to add"
+											 SearchFunc=@Search
+											 ItemDisabledFunc=@IsUserMember
+											 ToStringFunc=@(u=> u==null?null : $"{u.Username}")>
+								<ItemDisabledTemplate>
+									<MudText> @context.Username</MudText>
+								</ItemDisabledTemplate>
+							</MudAutocomplete>
+						</MudItem>
+						<MudItem xs="12" md="4">
+							<BoardRoleSelect @bind-Value=@_selectedRole />
+						</MudItem>
+						@if (_selectedUser is not null)
+						{
+							<MudItem xs="12" md="12">
+								<MudButton Color="Color.Primary"
+										   Variant="Variant.Outlined"
+										   FullWidth>
+									Add user
+								</MudButton>
+							</MudItem>
+						}
+					</MudGrid>
+				</MudPaper>
+			}
+
+			<MudPaper Elevation="0" Class="pa-4">
+				<MudText Typo="Typo.h6" Class="mb-3">Board Members (@_members.Count)</MudText>
+
+				@if (_isLoading)
+				{
+					<MudProgressCircular Indeterminate
+										 Size="Size.Small" />
+				}
+				else
+				{
+					<MudPaper Elevation="0"
+							  Style="max-height: 400px; overflow-y: auto;"
+							  Class="pa-2">
+						<MudList T=@BoardUserDto
+								 Dense>
+							@foreach (var member in _members.OrderByDescending(m => m.Role))
+							{
+								<MudListItem>
+									<MudGrid>
+										<MudItem xs="5">
+											<MudStack Row
+													  AlignItems="AlignItems.Center"
+													  Spacing="2">
+												<UserAvatarSmall User=@member.User
+																 Size="Size.Small" />
+												<MudText>@member.User.Username</MudText>
+												<a href=@($"/users/{member.User.Id}")>
+													<MudIcon Icon="@Icons.Material.Filled.OpenInNew"
+															 Size="Size.Small"
+															 Color="Color.Primary" />
+												</a>
+											</MudStack>
+										</MudItem>
+
+										@if (CanChangeMembers())
+										{
+											<MudItem xs="5">
+												<BoardRoleSelect Value=@member.Role
+																 ValueChanged=@(role => OnRoleChanged(member, role))>
+													<Owner>
+														@if (CurrentUserRole == UserBoardRole.Owner)
+														{
+															<MudDivider />
+															<MudSelectItem Value=@UserBoardRole.Owner>
+																<MudStack Row>
+																	<MudIcon Icon=@Icons.Material.Filled.Star />
+																	<MudText Color="Color.Error">
+																		Transfer ownership
+																	</MudText>
+																</MudStack>
+															</MudSelectItem>
+														}
+													</Owner>
+												</BoardRoleSelect>
+											</MudItem>
+											<MudItem xs="2" Class="d-flex justify-end">
+												<MudIconButton Icon=@Icons.Material.Filled.Delete
+															   Color="Color.Error"
+															   Size="Size.Small"
+															   OnClick="@(() => OnRemoveMember(member))" />
+											</MudItem>
+										}
+										else
+										{
+											<MudChip Icon="@GetRoleIcon(member.Role)"
+													 Color="@GetRoleColor(member.Role)"
+													 Size="Size.Small">
+												@member.Role.ToString()
+											</MudChip>
+										}
+									</MudGrid>
+								</MudListItem>
+								<MudDivider />
+							}
+						</MudList>
+					</MudPaper>
+				}
+			</MudPaper>
+		</MudStack>
 	</DialogContent>
 </MudDialog>

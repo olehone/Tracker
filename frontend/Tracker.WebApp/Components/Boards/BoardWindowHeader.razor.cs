@@ -36,7 +36,7 @@ public partial class BoardWindowHeader : IDisposable
         await dialog.Result;
     }
 
-    private async Task OpenListsSwapMenu()
+    private async Task OpenListsSwap()
     {
         if (Board == null)
         {
@@ -45,7 +45,7 @@ public partial class BoardWindowHeader : IDisposable
 
         var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
             $"Move lists of {Board.Title}",
-            new DialogOptions {CloseButton = true}
+            new DialogOptions { CloseButton = true }
         );
 
         await dialog.Result;
@@ -58,13 +58,9 @@ public partial class BoardWindowHeader : IDisposable
             return;
         }
 
-        var settingsTitle = Board.Permissions.CanChangeBoard
-            ? "Board settings"
-            : "Board information";
-
         var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
-            settingsTitle,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            "Members",
+            new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true }
         );
 
         await dialog.Result;
