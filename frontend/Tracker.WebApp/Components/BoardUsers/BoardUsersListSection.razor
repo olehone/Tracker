@@ -25,7 +25,6 @@ else
 					 Dense
 					 ReadOnly>
 
-
 				@foreach (var boardUser in Users.BoardUsers.OrderByDescending(m => m.Role))
 				{
 					<BoardUserListItem @key=boardUser.User.Id BoardUser=boardUser />

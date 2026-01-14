@@ -19,6 +19,7 @@
 								 ItemDisabledFunc=@Users.IsUserMember
 								 AdornmentIcon=@Icons.Material.Filled.Search
 								 ToStringFunc=@(u => u == null ? null : $"{u.Username}")>
+
 					<ItemDisabledTemplate>
 						<MudText>@context.Username</MudText>
 					</ItemDisabledTemplate>
@@ -43,7 +44,6 @@
 					<MudDivider Vertical />
 
 					<MudIcon Icon=@Icons.Material.Filled.PersonAdd />
-
 				</MudButton>
 			</MudItem>
 		</MudGrid>
