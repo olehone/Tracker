@@ -76,6 +76,7 @@ public sealed class BoardUsersState
         {
             return;
         }
+
         _boardUsers.Add(result.Value);
         Notify();
     }
@@ -87,6 +88,7 @@ public sealed class BoardUsersState
         {
             return;
         }
+
         boardUser.Role = newRole;
         Notify();
     }
@@ -103,6 +105,7 @@ public sealed class BoardUsersState
         {
             return;
         }
+
         _boardUsers.Remove(boardUser);
         Notify();
     }
@@ -119,6 +122,7 @@ public sealed class BoardUsersState
         {
             return;
         }
+
         var previousOwner = _boardUsers.FirstOrDefault(u => u.Role == UserBoardRole.Owner);
         if (previousOwner is not null)
         {

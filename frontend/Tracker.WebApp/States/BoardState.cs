@@ -12,7 +12,7 @@ public sealed class BoardState
     private readonly IBoardService _boardService;
     private readonly IBoardListService _boardListService;
     private readonly IBoardItemService _boardItemService;
-    private readonly IResultNotifier _notifier;
+    private readonly IErrorNotifier _notifier;
 
     private BoardFullDto? _currentBoard;
 
@@ -29,7 +29,7 @@ public sealed class BoardState
         IBoardItemService boardItemService,
         IBoardUserService boardUserService,
         IUserService userService,
-        IResultNotifier notifier)
+        IErrorNotifier notifier)
     {
         _boardService = boardService;
         _boardListService = boardListService;
@@ -45,15 +45,15 @@ public sealed class BoardState
         Notify();
 
         var boardResult = await _boardService.GetBoardByIdAsync(boardId);
-        if (boardResult.IsSuccess)
+
+        if (_notifier.NotifyIfError(boardResult))
         {
-            _currentBoard = boardResult.Value;
-        await Users.LoadAsync();
+            _currentBoard = null;
         }
         else
         {
-            _currentBoard = null;
-            _notifier.Notify(boardResult);
+            _currentBoard = boardResult.Value;
+            await Users.LoadAsync();
         }
 
         IsLoading = false;
@@ -68,9 +68,8 @@ public sealed class BoardState
         }
 
         var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
-        _notifier.Notify(result);
 
-        if (!result.IsSuccess)
+        if (_notifier.NotifyIfError(result))
         {
             return false;
         }
@@ -93,7 +92,7 @@ public sealed class BoardState
         };
 
         var result = await _boardListService.CreateBoardListAsync(request);
-        if (!result.IsSuccess)
+        if (_notifier.NotifyIfError(result))
         {
             return false;
         }
@@ -116,8 +115,10 @@ public sealed class BoardState
         };
 
         var result = await _boardListService.MoveBoardListAsync(request);
-        if (!result.IsSuccess)
+        if (_notifier.NotifyIfError(result))
+        {
             return false;
+        }
 
         ApplyListMoved(listId, newPosition);
         return true;
@@ -137,8 +138,10 @@ public sealed class BoardState
         };
 
         var result = await _boardItemService.CreateBoardItemAsync(request);
-        if (!result.IsSuccess)
+        if (_notifier.NotifyIfError(result))
+        {
             return false;
+        }
 
         ApplyItemCreated(result.Value);
         return true;
@@ -161,7 +164,7 @@ public sealed class BoardState
         ApplyItemMoved(request);
 
         var result = await _boardItemService.MoveBoardItemAsync(request);
-        if (result.IsFailure)
+        if (_notifier.NotifyIfError(result))
         {
             await LoadAsync(_currentBoard.Id);
             return false;
