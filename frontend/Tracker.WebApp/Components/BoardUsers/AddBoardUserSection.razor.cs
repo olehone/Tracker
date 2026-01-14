@@ -7,17 +7,8 @@ namespace Tracker.WebApp.Components.BoardUsers;
 
 public partial class AddBoardUserSection
 {
-    [CascadingParameter]
-    private BoardState BoardState { get; set; } = null!;
-
     private UserDto? _selectedUser;
     private UserBoardRole _selectedRole = UserBoardRole.Observer;
-    private BoardUsersState Users => BoardState.Users;
-
-    protected override void OnInitialized()
-    {
-        BoardState.OnChange += StateHasChanged;
-    }
 
     private async Task AddUser()
     {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
-using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.BoardUsers;
 

@@ -7,16 +7,9 @@ namespace Tracker.WebApp.Components.BoardUsers;
 
 public partial class BoardUserActions
 {
-    [CascadingParameter]
-    private BoardState BoardState { get; set; } = null!;
 
     [Parameter, EditorRequired]
     public BoardUserDto BoardUser { get; set; }
-
-    protected override void OnInitialized()
-    {
-        BoardState.OnChange += StateHasChanged;
-    }
 
     private bool CanChange()
     {

@@ -1,8 +1,9 @@
 ﻿@using Tracker.Domain.Dtos
 @using Tracker.Domain.Enums
+@inherits BoardUsersSubscribeBase
 
 @if (Users.CanChangeMembers())
-{
+{ 
 	<MudPaper Elevation="0"
 			  Class="pa-4">
 		<MudGrid Class="align-end">
