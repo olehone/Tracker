@@ -1,0 +1,39 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@inherits BoardUsersSubscribeBase
+
+@if (BoardState.IsLoading)
+{
+	<MudProgressCircular Indeterminate
+						 Size=@Size.Small />
+}
+else
+{
+	<MudPaper Elevation="0"
+			  Class="pa-4">
+
+		<MudText Typo=@Typo.h6
+				 Class="mb-3">
+			Board Members (@Users.BoardUsers.Count)
+		</MudText>
+
+		<MudPaper Elevation="0"
+				  Style="max-height: 400px; overflow-y: auto;"
+				  Class="pa-2">
+
+			<MudList T=@BoardUserDto
+					 Dense
+					 ReadOnly>
+
+
+				@foreach (var boardUser in Users.BoardUsers.OrderByDescending(m => m.Role))
+				{
+					<BoardUserListItem @key=boardUser.User.Id BoardUser=boardUser />
+					<MudDivider />
+				}
+
+			</MudList>
+
+		</MudPaper>
+	</MudPaper>
+}

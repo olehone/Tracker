@@ -1,0 +1,29 @@
+@using Tracker.Domain.Enums
+
+<MudSelect Value=@Role
+		   ValueChanged=@RoleChanged
+		   Dense
+		   Variant=@Variant.Text>
+
+	<MudSelectItem Value=@UserBoardRole.Observer>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Visibility />
+			Observer
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@UserBoardRole.Member>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.Person />
+			Member
+		</MudStack>
+	</MudSelectItem>
+
+	<MudSelectItem Value=@UserBoardRole.Admin>
+		<MudStack Row>
+			<MudIcon Icon=@Icons.Material.Filled.AdminPanelSettings />
+			Admin
+		</MudStack>
+	</MudSelectItem>
+
+</MudSelect>

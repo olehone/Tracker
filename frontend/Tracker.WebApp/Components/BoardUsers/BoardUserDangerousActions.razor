@@ -1,0 +1,19 @@
+@using Tracker.Domain.Enums
+
+<MudMenu Icon=@Icons.Material.Filled.MoreVert
+		 Size=@Size.Small
+		 AriaLabel="Dangerous zone">
+
+	<MudMenuItem Label="Transfer ownership"
+				 Icon=@BoardRoleHelper.GetRoleIcon(UserBoardRole.Owner)
+				 IconColor=@BoardRoleHelper.GetRoleColor(UserBoardRole.Owner)
+				 OnClick=@(() => ShowTransferOwnershipDialog()) />
+
+	<MudMenuItem Icon=@Icons.Material.Filled.Delete
+				 IconColor=@Color.Error
+				 Label="Remove"
+				 OnClick=@(() => Users.RemoveBoardUserAsync(BoardUser)) />
+
+</MudMenu>
+
+

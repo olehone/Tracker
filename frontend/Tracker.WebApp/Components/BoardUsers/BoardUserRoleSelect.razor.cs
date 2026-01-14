@@ -3,10 +3,10 @@ using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.BoardUsers;
 
-public partial class BoardRoleSelect
+public partial class BoardUserRoleSelect
 {
     [Parameter]
-    public UserBoardRole Value { get; set; }
+    public UserBoardRole Role { get; set; }
     [Parameter]
-    public EventCallback<UserBoardRole> ValueChanged { get; set; }
+    public EventCallback<UserBoardRole> RoleChanged { get; set; }
 }

@@ -1,0 +1,14 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.BoardUsers
+
+<CascadingValue Value="BoardState">
+	<MudDialog>
+		<DialogContent>
+			<MudStack Spacing="3">
+				<AddBoardUserSection />
+				<BoardUsersListSection />
+			</MudStack>
+		</DialogContent>
+	</MudDialog>
+</CascadingValue>
