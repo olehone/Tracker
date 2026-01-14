@@ -7,14 +7,13 @@ namespace Tracker.WebApp.Components.Boards;
 
 public partial class BoardListsSwapDialog
 {
-    private MudDropContainer<BoardListDto> _container = null!;
-    
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter, EditorRequired]
+    public BoardState BoardState { get; set; } = null!;
 
-    [Inject] private BoardState BoardState { get; set; } = null!;
-
-    private List<BoardListDto>? Lists => BoardState.CurrentBoard?.BoardLists;
+    private MudDropContainer<BoardListDto> _container = null!;
+    private List<BoardListDto>? Lists => BoardState.Board?.BoardLists;
 
     protected override void OnInitialized()
     {

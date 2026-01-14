@@ -1,54 +1,56 @@
-﻿<MudDialog>
-	<DialogContent>
-		<MudForm @ref=@_form
-				 Model=@model
-				 Validation=@validator
-				 ValidationDelay="300"
-				 Disabled=@IsDisabled()>
-			<MudTextField @bind-Value=@model.Title
-						  Label="Title"
-						  Required
-						  Variant="Variant.Outlined" />
+﻿<CascadingValue Value="BoardState">
+	<MudDialog>
+		<DialogContent>
+			<MudForm @ref=@_form
+					 Model=@model
+					 Validation=@validator
+					 ValidationDelay="300"
+					 Disabled=@IsDisabled()>
+				<MudTextField @bind-Value=@model.Title
+							  Label="Title"
+							  Required
+							  Variant="Variant.Outlined" />
 
-			<MudTextField @bind-Value=@model.Description
-						  Label="Description"
-						  Lines="3"
-						  Variant="Variant.Outlined" />
+				<MudTextField @bind-Value=@model.Description
+							  Label="Description"
+							  Lines="3"
+							  Variant="Variant.Outlined" />
 
-			<BoardVisibilitySelect @bind-value=@model.Visibility />
+				<BoardVisibilitySelect @bind-value=@model.Visibility />
 
-			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
-						Label="Who can create lists" />
+				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
+										   Label="Who can create lists" />
 
-			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
-						Label="Who can change lists" />
+				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
+										   Label="Who can change lists" />
 
-			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
-						Label="Who can create items" />
+				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
+										   Label="Who can create items" />
 
-			<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
-						Label="Who can change items" />
-		</MudForm>
-	</DialogContent>
-	<DialogActions>
-		<MudButton OnClick="Cancel">
-			<MudText>Cancel</MudText>
-		</MudButton>
+				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
+										   Label="Who can change items" />
+			</MudForm>
+		</DialogContent>
+		<DialogActions>
+			<MudButton OnClick="Cancel">
+				<MudText>Cancel</MudText>
+			</MudButton>
 
-		<MudButton Disabled=@(isSubmitting || IsDisabled())
-				   OnClick=@Submit
-				   Variant="Variant.Filled"
-				   Color="Color.Primary">
-			@if (isSubmitting)
-			{
-				<MudProgressCircular Size="Size.Small"
-									 Indeterminate
-									 Color="Color.Inherit" />
-			}
-			else
-			{
-				<MudText>Save</MudText>
-			}
-		</MudButton>
-	</DialogActions>
-</MudDialog>
+			<MudButton Disabled=@(isSubmitting || IsDisabled())
+					   OnClick=@Submit
+					   Variant="Variant.Filled"
+					   Color="Color.Primary">
+				@if (isSubmitting)
+				{
+					<MudProgressCircular Size="Size.Small"
+										 Indeterminate
+										 Color="Color.Inherit" />
+				}
+				else
+				{
+					<MudText>Save</MudText>
+				}
+			</MudButton>
+		</DialogActions>
+	</MudDialog>
+</CascadingValue>

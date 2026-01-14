@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.WebApp.Components.BoardUsers;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
 public partial class BoardWindowHeader : IDisposable
 {
-    [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private BoardState BoardState { get; set; } = null!;
+    [CascadingParameter]
+    private BoardState BoardState { get; set; } = null!;
 
-    private BoardFullDto? Board => BoardState.CurrentBoard;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+
+    private BoardFullDto Board => BoardState.Board;
 
     protected override void OnInitialized()
     {
@@ -19,10 +22,10 @@ public partial class BoardWindowHeader : IDisposable
 
     private async Task OpenSettings()
     {
-        if (Board == null)
+        var parameters = new DialogParameters
         {
-            return;
-        }
+            { nameof(BoardSettingsDialog.BoardState), BoardState }
+        };
 
         var settingsTitle = Board.Permissions.CanChangeBoard
             ? "Board settings"
@@ -30,6 +33,7 @@ public partial class BoardWindowHeader : IDisposable
 
         var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
             settingsTitle,
+            parameters,
             new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
         );
 
@@ -38,13 +42,13 @@ public partial class BoardWindowHeader : IDisposable
 
     private async Task OpenListsSwap()
     {
-        if (Board == null)
+        var parameters = new DialogParameters
         {
-            return;
-        }
-
+            { nameof(BoardListsSwapDialog.BoardState), BoardState }
+        };
         var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
             $"Move lists of {Board.Title}",
+            parameters,
             new DialogOptions { CloseButton = true }
         );
 
@@ -53,13 +57,13 @@ public partial class BoardWindowHeader : IDisposable
 
     private async Task OpenMembers()
     {
-        if (Board == null)
+        var parameters = new DialogParameters
         {
-            return;
-        }
-
-        var dialog = await DialogService.ShowAsync<BoardMembersDialog>(
+            { nameof(BoardUsersDialog.BoardState), BoardState }
+        };
+        var dialog = await DialogService.ShowAsync<BoardUsersDialog>(
             "Members",
+            parameters,
             new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true }
         );
 
