@@ -1,9 +1,7 @@
-﻿using System.Data;
-using Tracker.API.Requests;
+﻿using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Pages.Admin;
 using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.States;
@@ -13,7 +11,7 @@ public sealed class BoardUsersState
     private readonly BoardState _boardState;
     private readonly IBoardUserService _boardUserService;
     private readonly IUserService _userService;
-    private readonly IResultNotifier _notifier;
+    private readonly IErrorNotifier _notifier;
 
     private readonly List<BoardUserDto> _boardUsers = [];
 
@@ -26,7 +24,7 @@ public sealed class BoardUsersState
         BoardState boardState,
         IBoardUserService boardUserService,
         IUserService userService,
-        IResultNotifier notifier)
+        IErrorNotifier notifier)
     {
         _boardState = boardState;
         _boardUserService = boardUserService;
@@ -42,15 +40,13 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.GetUsersByBoardAsync(Board.Id);
-        if (result.IsSuccess)
+        if (!_notifier.NotifyIfError(result))
         {
-            _boardUsers.Clear();
-            _boardUsers.AddRange(result.Value);
+            return;
         }
-        else
-        {
-            _notifier.Notify(result);
-        }
+
+        _boardUsers.Clear();
+        _boardUsers.AddRange(result.Value);
     }
 
     public async Task<IEnumerable<UserDto>> SearchAsync(string value, CancellationToken ct)
@@ -76,25 +72,23 @@ public sealed class BoardUsersState
     public async Task AddUserAsync(Guid userId, UserBoardRole role)
     {
         var result = await _boardUserService.AddUserToBoardAsync(Board.Id, userId, role);
-        _notifier.Notify(result);
-
-        if (result.IsSuccess)
+        if (!_notifier.NotifyIfError(result))
         {
-            _boardUsers.Add(result.Value);
-            Notify();
+            return;
         }
+        _boardUsers.Add(result.Value);
+        Notify();
     }
 
     public async Task ChangeRoleAsync(BoardUserDto boardUser, UserBoardRole newRole)
     {
         var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, newRole);
-        _notifier.Notify(result);
-
-        if (result.IsSuccess)
+        if (!_notifier.NotifyIfError(result))
         {
-            boardUser.Role = newRole;
-            Notify();
+            return;
         }
+        boardUser.Role = newRole;
+        Notify();
     }
 
     public async Task RemoveBoardUserAsync(BoardUserDto boardUser)
@@ -105,13 +99,12 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.RemoveUserFromBoardAsync(Board.Id, boardUser.User.Id);
-        _notifier.Notify(result);
-
-        if (result.IsSuccess)
+        if (!_notifier.NotifyIfError(result))
         {
-            _boardUsers.Remove(boardUser);
-            Notify();
+            return;
         }
+        _boardUsers.Remove(boardUser);
+        Notify();
     }
 
     public async Task TransferOwnershipAsync(BoardUserDto boardUser)
@@ -122,18 +115,17 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
-        _notifier.Notify(result);
-
-        if (result.IsSuccess)
+        if (!_notifier.NotifyIfError(result))
         {
-            var previousOwner = _boardUsers.FirstOrDefault(u => u.Role == UserBoardRole.Owner);
-            if (previousOwner is not null)
-            {
-                previousOwner.Role = UserBoardRole.Admin;
-            }
-            boardUser.Role = UserBoardRole.Owner;
-            Notify();
+            return;
         }
+        var previousOwner = _boardUsers.FirstOrDefault(u => u.Role == UserBoardRole.Owner);
+        if (previousOwner is not null)
+        {
+            previousOwner.Role = UserBoardRole.Admin;
+        }
+        boardUser.Role = UserBoardRole.Owner;
+        Notify();
     }
 
 
