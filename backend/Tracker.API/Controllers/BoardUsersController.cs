@@ -10,53 +10,54 @@ using Tracker.Application.UseCases.BoardUsers.Remove;
 
 namespace Tracker.API.Controllers;
 
-[Route("api/boards-users")]
+[Route("api/boards/{boardId:guid}/users")]
 [ApiController]
 [Authorize]
 public class BoardsUsersController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("{Id:guid}")]
-    public async Task<IActionResult> GetUsersByBoardAsync([FromRoute] GetByIdRequest request)
+    [HttpGet]
+    public async Task<IActionResult> GetUsersByBoardAsync(Guid boardId)
     {
-        var mediatorRequest = new SearchToAddByBoardIdQuery { BoardId = request.Id };
+        var mediatorRequest = new GetUsersByBoardIdQuery { BoardId = boardId };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddUserToBoardAsync([FromBody] AddUserToBoardRequest request)
+    [HttpPost("{userId:guid}")]
+    public async Task<IActionResult> AddUserToBoardAsync(Guid boardId, Guid userId,
+        [FromBody] BoardUserRoleRequest request)
     {
         var mediatorRequest = new AddUserToBoardCommand
         {
-            BoardId = request.BoardId,
-            UserId = request.UserId,
+            BoardId = boardId,
+            UserId = userId,
             Role = request.Role
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpPut]
-    public async Task<IActionResult> ChangeUserRoleAsync([FromBody] ChangeUserBoardRequest request)
+    [HttpPut("{userId:guid}")]
+    public async Task<IActionResult> ChangeUserRoleAsync(Guid boardId, Guid userId,
+        [FromBody] BoardUserRoleRequest request)
     {
         var mediatorRequest = new ChangeUserRoleCommand
         {
-            BoardId = request.BoardId,
-            UserId = request.UserId,
+            BoardId = boardId,
+            UserId = userId,
             Role = request.Role
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> RemoveUserFromBoardAsync(
-        [FromBody] RemoveUserFromBoardRequest request)
+    [HttpDelete("{userId:guid}")]
+    public async Task<IActionResult> RemoveUserFromBoardAsync(Guid boardId, Guid userId)
     {
         var mediatorRequest = new RemoveUserFromBoardCommand
         {
-            BoardId = request.BoardId,
-            UserId = request.UserId,
+            BoardId = boardId,
+            UserId = userId,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

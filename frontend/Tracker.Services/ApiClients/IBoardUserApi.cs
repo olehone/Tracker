@@ -6,12 +6,14 @@ namespace Tracker.Services.ApiClients;
 
 public interface IBoardUserApi
 {
-    [Get("/api/boards-users/{boardId}")]
+    [Get("/api/boards/{boardId}/users")]
     Task<ApiResponse<List<BoardUserDto>>> GetUsersByBoardAsync(Guid boardId);
-    [Post("/api/boards-users")]
-    Task<ApiResponse<BoardUserDto>> AddUserToBoardAsync(AddUserToBoardRequest request);
-    [Put("/api/boards-users")]
-    Task<ApiResponse<object>> ChangeUserRoleAsync(ChangeUserBoardRequest request);
-    [Delete("/api/boards-users")]
-    Task<ApiResponse<object>> RemoveUserFromBoardAsync(RemoveUserFromBoardRequest request);
+    [Post("/api/boards/{boardId}/users/{userId}")]
+    Task<ApiResponse<BoardUserDto>> AddUserToBoardAsync(Guid boardId, Guid userId,
+        BoardUserRoleRequest request);
+    [Put("/api/boards/{boardId}/users/{userId}")]
+    Task<ApiResponse<object>> ChangeUserRoleAsync(Guid boardId, Guid userId,
+        BoardUserRoleRequest request);
+    [Delete("/api/boards/{boardId}/users/{userId}")]
+    Task<ApiResponse<object>> RemoveUserFromBoardAsync(Guid boardId, Guid userId);
 }
