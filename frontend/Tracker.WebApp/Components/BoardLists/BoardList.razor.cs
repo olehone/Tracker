@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.WebApp.Components.Boards;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.BoardLists;
@@ -12,35 +11,29 @@ public partial class BoardList
     private BoardState BoardState { get; set; } = null!;
 
     [Parameter]
-    public required bool CanAddItem { get; set; }
-    [Parameter]
     public required BoardListDto List { get; set; }
-    [Parameter]
-    public EventCallback<string> OnCreateItem { get; set; }
 
     [Inject] IDialogService DialogService { get; set; } = null!;
 
     private BoardFullDto Board => BoardState.Board!;
+
     private async Task CreateNewItem(string title)
     {
-        await OnCreateItem.InvokeAsync(title);
+        await BoardState.CreateBoardItemAsync(List.Id, title);
     }
 
     private async Task OpenListSettings()
     {
         var parameters = new DialogParameters
         {
-            { nameof(BoardSettingsDialog.BoardState), BoardState }
+            { nameof(BoardListSettingsDialog.BoardState), BoardState },
+            { nameof(BoardListSettingsDialog.List), List }
         };
 
-        var settingsTitle = Board.Permissions.CanChangeBoard
-            ? "Board settings"
-            : "Board information";
-
-        var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
-            settingsTitle,
+        var dialog = await DialogService.ShowAsync<BoardListSettingsDialog>(
+            List.Title,
             parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            new DialogOptions { MaxWidth = MaxWidth.Medium }
         );
 
         await dialog.Result;

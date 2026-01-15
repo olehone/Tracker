@@ -13,10 +13,14 @@
 					 Class="text-ellipsis">
 				@List.Title
 			</MudText>
-			<MudTooltip Text="Settings">
-				<MudIconButton Icon=@Icons.Material.Outlined.Settings
-							   OnClick=@OpenListSettings />
-			</MudTooltip>
+			@if (Board.Permissions.CanChangeList)
+			{
+				<MudSpacer />
+				<MudTooltip Text="Settings">
+					<MudIconButton Icon=@Icons.Material.Outlined.Settings
+								   OnClick=@OpenListSettings />
+				</MudTooltip>
+			}
 		</MudToolBar>
 
 		@if (List.BoardItems.Count == 0)
@@ -35,7 +39,7 @@
 						 Style="max-height: 400px; overflow-y: auto;"
 						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
 		}
-		@if (CanAddItem)
+		@if (Board.Permissions.CanCreateItem)
 		{
 			<OneLineCreateButton Title="Add new item"
 								 OnCreate=@CreateNewItem />

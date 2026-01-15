@@ -119,26 +119,37 @@ public sealed class BoardState
         return true;
     }
 
-    public async Task<bool> UpdateBoardListAsync(Guid listId, string title, string description)
+    public async Task<bool> UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
     {
         if (_currentBoard is null)
         {
             return false;
         }
 
-        var request = new UpdateBoardListRequest
-        {
-            Title = title,
-            Description = description,
-        };
+        ApplyListUpdated(listId, request);
 
         var result = await _boardListService.UpdateBoardListAsync(listId, request);
         if (result.IsFailure)
         {
             return false;
         }
+        return true;
+    }
 
-        //ApplyListChanged(listId, request);
+    public async Task<bool> DeleteBoardListAsync(Guid listId)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        ApplyListDeleted(listId);
+
+        var result = await _boardListService.DeleteBoardListAsync(listId);
+        if (result.IsFailure)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -243,6 +254,29 @@ public sealed class BoardState
         Notify();
     }
 
+
+    private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
+    {
+        var list = Board.BoardLists.FirstOrDefault(bl => bl.Id == listId);
+        if (list is null)
+        {
+            return;
+        }
+        list.Title = request.Title;
+        list.Description = request.Description;
+        Notify();
+    }
+
+    private void ApplyListDeleted(Guid listId)
+    {
+        var removed = Board.BoardLists.RemoveAll(bl => bl.Id == listId);
+        if (removed == 0)
+        {
+            return;
+        }
+
+        Notify();
+    }
 
     private void ApplyItemCreated(BoardItemDto newItem)
     {

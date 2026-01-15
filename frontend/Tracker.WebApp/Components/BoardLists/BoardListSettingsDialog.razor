@@ -4,8 +4,7 @@
 			<MudForm @ref=@_form
 					 Model=@model
 					 Validation=@validator
-					 ValidationDelay="300"
-					 Disabled=@IsDisabled()>
+					 ValidationDelay="300">
 				<MudTextField @bind-Value=@model.Title
 							  Label="Title"
 							  Required
@@ -17,13 +16,16 @@
 							  Variant="Variant.Outlined" />
 
 			</MudForm>
+			<MudButton Variant="Variant.Filled"
+					   Color="Color.Error"
+					   OnClick=@Delete>Delete</MudButton>
 		</DialogContent>
 		<DialogActions>
 			<MudButton OnClick="Cancel">
 				<MudText>Cancel</MudText>
 			</MudButton>
 
-			<MudButton Disabled=@(isSubmitting || IsDisabled())
+			<MudButton Disabled=@(isSubmitting)
 					   OnClick=@Submit
 					   Variant="Variant.Filled"
 					   Color="Color.Primary">
