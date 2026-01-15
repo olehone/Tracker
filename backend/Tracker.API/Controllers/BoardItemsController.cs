@@ -13,12 +13,13 @@ namespace Tracker.API.Controllers;
 public class BoardItemsController(IMediator mediator) : ControllerBase
 {
 
-    [HttpPost]
-    public async Task<IActionResult> CreateBoardItemAsync([FromBody] CreateBoardItemRequest request)
+    [HttpPost("{boardListId:guid}")]
+    public async Task<IActionResult> CreateBoardItemAsync(Guid boardListId, 
+        [FromBody] CreateBoardItemRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
         {
-            BoardListId = request.BoardListId,
+            BoardListId = boardListId,
             Title = request.Title,
             Description = request.Description
         };

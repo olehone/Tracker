@@ -17,23 +17,19 @@ namespace Tracker.API.Controllers;
 public class UserController(IMediator mediator) : ControllerBase
 {
 
-    [HttpGet("{Id:guid}")]
-    public async Task<IActionResult> GetUserByIdAsync([FromRoute] GetByIdRequest request)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetUserByIdAsync(Guid id)
     {
-        var mediatorRequest = new GetUserByIdQuery()
-        {
-            Id = request.Id
-        };
+        var mediatorRequest = new GetUserByIdQuery { Id = id };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpGet("{Id:guid}/workspaces")]
-    public async Task<IActionResult> GetMutualWorkspacesAsync(
-        [FromRoute] Guid id,
+    [HttpGet("{id:guid}/workspaces")]
+    public async Task<IActionResult> GetMutualWorkspacesAsync(Guid id,
         [FromQuery] PaginatedSearchRequest request)
     {
-        var mediatorRequest = new GetMutualWorkspacesQuery()
+        var mediatorRequest = new GetMutualWorkspacesQuery
         {
             TargetUserId = id,
             SearchQuery = request.SearchQuery,
@@ -44,13 +40,13 @@ public class UserController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpGet("{Id:guid}/workspaces/all")]
+    [HttpGet("{id:guid}/workspaces/all")]
     [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetAllUserWorkspacesAsync(
-        [FromRoute] Guid id,
+        Guid id,
         [FromQuery] PaginatedSearchRequest request)
     {
-        var mediatorRequest = new GetAllWorkspacesByUserQuery()
+        var mediatorRequest = new GetAllWorkspacesByUserQuery
         {
             Id = id,
             SearchQuery = request.SearchQuery,
@@ -62,10 +58,9 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<IActionResult> GetUsersAsync(
-        [FromQuery] PaginatedSearchRequest request)
+    public async Task<IActionResult> GetUsersAsync([FromQuery] PaginatedSearchRequest request)
     {
-        var mediatorRequest = new GetUsersQuery()
+        var mediatorRequest = new GetUsersQuery
         {
             SearchQuery = request.SearchQuery,
             Page = request.Page,

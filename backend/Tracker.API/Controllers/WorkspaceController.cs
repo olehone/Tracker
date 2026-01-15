@@ -17,25 +17,25 @@ namespace Tracker.API.Controllers;
 public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
-    [HttpGet("{Id:guid}")]
+    [HttpGet("{id:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetWorkspaceByIdAsync([FromRoute] GetByIdRequest request)
+    public async Task<IActionResult> GetWorkspaceByIdAsync(Guid id)
     {
         var mediatorRequest = new GetWorkspaceByIdQuery()
         {
-            Id = request.Id
+            Id = id
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpPut("{Id:guid}/settings")]
-    public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest workspaceId,
+    [HttpPut("{id:guid}/settings")]
+    public async Task<IActionResult> UpdateAsync(Guid id,
             [FromBody] UpdateWorkspaceBodyRequest request)
     {
         var mediatorRequest = new UpdateWorkspaceCommand
         {
-            WorkspaceId = workspaceId.Id,
+            WorkspaceId = id,
             Title = request.Title,
             Description = request.Description,
             Visibility = request.Visibility,
