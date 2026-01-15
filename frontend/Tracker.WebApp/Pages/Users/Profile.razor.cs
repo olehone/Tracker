@@ -42,7 +42,6 @@ public partial class Profile
         StateHasChanged();
     }
 
-
     private async Task<Paginated<WorkspaceSummaryDto>> LoadWorkspaces(
         PaginatedSearchRequest request)
     {
@@ -64,4 +63,6 @@ public partial class Profile
         }
         return result.Value;
     }
+
+
 }

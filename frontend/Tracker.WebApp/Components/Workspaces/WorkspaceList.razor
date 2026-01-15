@@ -5,10 +5,10 @@
 
 <MudTable T=@WorkspaceSummaryDto
 		  ServerData=@LoadServerData
-		  FixedFooter
+		  FixedHeader
 		  Dense
 		  Hover
-		  Class=@($"max-height:{Height}")
+		  Height=@Height
 		  @ref=@_table>
 
 	<ToolBarContent>
