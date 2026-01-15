@@ -5,16 +5,13 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardLists
+public partial class BoardOverview
 {
+    [CascadingParameter] 
+    private BoardState BoardState { get; set; } = null!;
+    
     private MudDropContainer<BoardItemDto> _container = null!;
-
-    [Parameter]
-    public Guid BoardId { get; set; }
-
-    [Inject] private BoardState BoardState { get; set; } = null!;
-
-    private BoardFullDto Board => BoardState.CurrentBoard!;
+    private BoardFullDto Board => BoardState.Board!;
 
     protected override void OnInitialized()
     {
@@ -33,7 +30,7 @@ public partial class BoardLists
         }
 
         _ = BoardState.MoveBoardItemAsync(
-            dropInfo.Item.Id.ToString(),
+            dropInfo.Item.Id,
             dropInfo.DropzoneIdentifier,
             dropInfo.IndexInZone + 1
         );

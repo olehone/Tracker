@@ -1,0 +1,22 @@
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@inherits BoardUsersSubscribeBase
+
+<MudStack Row
+		  AlignItems=@AlignItems.Stretch
+		  Justify=@Justify.FlexStart>
+
+	@if (CanChange())
+	{
+		<BoardUserRoleChange BoardUser=@BoardUser/>
+
+		<BoardUserDangerousActions BoardUser=@BoardUser />
+	}
+	else
+	{
+		<BoardUserRoleChip Role=@BoardUser.Role />
+	}
+
+</MudStack>
+
+

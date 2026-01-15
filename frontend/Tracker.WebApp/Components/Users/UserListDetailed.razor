@@ -1,7 +1,4 @@
-@using Microsoft.AspNetCore.Authorization
-@using Tracker.WebApp.Components.Shared
 @using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.Users
 
 <MudTable T=@UserDto
 		  ServerData=@LoadServerData
@@ -20,10 +17,6 @@
 					  DebounceInterval="500"
 					  Adornment="Adornment.Start"
 					  AdornmentIcon="@Icons.Material.Filled.Search" />
-
-
-
-
 	</ToolBarContent>
 
 	<HeaderContent>

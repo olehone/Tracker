@@ -2,12 +2,9 @@
 
 namespace Tracker.WebApp.States;
 
-public class UserState
-{
+public class AppState(){
+
     private UserDto? _currentUser;
-
-    public event Action? OnUserChange;
-
     public UserDto? CurrentUser
     {
         get => _currentUser;
@@ -17,6 +14,7 @@ public class UserState
             NotifyUserChanged();
         }
     }
+    public event Action? OnUserChange;
 
     public void NotifyUserChanged()
     {

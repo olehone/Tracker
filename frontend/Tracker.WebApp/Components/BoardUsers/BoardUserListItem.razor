@@ -1,0 +1,13 @@
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.Users
+
+<MudListItem T=@BoardUserDto>
+	<MudStack Row
+			  Justify=@Justify.SpaceBetween
+			  Spacing="2">
+		<SmallUserInfo User=@BoardUser.User />
+
+		<BoardUserActions BoardUser=@BoardUser />
+	</MudStack>
+</MudListItem>

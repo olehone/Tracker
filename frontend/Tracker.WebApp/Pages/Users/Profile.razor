@@ -23,7 +23,7 @@
 						 ApplyEffectsToContainer
 						 Class="mt-8"
 						 PanelClass="pa-0">
-					<AuthorizeView>
+					<AuthorizeView Policy="AdminOrHigher">
 						<MudTabPanel Text="All user workspaces">
 							<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
 										   Height="40vh" />

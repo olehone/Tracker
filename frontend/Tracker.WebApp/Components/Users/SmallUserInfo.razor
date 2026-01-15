@@ -1,0 +1,20 @@
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Users
+
+<MudStack Row
+		  AlignItems=@AlignItems.Start>
+
+	<UserAvatarSmall User=@User
+					 Size=@Size.Small />
+
+	<MudText>@User.Username</MudText>
+
+	<a href=@($"/users/{User.Id}")>
+		<MudIcon Icon=@Icons.Material.Filled.OpenInNew
+				 Size=@Size.Small
+				 Color=@Color.Primary />
+	</a>
+
+</MudStack>
+
+

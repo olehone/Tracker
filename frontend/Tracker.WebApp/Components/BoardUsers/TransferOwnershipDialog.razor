@@ -1,0 +1,56 @@
+<MudDialog>
+
+	<DialogContent>
+
+		<MudStack Spacing="3">
+
+			<MudAlert Severity=@Severity.Warning
+					  Icon=@Icons.Material.Filled.Warning>
+				You are about to transfer ownership of this board
+			</MudAlert>
+
+			<MudText>
+				Are you sure you want to transfer ownership to <strong>@NewOwnerName</strong>?
+			</MudText>
+
+			<MudText Typo=@Typo.body2
+					 Color=@Color.Error>
+				This action will demote you from Owner to Admin. You may no longer be able to:
+			</MudText>
+
+			<MudList T="string"
+					 Dense>
+
+				<MudListItem Icon=@Icons.Material.Filled.Block>
+					Transfer ownership again
+				</MudListItem>
+
+				<MudListItem Icon=@Icons.Material.Filled.Block>
+					Delete the board
+				</MudListItem>
+
+				<MudListItem Icon=@Icons.Material.Filled.Block>
+					Change certain board settings
+				</MudListItem>
+
+			</MudList>
+
+		</MudStack>
+
+	</DialogContent>
+
+	<DialogActions>
+
+		<MudButton OnClick=@Cancel>
+			Cancel
+		</MudButton>
+
+		<MudButton Color=@Color.Warning
+				   Variant=@Variant.Filled
+				   OnClick=@Confirm>
+			Transfer Ownership
+		</MudButton>
+
+	</DialogActions>
+
+</MudDialog>

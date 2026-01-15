@@ -41,7 +41,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
         var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRole(userId, workspace.Id);
+            .GetRoleAsync(userId, workspace.Id);
 
         if (!WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
         {

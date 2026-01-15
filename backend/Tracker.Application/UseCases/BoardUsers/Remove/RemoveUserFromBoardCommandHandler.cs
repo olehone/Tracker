@@ -2,6 +2,9 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
+using Tracker.Application.UseCases.BoardUsers.Change;
+using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardUsers.Remove;
@@ -46,7 +49,15 @@ public class RemoveUserFromBoardCommandHandler(
         {
             return AuthErrors.Forbidden();
         }
-        await uow.UserBoardRepository.RemoveAsync(userBoard.Id);
+
+        if (userBoard.Role == UserBoardRole.Owner && userBoard.Id == userId)
+        {
+            await uow.BoardRepository.RemoveAsync(board.Id);
+        }
+        else
+        {
+            await uow.UserBoardRepository.RemoveAsync(userBoard.Id);
+        }
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 
@@ -54,4 +65,5 @@ public class RemoveUserFromBoardCommandHandler(
             ? Error.Unknown
             : Result.Success();
     }
+
 }

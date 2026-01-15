@@ -5,6 +5,6 @@ namespace Tracker.Application.Common.Repositories;
 
 public interface IUserWorkspaceRepository : IRepository<UserWorkspace, Guid>
 {
-    Task<UserWorkspaceRole> GetRole(Guid userId, Guid workspaceId);
-    Task<UserWorkspace?> GetByUserAndWorkspace(Guid userId, Guid workspaceId);
+    Task<UserWorkspaceRole> GetRoleAsync(Guid userId, Guid workspaceId);
+    Task<UserWorkspace?> GetByUserAndWorkspaceAsync(Guid userId, Guid workspaceId);
 }

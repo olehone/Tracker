@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
-using Tracker.Domain.Dtos;
+using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Boards;
@@ -10,15 +10,28 @@ public partial class Overview
     [Parameter]
     public Guid BoardId { get; set; }
 
-    [Inject] private BoardState BoardState { get; set; } = null!;
+    [Inject] IBoardService BoardService { get; set; } = null!;
+    [Inject] IBoardListService BoardListService { get; set; } = null!;
+    [Inject] IBoardItemService BoardItemService { get; set; } = null!;
+    [Inject] IBoardUserService BoardUserService { get; set; } = null!;
+    [Inject] IUserService UserService { get; set; } = null!;
+    [Inject] IResultNotifier Notifier { get; set; } = null!;
 
-    private BoardFullDto? Board => BoardState.CurrentBoard;
+    private BoardState BoardState { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        BoardState = new BoardState(BoardService,
+            BoardListService,
+            BoardItemService,
+            BoardUserService,
+            UserService,
+            Notifier);
+        await BoardState.LoadAsync(BoardId);
         BoardState.OnChange += StateHasChanged;
-        await BoardState.LoadBoardAsync(BoardId);
     }
 
-    private string PageTitle() => Board?.Title ?? "Board";
+    private string PageTitle() => BoardState.IsLoading
+        ? "Board loading"
+        : BoardState.Board.Title;
 }

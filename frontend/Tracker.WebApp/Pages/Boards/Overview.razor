@@ -7,20 +7,19 @@
 @using Tracker.WebApp.Components.Boards;
 
 <PageTitle>@PageTitle()</PageTitle>
-<WorkWindow>
+<CascadingValue Value=@BoardState>
+	<WorkWindow>
 
-	<Header>
-		<BoardWindowHeader />
-	</Header>
+		<Header>
+			<BoardWindowHeader />
+		</Header>
 
-	<Body>
-		<MudStack StretchItems="StretchItems.None"
-				  AlignItems="AlignItems.Start"
-				  Style="overflow-x: auto;">
-			@if (Board is not null)
-			{
-				<BoardLists />
-			}
-		</MudStack>
-	</Body>
-</WorkWindow>
+		<Body>
+			<MudStack StretchItems="StretchItems.None"
+					  AlignItems="AlignItems.Start"
+					  Style="overflow-x: auto;">
+				<BoardOverview />
+			</MudStack>
+		</Body>
+	</WorkWindow>
+</CascadingValue>

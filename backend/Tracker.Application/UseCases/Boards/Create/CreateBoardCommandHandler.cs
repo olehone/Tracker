@@ -38,7 +38,7 @@ public sealed class CreateBoardCommandHandler(
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
         var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRole(userId, request.WorkspaceId);
+            .GetRoleAsync(userId, request.WorkspaceId);
 
         var permissions = WorkspacePolicy
             .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);

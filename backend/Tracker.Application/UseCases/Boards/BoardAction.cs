@@ -7,4 +7,5 @@ public enum BoardAction
     ChangeItem = 3,
     CreateList = 4,
     ChangeList = 5,
+    ChangeOwner = 6,
 }

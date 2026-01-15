@@ -26,6 +26,7 @@ public static class BoardPolicy
             CanChangeItem = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeItemRole,
             CanCreateList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinCreateListRole,
             CanChangeList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeListRole,
+            CanChangeOwner = CanChangeOwner(globalRole, workspaceRole, boardRole),
         };
     }
 
@@ -35,6 +36,20 @@ public static class BoardPolicy
         {
             return true;
         }
+        return false;
+    }
+
+    public static bool CanChangeOwner(GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole,
+        UserBoardRole boardRole)
+    {
+        if (globalRole >= GlobalRole.Admin ||
+            workspaceRole >= UserWorkspaceRole.Admin ||
+            boardRole == UserBoardRole.Owner)
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -106,6 +121,8 @@ public static class BoardPolicy
             BoardAction.ChangeItem => permissions.CanChangeItem,
             BoardAction.CreateList => permissions.CanCreateList,
             BoardAction.ChangeList => permissions.CanChangeList,
+            BoardAction.ChangeBoard => permissions.CanChangeBoard,
+            BoardAction.ChangeOwner => permissions.CanChangeOwner,
             _ => false
         };
     }

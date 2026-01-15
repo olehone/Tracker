@@ -62,7 +62,6 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("all")]
-    [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetUsersAsync(
         [FromQuery] PaginatedSearchRequest request)
     {

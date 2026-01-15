@@ -4,7 +4,6 @@ using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
-using Tracker.Domain.Enums;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -27,10 +26,17 @@ public class AddUserToBoardCommandHandler(
             return Error.NotFound("Board");
         }
 
-        var user = await uow.UserRepository.GetByIdAsync(request.BoardId);
+        var user = await uow.UserRepository.GetByIdAsync(request.UserId);
         if (user is null)
         {
             return Error.NotFound("User");
+        }
+
+        var userBoard = await uow.UserBoardRepository
+            .GetByUserAndBoardAsync(request.UserId, request.BoardId);
+        if (userBoard is not null)
+        {
+            return Error.AlreadyExists("User", "Board", user.Username);
         }
 
         var userId = userContext.GetUserId();

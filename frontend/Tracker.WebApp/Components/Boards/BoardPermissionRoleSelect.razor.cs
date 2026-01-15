@@ -3,7 +3,7 @@ using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardRoleSelect
+public partial class BoardPermissionRoleSelect
 {
     [Parameter]
     public BoardPermissionRole Value { get; set; }

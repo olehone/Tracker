@@ -7,38 +7,57 @@ using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.States;
 
-public class BoardState(
+public sealed class BoardState
+{
+    private readonly IBoardService _boardService;
+    private readonly IBoardListService _boardListService;
+    private readonly IBoardItemService _boardItemService;
+    private readonly IErrorNotifier _notifier;
+
+    private BoardFullDto? _currentBoard;
+
+    public BoardFullDto Board => _currentBoard
+        ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
+    public BoardUsersState Users { get; }
+
+    public bool IsLoading { get; private set; }
+    public event Action? OnChange;
+
+    public BoardState(
         IBoardService boardService,
         IBoardListService boardListService,
         IBoardItemService boardItemService,
-        IResultNotifier notifier)
-{
+        IBoardUserService boardUserService,
+        IUserService userService,
+        IErrorNotifier notifier)
+    {
+        _boardService = boardService;
+        _boardListService = boardListService;
+        _boardItemService = boardItemService;
+        _notifier = notifier;
 
-    private BoardFullDto? _currentBoard;
-    private void NotifyStateChanged() => OnChange?.Invoke();
+        Users = new BoardUsersState(this, boardUserService, userService, notifier);
+    }
 
-    public event Action? OnChange;
-
-    public BoardFullDto? CurrentBoard => _currentBoard;
-    public bool IsLoading { get; private set; }
-
-    public async Task LoadBoardAsync(Guid boardId)
+    public async Task LoadAsync(Guid boardId)
     {
         IsLoading = true;
-        NotifyStateChanged();
+        Notify();
 
-        var result = await boardService.GetBoardByIdAsync(boardId);
-        if (result.IsSuccess)
-        {
-            _currentBoard = result.Value;
-        }
-        else
+        var boardResult = await _boardService.GetBoardByIdAsync(boardId);
+
+        if (_notifier.NotifyIfError(boardResult))
         {
             _currentBoard = null;
         }
+        else
+        {
+            _currentBoard = boardResult.Value;
+            await Users.LoadAsync();
+        }
 
         IsLoading = false;
-        NotifyStateChanged();
+        Notify();
     }
 
     public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
@@ -48,16 +67,15 @@ public class BoardState(
             return false;
         }
 
-        var result = await boardService.UpdateAsync(_currentBoard.Id, request);
-        notifier.Notify(result);
+        var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
 
-        if (result.IsSuccess)
+        if (_notifier.NotifyIfError(result))
         {
-            ApplyBoardUpdated(request);
-            return true;
+            return false;
         }
 
-        return false;
+        ApplyBoardUpdated(request);
+        return true;
     }
 
     public async Task<bool> CreateBoardListAsync(string title)
@@ -73,15 +91,14 @@ public class BoardState(
             Title = title
         };
 
-        var result = await boardListService.CreateBoardListAsync(request);
-
-        if (result.IsSuccess)
+        var result = await _boardListService.CreateBoardListAsync(request);
+        if (_notifier.NotifyIfError(result))
         {
-            ApplyListCreated(result.Value);
-            return true;
+            return false;
         }
 
-        return false;
+        ApplyListCreated(result.Value);
+        return true;
     }
 
     public async Task<bool> MoveBoardListAsync(Guid listId, int newPosition)
@@ -97,15 +114,14 @@ public class BoardState(
             Position = newPosition
         };
 
-        var result = await boardListService.MoveBoardListAsync(request);
-
-        if (result.IsSuccess)
+        var result = await _boardListService.MoveBoardListAsync(request);
+        if (_notifier.NotifyIfError(result))
         {
-            ApplyListMoved(listId, newPosition);
-            return true;
+            return false;
         }
 
-        return false;
+        ApplyListMoved(listId, newPosition);
+        return true;
     }
 
     public async Task<bool> CreateBoardItemAsync(Guid boardListId, string title)
@@ -121,18 +137,17 @@ public class BoardState(
             Title = title
         };
 
-        var result = await boardItemService.CreateBoardItemAsync(request);
-
-        if (result.IsSuccess)
+        var result = await _boardItemService.CreateBoardItemAsync(request);
+        if (_notifier.NotifyIfError(result))
         {
-            ApplyItemCreated(result.Value);
-            return true;
+            return false;
         }
 
-        return false;
+        ApplyItemCreated(result.Value);
+        return true;
     }
 
-    public async Task<bool> MoveBoardItemAsync(string itemId, string toBoardListId, int position)
+    public async Task<bool> MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
     {
         if (_currentBoard is null)
         {
@@ -141,18 +156,17 @@ public class BoardState(
 
         var request = new MoveBoardItemRequest
         {
-            BoardItemId = Guid.Parse(itemId),
+            BoardItemId = itemId,
             ToBoardListId = Guid.Parse(toBoardListId),
             Position = position
         };
 
         ApplyItemMoved(request);
 
-        var result = await boardItemService.MoveBoardItemAsync(request);
-
-        if (result.IsFailure)
+        var result = await _boardItemService.MoveBoardItemAsync(request);
+        if (_notifier.NotifyIfError(result))
         {
-            await LoadBoardAsync(_currentBoard.Id);
+            await LoadAsync(_currentBoard.Id);
             return false;
         }
 
@@ -171,7 +185,7 @@ public class BoardState(
         _currentBoard.Visibility = request.Visibility;
         _currentBoard.PermissionRoles = request.PermissionRoles;
 
-        NotifyStateChanged();
+        Notify();
     }
 
     private void ApplyListCreated(BoardListDto newList)
@@ -186,7 +200,7 @@ public class BoardState(
             .OrderBy(bl => bl.Position)
             .ToList();
 
-        NotifyStateChanged();
+        Notify();
 
     }
     private void ApplyListMoved(Guid listId, int newPosition)
@@ -208,7 +222,7 @@ public class BoardState(
             .OrderBy(bl => bl.Position)
             .ToList();
 
-        NotifyStateChanged();
+        Notify();
     }
 
     private void ApplyItemCreated(BoardItemDto newItem)
@@ -221,7 +235,7 @@ public class BoardState(
         var list = _currentBoard.BoardLists.FirstOrDefault(l => l.Id == newItem.BoardListId);
         list?.BoardItems.Add(newItem);
 
-        NotifyStateChanged();
+        Notify();
     }
 
     private void ApplyItemMoved(MoveBoardItemRequest request)
@@ -281,7 +295,7 @@ public class BoardState(
             toList.BoardItems.Insert(item.Position - 1, item);
         }
 
-        NotifyStateChanged();
+        Notify();
     }
 
     private static void ShiftItemsPosition(BoardListDto list, int delta, int from)
@@ -299,7 +313,6 @@ public class BoardState(
             item.Position += delta;
         }
     }
-
 
     private static void ShiftLists(BoardFullDto board, int newPosition, int oldPosition)
     {
@@ -321,4 +334,6 @@ public class BoardState(
             }
         }
     }
+
+    private void Notify() => OnChange?.Invoke();
 }

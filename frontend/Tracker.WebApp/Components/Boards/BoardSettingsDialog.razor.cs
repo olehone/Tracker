@@ -12,11 +12,8 @@ public partial class BoardSettingsDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
-
     [Parameter]
-    public required BoardFullDto Board { get; set; }
-
-    [Inject] private BoardState BoardState { get; set; } = null!;
+    public BoardState BoardState { get; set; } = null!;
 
     private MudForm? _form;
     private UpdateBoardRequest model = null!;
@@ -27,19 +24,19 @@ public partial class BoardSettingsDialog : IDisposable
     {
         BoardState.OnChange += StateHasChanged;
 
-        if (BoardState.CurrentBoard != null)
+        if (BoardState.Board != null)
         {
             model = new UpdateBoardRequest
             {
-                Title = BoardState.CurrentBoard.Title,
-                Description = BoardState.CurrentBoard.Description,
-                Visibility = BoardState.CurrentBoard.Visibility,
+                Title = BoardState.Board.Title,
+                Description = BoardState.Board.Description,
+                Visibility = BoardState.Board.Visibility,
                 PermissionRoles = new BoardPermissionRoles
                 {
-                    MinCreateItemRole = BoardState.CurrentBoard.PermissionRoles.MinCreateItemRole,
-                    MinChangeItemRole = BoardState.CurrentBoard.PermissionRoles.MinChangeItemRole,
-                    MinCreateListRole = BoardState.CurrentBoard.PermissionRoles.MinCreateListRole,
-                    MinChangeListRole = BoardState.CurrentBoard.PermissionRoles.MinChangeListRole,
+                    MinCreateItemRole = BoardState.Board.PermissionRoles.MinCreateItemRole,
+                    MinChangeItemRole = BoardState.Board.PermissionRoles.MinChangeItemRole,
+                    MinCreateListRole = BoardState.Board.PermissionRoles.MinCreateListRole,
+                    MinChangeListRole = BoardState.Board.PermissionRoles.MinChangeListRole,
                 }
             };
         }
@@ -74,7 +71,7 @@ public partial class BoardSettingsDialog : IDisposable
     private void Cancel() => MudDialog.Cancel();
 
     private bool IsDisabled() =>
-        BoardState.CurrentBoard?.Permissions.CanChangeBoard != true;
+        BoardState.Board?.Permissions.CanChangeBoard != true;
 
     void IDisposable.Dispose()
     {

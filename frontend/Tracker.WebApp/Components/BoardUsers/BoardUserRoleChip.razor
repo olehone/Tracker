@@ -1,0 +1,9 @@
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.Boards
+
+<MudChip T=@UserBoardRole
+		 Icon=@BoardRoleHelper.GetRoleIcon(Role)
+		 Color=@BoardRoleHelper.GetRoleColor(Role)
+		 Size="Size.Small">
+	@Role.ToString()
+</MudChip>
