@@ -10,9 +10,9 @@ namespace Tracker.Services;
 public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi api)
     : IBoardListService
 {
-    public Task<Result<BoardListDto>> CreateBoardListAsync(CreateBoardListRequest request)
+    public Task<Result<BoardListDto>> CreateBoardListAsync(Guid id, CreateBoardListRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardListAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardListAsync(id, request));
     }
 
     public Task<Result> MoveBoardListAsync(MoveBoardListRequest request)
