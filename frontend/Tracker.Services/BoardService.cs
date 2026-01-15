@@ -12,16 +12,16 @@ public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IB
 {
     public Task<Result<BoardSummaryDto>> CreateBoardAsync(CreateBoardRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(request, api.CreateBoardAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardAsync(request));
     }
 
-    public Task<Result> UpdateAsync(GetByIdRequest id, UpdateBoardRequest request)
+    public Task<Result> UpdateAsync(Guid id, UpdateBoardRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(id.Id, request, api.UpdateAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
     }
 
-    public Task<Result<BoardFullDto>> GetBoardByIdAsync(GetByIdRequest request)
+    public Task<Result<BoardFullDto>> GetBoardByIdAsync(Guid id)
     {
-        return apiErrorHandler.ExecuteAsync(request.Id, api.GetBoardByIdAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.GetBoardByIdAsync(id));
     }
 }

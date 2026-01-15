@@ -22,7 +22,7 @@ public sealed class AuthService(
 
     public async Task<Result> LoginAsync(LoginUserRequest request)
     {
-        var result = await apiErrorHandler.ExecuteAsync(request, api.LoginAsync);
+        var result = await apiErrorHandler.ExecuteAsync(() => api.LoginAsync(request));
         if (result.IsFailure)
         {
             return result.Error;
@@ -40,7 +40,7 @@ public sealed class AuthService(
 
     public async Task<Result> RegisterAsync(RegisterUserRequest request)
     {
-        var result = await apiErrorHandler.ExecuteAsync(request, api.RegisterAsync);
+        var result = await apiErrorHandler.ExecuteAsync(() => api.RegisterAsync(request));
         if (result.IsFailure)
         {
             return result.Error;
@@ -111,7 +111,7 @@ public sealed class AuthService(
                 RefreshToken = tokensDto.RefreshToken
             };
 
-            var result = await apiErrorHandler.ExecuteAsync(request, api.RefreshTokenAsync);
+            var result = await apiErrorHandler.ExecuteAsync(() => api.RefreshTokenAsync(request));
 
             if (result == null || result.IsFailure)
             {

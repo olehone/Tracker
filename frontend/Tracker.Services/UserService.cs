@@ -21,23 +21,23 @@ public class UserService(
 
     public Task<Result<Paginated<UserDto>>> GetUsersAsync(PaginatedSearchRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(request, api.GetUsersAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.GetUsersAsync(request));
     }
 
-    public Task<Result<UserDto>> GetUserByIdAsync(GetByIdRequest request)
+    public Task<Result<UserDto>> GetUserByIdAsync(Guid id)
     {
-        return apiErrorHandler.ExecuteAsync(request.Id, api.GetUserByIdAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.GetUserByIdAsync(id));
     }
 
     public Task<Result<Paginated<WorkspaceSummaryDto>>> GetAllUserWorkspacesAsync(
-        GetByIdRequest id, PaginatedSearchRequest request)
+        Guid id, PaginatedSearchRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(id.Id, request, api.GetAllUserWorkspacesAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.GetAllUserWorkspacesAsync(id, request));
     }
 
     public Task<Result<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync(
-        GetByIdRequest id, PaginatedSearchRequest request)
+        Guid id, PaginatedSearchRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(id.Id, request, api.GetMutualWorkspacesAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.GetMutualWorkspacesAsync(id, request));
     }
 }
