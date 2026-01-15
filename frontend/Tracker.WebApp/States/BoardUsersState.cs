@@ -11,8 +11,6 @@ public sealed class BoardUsersState
     private readonly BoardState _boardState;
     private readonly IBoardUserService _boardUserService;
     private readonly IUserService _userService;
-    private readonly IErrorNotifier _notifier;
-
     private readonly List<BoardUserDto> _boardUsers = [];
 
     public IReadOnlyList<BoardUserDto> BoardUsers => _boardUsers;
@@ -23,13 +21,11 @@ public sealed class BoardUsersState
     public BoardUsersState(
         BoardState boardState,
         IBoardUserService boardUserService,
-        IUserService userService,
-        IErrorNotifier notifier)
+        IUserService userService)
     {
         _boardState = boardState;
         _boardUserService = boardUserService;
         _userService = userService;
-        _notifier = notifier;
     }
 
     public async Task LoadAsync()
@@ -40,7 +36,7 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.GetUsersByBoardAsync(Board.Id);
-        if (!_notifier.NotifyIfError(result))
+        if (result.IsFailure)
         {
             return;
         }
@@ -72,7 +68,7 @@ public sealed class BoardUsersState
     public async Task AddUserAsync(Guid userId, UserBoardRole role)
     {
         var result = await _boardUserService.AddUserToBoardAsync(Board.Id, userId, role);
-        if (!_notifier.NotifyIfError(result))
+        if (result.IsFailure)
         {
             return;
         }
@@ -84,7 +80,7 @@ public sealed class BoardUsersState
     public async Task ChangeRoleAsync(BoardUserDto boardUser, UserBoardRole newRole)
     {
         var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, newRole);
-        if (!_notifier.NotifyIfError(result))
+        if (result.IsFailure)
         {
             return;
         }
@@ -101,7 +97,7 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.RemoveUserFromBoardAsync(Board.Id, boardUser.User.Id);
-        if (!_notifier.NotifyIfError(result))
+        if (result.IsFailure)
         {
             return;
         }
@@ -118,7 +114,7 @@ public sealed class BoardUsersState
         }
 
         var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
-        if (!_notifier.NotifyIfError(result))
+        if (result.IsFailure)
         {
             return;
         }

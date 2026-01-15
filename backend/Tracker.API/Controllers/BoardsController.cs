@@ -14,11 +14,11 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardsController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("{Id:guid}")]
+    [HttpGet("{id:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetBoardByIdAsync([FromRoute] GetByIdRequest request)
+    public async Task<IActionResult> GetBoardByIdAsync(Guid id)
     {
-        var mediatorRequest = new GetBoardByIdQuery() { Id = request.Id };
+        var mediatorRequest = new GetBoardByIdQuery() { Id = id };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
@@ -36,13 +36,13 @@ public class BoardsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpPut("{Id:guid}/settings")]
-    public async Task<IActionResult> UpdateAsync([FromRoute] GetByIdRequest boardId,
+    [HttpPut("{id:guid}/settings")]
+    public async Task<IActionResult> UpdateAsync(Guid id,
             [FromBody] UpdateBoardBodyRequest request)
     {
         var mediatorRequest = new UpdateBoardCommand
         {
-            BoardId = boardId.Id,
+            BoardId = id,
             Title = request.Title,
             Description = request.Description,
             Visibility = request.Visibility,

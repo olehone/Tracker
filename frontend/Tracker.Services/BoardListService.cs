@@ -12,11 +12,11 @@ public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi ap
 {
     public Task<Result<BoardListDto>> CreateBoardListAsync(CreateBoardListRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(request, api.CreateBoardListAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardListAsync(request));
     }
 
     public Task<Result> MoveBoardListAsync(MoveBoardListRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(request, api.MoveBoardListAsync);
+        return apiErrorHandler.ExecuteAsync(() => api.MoveBoardListAsync(request));
     }
 }

@@ -15,7 +15,6 @@ public partial class Overview
     [Inject] IBoardItemService BoardItemService { get; set; } = null!;
     [Inject] IBoardUserService BoardUserService { get; set; } = null!;
     [Inject] IUserService UserService { get; set; } = null!;
-    [Inject] IResultNotifier Notifier { get; set; } = null!;
 
     private BoardState BoardState { get; set; } = null!;
 
@@ -25,8 +24,7 @@ public partial class Overview
             BoardListService,
             BoardItemService,
             BoardUserService,
-            UserService,
-            Notifier);
+            UserService);
         await BoardState.LoadAsync(BoardId);
         BoardState.OnChange += StateHasChanged;
     }
