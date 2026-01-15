@@ -57,9 +57,10 @@ public class DeleteBoardListCommandHandler(
         {
             return AuthErrors.Forbidden();
         }
-
         await uow.BoardListRepository.RemoveAsync(boardList.Id);
-
-        return Result.Success();
+        var sc = await uow.SaveChangesAsync(cancellationToken);
+        return sc.IsFailure
+            ? Error.Unknown
+            : Result.Success();
     }
 }

@@ -2,8 +2,6 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
-using Tracker.Application.UseCases.Workspaces;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardLists.Update;
