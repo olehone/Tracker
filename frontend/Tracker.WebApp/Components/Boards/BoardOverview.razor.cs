@@ -9,9 +9,8 @@ public partial class BoardOverview
 {
     [CascadingParameter] 
     private BoardState BoardState { get; set; } = null!;
-    
-    private MudDropContainer<BoardItemDto> _container = null!;
     private BoardFullDto Board => BoardState.Board!;
+    private MudDropContainer<BoardItemDto> _container = null!;
 
     protected override void OnInitialized()
     {

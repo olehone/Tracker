@@ -5,9 +5,9 @@ using Tracker.Domain.Requests.Board;
 using Tracker.Domain.ValueObjects;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.Boards;
+namespace Tracker.WebApp.Components.BoardLists;
 
-public partial class BoardSettingsDialog : IDisposable
+public partial class BoardListSettingsDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;

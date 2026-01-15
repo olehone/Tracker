@@ -13,6 +13,10 @@
 					 Class="text-ellipsis">
 				@List.Title
 			</MudText>
+			<MudTooltip Text="Settings">
+				<MudIconButton Icon=@Icons.Material.Outlined.Settings
+							   OnClick=@OpenListSettings />
+			</MudTooltip>
 		</MudToolBar>
 
 		@if (List.BoardItems.Count == 0)

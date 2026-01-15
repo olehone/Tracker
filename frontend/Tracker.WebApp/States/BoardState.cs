@@ -84,11 +84,10 @@ public sealed class BoardState
 
         var request = new CreateBoardListRequest
         {
-            BoardId = _currentBoard.Id,
             Title = title
         };
 
-        var result = await _boardListService.CreateBoardListAsync(request);
+        var result = await _boardListService.CreateBoardListAsync(Board.Id, request);
         if (result.IsFailure)
         {
             return false;
@@ -107,17 +106,39 @@ public sealed class BoardState
 
         var request = new MoveBoardListRequest
         {
-            BoardListId = listId,
             Position = newPosition
         };
 
-        var result = await _boardListService.MoveBoardListAsync(request);
+        var result = await _boardListService.MoveBoardListAsync(listId, request);
         if (result.IsFailure)
         {
             return false;
         }
 
         ApplyListMoved(listId, newPosition);
+        return true;
+    }
+
+    public async Task<bool> UpdateBoardListAsync(Guid listId, string title, string description)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        var request = new UpdateBoardListRequest
+        {
+            Title = title,
+            Description = description,
+        };
+
+        var result = await _boardListService.UpdateBoardListAsync(listId, request);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+
+        //ApplyListChanged(listId, request);
         return true;
     }
 
@@ -130,11 +151,10 @@ public sealed class BoardState
 
         var request = new CreateBoardItemRequest
         {
-            BoardListId = boardListId,
             Title = title
         };
 
-        var result = await _boardItemService.CreateBoardItemAsync(request);
+        var result = await _boardItemService.CreateBoardItemAsync(boardListId, request);
         if (result.IsFailure)
         {
             return false;
@@ -200,6 +220,7 @@ public sealed class BoardState
         Notify();
 
     }
+
     private void ApplyListMoved(Guid listId, int newPosition)
     {
         if (_currentBoard is null)
@@ -221,6 +242,7 @@ public sealed class BoardState
 
         Notify();
     }
+
 
     private void ApplyItemCreated(BoardItemDto newItem)
     {
