@@ -13,8 +13,8 @@ public interface IBoardListApi
     public Task<ApiResponse<object>> MoveBoardListAsync(Guid id, MoveBoardListRequest request);
 
     [Put("/api/board-lists/{id}")]
-    public Task<ApiResponse<BoardListDto>> UpdateBoardListAsync(Guid id, UpdateBoardListRequest request);
+    public Task<ApiResponse<object>> UpdateBoardListAsync(Guid id, UpdateBoardListRequest request);
 
     [Delete("/api/board-lists/{id}")]
-    public Task<ApiResponse<BoardListDto>> DeleteBoardListAsync(Guid id);
+    public Task<ApiResponse<object>> DeleteBoardListAsync(Guid id);
 }

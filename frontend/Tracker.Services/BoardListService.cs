@@ -20,13 +20,13 @@ public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi ap
         return apiErrorHandler.ExecuteAsync(() => api.MoveBoardListAsync(id, request));
     }
 
-    public Task<Result<BoardListDto>> UpdateBoardListAsync(Guid id,
+    public Task<Result> UpdateBoardListAsync(Guid id,
         UpdateBoardListRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UpdateBoardListAsync(id, request));
     }
 
-    public Task<Result<BoardListDto>> DeleteBoardListAsync(Guid id)
+    public Task<Result> DeleteBoardListAsync(Guid id)
     {
         return apiErrorHandler.ExecuteAsync(() => api.DeleteBoardListAsync(id));
     }

@@ -8,4 +8,6 @@ public interface IBoardItemService
 {
     public Task<Result<BoardItemDto>> CreateBoardItemAsync(Guid boardId, CreateBoardItemRequest request);
     public Task<Result> MoveBoardItemAsync(MoveBoardItemRequest request);
+    public Task<Result> UpdateBoardItemAsync(Guid id, UpdateBoardItemRequest request);
+    public Task<Result> DeleteBoardItemAsync(Guid id);
 }
