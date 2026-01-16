@@ -18,6 +18,12 @@
 			<MudText Typo="Typo.h5">@User.Username</MudText>
 
 			<MudText>@User.Email</MudText>
+			@if (IsOwn())
+			{
+				<MudButton Variant="Variant.Filled">
+					Change settings
+				</MudButton>
+			}
 		</MudStack>
 	</MudItem>
 </MudGrid>

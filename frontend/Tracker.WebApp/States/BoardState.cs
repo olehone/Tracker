@@ -84,11 +84,10 @@ public sealed class BoardState
 
         var request = new CreateBoardListRequest
         {
-            BoardId = _currentBoard.Id,
             Title = title
         };
 
-        var result = await _boardListService.CreateBoardListAsync(request);
+        var result = await _boardListService.CreateBoardListAsync(Board.Id, request);
         if (result.IsFailure)
         {
             return false;
@@ -107,17 +106,50 @@ public sealed class BoardState
 
         var request = new MoveBoardListRequest
         {
-            BoardListId = listId,
             Position = newPosition
         };
 
-        var result = await _boardListService.MoveBoardListAsync(request);
+        var result = await _boardListService.MoveBoardListAsync(listId, request);
         if (result.IsFailure)
         {
             return false;
         }
 
         ApplyListMoved(listId, newPosition);
+        return true;
+    }
+
+    public async Task<bool> UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        ApplyListUpdated(listId, request);
+
+        var result = await _boardListService.UpdateBoardListAsync(listId, request);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public async Task<bool> DeleteBoardListAsync(Guid listId)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        ApplyListDeleted(listId);
+
+        var result = await _boardListService.DeleteBoardListAsync(listId);
+        if (result.IsFailure)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -130,11 +162,10 @@ public sealed class BoardState
 
         var request = new CreateBoardItemRequest
         {
-            BoardListId = boardListId,
             Title = title
         };
 
-        var result = await _boardItemService.CreateBoardItemAsync(request);
+        var result = await _boardItemService.CreateBoardItemAsync(boardListId, request);
         if (result.IsFailure)
         {
             return false;
@@ -200,6 +231,7 @@ public sealed class BoardState
         Notify();
 
     }
+
     private void ApplyListMoved(Guid listId, int newPosition)
     {
         if (_currentBoard is null)
@@ -218,6 +250,30 @@ public sealed class BoardState
         _currentBoard.BoardLists = _currentBoard.BoardLists
             .OrderBy(bl => bl.Position)
             .ToList();
+
+        Notify();
+    }
+
+
+    private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
+    {
+        var list = Board.BoardLists.FirstOrDefault(bl => bl.Id == listId);
+        if (list is null)
+        {
+            return;
+        }
+        list.Title = request.Title;
+        list.Description = request.Description;
+        Notify();
+    }
+
+    private void ApplyListDeleted(Guid listId)
+    {
+        var removed = Board.BoardLists.RemoveAll(bl => bl.Id == listId);
+        if (removed == 0)
+        {
+            return;
+        }
 
         Notify();
     }

@@ -1,7 +1,7 @@
 ﻿namespace Tracker.Domain.Requests.BoardList;
 
-public class CreateBoardListRequest
+public class UpdateBoardListRequest
 {
     public required string Title { get; set; }
-    public string? Description { get; set; }
+    public required string Description { get; set; }
 }

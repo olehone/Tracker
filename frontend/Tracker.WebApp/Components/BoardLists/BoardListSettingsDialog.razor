@@ -1,0 +1,45 @@
+﻿<CascadingValue Value="BoardState">
+	<MudDialog>
+		<DialogContent>
+			<MudForm @ref=@_form
+					 Model=@model
+					 Validation=@validator
+					 ValidationDelay="300">
+				<MudTextField @bind-Value=@model.Title
+							  Label="Title"
+							  Required
+							  Variant="Variant.Outlined" />
+
+				<MudTextField @bind-Value=@model.Description
+							  Label="Description"
+							  Lines="3"
+							  Variant="Variant.Outlined" />
+
+			</MudForm>
+			<MudButton Variant="Variant.Filled"
+					   Color="Color.Error"
+					   OnClick=@Delete>Delete</MudButton>
+		</DialogContent>
+		<DialogActions>
+			<MudButton OnClick="Cancel">
+				<MudText>Cancel</MudText>
+			</MudButton>
+
+			<MudButton Disabled=@(isSubmitting)
+					   OnClick=@Submit
+					   Variant="Variant.Filled"
+					   Color="Color.Primary">
+				@if (isSubmitting)
+				{
+					<MudProgressCircular Size="Size.Small"
+										 Indeterminate
+										 Color="Color.Inherit" />
+				}
+				else
+				{
+					<MudText>Save</MudText>
+				}
+			</MudButton>
+		</DialogActions>
+	</MudDialog>
+</CascadingValue>

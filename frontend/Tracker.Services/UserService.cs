@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Tracker.API.Requests;
+﻿using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.Common;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;

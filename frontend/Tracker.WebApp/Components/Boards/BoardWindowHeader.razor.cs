@@ -11,7 +11,7 @@ public partial class BoardWindowHeader : IDisposable
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] IDialogService DialogService { get; set; } = null!;
 
     private BoardFullDto Board => BoardState.Board;
 

@@ -20,9 +20,7 @@ else
 		<ChildContent>
 			@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
 			{
-				<BoardList CanAddItem=@Board.Permissions.CanCreateItem
-						   List=@list
-						   OnCreateItem=@(title => CreateItemForList(list, title)) />
+				<BoardList List=@list/>
 			}
 			@if (Board.Permissions.CanCreateList)
 			{

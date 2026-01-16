@@ -1,22 +1,27 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Tracker.Domain.Requests.Board;
-using Tracker.Domain.ValueObjects;
+using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests.BoardList;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.Boards;
+namespace Tracker.WebApp.Components.BoardLists;
 
-public partial class BoardSettingsDialog : IDisposable
+public partial class BoardListSettingsDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
+
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
+    [Parameter]
+    public BoardListDto List { get; set; } = null!;
+
+    [Inject] private IDialogService DialogService { get; set; }
 
     private MudForm? _form;
-    private UpdateBoardRequest model = null!;
-    private readonly UpdateBoardRequestValidator validator = new();
+    private UpdateBoardListRequest model = null!;
+    private readonly UpdateBoardListRequestValidator validator = new();
     private bool isSubmitting = false;
 
     protected override void OnInitialized()
@@ -25,20 +30,26 @@ public partial class BoardSettingsDialog : IDisposable
 
         if (BoardState.Board != null)
         {
-            model = new UpdateBoardRequest
+            model = new UpdateBoardListRequest
             {
-                Title = BoardState.Board.Title,
-                Description = BoardState.Board.Description,
-                Visibility = BoardState.Board.Visibility,
-                PermissionRoles = new BoardPermissionRoles
-                {
-                    MinCreateItemRole = BoardState.Board.PermissionRoles.MinCreateItemRole,
-                    MinChangeItemRole = BoardState.Board.PermissionRoles.MinChangeItemRole,
-                    MinCreateListRole = BoardState.Board.PermissionRoles.MinCreateListRole,
-                    MinChangeListRole = BoardState.Board.PermissionRoles.MinChangeListRole,
-                }
+                Title = List.Title,
+                Description = List.Description ?? string.Empty,
             };
         }
+    }
+
+    private async Task Delete()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning",
+            "Deleting can not be undone!",
+            yesText: "Delete!", cancelText: "Cancel");
+        if(result == null)
+        {
+            return;
+        }
+        await BoardState.DeleteBoardListAsync(List.Id);
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private async Task Submit()
@@ -57,7 +68,7 @@ public partial class BoardSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        var success = await BoardState.UpdateBoardAsync(model);
+        var success = await BoardState.UpdateBoardListAsync(List.Id, model);
 
         isSubmitting = false;
 
@@ -69,17 +80,14 @@ public partial class BoardSettingsDialog : IDisposable
 
     private void Cancel() => MudDialog.Cancel();
 
-    private bool IsDisabled() =>
-        BoardState.Board?.Permissions.CanChangeBoard != true;
-
     void IDisposable.Dispose()
     {
         BoardState.OnChange -= StateHasChanged;
     }
 
-    public class UpdateBoardRequestValidator : AbstractValidator<UpdateBoardRequest>
+    public class UpdateBoardListRequestValidator : AbstractValidator<UpdateBoardListRequest>
     {
-        public UpdateBoardRequestValidator()
+        public UpdateBoardListRequestValidator()
         {
             RuleFor(x => x.Title)
                 .NotEmpty().WithMessage("Title is required")
@@ -88,12 +96,6 @@ public partial class BoardSettingsDialog : IDisposable
 
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
-
-            RuleFor(x => x.Visibility)
-                .IsInEnum().WithMessage("Invalid visibility");
-
-            RuleFor(x => x.PermissionRoles)
-                .NotNull().WithMessage("Permission roles are required");
         }
     }
 }
