@@ -4,7 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.BoardItems.Create;
+using Tracker.Application.UseCases.BoardItems.Delete;
 using Tracker.Application.UseCases.BoardItems.Move;
+using Tracker.Application.UseCases.BoardItems.Update;
+using Tracker.Application.UseCases.BoardLists.Delete;
+using Tracker.Application.UseCases.BoardLists.Update;
+using Tracker.Domain.Requests.BoardItem;
+using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.API.Controllers;
 [Route("api/board-items")]
@@ -14,7 +20,7 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
 {
 
     [HttpPost("{boardListId:guid}")]
-    public async Task<IActionResult> CreateBoardItemAsync(Guid boardListId, 
+    public async Task<IActionResult> CreateBoardItemAsync(Guid boardListId,
         [FromBody] CreateBoardItemRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
@@ -36,6 +42,29 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
             BoardItemId = request.BoardItemId,
             Position = request.Position
         };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+
+    [HttpPut("{boardListId:guid}")]
+    public async Task<IActionResult> UpdateBoardItemAsync(Guid boardListId,
+        [FromBody] UpdateBoardItemRequest request)
+    {
+        var mediatorRequest = new UpdateBoardItemCommand
+        {
+            BoardItemId = boardListId,
+            Title = request.Title,
+            Description = request.Description
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpDelete("{boardListId:guid}")]
+    public async Task<IActionResult> DeleteBoardItemAsync(Guid boardItemId)
+    {
+        var mediatorRequest = new DeleteBoardItemCommand { BoardItemId = boardItemId };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
