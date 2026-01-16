@@ -47,13 +47,13 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
     }
 
 
-    [HttpPut("{boardListId:guid}")]
-    public async Task<IActionResult> UpdateBoardItemAsync(Guid boardListId,
+    [HttpPut("{boardItemId:guid}")]
+    public async Task<IActionResult> UpdateBoardItemAsync(Guid boardItemId,
         [FromBody] UpdateBoardItemRequest request)
     {
         var mediatorRequest = new UpdateBoardItemCommand
         {
-            BoardItemId = boardListId,
+            BoardItemId = boardItemId,
             Title = request.Title,
             Description = request.Description
         };
@@ -61,7 +61,7 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpDelete("{boardListId:guid}")]
+    [HttpDelete("{boardItemId:guid}")]
     public async Task<IActionResult> DeleteBoardItemAsync(Guid boardItemId)
     {
         var mediatorRequest = new DeleteBoardItemCommand { BoardItemId = boardItemId };
