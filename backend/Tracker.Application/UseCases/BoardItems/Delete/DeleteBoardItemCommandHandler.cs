@@ -2,18 +2,17 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
-using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.BoardLists.Delete;
+namespace Tracker.Application.UseCases.BoardItems.Delete;
 
-public class DeleteBoardListCommandHandler(
+public class DeleteBoardItemCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<DeleteBoardListCommand, Result>
+    : IRequestHandler<DeleteBoardItemCommand, Result>
 {
     public async Task<Result> Handle(
-        DeleteBoardListCommand request,
+        DeleteBoardItemCommand request,
         CancellationToken cancellationToken)
     {
         if (!userContext.IsAuthenticated())
@@ -22,11 +21,17 @@ public class DeleteBoardListCommandHandler(
         }
 
         await using var uow = unitOfWorkFactory.Create();
-        var boardList = await uow.BoardListRepository.GetByIdAsync(request.BoardListId);
+        var boardItem = await uow.BoardItemRepository.GetByIdAsync(request.BoardItemId);
+        if (boardItem is null)
+        {
+            return Error.NotFound("Board item");
+        }
+
+        var boardList = await uow.BoardListRepository.GetByIdAsync(boardItem.BoardListId);
 
         if (boardList is null)
         {
-            return Error.NotFound("Board list");
+            return Error.NotFound("Board list", "item");
         }
 
         var board = await uow.BoardRepository.GetByIdAsync(boardList.BoardId);
@@ -52,16 +57,15 @@ public class DeleteBoardListCommandHandler(
         var boardPermissions = BoardPolicy
             .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
 
-        var canChange = BoardPolicy.IsActionAllowed(boardPermissions, BoardAction.ChangeList);
+        var canChange = BoardPolicy.IsActionAllowed(boardPermissions, BoardAction.ChangeItem);
         if (!canChange)
         {
             return AuthErrors.Forbidden();
         }
-        await uow.BoardListRepository.RemoveAsync(boardList.Id);
+        await uow.BoardItemRepository.RemoveAsync(boardItem.Id);
         
-        var maxPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(board.Id);
-        await uow.BoardListRepository.ShiftPositions(
-            boardList.BoardId, -1, boardList.Position + 1, maxPosition);
+        await uow.BoardItemRepository.ShiftPositions(
+            boardItem.BoardListId, -1, boardItem.Position);
         var sc = await uow.SaveChangesAsync(cancellationToken);
         return sc.IsFailure
             ? Error.Unknown
