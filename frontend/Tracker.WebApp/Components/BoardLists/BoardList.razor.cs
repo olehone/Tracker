@@ -13,13 +13,15 @@ public partial class BoardList
     [Parameter]
     public required BoardListDto List { get; set; }
 
+    [Parameter]
+    public EventCallback<string> OnCreateItem { get; set; }
     [Inject] IDialogService DialogService { get; set; } = null!;
 
     private BoardFullDto Board => BoardState.Board!;
 
     private async Task CreateNewItem(string title)
     {
-        await BoardState.CreateBoardItemAsync(List.Id, title);
+        await OnCreateItem.InvokeAsync(title);
     }
 
     private async Task OpenListSettings()
