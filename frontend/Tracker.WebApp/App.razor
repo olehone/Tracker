@@ -2,7 +2,10 @@
 @using Tracker.WebApp.Pages
 
 <MudPopoverProvider />
-<MudDialogProvider />
+<MudDialogProvider FullWidth="true"
+	CloseButton="true"
+	BackdropClick="true"
+	CloseOnEscapeKey="true"/>
 <MudSnackbarProvider />
 
 <CascadingAuthenticationState>
