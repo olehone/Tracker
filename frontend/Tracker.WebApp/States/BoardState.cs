@@ -1,4 +1,5 @@
-﻿using Tracker.Domain.Dtos;
+﻿using MudBlazor;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
@@ -18,6 +19,7 @@ public sealed class BoardState
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
     public BoardUsersState Users { get; }
+
 
     public bool IsLoading { get; private set; }
     public event Action? OnChange;
