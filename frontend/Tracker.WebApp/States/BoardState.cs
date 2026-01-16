@@ -269,10 +269,22 @@ public sealed class BoardState
 
     private void ApplyListDeleted(Guid listId)
     {
+        var list = Board.BoardLists.FirstOrDefault(bl => bl.Id == listId);
+        if (list is null)
+        {
+            return;
+        }
+
+        var deletedPosition = list.Position;
         var removed = Board.BoardLists.RemoveAll(bl => bl.Id == listId);
         if (removed == 0)
         {
             return;
+        }
+
+        foreach (var l in Board.BoardLists.Where(bl => bl.Position > deletedPosition))
+        {
+            l.Position -= 1;
         }
 
         Notify();
@@ -369,21 +381,23 @@ public sealed class BoardState
 
     private static void ShiftLists(BoardFullDto board, int newPosition, int oldPosition)
     {
-        foreach (var l in board.BoardLists)
+        if (newPosition == oldPosition)
         {
-            if (oldPosition < newPosition)
+            return;
+        }
+
+        if (oldPosition < newPosition)
+        {
+            foreach (var l in board.BoardLists.Where(bl => bl.Position > oldPosition && bl.Position <= newPosition))
             {
-                if (l.Position > oldPosition && l.Position <= newPosition)
-                {
-                    l.Position -= 1;
-                }
+                l.Position -= 1;
             }
-            else
+        }
+        else
+        {
+            foreach (var l in board.BoardLists.Where(bl => bl.Position >= newPosition && bl.Position < oldPosition))
             {
-                if (l.Position >= newPosition && l.Position < oldPosition)
-                {
-                    l.Position += 1;
-                }
+                l.Position += 1;
             }
         }
     }

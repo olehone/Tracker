@@ -58,6 +58,10 @@ public class DeleteBoardListCommandHandler(
             return AuthErrors.Forbidden();
         }
         await uow.BoardListRepository.RemoveAsync(boardList.Id);
+        
+        var maxPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(board.Id);
+        await uow.BoardListRepository.ShiftPositions(
+            boardList.BoardId, -1, boardList.Position + 1, maxPosition);
         var sc = await uow.SaveChangesAsync(cancellationToken);
         return sc.IsFailure
             ? Error.Unknown
