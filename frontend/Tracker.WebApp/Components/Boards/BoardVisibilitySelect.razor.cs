@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.Boards;
+
 public partial class BoardVisibilitySelect
 {
     [Parameter]

@@ -25,8 +25,7 @@ public partial class BoardItem
 
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
             Item.Title,
-            parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            parameters
         );
 
         await dialog.Result;

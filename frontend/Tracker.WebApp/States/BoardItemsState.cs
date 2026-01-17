@@ -9,8 +9,21 @@ public sealed class BoardItemsState(
     IBoardItemService boardItemService)
 {
     private readonly List<BoardItemDto> _boardItems = [];
+    private List<BoardItemDto>? _sortedItems;
 
-    public IReadOnlyList<BoardItemDto> BoardItems => _boardItems;
+    public IReadOnlyList<BoardItemDto> BoardItems
+    {
+        get
+        {
+            _sortedItems ??= _boardItems
+                .OrderBy(i => i.BoardListId)
+                .ThenBy(i => i.Position)
+                .ToList();
+
+            return _sortedItems;
+        }
+    }
+
     public event Action? OnChange;
 
     private BoardFullDto Board => boardState.Board!;
@@ -176,5 +189,9 @@ public sealed class BoardItemsState(
         }
     }
 
-    private void Notify() => OnChange?.Invoke();
+    private void Notify()
+    {
+        _sortedItems = null;
+        OnChange?.Invoke();
+    }
 }

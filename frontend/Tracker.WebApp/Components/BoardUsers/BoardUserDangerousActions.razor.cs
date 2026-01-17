@@ -4,7 +4,7 @@ using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Components.BoardUsers;
 
-public partial class BoardUserDangerousActions 
+public partial class BoardUserDangerousActions
 {
     [Parameter, EditorRequired]
     public BoardUserDto BoardUser { get; set; }
@@ -14,21 +14,14 @@ public partial class BoardUserDangerousActions
     private async Task ShowTransferOwnershipDialog()
     {
         var parameters = new DialogParameters
-    {
-        { "NewOwnerName", BoardUser.User.Username }
-    };
-
-        var options = new DialogOptions
         {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true
+            { "NewOwnerName", BoardUser.User.Username }
         };
 
         var dialog = await DialogService.ShowAsync<TransferOwnershipDialog>(
             "Transfer Ownership",
             parameters,
-            options);
+            new DialogOptions { MaxWidth = MaxWidth.Small });
 
         var result = await dialog.Result;
         if (result is null || result.Canceled)
