@@ -13,11 +13,19 @@ else
 			  Spacing="0"
 			  AlignItems="AlignItems.Center"
 			  Class="mud-theme-secondary px-5 py-3 rounded-t">
-		<MudText Color="Color.Inherit"
-				 Typo="Typo.h6"
-				 Class="text-ellipsis">
-			@Board.Title
-		</MudText>
+		<MudTooltip Text="To workspace">
+			<a href=@($"/workspaces/{Board.WorkspaceId}")>
+				<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft />
+			</a>
+		</MudTooltip>
+		@if (Board.Permissions.CanChangeBoard)
+		{
+			<MudText Color="Color.Inherit"
+					 Typo="Typo.h6"
+					 Class="text-ellipsis">
+				@Board.Title
+			</MudText>
+		}
 
 		<MudStack Row
 				  Spacing="3"

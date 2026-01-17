@@ -17,7 +17,7 @@ public partial class BoardListSettingsDialog : IDisposable
     [Parameter]
     public BoardListDto List { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; }
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private MudForm? _form;
     private UpdateBoardListRequest model = null!;

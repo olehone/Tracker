@@ -1,10 +1,8 @@
-﻿using MudBlazor;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.States;
 
@@ -59,24 +57,6 @@ public sealed class BoardState
         Notify();
     }
 
-    public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
-
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyBoardUpdated(request);
-        return true;
-    }
-
     public async Task<bool> CreateBoardListAsync(string title)
     {
         if (_currentBoard is null)
@@ -98,6 +78,40 @@ public sealed class BoardState
         ApplyListCreated(result.Value);
         return true;
     }
+
+    public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        var result = await _boardService.UpdateBoardAsync(_currentBoard.Id, request);
+
+        if (result.IsFailure)
+        {
+            return false;
+        }
+
+        ApplyBoardUpdated(request);
+        return true;
+    }
+
+    public async Task<bool> DeleteBoardAsync()
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        var result = await _boardService.DeleteBoardAsync(_currentBoard.Id);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+        return true;
+    }
+
 
     public async Task<bool> MoveBoardListAsync(Guid listId, int newPosition)
     {

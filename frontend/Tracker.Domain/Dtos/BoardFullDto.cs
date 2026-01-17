@@ -6,6 +6,7 @@ namespace Tracker.Domain.Dtos;
 public class BoardFullDto
 {
     public required Guid Id { get; set; }
+    public required Guid WorkspaceId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required BoardVisibility Visibility { get; set; }

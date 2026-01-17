@@ -14,6 +14,8 @@ public partial class BoardSettingsDialog : IDisposable
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
 
+    [Inject] IDialogService DialogService { get; set; } = null!;
+
     private MudForm? _form;
     private UpdateBoardRequest model = null!;
     private readonly UpdateBoardRequestValidator validator = new();
@@ -38,6 +40,23 @@ public partial class BoardSettingsDialog : IDisposable
                     MinChangeListRole = BoardState.Board.PermissionRoles.MinChangeListRole,
                 }
             };
+        }
+    }
+
+    private async Task Delete()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Warning",
+            "Deleting can not be undone!",
+            yesText: "Delete!", cancelText: "Cancel");
+        if (result == null)
+        {
+            return;
+        }
+        bool deleted = await BoardState.DeleteBoardAsync();
+        if (deleted)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
         }
     }
 
