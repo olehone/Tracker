@@ -32,8 +32,7 @@ public partial class BoardList
 
         var dialog = await DialogService.ShowAsync<BoardListSettingsDialog>(
             List.Title,
-            parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            parameters
         );
 
         await dialog.Result;

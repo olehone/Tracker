@@ -13,13 +13,20 @@ public partial class BoardWindowHeader : IDisposable
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
-   
+
     private BoardFullDto Board => BoardState.Board;
+    private bool _disposed;
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.OnChange += OnBoardStateChanged;
+        BoardState.Lists.OnChange += OnBoardStateChanged;
         BoardState.OnBoardNotFound += ToWorkspace;
+    }
+
+    private void OnBoardStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
     }
 
     private void ToWorkspace()
@@ -41,8 +48,7 @@ public partial class BoardWindowHeader : IDisposable
 
         var dialog = await DialogService.ShowAsync<BoardSettingsDialog>(
             settingsTitle,
-            parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            parameters
         );
 
         await dialog.Result;
@@ -56,8 +62,7 @@ public partial class BoardWindowHeader : IDisposable
         };
         var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
             $"Move lists of {Board.Title}",
-            parameters,
-            new DialogOptions { CloseButton = true }
+            parameters
         );
 
         await dialog.Result;
@@ -72,14 +77,28 @@ public partial class BoardWindowHeader : IDisposable
         var dialog = await DialogService.ShowAsync<BoardUsersDialog>(
             "Members",
             parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true, CloseButton = true }
+            new DialogOptions { MaxWidth = MaxWidth.Small }
         );
 
         await dialog.Result;
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                BoardState.Items.OnChange -= OnBoardStateChanged;
+                BoardState.Lists.OnChange -= OnBoardStateChanged;
+            }
+            _disposed = true;
+        }
+    }
+
     public void Dispose()
     {
-        BoardState.OnChange -= StateHasChanged;
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

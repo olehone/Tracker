@@ -1,6 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
@@ -8,8 +7,6 @@ namespace Tracker.WebApp.States;
 public sealed class BoardState
 {
     private readonly IBoardService _boardService;
-    private readonly IBoardListService _boardListService;
-
     private BoardFullDto? _currentBoard;
 
     public BoardFullDto Board => _currentBoard
@@ -30,7 +27,6 @@ public sealed class BoardState
         IUserService userService)
     {
         _boardService = boardService;
-        _boardListService = boardListService;
 
         Users = new BoardUsersState(this, boardUserService, userService);
         Items = new BoardItemsState(this, boardItemService);
@@ -65,129 +61,32 @@ public sealed class BoardState
         return LoadAsync(Board.Id);
     }
 
-    public async Task<bool> CreateBoardListAsync(string title)
+    public async Task UpdateBoardAsync(UpdateBoardRequest request)
     {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new CreateBoardListRequest
-        {
-            Title = title
-        };
-
-        var result = await _boardListService.CreateBoardListAsync(Board.Id, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyListCreated(result.Value);
-        return true;
-    }
-
-    public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
+        var result = await _boardService.UpdateAsync(Board.Id, request);
 
         if (result.IsFailure)
         {
-            return false;
+            await ReloadAsync();
         }
-
         ApplyBoardUpdated(request);
-        return true;
     }
 
     public async Task DeleteBoardAsync()
     {
-        if (_currentBoard is null)
+        var result = await _boardService.DeleteAsync(Board.Id);
+        if (result.IsSuccess)
         {
-            return false;
+            OnBoardNotFound?.Invoke();
         }
-
-        var result = await _boardService.DeleteBoardAsync(_currentBoard.Id);
-        if (result.IsFailure)
-        {
-            return;
-        }
-        OnBoardNotFound?.Invoke();
-    }
-
-
-    public async Task<bool> MoveBoardListAsync(Guid listId, int newPosition)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new MoveBoardListRequest
-        {
-            Position = newPosition
-        };
-
-        var result = await _boardListService.MoveBoardListAsync(listId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyListMoved(listId, newPosition);
-        return true;
-    }
-
-    public async Task<bool> UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyListUpdated(listId, request);
-
-        var result = await _boardListService.UpdateBoardListAsync(listId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    public async Task<bool> DeleteBoardListAsync(Guid itemId)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyListDeleted(itemId);
-
-        var result = await _boardListService.DeleteBoardListAsync(itemId);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
     }
 
     private void ApplyBoardUpdated(UpdateBoardRequest request)
     {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        _currentBoard.Title = request.Title;
-        _currentBoard.Description = request.Description;
-        _currentBoard.Visibility = request.Visibility;
-        _currentBoard.PermissionRoles = request.PermissionRoles;
+        Board.Title = request.Title;
+        Board.Description = request.Description;
+        Board.Visibility = request.Visibility;
+        Board.PermissionRoles = request.PermissionRoles;
 
         Notify();
     }

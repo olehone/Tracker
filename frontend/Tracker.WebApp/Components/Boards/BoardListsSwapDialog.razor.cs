@@ -5,19 +5,25 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardListsSwapDialog
+public partial class BoardListsSwapDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
     [Parameter, EditorRequired]
     public BoardState BoardState { get; set; } = null!;
 
-    private MudDropContainer<BoardListDto> _container = null!;
-    private List<BoardListDto>? Lists => BoardState.Board?.BoardLists;
+    private IReadOnlyList<BoardListDto> Lists => 
+        BoardState.Lists.BoardLists;
+    private bool _disposed;
 
     protected override void OnInitialized()
     {
-        BoardState.Lists.OnChange += StateHasChanged;
+        BoardState.Lists.OnChange += OnStateChanged;
+    }
+
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task SwapList(MudItemDropInfo<BoardListDto> dropInfo)
@@ -31,5 +37,23 @@ public partial class BoardListsSwapDialog
             dropInfo.Item.Id,
             dropInfo.IndexInZone + 1
         );
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                BoardState.Lists.OnChange -= OnStateChanged;
+            }
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
