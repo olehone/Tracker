@@ -25,7 +25,7 @@ else
 					 Dense
 					 ReadOnly>
 
-				@foreach (var boardUser in Users.BoardUsers.OrderByDescending(m => m.Role))
+				@foreach (var boardUser in Users.BoardUsers)
 				{
 					<BoardUserListItem @key=boardUser.User.Id BoardUser=boardUser />
 					<MudDivider />

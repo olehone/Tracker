@@ -18,7 +18,7 @@ public class GetBoardByIdQueryHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository.GetByIdWithListsAndItemsAsync(request.Id);
+        var board = await uow.BoardRepository.GetByIdWithListsItemsUsersAsync(request.Id);
         if (board is null)
         {
             return Error.NotFound("Board");
@@ -47,6 +47,7 @@ public class GetBoardByIdQueryHandler(
         {
             return AuthErrors.Forbidden();
         }
+
         return board.ToFullDto(permissions);
     }
 }
