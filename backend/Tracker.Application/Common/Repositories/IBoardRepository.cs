@@ -7,7 +7,7 @@ public interface IBoardRepository : IRepository<Board, Guid>
     Task<Board?> GetBoardWithWorkspaceAsync(Guid id);
     Task<Board?> GetBoardWithWorkspaceByItemAsync(Guid itemId);
     Task<Board?> GetBoardWithWorkspaceByListAsync(Guid listId);
-    Task<Board?> GetByIdWithListsAndItemsAsync(Guid id);
+    Task<Board?> GetByIdWithListsItemsUsersAsync(Guid id);
     Task<IReadOnlyList<Board>> GetPublicByWorkspaceAsync(Guid workspaceId);
     Task<IReadOnlyList<Board>> GetByWorkspaceAndUserAsync(Guid workspaceId, Guid userId);
 }
