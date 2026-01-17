@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
+using Tracker.Application.UseCases.Boards.Delete;
 using Tracker.Application.UseCases.Boards.GetById;
 using Tracker.Application.UseCases.Boards.Update;
 
@@ -37,7 +38,7 @@ public class BoardsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}/settings")]
-    public async Task<IActionResult> UpdateAsync(Guid id,
+    public async Task<IActionResult> UpdateBoardAsync(Guid id,
             [FromBody] UpdateBoardBodyRequest request)
     {
         var mediatorRequest = new UpdateBoardCommand
@@ -47,6 +48,17 @@ public class BoardsController(IMediator mediator) : ControllerBase
             Description = request.Description,
             Visibility = request.Visibility,
             PermissionRoles = request.PermissionRoles,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteBoardAsync(Guid id)
+    {
+        var mediatorRequest = new DeleteBoardCommand
+        {
+            BoardId = id,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
