@@ -8,9 +8,9 @@ public sealed class BoardItemsState
 {
     private readonly BoardState _boardState;
     private readonly IBoardItemService _boardItemService;
-    private readonly List<BoardItemDto> _boardItems= [];
+    private readonly List<BoardItemDto> _boardItems = [];
 
-    public IReadOnlyList<BoardItemDto> BoardItems=> _boardItems;
+    public IReadOnlyList<BoardItemDto> BoardItems => _boardItems;
     public event Action? OnChange;
 
     private BoardFullDto Board => _boardState.Board!;
@@ -25,7 +25,7 @@ public sealed class BoardItemsState
 
     public void Reload()
     {
-        var items = Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList() ?? [];
+        var items = Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList();
         _boardItems.Clear();
         _boardItems.AddRange(items);
     }
@@ -93,26 +93,18 @@ public sealed class BoardItemsState
 
     private void ApplyItemCreated(BoardItemDto newItem)
     {
-        var list = Board.BoardLists.FirstOrDefault(l => l.Id == newItem.BoardListId);
-        list?.BoardItems.Add(newItem);
-
+        _boardItems.Add(newItem);
         Notify();
     }
 
     private void ApplyItemMoved(MoveBoardItemRequest request)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
-
         if (item is null)
         {
             return;
         }
 
-        var fromList = Board.BoardLists.FirstOrDefault(bl => bl.Id == item.BoardListId);
-        if (fromList is null)
-        {
-            return;
-        }
         if (item.BoardListId == request.ToBoardListId)
         {
             if (item.Position == request.Position)
@@ -122,31 +114,25 @@ public sealed class BoardItemsState
 
             if (item.Position > request.Position)
             {
-                ShiftItemsPosition(fromList, +1, request.Position, item.Position - 1);
+                ShiftItemsPosition(item.BoardListId, +1, request.Position, item.Position - 1);
                 item.Position = request.Position;
             }
             else
             {
-                ShiftItemsPosition(fromList, -1, item.Position + 1, request.Position);
+                ShiftItemsPosition(item.BoardListId, -1, item.Position + 1, request.Position);
                 item.Position = request.Position;
             }
-            fromList.BoardItems = fromList.BoardItems.OrderBy(bi => bi.Position).ToList();
         }
         else
         {
-            var toList = Board.BoardLists.FirstOrDefault(bl => bl.Id == request.ToBoardListId);
-            if (toList is null)
-            {
-                return;
-            }
+            var oldListId = item.BoardListId;
+            var oldPosition = item.Position;
 
-            fromList.BoardItems.Remove(item);
-            ShiftItemsPosition(fromList, -1, item.Position);
-            ShiftItemsPosition(toList, +1, request.Position);
+            ShiftItemsPosition(oldListId, -1, oldPosition + 1);
+            ShiftItemsPosition(request.ToBoardListId, +1, request.Position);
 
             item.BoardListId = request.ToBoardListId;
             item.Position = request.Position;
-            toList.BoardItems.Insert(item.Position - 1, item);
         }
 
         Notify();
@@ -154,7 +140,7 @@ public sealed class BoardItemsState
 
     private void ApplyItemUpdated(Guid itemId, UpdateBoardItemRequest request)
     {
-        var item = Board.BoardLists.SelectMany(bl=> bl.BoardItems).FirstOrDefault(bi => bi.Id  == itemId);
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
@@ -167,40 +153,36 @@ public sealed class BoardItemsState
 
     private void ApplyItemDeleted(Guid itemId)
     {
-        var list = Board.BoardLists
-            .FirstOrDefault(bl => bl.BoardItems.Any(bi => bi.Id == itemId));
-        if (list is null)
-        {
-            return;
-        }
-
-        var item = list.BoardItems.FirstOrDefault(bi => bi.Id == itemId);
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
         }
 
         var deletedPosition = item.Position;
+        var listId = item.BoardListId;
 
-        list.BoardItems.Remove(item);
-        ShiftItemsPosition(list, -1, deletedPosition + 1);
-        list.BoardItems = list.BoardItems
-            .OrderBy(bi => bi.Position)
-            .ToList();
+        _boardItems.Remove(item);
+
+        foreach (var i in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position > deletedPosition))
+        {
+            i.Position -= 1;
+        }
+
         Notify();
     }
 
-    private static void ShiftItemsPosition(BoardListDto list, int delta, int from)
+    private void ShiftItemsPosition(Guid listId, int delta, int from)
     {
-        foreach (var item in list.BoardItems.Where(bi => bi.Position >= from))
+        foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from))
         {
             item.Position += delta;
         }
     }
 
-    private static void ShiftItemsPosition(BoardListDto list, int delta, int from, int to)
+    private void ShiftItemsPosition(Guid listId, int delta, int from, int to)
     {
-        foreach (var item in list.BoardItems.Where(bi => bi.Position >= from && bi.Position <= to))
+        foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from && bi.Position <= to))
         {
             item.Position += delta;
         }

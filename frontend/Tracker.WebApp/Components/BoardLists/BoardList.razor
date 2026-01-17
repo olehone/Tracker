@@ -23,22 +23,12 @@
 			}
 		</MudToolBar>
 
-		@if (List.BoardItems.Count == 0)
-		{
-			<MudDropZone T="BoardItemDto"
-						 Identifier=@List.Id.ToString()
-						 AllowReorder
-						 Style="min-height: 60px;"
-						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
-		}
-		else
-		{
-			<MudDropZone T="BoardItemDto"
-						 Identifier=@List.Id.ToString()
-						 AllowReorder
-						 Style="max-height: 400px; overflow-y: auto;"
-						 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
-		}
+		<MudDropZone T="BoardItemDto"
+					 Identifier=@List.Id.ToString()
+					 AllowReorder
+					 Style="min-height: 60px; max-height: 400px; overflow-y: auto;"
+					 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
+
 		@if (Board.Permissions.CanCreateItem)
 		{
 			<OneLineCreateButton Title="Add new item"
