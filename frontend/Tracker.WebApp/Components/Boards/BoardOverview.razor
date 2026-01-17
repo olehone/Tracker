@@ -18,7 +18,7 @@ else
 					  ItemDropped=@ItemDropped
 					  Class="d-flex flex-row flex-nowrap">
 		<ChildContent>
-			@foreach (var list in Board.BoardLists.OrderBy(x => x.Position))
+			@foreach (var list in BoardState.Lists.BoardLists)
 			{
 				<BoardList List=@list />
 			}

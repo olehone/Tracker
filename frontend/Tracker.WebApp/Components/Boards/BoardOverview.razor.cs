@@ -15,8 +15,8 @@ public partial class BoardOverview
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += OnBoardStateChanged;
         BoardState.Items.OnChange += OnBoardStateChanged;
+        BoardState.Lists.OnChange += OnBoardStateChanged;
     }
 
     private void OnBoardStateChanged()
@@ -41,7 +41,7 @@ public partial class BoardOverview
 
     private async Task CreateList(string title)
     {
-        await BoardState.CreateBoardListAsync(title);
+        await BoardState.Lists.CreateBoardListAsync(title);
     }
 
 }

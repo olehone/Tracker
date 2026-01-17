@@ -33,6 +33,7 @@ public sealed class BoardItemsState(
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
+            return;
         }
 
         ApplyItemCreated(result.Value);
