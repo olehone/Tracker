@@ -19,7 +19,6 @@ public static class ErrorMappingService
         return response.IsSuccess
             ? new NoContentResult()
             : response.Error.ToProblemDetails();
-
     }
 
     public static IActionResult ResultToActionResult<TValue>(Result<TValue> response)
@@ -49,10 +48,10 @@ public static class ErrorMappingService
             }),
 
             ErrorType.Unauthenticated => new UnauthorizedObjectResult(new ProblemDetails
-                {
-                    Title = error.Description,
-                    Status = StatusCodes.Status401Unauthorized
-                }),
+            {
+                Title = error.Description,
+                Status = StatusCodes.Status401Unauthorized
+            }),
 
             ErrorType.Forbidden => new ObjectResult(new ProblemDetails
             {

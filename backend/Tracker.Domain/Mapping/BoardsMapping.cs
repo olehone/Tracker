@@ -22,6 +22,7 @@ public static class BoardsMapping
         return new BoardFullDto
         {
             Id = board.Id,
+            WorkspaceId = board.WorkspaceId,
             Title = board.Title,
             Description = board.Description ?? string.Empty,
             Visibility = board.Visibility,
