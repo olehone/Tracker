@@ -21,7 +21,7 @@
 								 ToStringFunc=@(u => u == null ? null : $"{u.Username}")>
 
 					<ItemDisabledTemplate>
-						<MudText>@context.Username</MudText>
+						@context.Username
 					</ItemDisabledTemplate>
 				</MudAutocomplete>
 			</MudItem>

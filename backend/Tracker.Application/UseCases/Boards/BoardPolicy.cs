@@ -96,7 +96,7 @@ public static class BoardPolicy
             return true;
         }
 
-        if (boardRole <= UserBoardRole.Admin)
+        if (boardRole >= UserBoardRole.Admin)
         {
             return true;
         }
