@@ -5,8 +5,8 @@ using Tracker.Services.Abstraction;
 namespace Tracker.WebApp.States;
 
 public sealed class BoardItemsState(
-    BoardState boardState,
-    IBoardItemService boardItemService)
+        BoardState boardState,
+        IBoardItemService boardItemService)
 {
     private readonly List<BoardItemDto> _boardItems = [];
     private List<BoardItemDto>? _sortedItems;
@@ -102,6 +102,7 @@ public sealed class BoardItemsState(
     private void ApplyMoved(MoveBoardItemRequest request)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
+
         if (item is null)
         {
             return;
