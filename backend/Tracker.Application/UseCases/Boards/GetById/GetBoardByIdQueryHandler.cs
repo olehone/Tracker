@@ -24,7 +24,7 @@ public class GetBoardByIdQueryHandler(
             return Error.NotFound("Board");
         }
 
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             if (BoardPolicy.CanAnonView(board.Visibility))
             {

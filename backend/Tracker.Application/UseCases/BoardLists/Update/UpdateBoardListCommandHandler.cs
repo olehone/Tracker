@@ -4,29 +4,29 @@ using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.BoardItems.Update;
+namespace Tracker.Application.UseCases.BoardLists.Update;
 
-public class UpdateBoardItemCommandHandler(
+public class UpdateBoardListCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<UpdateBoardItemCommand, Result>
+    : IRequestHandler<UpdateBoardListCommand, Result>
 {
-    public async Task<Result> Handle(UpdateBoardItemCommand request,
+    public async Task<Result> Handle(UpdateBoardListCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.ChangeList);
         if (listResult.IsFailure)
         {
             return listResult.Error;
         }
-        var boardItem = listResult.Value;
+        var boardList = listResult.Value;
 
-        boardItem.Title = request.Title;
-        boardItem.Description = request.Description;
+        boardList.Title = request.Title;
+        boardList.Description = request.Description;
 
-        uow.BoardItemRepository.Update(boardItem);
+        uow.BoardListRepository.Update(boardList);
         var result = await uow.SaveChangesAsync(cancellationToken);
         if (result.IsFailure)
         {

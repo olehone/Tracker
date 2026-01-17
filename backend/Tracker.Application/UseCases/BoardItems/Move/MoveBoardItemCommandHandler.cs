@@ -1,10 +1,13 @@
 ﻿using MediatR;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItems.Move;
 
 public class MoveBoardItemCommandHandler(
+    IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<MoveBoardItemCommand, Result>
 {
@@ -14,11 +17,12 @@ public class MoveBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var boardItem = await uow.BoardItemRepository.GetByIdAsync(request.BoardItemId);
-        if (boardItem is null)
+        var listResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
+        if (listResult.IsFailure)
         {
-            return Error.NotFound("BoardItem");
+            return listResult.Error;
         }
+        var boardItem = listResult.Value;
 
         int currentPosition = boardItem.Position;
         int maxNewPosition = await uow.BoardItemRepository

@@ -1,0 +1,105 @@
+﻿using Tracker.Application.Common.Auth;
+using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Entities;
+using Tracker.Domain.Results;
+
+namespace Tracker.Application.UseCases.Boards;
+
+public static class BoardHelper
+{
+    public static async Task<Result<Board>> GetBoardForActionAsync(IUnitOfWork uow, 
+        IUserContext userContext, Guid boardId, BoardAction action)
+    {
+        if (userContext.IsUnauthenticated())
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
+        var board = await uow.BoardRepository.GetByIdAsync(boardId);
+
+        if (board is null)
+        {
+            return Error.NotFound("Board");
+        }
+
+        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
+        if (!isAllowed)
+        {
+            return AuthErrors.Forbidden();
+        }
+        return board;
+    }
+
+    public static async Task<Result<BoardList>> GetBoardListForActionAsync(IUnitOfWork uow, 
+        IUserContext userContext, Guid boardListId, BoardAction action)
+    {
+        if (userContext.IsUnauthenticated())
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
+        var board = await uow.BoardRepository.GetBoardWithWorkspaceByListAsync(boardListId);
+        if (board is null)
+        {
+            return Error.NotFound("Board");
+        }
+
+        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
+        if (!isAllowed)
+        {
+            return AuthErrors.Forbidden();
+        }
+
+        var boardList = await uow.BoardListRepository.GetByIdAsync(boardListId);
+        if (boardList is null)
+        {
+            return Error.NotFound("Board list");
+        }
+
+        return boardList;
+    }
+    
+    public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow, 
+        IUserContext userContext, Guid boardItemId, BoardAction action)
+    {
+        if (userContext.IsUnauthenticated())
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
+        var board = await uow.BoardRepository.GetBoardWithWorkspaceByItemAsync(boardItemId);
+        if (board is null)
+        {
+            return Error.NotFound("Board");
+        }
+
+        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
+        if (!isAllowed)
+        {
+            return AuthErrors.Forbidden();
+        }
+
+        var boardList = await uow.BoardItemRepository.GetByIdAsync(boardItemId);
+        if (boardList is null)
+        {
+            return Error.NotFound("Board item");
+        }
+
+        return boardList;
+    }
+
+    // User must be authenticated before call
+    // for proper separation of unauthenticated and forbidden error
+    private static async Task<bool> IsActionAllowed(IUnitOfWork uow, 
+        IUserContext userContext, Board board, BoardAction action)
+    {
+        var userId = userContext.GetUserId();
+        var userRole = userContext.GetUserRole();
+        var workspaceRole = await uow.UserWorkspaceRepository.GetRoleAsync(userId, board.Id);
+        var boardRole = await uow.UserBoardRepository.GetRoleAsync(userId, board.WorkspaceId);
+        var permissions = BoardPolicy
+            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
+
+        return BoardPolicy.IsActionAllowed(permissions, action);
+    }
+}

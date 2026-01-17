@@ -16,52 +16,21 @@ public class DeleteBoardListCommandHandler(
         DeleteBoardListCommand request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
-        {
-            return AuthErrors.Unauthenticated;
-        }
-
         await using var uow = unitOfWorkFactory.Create();
-        var boardList = await uow.BoardListRepository.GetByIdAsync(request.BoardListId);
 
-        if (boardList is null)
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.ChangeList);
+        if (listResult.IsFailure)
         {
-            return Error.NotFound("Board list");
+            return listResult.Error;
         }
+        var boardList = listResult.Value;
 
-        var board = await uow.BoardRepository.GetByIdAsync(boardList.BoardId);
-        if (board is null)
-        {
-            return Error.NotFound("Board", "board list");
-        }
-
-        var workspace = await uow.WorkspaceRepository
-            .GetByIdAsync(board.WorkspaceId);
-        if (workspace is null)
-        {
-            return Error.NotFound("Workspace", "board");
-        }
-
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRoleAsync(userId, workspace.Id);
-        var boardRole = await uow.UserBoardRepository
-            .GetRoleAsync(userId, board.Id);
-
-        var boardPermissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
-
-        var canChange = BoardPolicy.IsActionAllowed(boardPermissions, BoardAction.ChangeList);
-        if (!canChange)
-        {
-            return AuthErrors.Forbidden();
-        }
         await uow.BoardListRepository.RemoveAsync(boardList.Id);
         
-        var maxPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(board.Id);
+        var maxPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(boardList.BoardId);
         await uow.BoardListRepository.ShiftPositions(
             boardList.BoardId, -1, boardList.Position + 1, maxPosition);
+
         var sc = await uow.SaveChangesAsync(cancellationToken);
         return sc.IsFailure
             ? Error.Unknown

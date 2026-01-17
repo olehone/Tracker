@@ -1,10 +1,13 @@
 ﻿using MediatR;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardLists.Move;
 
 public sealed class MoveBoardListCommandHandler(
+    IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<MoveBoardListCommand, Result>
 {
@@ -14,11 +17,12 @@ public sealed class MoveBoardListCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var boardList = await uow.BoardListRepository.GetByIdAsync(request.BoardListId);
-        if (boardList is null)
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.ChangeList);
+        if (listResult.IsFailure)
         {
-            return Error.NotFound("BoardList");
+            return listResult.Error;
         }
+        var boardList = listResult.Value;
 
         int currentPosition = boardList.Position;
         if (currentPosition == request.Position)
@@ -26,13 +30,7 @@ public sealed class MoveBoardListCommandHandler(
             return Result.Success();
         }
 
-        var board = await uow.BoardRepository.GetByIdAsync(boardList.BoardId);
-        if(board is null)
-        {
-            return Error.NotFound("Board", "board list");
-        }
-
-        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(board.Id) + 1;
+        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(boardList.Id) + 1;
         if (maxNewPosition < request.Position)
         {
             request.Position = maxNewPosition;

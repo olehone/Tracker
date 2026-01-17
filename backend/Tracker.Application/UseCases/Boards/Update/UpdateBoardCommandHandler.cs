@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.UseCases.Workspaces;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
 
@@ -15,44 +14,15 @@ public class UpdateBoardCommandHandler(
     public async Task<Result> Handle(UpdateBoardCommand request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
-        {
-            return AuthErrors.Unauthenticated;
-        }
-
         await using var uow = unitOfWorkFactory.Create();
-        var board = await uow.BoardRepository
-            .GetByIdAsync(request.BoardId);
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext, request.BoardId, BoardAction.ChangeBoard);
 
-        if (board is null)
+        if (boardResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return boardResult.Error;
         }
-        var workspace= await uow.WorkspaceRepository
-            .GetByIdAsync(board.WorkspaceId);
-
-        if (workspace is null)
-        {
-            return Error.NotFound("Workspace", "board");
-        }
-
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
-            .GetRoleAsync(userId, request.BoardId);
+        var board = boardResult.Value;
         
-        var workspacePermissions = WorkspacePolicy
-            .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
-
-        var canChange = BoardPolicy
-            .CanChangeSettings(userRole, workspaceRole, boardRole, workspacePermissions);
-        if (!canChange)
-        {
-            return AuthErrors.Forbidden();
-        }
-
         var newBoard = new Board
         {
             Id = request.BoardId,

@@ -14,41 +14,15 @@ public class DeleteBoardCommandHandler(
         DeleteBoardCommand request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
-        {
-            return AuthErrors.Unauthenticated;
-        }
-
         await using var uow = unitOfWorkFactory.Create();
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext, request.BoardId, BoardAction.ChangeBoard);
 
-        var board = await uow.BoardRepository.GetByIdAsync(request.BoardId);
-        if (board is null)
+        if (boardResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return boardResult.Error;
         }
+        var board = boardResult.Value;
 
-        var workspace = await uow.WorkspaceRepository
-            .GetByIdAsync(board.WorkspaceId);
-        if (workspace is null)
-        {
-            return Error.NotFound("Workspace", "board");
-        }
-
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRoleAsync(userId, workspace.Id);
-        var boardRole = await uow.UserBoardRepository
-            .GetRoleAsync(userId, board.Id);
-
-        var boardPermissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
-
-        var canChange = BoardPolicy.IsActionAllowed(boardPermissions, BoardAction.ChangeBoard);
-        if (!canChange)
-        {
-            return AuthErrors.Forbidden();
-        }
         await uow.BoardRepository.RemoveAsync(board.Id);
         
         var sc = await uow.SaveChangesAsync(cancellationToken);

@@ -17,7 +17,7 @@ public class GetCurrentUserQueryHandler(
         GetCurrentUserQuery request, 
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             return AuthErrors.Unauthenticated;
         }
