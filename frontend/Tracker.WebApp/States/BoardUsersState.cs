@@ -11,14 +11,25 @@ public sealed class BoardUsersState(
     IBoardUserService boardUserService)
 {
     private readonly List<BoardUserDto> _boardUsers = [];
-    public IReadOnlyList<BoardUserDto> Users => _boardUsers;
-    private BoardFullDto Board => boardState.Board!;
+    private List<BoardUserDto>? _sortedUsers;
+
+    public IReadOnlyList<BoardUserDto> BoardUsers
+    {
+        get
+        {
+            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
+            return _sortedUsers;
+        }
+    }
 
     public event Action? OnChange;
+
+    private BoardFullDto Board => boardState.Board!;
 
     public void Reload()
     {
         var users = Board.BoardUsers;
+        _sortedUsers = null;
         _boardUsers.Clear();
         _boardUsers.AddRange(users);
     }
@@ -117,6 +128,7 @@ public sealed class BoardUsersState(
 
     private void Notify()
     {
+        _sortedUsers = null;
         OnChange?.Invoke();
     }
 }
