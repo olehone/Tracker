@@ -4,8 +4,7 @@
 <CascadingValue Value="BoardState">
 	<MudDialog>
 		<DialogContent>
-			<MudDropContainer @ref=_container
-							  T=@BoardListDto
+			<MudDropContainer T=@BoardListDto
 							  Items=@Lists
 							  ItemsSelector=@((_, _) => true)
 							  ItemDropped=@SwapList
