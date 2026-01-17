@@ -10,15 +10,11 @@ public static class WorkspacePolicy
         UserWorkspaceRole workspaceRole,
         GlobalRole globalRole = GlobalRole.None)
     {
-        if (globalRole >= GlobalRole.Admin)
-        {
-            return WorkspacePermissionsDto.All;
-        }
-
+        var role = GetEffectivePermission(globalRole, workspaceRole);
         return new WorkspacePermissionsDto()
         {
-            CanCreateBoard = MapUserRoleToPermission(workspaceRole) >= permissionRoles.MinCreateBoardRole,
-            CanChangeBoard = MapUserRoleToPermission(workspaceRole) >= permissionRoles.MinCreateBoardRole,
+            CanCreateBoard = role >= permissionRoles.MinCreateBoardRole,
+            CanChangeBoard = role >= permissionRoles.MinChangeBoardRole,
             CanChangeWorkspace = CanChangeSettings(globalRole, workspaceRole),
         };
     }
@@ -79,6 +75,18 @@ public static class WorkspacePolicy
         };
     }
 
+    // Grand global admin same value as workspace owner
+    private static WorkspacePermissionRole GetEffectivePermission(
+        GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole)
+    {
+        if (globalRole >= GlobalRole.Admin)
+        {
+            return WorkspacePermissionRole.Owner;
+        }
+
+        return MapUserRoleToPermission(workspaceRole);
+    }
     private static WorkspacePermissionRole MapUserRoleToPermission(UserWorkspaceRole userWorkspaceRole)
     {
         return userWorkspaceRole switch

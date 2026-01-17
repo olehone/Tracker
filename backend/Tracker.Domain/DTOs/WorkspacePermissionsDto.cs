@@ -9,13 +9,6 @@ public class WorkspacePermissionsDto
         CanChangeWorkspace = false,
     };
 
-    public static readonly WorkspacePermissionsDto All = new()
-    {
-        CanCreateBoard = true,
-        CanChangeBoard = true,
-        CanChangeWorkspace = true,
-    };
-
     public required bool CanCreateBoard { get; set; }
     public required bool CanChangeBoard { get; set; }
     public required bool CanChangeWorkspace { get; set; }
