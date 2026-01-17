@@ -13,7 +13,7 @@ else
 {
 	<MudDropContainer @ref=@_container
 					  T=@BoardItemDto
-					  Items=@Items()
+					  Items=@BoardState.Items.BoardItems
 					  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
 					  ItemDropped=@ItemDropped
 					  Class="d-flex flex-row flex-nowrap">

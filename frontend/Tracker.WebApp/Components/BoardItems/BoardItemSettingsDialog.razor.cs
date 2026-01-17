@@ -48,7 +48,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         {
             return;
         }
-        await BoardState.DeleteBoardItemAsync(Item.Id);
+        await BoardState.Items.DeleteBoardItemAsync(Item.Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
@@ -68,7 +68,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        var success = await BoardState.UpdateBoardItemAsync(Item.Id, model);
+        var success = await BoardState.Items.UpdateBoardItemAsync(Item.Id, model);
 
         isSubmitting = false;
 

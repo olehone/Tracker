@@ -10,13 +10,13 @@ public sealed class BoardState
 {
     private readonly IBoardService _boardService;
     private readonly IBoardListService _boardListService;
-    private readonly IBoardItemService _boardItemService;
 
     private BoardFullDto? _currentBoard;
 
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
     public BoardUsersState Users { get; }
+    public BoardItemsState Items{ get; }
 
 
     public bool IsLoading { get; private set; }
@@ -31,9 +31,9 @@ public sealed class BoardState
     {
         _boardService = boardService;
         _boardListService = boardListService;
-        _boardItemService = boardItemService;
 
         Users = new BoardUsersState(this, boardUserService, userService);
+        Items = new BoardItemsState(this, boardItemService);
     }
 
     public async Task LoadAsync(Guid boardId)
@@ -51,6 +51,7 @@ public sealed class BoardState
         {
             _currentBoard = boardResult.Value;
             await Users.LoadAsync();
+            Items.Reload();
         }
 
         IsLoading = false;
@@ -169,88 +170,6 @@ public sealed class BoardState
         return true;
     }
 
-    public async Task<bool> CreateBoardItemAsync(Guid boardListId, string title)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new CreateBoardItemRequest
-        {
-            Title = title
-        };
-
-        var result = await _boardItemService.CreateBoardItemAsync(boardListId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyItemCreated(result.Value);
-        return true;
-    }
-
-    public async Task<bool> MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new MoveBoardItemRequest
-        {
-            BoardItemId = itemId,
-            ToBoardListId = Guid.Parse(toBoardListId),
-            Position = position
-        };
-
-        ApplyItemMoved(request);
-
-        var result = await _boardItemService.MoveBoardItemAsync(request);
-        if (result.IsFailure)
-        {
-            await LoadAsync(_currentBoard.Id);
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task<bool> UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyItemUpdated(itemId, request);
-
-        var result = await _boardItemService.UpdateBoardItemAsync(itemId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    public async Task<bool> DeleteBoardItemAsync(Guid itemId)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyItemDeleted(itemId);
-
-        var result = await _boardItemService.DeleteBoardItemAsync(itemId);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
-    }
-
     private void ApplyBoardUpdated(UpdateBoardRequest request)
     {
         if (_currentBoard is null)
@@ -337,140 +256,6 @@ public sealed class BoardState
         }
 
         Notify();
-    }
-
-    private void ApplyItemCreated(BoardItemDto newItem)
-    {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        var list = _currentBoard.BoardLists.FirstOrDefault(l => l.Id == newItem.BoardListId);
-        list?.BoardItems.Add(newItem);
-
-        Notify();
-    }
-
-    private void ApplyItemMoved(MoveBoardItemRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        var item = _currentBoard.BoardLists
-            .SelectMany(bl => bl.BoardItems)
-            .FirstOrDefault(bi => bi.Id == request.BoardItemId);
-
-        if (item is null)
-        {
-            return;
-        }
-
-        var fromList = _currentBoard.BoardLists.FirstOrDefault(bl => bl.Id == item.BoardListId);
-        if (fromList is null)
-        {
-            return;
-        }
-        if (item.BoardListId == request.ToBoardListId)
-        {
-            if (item.Position == request.Position)
-            {
-                return;
-            }
-
-            if (item.Position > request.Position)
-            {
-                ShiftItemsPosition(fromList, +1, request.Position, item.Position - 1);
-                item.Position = request.Position;
-            }
-            else
-            {
-                ShiftItemsPosition(fromList, -1, item.Position + 1, request.Position);
-                item.Position = request.Position;
-            }
-            fromList.BoardItems = fromList.BoardItems.OrderBy(bi => bi.Position).ToList();
-        }
-        else
-        {
-            var toList = _currentBoard.BoardLists.FirstOrDefault(bl => bl.Id == request.ToBoardListId);
-            if (toList is null)
-            {
-                return;
-            }
-
-            fromList.BoardItems.Remove(item);
-            ShiftItemsPosition(fromList, -1, item.Position);
-            ShiftItemsPosition(toList, +1, request.Position);
-
-            item.BoardListId = request.ToBoardListId;
-            item.Position = request.Position;
-            toList.BoardItems.Insert(item.Position - 1, item);
-        }
-
-        Notify();
-    }
-
-    private void ApplyItemUpdated(Guid itemId, UpdateBoardItemRequest request)
-    {
-        var item = Board.BoardLists.SelectMany(bl=> bl.BoardItems).FirstOrDefault(bi => bi.Id  == itemId);
-        if (item is null)
-        {
-            return;
-        }
-        item.Title = request.Title;
-        item.Description = request.Description;
-
-        Notify();
-    }
-
-    private void ApplyItemDeleted(Guid itemId)
-    {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        var list = _currentBoard.BoardLists
-            .FirstOrDefault(bl => bl.BoardItems.Any(bi => bi.Id == itemId));
-
-        if (list is null)
-        {
-            return;
-        }
-
-        var item = list.BoardItems.FirstOrDefault(bi => bi.Id == itemId);
-        if (item is null)
-        {
-            return;
-        }
-
-        var deletedPosition = item.Position;
-
-        list.BoardItems.Remove(item);
-        ShiftItemsPosition(list, -1, deletedPosition + 1);
-        list.BoardItems = list.BoardItems
-            .OrderBy(bi => bi.Position)
-            .ToList();
-
-        Notify();
-    }
-
-    private static void ShiftItemsPosition(BoardListDto list, int delta, int from)
-    {
-        foreach (var item in list.BoardItems.Where(bi => bi.Position >= from))
-        {
-            item.Position += delta;
-        }
-    }
-
-    private static void ShiftItemsPosition(BoardListDto list, int delta, int from, int to)
-    {
-        foreach (var item in list.BoardItems.Where(bi => bi.Position >= from && bi.Position <= to))
-        {
-            item.Position += delta;
-        }
     }
 
     private static void ShiftLists(BoardFullDto board, int newPosition, int oldPosition)

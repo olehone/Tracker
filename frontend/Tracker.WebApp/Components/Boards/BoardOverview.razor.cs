@@ -16,17 +16,13 @@ public partial class BoardOverview
     protected override void OnInitialized()
     {
         BoardState.OnChange += OnBoardStateChanged;
+        BoardState.Items.OnChange += OnBoardStateChanged;
     }
 
     private void OnBoardStateChanged()
     {
         StateHasChanged();
         _container?.Refresh();
-    }
-
-    private List<BoardItemDto> Items()
-    {
-        return Board?.BoardLists.SelectMany(bl => bl.BoardItems).ToList() ?? [];
     }
 
     private void ItemDropped(MudItemDropInfo<BoardItemDto> dropInfo)
@@ -36,7 +32,7 @@ public partial class BoardOverview
             return;
         }
 
-        _ = BoardState.MoveBoardItemAsync(
+        _ = BoardState.Items.MoveBoardItemAsync(
             dropInfo.Item.Id,
             dropInfo.DropzoneIdentifier,
             dropInfo.IndexInZone + 1

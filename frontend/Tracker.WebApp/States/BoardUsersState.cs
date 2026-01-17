@@ -2,7 +2,6 @@
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.States;
 
