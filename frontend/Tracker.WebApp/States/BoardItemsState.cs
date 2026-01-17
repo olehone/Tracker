@@ -31,6 +31,7 @@ public sealed class BoardItemsState(
     public void Reload()
     {
         var items = Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList();
+        _sortedItems = null;
         _boardItems.Clear();
         _boardItems.AddRange(items);
     }

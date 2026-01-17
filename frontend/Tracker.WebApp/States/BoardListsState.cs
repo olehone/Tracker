@@ -9,8 +9,16 @@ public sealed class BoardListsState(
     IBoardListService boardListService)
 {
     private readonly List<BoardListDto> _boardLists = [];
+    private List<BoardListDto>? _sortedLists;
 
-    public IReadOnlyList<BoardListDto> BoardLists => _boardLists;
+    public IReadOnlyList<BoardListDto> BoardLists
+    {
+        get
+        {
+            _sortedLists ??= _boardLists.OrderBy(bl => bl.Position).ToList();
+            return _sortedLists;
+        }
+    }
     public event Action? OnChange;
 
     private BoardFullDto Board => boardState.Board!;
@@ -18,6 +26,7 @@ public sealed class BoardListsState(
     public void Reload()
     {
         var lists = Board.BoardLists;
+        _sortedLists = null;
         _boardLists.Clear();
         _boardLists.AddRange(lists);
     }
@@ -149,5 +158,9 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void Notify() => OnChange?.Invoke();
+    private void Notify()
+    {
+        _sortedLists = null;
+        OnChange?.Invoke();
+    }
 }
