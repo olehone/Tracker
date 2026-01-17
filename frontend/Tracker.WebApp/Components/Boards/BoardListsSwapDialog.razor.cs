@@ -17,7 +17,7 @@ public partial class BoardListsSwapDialog
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.Lists.OnChange += StateHasChanged;
     }
 
     private async Task SwapList(MudItemDropInfo<BoardListDto> dropInfo)
@@ -27,11 +27,9 @@ public partial class BoardListsSwapDialog
             return;
         }
 
-        await BoardState.MoveBoardListAsync(
+        await BoardState.Lists.MoveBoardListAsync(
             dropInfo.Item.Id,
             dropInfo.IndexInZone + 1
         );
     }
-
-    private void Cancel() => MudDialog.Close(DialogResult.Ok(true));
 }

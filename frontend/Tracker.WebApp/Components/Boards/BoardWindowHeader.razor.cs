@@ -19,12 +19,13 @@ public partial class BoardWindowHeader : IDisposable
     protected override void OnInitialized()
     {
         BoardState.OnChange += StateHasChanged;
+        BoardState.OnBoardNotFound += ToWorkspace;
     }
 
     private void ToWorkspace()
     {
         var workspaceId = Board.WorkspaceId;
-        Nav.NavigateTo($"/{workspaceId}");
+        Nav.NavigateTo($"workspaces/{workspaceId}/overview");
     }
 
     private async Task OpenSettings()

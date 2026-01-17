@@ -15,11 +15,12 @@ public sealed class BoardState
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
     public BoardUsersState Users { get; }
-    public BoardItemsState Items{ get; }
-
+    public BoardItemsState Items { get; }
+    public BoardListsState Lists { get; }
 
     public bool IsLoading { get; private set; }
     public event Action? OnChange;
+    public event Action? OnBoardNotFound;
 
     public BoardState(
         IBoardService boardService,
@@ -33,6 +34,7 @@ public sealed class BoardState
 
         Users = new BoardUsersState(this, boardUserService, userService);
         Items = new BoardItemsState(this, boardItemService);
+        Lists = new BoardListsState(this, boardListService);
     }
 
     public async Task LoadAsync(Guid boardId)
@@ -44,13 +46,14 @@ public sealed class BoardState
 
         if (boardResult.IsFailure)
         {
-            _currentBoard = null;
+            OnBoardNotFound?.Invoke();
         }
         else
         {
             _currentBoard = boardResult.Value;
             await Users.LoadAsync();
             Items.Reload();
+            Lists.Reload();
         }
 
         IsLoading = false;
@@ -60,28 +63,6 @@ public sealed class BoardState
     public Task ReloadAsync()
     {
         return LoadAsync(Board.Id);
-    }
-
-    public async Task<bool> CreateBoardListAsync(string title)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new CreateBoardListRequest
-        {
-            Title = title
-        };
-
-        var result = await _boardListService.CreateBoardListAsync(Board.Id, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyListCreated(result.Value);
-        return true;
     }
 
     public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
@@ -102,76 +83,14 @@ public sealed class BoardState
         return true;
     }
 
-    public async Task<bool> DeleteBoardAsync()
+    public async Task DeleteBoardAsync()
     {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var result = await _boardService.DeleteBoardAsync(_currentBoard.Id);
+        var result = await _boardService.DeleteBoardAsync(Board.Id);
         if (result.IsFailure)
         {
-            return false;
+            return;
         }
-        return true;
-    }
-
-
-    public async Task<bool> MoveBoardListAsync(Guid listId, int newPosition)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var request = new MoveBoardListRequest
-        {
-            Position = newPosition
-        };
-
-        var result = await _boardListService.MoveBoardListAsync(listId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyListMoved(listId, newPosition);
-        return true;
-    }
-
-    public async Task<bool> UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyListUpdated(listId, request);
-
-        var result = await _boardListService.UpdateBoardListAsync(listId, request);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    public async Task<bool> DeleteBoardListAsync(Guid itemId)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        ApplyListDeleted(itemId);
-
-        var result = await _boardListService.DeleteBoardListAsync(itemId);
-        if (result.IsFailure)
-        {
-            return false;
-        }
-        return true;
+        OnBoardNotFound?.Invoke();
     }
 
     private void ApplyBoardUpdated(UpdateBoardRequest request)
@@ -187,102 +106,6 @@ public sealed class BoardState
         _currentBoard.PermissionRoles = request.PermissionRoles;
 
         Notify();
-    }
-
-    private void ApplyListCreated(BoardListDto newList)
-    {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        _currentBoard.BoardLists.Add(newList);
-        _currentBoard.BoardLists = _currentBoard.BoardLists
-            .OrderBy(bl => bl.Position)
-            .ToList();
-
-        Notify();
-
-    }
-
-    private void ApplyListMoved(Guid listId, int newPosition)
-    {
-        if (_currentBoard is null)
-        {
-            return;
-        }
-
-        var list = _currentBoard.BoardLists.FirstOrDefault(l => l.Id == listId);
-        if (list is null)
-        {
-            return;
-        }
-
-        ShiftLists(_currentBoard, newPosition, list.Position);
-        list.Position = newPosition;
-        _currentBoard.BoardLists = _currentBoard.BoardLists
-            .OrderBy(bl => bl.Position)
-            .ToList();
-
-        Notify();
-    }
-
-    private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
-    {
-        var list = Board.BoardLists.FirstOrDefault(bl => bl.Id == listId);
-        if (list is null)
-        {
-            return;
-        }
-        list.Title = request.Title;
-        list.Description = request.Description;
-        Notify();
-    }
-
-    private void ApplyListDeleted(Guid listId)
-    {
-        var list = Board.BoardLists.FirstOrDefault(bl => bl.Id == listId);
-        if (list is null)
-        {
-            return;
-        }
-
-        var deletedPosition = list.Position;
-        var removed = Board.BoardLists.RemoveAll(bl => bl.Id == listId);
-        if (removed == 0)
-        {
-            return;
-        }
-
-        foreach (var l in Board.BoardLists.Where(bl => bl.Position > deletedPosition))
-        {
-            l.Position -= 1;
-        }
-
-        Notify();
-    }
-
-    private static void ShiftLists(BoardFullDto board, int newPosition, int oldPosition)
-    {
-        if (newPosition == oldPosition)
-        {
-            return;
-        }
-
-        if (oldPosition < newPosition)
-        {
-            foreach (var l in board.BoardLists.Where(bl => bl.Position > oldPosition && bl.Position <= newPosition))
-            {
-                l.Position -= 1;
-            }
-        }
-        else
-        {
-            foreach (var l in board.BoardLists.Where(bl => bl.Position >= newPosition && bl.Position < oldPosition))
-            {
-                l.Position += 1;
-            }
-        }
     }
 
     private void Notify() => OnChange?.Invoke();
