@@ -16,7 +16,7 @@ public static class BoardsMapping
         };
     }
 
-    public static BoardFullDto ToFullDto(this Board board, 
+    public static BoardFullDto ToFullDto(this Board board,
         BoardPermissionsDto permissions)
     {
         return new BoardFullDto
@@ -30,7 +30,13 @@ public static class BoardsMapping
             PermissionRoles = board.PermissionRoles,
             BoardLists = board.BoardLists
                               .Select(boardList => boardList.ToDto())
-                              .ToList()
+                              .ToList(),
+            BoardUsers = board.UserBoards.Select(bm =>
+                new BoardUserDto
+                {
+                    User = bm.User.ToDto(),
+                    Role = bm.Role,
+                }).ToList()
         };
     }
 
