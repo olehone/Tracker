@@ -15,7 +15,8 @@ else
 			  Class="mud-theme-secondary px-5 py-3 rounded-t">
 		<MudTooltip Text="To workspace">
 			<a href=@($"/workspaces/{Board.WorkspaceId}")>
-				<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft />
+				<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
+							   Color="Color.Inherit" />
 			</a>
 		</MudTooltip>
 		@if (Board.Permissions.CanChangeBoard)

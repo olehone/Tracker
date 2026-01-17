@@ -4,24 +4,16 @@ using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
 
-public sealed class BoardItemsState
+public sealed class BoardItemsState(
+    BoardState boardState,
+    IBoardItemService boardItemService)
 {
-    private readonly BoardState _boardState;
-    private readonly IBoardItemService _boardItemService;
     private readonly List<BoardItemDto> _boardItems = [];
 
     public IReadOnlyList<BoardItemDto> BoardItems => _boardItems;
     public event Action? OnChange;
 
-    private BoardFullDto Board => _boardState.Board!;
-
-    public BoardItemsState(
-        BoardState boardState,
-        IBoardItemService boardItemService)
-    {
-        _boardState = boardState;
-        _boardItemService = boardItemService;
-    }
+    private BoardFullDto Board => boardState.Board!;
 
     public void Reload()
     {
@@ -30,24 +22,23 @@ public sealed class BoardItemsState
         _boardItems.AddRange(items);
     }
 
-    public async Task<bool> CreateBoardItemAsync(Guid boardListId, string title)
+    public async Task CreateBoardItemAsync(Guid boardListId, string title)
     {
         var request = new CreateBoardItemRequest
         {
             Title = title
         };
 
-        var result = await _boardItemService.CreateBoardItemAsync(boardListId, request);
+        var result = await boardItemService.CreateBoardItemAsync(boardListId, request);
         if (result.IsFailure)
         {
-            return false;
+            await boardState.ReloadAsync();
         }
 
         ApplyItemCreated(result.Value);
-        return true;
     }
 
-    public async Task<bool> MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
+    public async Task MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
     {
         var request = new MoveBoardItemRequest
         {
@@ -58,37 +49,33 @@ public sealed class BoardItemsState
 
         ApplyItemMoved(request);
 
-        var result = await _boardItemService.MoveBoardItemAsync(request);
+        var result = await boardItemService.MoveBoardItemAsync(request);
         if (result.IsFailure)
         {
-            return false;
+            await boardState.ReloadAsync();
         }
-
-        return true;
     }
 
-    public async Task<bool> UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
+    public async Task UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
     {
         ApplyItemUpdated(itemId, request);
 
-        var result = await _boardItemService.UpdateBoardItemAsync(itemId, request);
+        var result = await boardItemService.UpdateBoardItemAsync(itemId, request);
         if (result.IsFailure)
         {
-            return false;
+            await boardState.ReloadAsync();
         }
-        return true;
     }
 
-    public async Task<bool> DeleteBoardItemAsync(Guid itemId)
+    public async Task DeleteBoardItemAsync(Guid itemId)
     {
         ApplyItemDeleted(itemId);
 
-        var result = await _boardItemService.DeleteBoardItemAsync(itemId);
+        var result = await boardItemService.DeleteBoardItemAsync(itemId);
         if (result.IsFailure)
         {
-            return false;
+            await boardState.ReloadAsync();
         }
-        return true;
     }
 
     private void ApplyItemCreated(BoardItemDto newItem)

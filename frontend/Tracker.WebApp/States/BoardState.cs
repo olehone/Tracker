@@ -1,6 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
-using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction;
 
@@ -56,6 +55,11 @@ public sealed class BoardState
 
         IsLoading = false;
         Notify();
+    }
+
+    public Task ReloadAsync()
+    {
+        return LoadAsync(Board.Id);
     }
 
     public async Task<bool> CreateBoardListAsync(string title)
