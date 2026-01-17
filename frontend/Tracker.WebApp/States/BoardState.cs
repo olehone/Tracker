@@ -28,7 +28,7 @@ public sealed class BoardState
     {
         _boardService = boardService;
 
-        Users = new BoardUsersState(this, boardUserService, userService);
+        Users = new BoardUsersState(this, userService, boardUserService);
         Items = new BoardItemsState(this, boardItemService);
         Lists = new BoardListsState(this, boardListService);
     }
@@ -47,7 +47,7 @@ public sealed class BoardState
         else
         {
             _currentBoard = boardResult.Value;
-            await Users.LoadAsync();
+            Users.Reload();
             Items.Reload();
             Lists.Reload();
         }
