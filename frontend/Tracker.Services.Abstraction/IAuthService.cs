@@ -14,5 +14,4 @@ public interface IAuthService
     Task<Result> LogoutAsync();
     Task<string?> GetAccessTokenAsync();
     Task<ClaimsPrincipal> GetPrincipalAsync();
-    Task<bool> IsAuthenticatedAsync();
 }

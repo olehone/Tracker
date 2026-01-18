@@ -133,10 +133,4 @@ public sealed class AuthService(
             _refreshLock.Release();
         }
     }
-
-    public async Task<bool> IsAuthenticatedAsync()
-    {
-        var token = await GetAccessTokenAsync();
-        return !string.IsNullOrEmpty(token);
-    }
 }

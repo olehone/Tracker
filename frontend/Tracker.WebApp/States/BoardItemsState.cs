@@ -108,6 +108,10 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemMovedEvent evn)
     {
+        if (boardState.MyId == evn.UserId)
+        {
+            return;
+        }
         ApplyItemMoved(evn.BoardItemId, evn.ToBoardListId, evn.Position);
     }
 
