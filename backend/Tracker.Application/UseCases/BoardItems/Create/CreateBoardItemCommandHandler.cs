@@ -20,7 +20,8 @@ public class CreateBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.CreateItem);
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext,
+            request.BoardListId, BoardAction.CreateItem);
         if (listResult.IsFailure)
         {
             return listResult.Error;

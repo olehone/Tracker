@@ -16,12 +16,13 @@ public class UpdateBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, 
+            request.BoardItemId, BoardAction.ChangeItem, request.BoardId);
         if (itemResult.IsFailure)
         {
             return itemResult.Error;
         }
-        var boardItem = itemResult.Value.Item1;
+        var boardItem = itemResult.Value;
 
         boardItem.Title = request.Title;
         boardItem.Description = request.Description;

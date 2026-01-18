@@ -3,8 +3,9 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItems.Move;
 
-public class MoveBoardItemCommand: IRequest<Result<Guid>>
+public class MoveBoardItemCommand: IRequest<Result>
 {
+    public required Guid BoardId { get; set; }
     public required Guid ToBoardListId { get; set; }
     public required Guid BoardItemId { get; set; }
     public int Position { get; set; }

@@ -44,7 +44,7 @@ public sealed class BoardItemsState(
             Title = title
         };
 
-        var result = await boardItemService.CreateBoardItemAsync(boardListId, request);
+        var result = await boardItemService.CreateBoardItemAsync(Board.Id,boardListId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -64,14 +64,13 @@ public sealed class BoardItemsState(
 
         var request = new MoveBoardItemRequest
         {
-            BoardItemId = itemId,
             ToBoardListId = boardListId,
             Position = position
         };
 
         ApplyItemMoved(itemId, boardListId, position);
 
-        var result = await boardItemService.MoveBoardItemAsync(request);
+        var result = await boardItemService.MoveBoardItemAsync(Board.Id, itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -82,7 +81,7 @@ public sealed class BoardItemsState(
     {
         ApplyItemUpdated(itemId, request);
 
-        var result = await boardItemService.UpdateBoardItemAsync(itemId, request);
+        var result = await boardItemService.UpdateBoardItemAsync(Board.Id, itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -93,7 +92,7 @@ public sealed class BoardItemsState(
     {
         ApplyItemDeleted(itemId);
 
-        var result = await boardItemService.DeleteBoardItemAsync(itemId);
+        var result = await boardItemService.DeleteBoardItemAsync(Board.Id, itemId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();

@@ -5,5 +5,6 @@ namespace Tracker.Application.UseCases.BoardItems.Delete;
 
 public class DeleteBoardItemCommand : IRequest<Result>
 {
+    public required Guid BoardId { get; set; }
     public required Guid BoardItemId { get; set; }
 }
