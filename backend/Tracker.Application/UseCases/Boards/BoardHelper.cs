@@ -44,6 +44,11 @@ public static class BoardHelper
             return Error.NotFound("Board");
         }
 
+        //if (board.Id != boardId)
+        //{
+        //    return Error.Validation("Board does not have this list");
+        //}
+
         var isAllowed = await IsActionAllowed(uow, userContext, board, action);
         if (!isAllowed)
         {
@@ -59,8 +64,8 @@ public static class BoardHelper
         return boardList;
     }
     
-    public static async Task<Result<(BoardItem, Guid)>> GetBoardItemForActionAsync(IUnitOfWork uow, 
-        IUserContext userContext, Guid boardItemId, BoardAction action)
+    public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow, 
+        IUserContext userContext, Guid boardItemId, BoardAction action, Guid boardId)
     {
         if (userContext.IsUnauthenticated())
         {
@@ -71,6 +76,11 @@ public static class BoardHelper
         if (board is null)
         {
             return Error.NotFound("Board");
+        }
+
+        if (board.Id != boardId)
+        {
+            return Error.Validation("Board does not have this item");
         }
 
         var isAllowed = await IsActionAllowed(uow, userContext, board, action);
@@ -85,7 +95,7 @@ public static class BoardHelper
             return Error.NotFound("Board item");
         }
 
-        return (boardItem, board.Id);
+        return boardItem;
     }
 
     // User must be authenticated before call

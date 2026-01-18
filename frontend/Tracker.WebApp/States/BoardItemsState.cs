@@ -64,7 +64,6 @@ public sealed class BoardItemsState(
 
         var request = new MoveBoardItemRequest
         {
-            BoardItemId = itemId,
             ToBoardListId = boardListId,
             Position = position
         };

@@ -14,8 +14,9 @@ using Tracker.Application.UseCases.BoardItems.Update;
 using Tracker.Domain.Requests.BoardItem;
 
 namespace Tracker.API.Controllers;
-[Route("api/board-items")]
+[Route("api/board/{boardId:guid}/items")]
 [ApiController]
+
 [Authorize]
 public class BoardItemsController(IMediator mediator,
     IHubContext<BoardHub, IClientBoardHub> hubContext,
@@ -23,11 +24,12 @@ public class BoardItemsController(IMediator mediator,
 {
 
     [HttpPost("{boardListId:guid}")]
-    public async Task<IActionResult> CreateAsync(Guid boardListId,
+    public async Task<IActionResult> CreateAsync(Guid boardId, Guid boardListId,
         [FromBody] CreateBoardItemRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
         {
+            BoardId = boardId,
             BoardListId = boardListId,
             Title = request.Title,
             Description = request.Description
@@ -36,13 +38,14 @@ public class BoardItemsController(IMediator mediator,
         return response.ToActionResult();
     }
 
-    [HttpPost("move")]
-    public async Task<IActionResult> MoveAsync([FromBody] MoveBoardItemCommand request)
+    [HttpPost("move/{itemId:guid}")]
+    public async Task<IActionResult> MoveAsync(Guid boardId, Guid itemId, [FromBody] MoveBoardItemRequest request)
     {
         var mediatorRequest = new MoveBoardItemCommand()
         {
+            BoardId = boardId,
             ToBoardListId = request.ToBoardListId,
-            BoardItemId = request.BoardItemId,
+            BoardItemId = itemId,
             Position = request.Position
         };
         var response = await mediator.Send(mediatorRequest);
@@ -51,27 +54,28 @@ public class BoardItemsController(IMediator mediator,
         {
             var userId = userContext.GetUserId();
             var evn = new ItemMovedEvent(
-                BoardId: response.Value,
+                BoardId: boardId,
                 ToBoardListId: request.ToBoardListId,
-                BoardItemId: request.BoardItemId,
+                BoardItemId: itemId,
                 Position: request.Position,
                 UserId: userId
             );
             await hubContext.Clients
-                .Group($"board:{response.Value}")
+                .Group($"board:{boardId}")
                 .ItemMoved(evn);
         }
         return response.ToActionResult();
     }
 
 
-    [HttpPut("{boardItemId:guid}")]
-    public async Task<IActionResult> UpdateAsync(Guid boardItemId,
+    [HttpPut("{itemId:guid}")]
+    public async Task<IActionResult> UpdateAsync(Guid boardId, Guid itemId,
         [FromBody] UpdateBoardItemRequest request)
     {
         var mediatorRequest = new UpdateBoardItemCommand
         {
-            BoardItemId = boardItemId,
+            BoardId = boardId,
+            BoardItemId = itemId,
             Title = request.Title,
             Description = request.Description
         };
@@ -79,10 +83,10 @@ public class BoardItemsController(IMediator mediator,
         return response.ToActionResult();
     }
 
-    [HttpDelete("{boardItemId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid boardItemId)
+    [HttpDelete("{itemId:guid}")]
+    public async Task<IActionResult> DeleteAsync(Guid boardId, Guid itemId)
     {
-        var mediatorRequest = new DeleteBoardItemCommand { BoardItemId = boardItemId };
+        var mediatorRequest = new DeleteBoardItemCommand { BoardId = boardId, BoardItemId = itemId };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }

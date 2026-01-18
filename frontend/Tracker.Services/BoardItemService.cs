@@ -10,23 +10,23 @@ namespace Tracker.Services;
 public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi api)
     : IBoardItemService
 {
-    public Task<Result<BoardItemDto>> CreateAsync(Guid boardId, CreateBoardItemRequest request)
+    public Task<Result<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, boardListId, request));
     }
 
-    public Task<Result> MoveAsync(MoveBoardItemRequest request)
+    public Task<Result> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(boardId, itemId, request));
     }
 
-    public Task<Result> UpdateAsync(Guid id, UpdateBoardItemRequest request)
+    public Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
     }
 
-    public Task<Result> DeleteAsync(Guid id)
+    public Task<Result> DeleteAsync(Guid boardId, Guid itemId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(id));
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(boardId, itemId));
     }
 }
