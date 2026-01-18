@@ -35,6 +35,16 @@ public class BoardItemsController(IMediator mediator,
             Description = request.Description
         };
         var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new ItemCreatedEvent(
+                UserId: userId,
+                BoardId: boardId,
+                Item: response.Value
+            );
+            await hubContext.Clients.Group($"board:{boardId}").ItemCreated(evt);
+        }
         return response.ToActionResult();
     }
 
@@ -53,16 +63,14 @@ public class BoardItemsController(IMediator mediator,
         if (response.IsSuccess)
         {
             var userId = userContext.GetUserId();
-            var evn = new ItemMovedEvent(
+            var evt = new ItemMovedEvent(
+                UserId: userId,
                 BoardId: boardId,
                 ToBoardListId: request.ToBoardListId,
                 BoardItemId: itemId,
-                Position: request.Position,
-                UserId: userId
+                Position: request.Position
             );
-            await hubContext.Clients
-                .Group($"board:{boardId}")
-                .ItemMoved(evn);
+            await hubContext.Clients.Group($"board:{boardId}").ItemMoved(evt);
         }
         return response.ToActionResult();
     }
@@ -80,6 +88,16 @@ public class BoardItemsController(IMediator mediator,
             Description = request.Description
         };
         var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new ItemUpdatedEvent(
+                UserId: userId,
+                BoardId: boardId,
+                Item: response.Value
+            );
+            await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
+        }
         return response.ToActionResult();
     }
 
@@ -88,6 +106,16 @@ public class BoardItemsController(IMediator mediator,
     {
         var mediatorRequest = new DeleteBoardItemCommand { BoardId = boardId, BoardItemId = itemId };
         var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new ItemDeletedEvent(
+                UserId: userId,
+                BoardId: boardId,
+                BoardItemId: itemId
+            );
+            await hubContext.Clients.Group($"board:{boardId}").ItemDeleted(evt);
+        }
         return response.ToActionResult();
     }
 }

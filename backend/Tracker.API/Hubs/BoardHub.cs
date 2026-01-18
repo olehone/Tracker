@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Tracker.API.Hubs.Events;
-using Tracker.API.Requests;
 using Tracker.Application.UseCases.Boards.CheckRealtimeAccess;
 
 namespace Tracker.API.Hubs;
