@@ -11,6 +11,8 @@ public partial class UserAvatarSmall
     public required UserDto User { get; set; } = null!;
     [Parameter]
     public Size Size { get; set; } = Size.Medium;
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
 
     private string CustomColor
     {

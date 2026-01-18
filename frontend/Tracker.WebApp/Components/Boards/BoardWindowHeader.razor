@@ -1,5 +1,7 @@
+@using Tracker.WebApp.Components.BoardUsers
 @using Tracker.WebApp.Components.Boards
 @using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
 @using Tracker.WebApp.Shared
 
 @if (BoardState.IsLoading)
@@ -14,9 +16,9 @@ else
 			  AlignItems="AlignItems.Center"
 			  Class="mud-theme-secondary px-5 py-3 rounded-t">
 		<MudTooltip Text="To workspace">
-				<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
-							   Color="Color.Inherit" 
-							   OnClick=@ToWorkspace/>
+			<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
+						   Color="Color.Inherit"
+						   OnClick=@ToWorkspace />
 		</MudTooltip>
 		@if (Board.Permissions.CanChangeBoard)
 		{
@@ -30,7 +32,19 @@ else
 		<MudStack Row
 				  Spacing="3"
 				  AlignItems="AlignItems.Center">
-
+			@if (BoardState.Users.RecentActiveUsers().Any())
+			{
+				<MudAvatarGroup Spacing="4" Max="5" @key="@GetUsersKey()">
+					@foreach (var boardUser in BoardState.Users.RecentActiveUsers())
+					{
+						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
+						Console.WriteLine(color);
+						<UserAvatarSmall @key=@boardUser.User.Id
+										 User=@boardUser.User
+										 Color=color />
+					}
+				</MudAvatarGroup>
+			}
 			@if (Board.Permissions.CanChangeList && BoardState.Lists.BoardLists.Count > 1)
 			{
 				<MudTooltip Text="Move lists">
