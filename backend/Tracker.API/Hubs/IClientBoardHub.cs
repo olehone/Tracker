@@ -4,5 +4,5 @@ namespace Tracker.API.Hubs;
 
 public interface IClientBoardHub
 {
-    Task ItemMoved(ItemMovedEvent evt);
+    Task ItemMoved(ItemMovedEvent evn);
 }
