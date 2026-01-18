@@ -41,7 +41,7 @@ public class BoardsUsersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> ChangeUserRoleAsync(Guid boardId, Guid userId,
         [FromBody] BoardUserRoleRequest request)
     {
-        var mediatorRequest = new ChangeUserRoleCommand
+        var mediatorRequest = new ChangeBoardUserRoleCommand
         {
             BoardId = boardId,
             UserId = userId,

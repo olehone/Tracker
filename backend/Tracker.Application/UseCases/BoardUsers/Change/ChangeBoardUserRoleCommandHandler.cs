@@ -8,13 +8,13 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardUsers.Change;
 
-public class ChangeUserRoleCommandHandler(
+public class ChangeBoardUserRoleCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<ChangeUserRoleCommand, Result>
+    : IRequestHandler<ChangeBoardUserRoleCommand, Result>
 {
     public async Task<Result> Handle(
-        ChangeUserRoleCommand request,
+        ChangeBoardUserRoleCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -73,9 +73,9 @@ public class ChangeUserRoleCommandHandler(
             : Result.Success();
     }
 
-    private static async Task ChangeOwner(ChangeUserRoleCommand request, IUnitOfWork uow)
+    private static async Task ChangeOwner(ChangeBoardUserRoleCommand request, IUnitOfWork uow)
     {
-        var oldOwner = await uow.UserBoardRepository.GetOwnerOfBoardAsync(request.BoardId)!;
+        var oldOwner = await uow.UserBoardRepository.GetOwnerAsync(request.BoardId)!;
         var oldOwnerAsAdmin = new UserBoard
         {
             UserId = oldOwner!.UserId,

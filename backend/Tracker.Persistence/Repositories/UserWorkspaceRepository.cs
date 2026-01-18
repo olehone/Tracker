@@ -20,6 +20,20 @@ public class UserWorkspaceRepository : Repository<UserWorkspace, Guid>, IUserWor
             .FirstOrDefaultAsync(uw => uw.UserId == userId && uw.WorkspaceId == workspaceId);
     }
 
+    public async Task<IReadOnlyList<UserWorkspace>> GetByWorkspaceAsync(Guid workspaceId)
+    {
+        return await _dbSet.AsNoTracking()
+            .Include(uw => uw.User)
+            .Where(uw => uw.WorkspaceId == workspaceId)
+            .ToListAsync();
+    }
+
+    public async Task<UserWorkspace?> GetOwnerAsync(Guid workspaceId)
+    {
+        return await _dbSet.AsNoTracking()
+            .FirstOrDefaultAsync(uw => uw.WorkspaceId == workspaceId && uw.Role == UserWorkspaceRole.Owner);
+    }
+
     public async Task<UserWorkspaceRole> GetRoleAsync(Guid userId, Guid workspaceId)
     {
         var userWorkspace = await GetByUserAndWorkspaceAsync(userId, workspaceId);

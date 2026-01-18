@@ -27,7 +27,7 @@ public class UserBoardRepository : Repository<UserBoard, Guid>, IUserBoardReposi
             .ToListAsync();
     }
 
-    public async Task<UserBoard?> GetOwnerOfBoardAsync(Guid boardId)
+    public async Task<UserBoard?> GetOwnerAsync(Guid boardId)
     {
         return await _dbSet.AsNoTracking()
             .FirstOrDefaultAsync(ub => ub.BoardId == boardId && ub.Role == UserBoardRole.Owner);
