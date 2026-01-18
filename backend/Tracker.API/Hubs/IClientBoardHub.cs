@@ -1,6 +1,6 @@
-﻿using Tracker.Application.Events;
+﻿using Tracker.API.Hubs.Events;
 
-namespace Tracker.Infrastructure.SignalR;
+namespace Tracker.API.Hubs;
 
 public interface IClientBoardHub
 {

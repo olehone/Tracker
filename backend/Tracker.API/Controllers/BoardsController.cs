@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Hubs;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
@@ -13,7 +14,7 @@ namespace Tracker.API.Controllers;
 [Route("api/boards")]
 [ApiController]
 [Authorize]
-public class BoardsController(IMediator mediator) : ControllerBase
+public class BoardsController(IMediator mediator, BoardHub hub) : ControllerBase
 {
     [HttpGet("{id:guid}")]
     [AllowAnonymous]

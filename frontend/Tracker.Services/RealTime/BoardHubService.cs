@@ -43,7 +43,7 @@ public class BoardHubService(
             .WithAutomaticReconnect()
             .Build();
 
-        _hubConnection.On<ItemMovedEvent>(BoardRealTimeMethods.ItemMoved, (evt) =>
+        _hubConnection.On<ItemMovedEvent>(BoardRealtimeMethods.ItemMoved, (evt) =>
         {
              OnItemMoved?.Invoke(evt);
         });
@@ -52,7 +52,7 @@ public class BoardHubService(
         {
             if (_currentBoardId.HasValue)
             {
-                await _hubConnection.InvokeAsync(BoardRealTimeMethods.JoinBoard, _currentBoardId.Value);
+                await _hubConnection.InvokeAsync(BoardRealtimeMethods.JoinBoard, _currentBoardId.Value);
             }
         };
 
@@ -62,7 +62,7 @@ public class BoardHubService(
         };
 
         await _hubConnection.StartAsync();
-        await _hubConnection.InvokeAsync(BoardRealTimeMethods.JoinBoard, boardId);
+        await _hubConnection.InvokeAsync(BoardRealtimeMethods.JoinBoard, boardId);
         _currentBoardId = boardId;
     }
 
@@ -77,7 +77,7 @@ public class BoardHubService(
         {
             if (_currentBoardId.HasValue && IsConnected)
             {
-                await _hubConnection.InvokeAsync(BoardRealTimeMethods.LeaveBoard, _currentBoardId.Value);
+                await _hubConnection.InvokeAsync(BoardRealtimeMethods.LeaveBoard, _currentBoardId.Value);
                 _currentBoardId = null;
             }
 
