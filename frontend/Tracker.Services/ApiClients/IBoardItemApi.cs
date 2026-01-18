@@ -1,7 +1,6 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
-using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.Services.ApiClients;
 

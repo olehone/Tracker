@@ -2,6 +2,7 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Domain.Options;
 using Tracker.Infrastructure.Auth;
+using Tracker.Infrastructure.SignalR;
 
 namespace Tracker.Infrastructure;
 
@@ -19,6 +20,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ITokenProvider, TokenProvider>();
         services.AddScoped<IUserContext, UserContext>();
+        services.AddSignalR();
+        services.AddScoped<BoardHub, IClientBoardHub>();
 
         return services;
     }

@@ -1,12 +1,14 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.Events;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItems.Move;
 
 public class MoveBoardItemCommandHandler(
+    IMediator mediator,
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<MoveBoardItemCommand, Result>
@@ -17,12 +19,12 @@ public class MoveBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
-        if (listResult.IsFailure)
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
+        if (itemResult.IsFailure)
         {
-            return listResult.Error;
+            return itemResult.Error;
         }
-        var boardItem = listResult.Value;
+        var boardItem = itemResult.Value.Item1;
 
         int currentPosition = boardItem.Position;
         int maxNewPosition = await uow.BoardItemRepository
@@ -64,8 +66,15 @@ public class MoveBoardItemCommandHandler(
         uow.BoardItemRepository.Update(boardItem);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
-        return sc.IsFailure
-            ? Error.Unknown
-            : Result.Success();
+        if (sc.IsFailure)
+        {
+            return Error.Unknown;
+        }
+        var userId = userContext.GetUserId();
+        var evn = new ItemMovedEvent(userId, itemResult.Value.Item2, 
+            request.ToBoardListId, request.BoardItemId, request.Position);
+
+        await mediator.Publish(evn, cancellationToken);
+        return Result.Success();
     }
 }

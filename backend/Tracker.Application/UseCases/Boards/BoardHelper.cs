@@ -59,7 +59,7 @@ public static class BoardHelper
         return boardList;
     }
     
-    public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow, 
+    public static async Task<Result<(BoardItem, Guid)>> GetBoardItemForActionAsync(IUnitOfWork uow, 
         IUserContext userContext, Guid boardItemId, BoardAction action)
     {
         if (userContext.IsUnauthenticated())
@@ -79,13 +79,13 @@ public static class BoardHelper
             return AuthErrors.Forbidden();
         }
 
-        var boardList = await uow.BoardItemRepository.GetByIdAsync(boardItemId);
-        if (boardList is null)
+        var boardItem = await uow.BoardItemRepository.GetByIdAsync(boardItemId);
+        if (boardItem is null)
         {
             return Error.NotFound("Board item");
         }
 
-        return boardList;
+        return (boardItem, board.Id);
     }
 
     // User must be authenticated before call
