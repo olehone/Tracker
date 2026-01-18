@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.Events;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Results;
 
@@ -11,20 +10,23 @@ public class MoveBoardItemCommandHandler(
     IMediator mediator,
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<MoveBoardItemCommand, Result>
+    : IRequestHandler<MoveBoardItemCommand, Result<Guid>>
 {
-    public async Task<Result> Handle(
+    public async Task<Result<Guid>> Handle(
         MoveBoardItemCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
+            request.BoardItemId, BoardAction.ChangeItem);
         if (itemResult.IsFailure)
         {
             return itemResult.Error;
         }
+
         var boardItem = itemResult.Value.Item1;
+        var boardId = itemResult.Value.Item2;
 
         int currentPosition = boardItem.Position;
         int maxNewPosition = await uow.BoardItemRepository
@@ -39,7 +41,7 @@ public class MoveBoardItemCommandHandler(
         {
             if (currentPosition == request.Position)
             {
-                return Result.Success();
+                return Result.SuccessOf(boardId);
             }
             else if (currentPosition < request.Position)
             {
@@ -66,15 +68,8 @@ public class MoveBoardItemCommandHandler(
         uow.BoardItemRepository.Update(boardItem);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
-        if (sc.IsFailure)
-        {
-            return Error.Unknown;
-        }
-        var userId = userContext.GetUserId();
-        var evn = new ItemMovedEvent(userId, itemResult.Value.Item2, 
-            request.ToBoardListId, request.BoardItemId, request.Position);
-
-        await mediator.Publish(evn, cancellationToken);
-        return Result.Success();
+        return sc.IsFailure
+            ? Error.Unknown
+            : boardId;
     }
 }

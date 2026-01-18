@@ -1,22 +1,20 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Hubs;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.BoardItems.Create;
 using Tracker.Application.UseCases.BoardItems.Delete;
 using Tracker.Application.UseCases.BoardItems.Move;
 using Tracker.Application.UseCases.BoardItems.Update;
-using Tracker.Application.UseCases.BoardLists.Delete;
-using Tracker.Application.UseCases.BoardLists.Update;
 using Tracker.Domain.Requests.BoardItem;
-using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.API.Controllers;
 [Route("api/board-items")]
 [ApiController]
 [Authorize]
-public class BoardItemsController(IMediator mediator) : ControllerBase
+public class BoardItemsController(IMediator mediator, BoardHub hub) : ControllerBase
 {
 
     [HttpPost("{boardListId:guid}")]
@@ -43,6 +41,11 @@ public class BoardItemsController(IMediator mediator) : ControllerBase
             Position = request.Position
         };
         var response = await mediator.Send(mediatorRequest);
+
+        if (response.IsSuccess)
+        {
+            await hub.ItemMoved(request, response.Value);
+        }
         return response.ToActionResult();
     }
 

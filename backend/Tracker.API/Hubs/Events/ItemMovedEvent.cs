@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Tracker.Application.Events;
+﻿namespace Tracker.API.Hubs.Events;
 
 public sealed record ItemMovedEvent(
     Guid UserId,
@@ -8,4 +6,4 @@ public sealed record ItemMovedEvent(
     Guid ToBoardListId,
     Guid BoardItemId,
     int Position
-) : INotification;
+);

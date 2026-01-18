@@ -32,6 +32,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -45,6 +46,6 @@ app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<BoardHubImplementation>("/hubs/board");
+app.MapHub<BoardHub>("/hubs/board");
 
 await app.RunAsync();
