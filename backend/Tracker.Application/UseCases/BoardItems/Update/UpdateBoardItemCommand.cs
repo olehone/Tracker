@@ -10,4 +10,5 @@ public class UpdateBoardItemCommand : IRequest<Result<BoardItemDto>>
     public required Guid BoardItemId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
+    public required bool IsDone { get; set; }
 }

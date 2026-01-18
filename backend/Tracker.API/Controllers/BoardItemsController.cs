@@ -85,7 +85,8 @@ public class BoardItemsController(IMediator mediator,
             BoardId = boardId,
             BoardItemId = itemId,
             Title = request.Title,
-            Description = request.Description
+            Description = request.Description,
+            IsDone = request.IsDone
         };
         var response = await mediator.Send(mediatorRequest);
         if (response.IsSuccess)

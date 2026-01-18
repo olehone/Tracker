@@ -23,6 +23,9 @@
     <EmbeddedResource Include="Scripts\006-Add-RoleEnum-To-User.sql" />
     <EmbeddedResource Include="Scripts\008-Add-UserBoard-Relation.sql" />
     <EmbeddedResource Include="Scripts\009-Add-UserWorkspace-Relation.sql" />
+    <EmbeddedResource Include="Scripts\014-Make-Status-Not-Null-Set-Default.sql" />
+    <EmbeddedResource Include="Scripts\013-Add-Status-To-Task.sql" />
+    <EmbeddedResource Include="Scripts\012-Add-Workspace-Title-Index.sql" />
     <EmbeddedResource Include="Scripts\011-Add-Workspace-Settings.sql" />
     <EmbeddedResource Include="Scripts\010-Add-Board-Settings.sql" />
     <EmbeddedResource Include="Scripts\007-Change-Role-From-String-To-Enum.sql" />
