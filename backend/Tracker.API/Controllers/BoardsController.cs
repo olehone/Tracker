@@ -14,7 +14,7 @@ namespace Tracker.API.Controllers;
 [Route("api/boards")]
 [ApiController]
 [Authorize]
-public class BoardsController(IMediator mediator, BoardHub hub) : ControllerBase
+public class BoardsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{id:guid}")]
     [AllowAnonymous]

@@ -6,7 +6,6 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Boards.CheckRealtimeAccess;
 
 public class CheckBoardRealtimeAccessQueryHandler(
-    IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler< CheckBoardRealtimeAccessQuery , Result>
 {
@@ -21,18 +20,17 @@ public class CheckBoardRealtimeAccessQueryHandler(
         {
             return Error.NotFound("Board");
         }
-
-        if (userContext.IsUnauthenticated())
+        var user = await uow.UserRepository.GetByIdAsync(request.UserId);
+        if (user is null)
         {
-            return AuthErrors.Forbidden();
+            return Error.NotFound("User");
         }
 
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
+        var userRole = user.Role;
         var workspaceRole = await uow.UserWorkspaceRepository
-            .GetRoleAsync(userId, board.WorkspaceId);
+            .GetRoleAsync(user.Id, board.WorkspaceId);
         var boardRole = await uow.UserBoardRepository
-            .GetRoleAsync(userId, board.Id);
+            .GetRoleAsync(user.Id, board.Id);
 
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
