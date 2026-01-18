@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
+using Tracker.API.Hubs.Events;
 using Tracker.Domain.Events;
 using Tracker.Domain.Options;
 using Tracker.Services.Abstraction;
@@ -16,7 +17,10 @@ public class BoardHubService(
 
     public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
+    public event Action<ItemCreatedEvent>? OnItemCreated;
     public event Action<ItemMovedEvent>? OnItemMoved;
+    public event Action<ItemUpdatedEvent>? OnItemUpdated;
+    public event Action<ItemDeletedEvent>? OnItemDeleted;
 
     public async Task ConnectAndJoinBoardAsync(Guid boardId)
     {
@@ -43,9 +47,24 @@ public class BoardHubService(
             .WithAutomaticReconnect()
             .Build();
 
+        _hubConnection.On<ItemCreatedEvent>(BoardRealtimeMethods.ItemCreated, (evt) =>
+        {
+             OnItemCreated?.Invoke(evt);
+        });
+
         _hubConnection.On<ItemMovedEvent>(BoardRealtimeMethods.ItemMoved, (evt) =>
         {
              OnItemMoved?.Invoke(evt);
+        });
+
+        _hubConnection.On<ItemUpdatedEvent>(BoardRealtimeMethods.ItemUpdated, (evt) =>
+        {
+             OnItemUpdated?.Invoke(evt);
+        });
+
+        _hubConnection.On<ItemDeletedEvent>(BoardRealtimeMethods.ItemDeleted, (evt) =>
+        {
+             OnItemDeleted?.Invoke(evt);
         });
 
         _hubConnection.Reconnected += async connectionId =>

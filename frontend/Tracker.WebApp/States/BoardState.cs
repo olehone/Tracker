@@ -78,7 +78,10 @@ public sealed class BoardState : IAsyncDisposable
         }
 
         await _boardRealtime.ConnectAndJoinBoardAsync(Board.Id);
+        _boardRealtime.OnItemCreated += Items.Apply;
         _boardRealtime.OnItemMoved += Items.Apply;
+        _boardRealtime.OnItemUpdated += Items.Apply;
+        _boardRealtime.OnItemDeleted += Items.Apply;
     }
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)
@@ -115,7 +118,10 @@ public sealed class BoardState : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        _boardRealtime.OnItemCreated -= Items.Apply;
         _boardRealtime.OnItemMoved -= Items.Apply;
+        _boardRealtime.OnItemUpdated -= Items.Apply;
+        _boardRealtime.OnItemDeleted -= Items.Apply;
         await _boardRealtime.DisconnectAsync();
     }
 }

@@ -2,6 +2,8 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
+using Tracker.Domain.Dtos;
+using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItems.Update;
@@ -9,14 +11,14 @@ namespace Tracker.Application.UseCases.BoardItems.Update;
 public class UpdateBoardItemCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<UpdateBoardItemCommand, Result>
+    : IRequestHandler<UpdateBoardItemCommand, Result<BoardItemDto>>
 {
-    public async Task<Result> Handle(UpdateBoardItemCommand request,
+    public async Task<Result<BoardItemDto>> Handle(UpdateBoardItemCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, 
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
             request.BoardItemId, BoardAction.ChangeItem, request.BoardId);
         if (itemResult.IsFailure)
         {
@@ -29,10 +31,12 @@ public class UpdateBoardItemCommandHandler(
 
         uow.BoardItemRepository.Update(boardItem);
         var result = await uow.SaveChangesAsync(cancellationToken);
-        if (result.IsFailure)
+
+        var item = await uow.BoardItemRepository.GetByIdAsync(request.BoardItemId);
+        if (result.IsFailure || item is null)
         {
-            return result;
+            return Error.Unknown;
         }
-        return Result.Success();
+        return item.ToDto();
     }
 }

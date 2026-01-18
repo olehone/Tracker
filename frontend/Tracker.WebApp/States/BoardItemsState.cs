@@ -1,4 +1,5 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Tracker.API.Hubs.Events;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
@@ -79,7 +80,7 @@ public sealed class BoardItemsState(
 
     public async Task UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyItemUpdated(itemId, request);
+        ApplyItemUpdated(itemId, request.Title, request.Description);
 
         var result = await boardItemService.UpdateBoardItemAsync(Board.Id, itemId, request);
         if (result.IsFailure)
@@ -99,19 +100,46 @@ public sealed class BoardItemsState(
         }
     }
 
+    public void Apply(ItemCreatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyItemCreated(evt.Item);
+    }
+
+    public void Apply(ItemMovedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyItemMoved(evt.BoardItemId, evt.ToBoardListId, evt.Position);
+    }
+
+    public void Apply(ItemUpdatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyItemUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
+    }
+
+    public void Apply(ItemDeletedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyItemDeleted(evt.BoardItemId);
+    }
+
     private void ApplyItemCreated(BoardItemDto newItem)
     {
         _boardItems.Add(newItem);
         Notify();
-    }
-
-    public void Apply(ItemMovedEvent evn)
-    {
-        if (boardState.MyId == evn.UserId)
-        {
-            return;
-        }
-        ApplyItemMoved(evn.BoardItemId, evn.ToBoardListId, evn.Position);
     }
 
     private void ApplyItemMoved(Guid boardItemId, Guid toBoardListId, int position)
@@ -155,15 +183,15 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyItemUpdated(Guid itemId, UpdateBoardItemRequest request)
+    private void ApplyItemUpdated(Guid itemId, string title, string description)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
         }
-        item.Title = request.Title;
-        item.Description = request.Description;
+        item.Title = title;
+        item.Description = description;
 
         Notify();
     }
