@@ -10,6 +10,7 @@ public partial class Overview
     [Parameter]
     public Guid BoardId { get; set; }
 
+    [Inject] AppState AppState { get; set; } = null!;
     [Inject] IBoardRealtimeService BoardRealtime { get; set; } = null!;
     [Inject] IBoardService BoardService { get; set; } = null!;
     [Inject] IBoardListService BoardListService { get; set; } = null!;
@@ -21,7 +22,9 @@ public partial class Overview
 
     protected override async Task OnInitializedAsync()
     {
-        BoardState = new BoardState(BoardService,
+        BoardState = new BoardState(
+            AppState,
+            BoardService,
             BoardListService,
             BoardItemService,
             BoardUserService,

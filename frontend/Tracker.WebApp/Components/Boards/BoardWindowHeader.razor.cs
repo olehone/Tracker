@@ -31,6 +31,10 @@ public partial class BoardWindowHeader : IDisposable
 
     private void ToWorkspace()
     {
+        if (BoardState.IsLoading)
+        {
+            return;
+        }
         var workspaceId = Board.WorkspaceId;
         Nav.NavigateTo($"workspaces/{workspaceId}/overview");
     }

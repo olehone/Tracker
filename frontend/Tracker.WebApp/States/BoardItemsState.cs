@@ -108,8 +108,10 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemMovedEvent evn)
     {
-        var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
-
+        if (boardState.MyId == evn.UserId)
+        {
+            return;
+        }
         ApplyItemMoved(evn.BoardItemId, evn.ToBoardListId, evn.Position);
     }
 
