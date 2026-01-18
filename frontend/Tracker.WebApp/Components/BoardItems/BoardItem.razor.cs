@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.WebApp.Components.BoardLists;
+using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.BoardItems;
@@ -11,9 +11,28 @@ public partial class BoardItem
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
-    [Parameter]
-    public required BoardItemDto Item { get; set; }
-    [Inject] IDialogService DialogService { get; set; } = null!;
+    [Parameter, EditorRequired]
+    public BoardItemDto Item { get; set; } = null!;
+
+    [Inject]
+    private IDialogService DialogService { get; set; } = null!;
+
+    private async Task OnIsDoneChanged(bool isDone)
+    {
+        await BoardState.Items.UpdateBoardItemAsync(
+            Item.Id,
+            new UpdateBoardItemRequest
+            {
+                Title = Item.Title,
+                Description = Item.Description,
+                IsDone = isDone
+            });
+        Item.IsDone = isDone;
+        StateHasChanged();
+    }
+
+    private string ItemStyle =>
+        Item.IsDone ? "text-decoration: line-through;" : string.Empty;
 
     private async Task OpenItemSettings()
     {
@@ -25,8 +44,7 @@ public partial class BoardItem
 
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
             Item.Title,
-            parameters
-        );
+            parameters);
 
         await dialog.Result;
     }

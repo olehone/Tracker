@@ -5,10 +5,17 @@
 					 Model=@model
 					 Validation=@validator
 					 ValidationDelay="300">
-				<MudTextField @bind-Value=@model.Title
-							  Label="Title"
-							  Required
-							  Variant="Variant.Outlined" />
+				<MudStack Row
+						  AlignItems="AlignItems.Center">
+					<MudCheckBox @bind-Value=@model.IsDone
+								 Size="Size.Large"></MudCheckBox>
+
+					<MudTextField @bind-Value=@model.Title
+								  Label="Title"
+								  Required
+								  Variant="Variant.Outlined"
+								  Style=@Style() />
+				</MudStack>
 
 				<MudTextField @bind-Value=@model.Description
 							  Label="Description"
@@ -18,7 +25,7 @@
 			</MudForm>
 
 			<MudDivider />
-			
+
 			<MudButton Variant="Variant.Filled"
 					   Color="Color.Error"
 					   FullWidth

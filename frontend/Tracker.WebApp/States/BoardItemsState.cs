@@ -80,7 +80,7 @@ public sealed class BoardItemsState(
 
     public async Task UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyItemUpdated(itemId, request.Title, request.Description);
+        ApplyItemUpdated(itemId, request.Title, request.Description, request.IsDone);
 
         var result = await boardItemService.UpdateBoardItemAsync(Board.Id, itemId, request);
         if (result.IsFailure)
@@ -126,7 +126,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyItemUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
+        ApplyItemUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description, evt.Item.IsDone);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -187,7 +187,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyItemUpdated(Guid itemId, string title, string description)
+    private void ApplyItemUpdated(Guid itemId, string title, string description, bool isDone)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -196,6 +196,7 @@ public sealed class BoardItemsState(
         }
         item.Title = title;
         item.Description = description;
+        item.IsDone = isDone;
 
         Notify();
     }
