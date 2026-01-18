@@ -10,6 +10,7 @@ public partial class Overview
     [Parameter]
     public Guid BoardId { get; set; }
 
+    [Inject] IBoardRealtimeService BoardRealtime { get; set; } = null!;
     [Inject] IBoardService BoardService { get; set; } = null!;
     [Inject] IBoardListService BoardListService { get; set; } = null!;
     [Inject] IBoardItemService BoardItemService { get; set; } = null!;
@@ -24,7 +25,8 @@ public partial class Overview
             BoardListService,
             BoardItemService,
             BoardUserService,
-            UserService);
+            UserService,
+            BoardRealtime);
         await BoardState.LoadAsync(BoardId);
         BoardState.OnChange += StateHasChanged;
     }

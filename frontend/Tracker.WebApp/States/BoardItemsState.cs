@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 
@@ -55,14 +56,20 @@ public sealed class BoardItemsState(
 
     public async Task MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
     {
+        if (!Guid.TryParse(toBoardListId, out Guid boardListId))
+        {
+            await boardState.ReloadAsync();
+            return;
+        }
+
         var request = new MoveBoardItemRequest
         {
             BoardItemId = itemId,
-            ToBoardListId = Guid.Parse(toBoardListId),
+            ToBoardListId = boardListId,
             Position = position
         };
 
-        ApplyItemMoved(request);
+        ApplyItemMoved(itemId, boardListId, position);
 
         var result = await boardItemService.MoveBoardItemAsync(request);
         if (result.IsFailure)
@@ -99,30 +106,35 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyItemMoved(MoveBoardItemRequest request)
+    public void Apply(ItemMovedEvent evn)
     {
-        var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
+        ApplyItemMoved(evn.BoardItemId, evn.ToBoardListId, evn.Position);
+    }
+
+    private void ApplyItemMoved(Guid boardItemId, Guid toBoardListId, int position)
+    {
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == boardItemId);
         if (item is null)
         {
             return;
         }
 
-        if (item.BoardListId == request.ToBoardListId)
+        if (item.BoardListId == toBoardListId)
         {
-            if (item.Position == request.Position)
+            if (item.Position == position)
             {
                 return;
             }
 
-            if (item.Position > request.Position)
+            if (item.Position > position)
             {
-                ShiftItemsPosition(item.BoardListId, +1, request.Position, item.Position - 1);
-                item.Position = request.Position;
+                ShiftItemsPosition(item.BoardListId, +1, position, item.Position - 1);
+                item.Position = position;
             }
             else
             {
-                ShiftItemsPosition(item.BoardListId, -1, item.Position + 1, request.Position);
-                item.Position = request.Position;
+                ShiftItemsPosition(item.BoardListId, -1, item.Position + 1, position);
+                item.Position = position;
             }
         }
         else
@@ -131,10 +143,10 @@ public sealed class BoardItemsState(
             var oldPosition = item.Position;
 
             ShiftItemsPosition(oldListId, -1, oldPosition + 1);
-            ShiftItemsPosition(request.ToBoardListId, +1, request.Position);
+            ShiftItemsPosition(toBoardListId, +1, position);
 
-            item.BoardListId = request.ToBoardListId;
-            item.Position = request.Position;
+            item.BoardListId = toBoardListId;
+            item.Position = position;
         }
 
         Notify();

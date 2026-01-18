@@ -1,4 +1,5 @@
 using Tracker.API;
+using Tracker.API.Hubs;
 using Tracker.Application;
 using Tracker.Database;
 using Tracker.Infrastructure;
@@ -44,5 +45,6 @@ app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<BoardHubImplementation>("/hubs/board");
 
 await app.RunAsync();
