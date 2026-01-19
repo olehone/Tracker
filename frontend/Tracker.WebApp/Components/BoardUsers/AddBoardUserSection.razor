@@ -2,7 +2,7 @@
 @using Tracker.Domain.Enums
 @inherits BoardUsersSubscribeBase
 
-@if (Users.CanChangeMembers())
+@if (UsersState.CanChangeMembers())
 { 
 	<MudPaper Elevation="0"
 			  Class="pa-4">
@@ -14,9 +14,9 @@
 								 ResetValueOnEmptyText
 								 SelectValueOnTab
 								 Label="Search users to add"
-								 SearchFunc=@Users.SearchAsync
+								 SearchFunc=@UsersState.SearchAsync
 								 Dense
-								 ItemDisabledFunc=@Users.IsUserMember
+								 ItemDisabledFunc=@UsersState.IsUserMember
 								 AdornmentIcon=@Icons.Material.Filled.Search
 								 ToStringFunc=@(u => u == null ? null : $"{u.Username}")>
 

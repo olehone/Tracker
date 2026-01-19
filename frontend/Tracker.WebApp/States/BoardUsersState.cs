@@ -11,6 +11,7 @@ public sealed class BoardUsersState(
     IBoardUserService boardUserService)
 {
     private readonly List<BoardUserDto> _boardUsers = [];
+    public IReadOnlyList<BoardUserDto> Users => _boardUsers;
     private BoardFullDto Board => boardState.Board!;
 
     public event Action? OnChange;
@@ -42,7 +43,7 @@ public sealed class BoardUsersState(
             : [];
     }
 
-    public async Task AddUserAsync(Guid userId, UserBoardRole role)
+    public async Task AddAsync(Guid userId, UserBoardRole role)
     {
         var result = await boardUserService.AddAsync(Board.Id, userId, role);
         if (result.IsFailure)
@@ -66,7 +67,7 @@ public sealed class BoardUsersState(
         Notify();
     }
 
-    public async Task RemoveBoardUserAsync(BoardUserDto boardUser)
+    public async Task RemoveAsync(BoardUserDto boardUser)
     {
         if (boardUser.Role == UserBoardRole.Owner)
         {

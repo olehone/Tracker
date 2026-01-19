@@ -29,6 +29,6 @@ public partial class BoardUserDangerousActions
             return;
         }
 
-        await Users.TransferOwnershipAsync(BoardUser);
+        await UsersState.TransferOwnershipAsync(BoardUser);
     }
 }

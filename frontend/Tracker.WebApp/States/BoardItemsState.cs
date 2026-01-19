@@ -36,14 +36,14 @@ public sealed class BoardItemsState(
         _boardItems.AddRange(items);
     }
 
-    public async Task CreateBoardItemAsync(Guid boardListId, string title)
+    public async Task CreateAsync(Guid boardListId, string title)
     {
         var request = new CreateBoardItemRequest
         {
             Title = title
         };
 
-        var result = await boardItemService.CreateBoardItemAsync(boardListId, request);
+        var result = await boardItemService.CreateAsync(boardListId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -53,7 +53,7 @@ public sealed class BoardItemsState(
         ApplyItemCreated(result.Value);
     }
 
-    public async Task MoveBoardItemAsync(Guid itemId, string toBoardListId, int position)
+    public async Task MoveAsync(Guid itemId, string toBoardListId, int position)
     {
         var request = new MoveBoardItemRequest
         {
@@ -64,29 +64,29 @@ public sealed class BoardItemsState(
 
         ApplyItemMoved(request);
 
-        var result = await boardItemService.MoveBoardItemAsync(request);
+        var result = await boardItemService.MoveAsync(request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
+    public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
         ApplyItemUpdated(itemId, request);
 
-        var result = await boardItemService.UpdateBoardItemAsync(itemId, request);
+        var result = await boardItemService.UpdateAsync(itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task DeleteBoardItemAsync(Guid itemId)
+    public async Task DeleteAsync(Guid itemId)
     {
         ApplyItemDeleted(itemId);
 
-        var result = await boardItemService.DeleteBoardItemAsync(itemId);
+        var result = await boardItemService.DeleteAsync(itemId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();

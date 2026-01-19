@@ -35,14 +35,14 @@ public partial class BoardOverview : IDisposable
             return;
         }
 
-        await BoardState.Items.MoveBoardItemAsync(dropInfo.Item.Id,
+        await BoardState.Items.MoveAsync(dropInfo.Item.Id,
             dropInfo.DropzoneIdentifier,
             dropInfo.IndexInZone + 1);
     }
 
     private async Task CreateList(string title)
     {
-        await BoardState.Lists.CreateBoardListAsync(title);
+        await BoardState.Lists.CreateAsync(title);
     }
 
     protected virtual void Dispose(bool disposing)

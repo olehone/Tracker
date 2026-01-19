@@ -31,14 +31,14 @@ public sealed class BoardListsState(
         _boardLists.AddRange(lists);
     }
 
-    public async Task CreateBoardListAsync(string title)
+    public async Task CreateAsync(string title)
     {
         var request = new CreateBoardListRequest
         {
             Title = title
         };
 
-        var result = await boardListService.CreateBoardListAsync(Board.Id, request);
+        var result = await boardListService.CreateAsync(Board.Id, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -48,7 +48,7 @@ public sealed class BoardListsState(
         ApplyListCreated(result.Value);
     }
 
-    public async Task MoveBoardListAsync(Guid listId, int newPosition)
+    public async Task MoveAsync(Guid listId, int newPosition)
     {
         var request = new MoveBoardListRequest
         {
@@ -57,29 +57,29 @@ public sealed class BoardListsState(
 
         ApplyListMoved(listId, newPosition);
 
-        var result = await boardListService.MoveBoardListAsync(listId, request);
+        var result = await boardListService.MoveAsync(listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
+    public async Task UpdateAsync(Guid listId, UpdateBoardListRequest request)
     {
         ApplyListUpdated(listId, request);
 
-        var result = await boardListService.UpdateBoardListAsync(listId, request);
+        var result = await boardListService.UpdateAsync(listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task DeleteBoardListAsync(Guid listId)
+    public async Task DeleteAsync(Guid listId)
     {
         ApplyListDeleted(listId);
 
-        var result = await boardListService.DeleteBoardListAsync(listId);
+        var result = await boardListService.DeleteAsync(listId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
