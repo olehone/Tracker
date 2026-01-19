@@ -9,23 +9,23 @@ namespace Tracker.Services;
 
 public class BoardUserService(IApiErrorHandler apiErrorHandler, IBoardUserApi api) : IBoardUserService
 {
-    public Task<Result<List<BoardUserDto>>> GetUsersByBoardAsync(Guid boardId)
+    public Task<Result<List<BoardUserDto>>> GetByBoardAsync(Guid boardId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.GetUsersByBoardAsync(boardId));
+        return apiErrorHandler.ExecuteAsync(() => api.GetByBoardAsync(boardId));
     }
 
-    public Task<Result<BoardUserDto>> AddUserToBoardAsync(Guid boardId, Guid userId, UserBoardRole role)
+    public Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, UserBoardRole role)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.AddUserToBoardAsync(boardId, userId, role));
+        return apiErrorHandler.ExecuteAsync(() => api.AddAsync(boardId, userId, role));
     }
 
-    public Task<Result> ChangeUserRoleAsync(Guid boardId, Guid userId, UserBoardRole role)
+    public Task<Result> ChangeRoleAsync(Guid boardId, Guid userId, UserBoardRole role)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.ChangeUserRoleAsync(boardId, userId, role));
+        return apiErrorHandler.ExecuteAsync(() => api.ChangeRoleAsync(boardId, userId, role));
     }
 
-    public Task<Result> RemoveUserFromBoardAsync(Guid boardId, Guid userId)
+    public Task<Result> RemoveAsync(Guid boardId, Guid userId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.RemoveUserFromBoardAsync(boardId, userId));
+        return apiErrorHandler.ExecuteAsync(() => api.RemoveAsync(boardId, userId));
     }
 }

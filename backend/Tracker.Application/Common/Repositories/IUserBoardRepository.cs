@@ -5,8 +5,8 @@ namespace Tracker.Application.Common.Repositories;
 
 public interface IUserBoardRepository : IRepository<UserBoard, Guid>
 {
-    Task<UserBoard?> GetByUserAndBoardAsync(Guid userId, Guid boardId);
-    Task<IReadOnlyList<UserBoard>> GetByBoardAsync(Guid boardId);
+    Task<UserBoard?> GetAsync(Guid userId, Guid boardId);
+    Task<IReadOnlyList<UserBoard>> GetAsync(Guid boardId);
     Task<UserBoard?> GetOwnerOfBoardAsync(Guid boardId);
     Task<UserBoardRole> GetRoleAsync(Guid userId, Guid boardId);
 }

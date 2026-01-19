@@ -35,7 +35,7 @@ public sealed class BoardUsersState
             return;
         }
 
-        var result = await _boardUserService.GetUsersByBoardAsync(Board.Id);
+        var result = await _boardUserService.GetByBoardAsync(Board.Id);
         if (result.IsFailure)
         {
             return;
@@ -59,7 +59,7 @@ public sealed class BoardUsersState
             Page = 1
         };
 
-        var result = await _userService.GetUsersAsync(request);
+        var result = await _userService.GetAsync(request);
         return result.IsSuccess
             ? result.Value.Items
             : [];
@@ -67,7 +67,7 @@ public sealed class BoardUsersState
 
     public async Task AddUserAsync(Guid userId, UserBoardRole role)
     {
-        var result = await _boardUserService.AddUserToBoardAsync(Board.Id, userId, role);
+        var result = await _boardUserService.AddAsync(Board.Id, userId, role);
         if (result.IsFailure)
         {
             return;
@@ -79,7 +79,7 @@ public sealed class BoardUsersState
 
     public async Task ChangeRoleAsync(BoardUserDto boardUser, UserBoardRole newRole)
     {
-        var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, newRole);
+        var result = await _boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, newRole);
         if (result.IsFailure)
         {
             return;
@@ -96,7 +96,7 @@ public sealed class BoardUsersState
             return;
         }
 
-        var result = await _boardUserService.RemoveUserFromBoardAsync(Board.Id, boardUser.User.Id);
+        var result = await _boardUserService.RemoveAsync(Board.Id, boardUser.User.Id);
         if (result.IsFailure)
         {
             return;
@@ -113,7 +113,7 @@ public sealed class BoardUsersState
             return;
         }
 
-        var result = await _boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
+        var result = await _boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
         if (result.IsFailure)
         {
             return;

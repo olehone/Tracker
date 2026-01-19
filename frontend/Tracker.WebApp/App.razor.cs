@@ -17,7 +17,7 @@ public partial class App
 
         if (principal.Identity?.IsAuthenticated == true)
         {
-            var result = await UserService.GetCurrentUserAsync();
+            var result = await UserService.GetCurrentAsync();
             if (result.IsFailure)
             {
                 return;

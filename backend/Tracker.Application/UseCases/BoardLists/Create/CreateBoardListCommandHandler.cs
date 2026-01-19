@@ -28,7 +28,7 @@ public sealed class CreateBoardListCommandHandler(
             return boardResult.Error;
         }
 
-        int upperLimit = await uow.BoardListRepository.GetMaxPositionByBoardId(request.BoardId);
+        int upperLimit = await uow.BoardListRepository.GetMaxPositionAsync(request.BoardId);
 
         var boardList = new BoardList()
         {

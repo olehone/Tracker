@@ -17,7 +17,7 @@ public partial class Overview
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+        var result = await WorkspaceService.GetByIdAsync(WorkspaceId);
         if (result.IsFailure)
         {
             return;
@@ -33,7 +33,7 @@ public partial class Overview
         {
             Workspace = null;
             StateHasChanged();
-            var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+            var result = await WorkspaceService.GetByIdAsync(WorkspaceId);
             if (result.IsFailure)
             {
                 return;
@@ -50,7 +50,7 @@ public partial class Overview
             WorkspaceId = WorkspaceId,
             Title = title
         };
-        var result = await BoardService.CreateBoardAsync(request);
+        var result = await BoardService.CreateAsync(request);
         if (result.IsFailure)
         {
             return;

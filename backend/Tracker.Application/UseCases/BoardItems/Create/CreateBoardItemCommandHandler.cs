@@ -27,7 +27,7 @@ public class CreateBoardItemCommandHandler(
         }
 
         int upperLimit = await uow.BoardItemRepository
-            .GetMaxPositionByListIdAsync(request.BoardListId);
+            .GetMaxPositionAsync(request.BoardListId);
 
         var boardItem = new BoardItem()
         {

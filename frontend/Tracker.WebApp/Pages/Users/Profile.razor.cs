@@ -32,7 +32,7 @@ public partial class Profile
     }
     private async Task LoadUser()
     {
-        var result = await UserService.GetUserByIdAsync(UserId);
+        var result = await UserService.GetByIdAsync(UserId);
         if (result.IsFailure)
         {
             return;
@@ -56,7 +56,7 @@ public partial class Profile
     private async Task<Paginated<WorkspaceSummaryDto>> LoadAllWorkspaces(
     PaginatedSearchRequest request)
     {
-        var result = await UserService.GetAllUserWorkspacesAsync(UserId, request);
+        var result = await UserService.GetAllWorkspacesAsync(UserId, request);
         if (ErrorNotifier.NotifyIfError(result))
         {
             return Paginated<WorkspaceSummaryDto>.Empty();

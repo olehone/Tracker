@@ -9,23 +9,23 @@ namespace Tracker.Services;
 
 public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IBoardService
 {
-    public Task<Result<BoardFullDto>> GetBoardByIdAsync(Guid id)
+    public Task<Result<BoardFullDto>> GetByIdAsync(Guid id)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.GetBoardByIdAsync(id));
+        return apiErrorHandler.ExecuteAsync(() => api.GetByIdAsync(id));
     }
 
-    public Task<Result<BoardSummaryDto>> CreateBoardAsync(CreateBoardRequest request)
+    public Task<Result<BoardSummaryDto>> CreateAsync(CreateBoardRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(request));
     }
 
-    public Task<Result> UpdateBoardAsync(Guid id, UpdateBoardRequest request)
+    public Task<Result> UpdateAsync(Guid id, UpdateBoardRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.UpdateBoardAsync(id, request));
+        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
     }
 
-    public Task<Result> DeleteBoardAsync(Guid id)
+    public Task<Result> DeleteAsync(Guid id)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DeleteBoardAsync(id));
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(id));
     }
 }

@@ -30,7 +30,7 @@ public sealed class MoveBoardListCommandHandler(
             return Result.Success();
         }
 
-        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(boardList.Id) + 1;
+        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionAsync(boardList.Id) + 1;
         if (maxNewPosition < request.Position)
         {
             request.Position = maxNewPosition;
@@ -38,12 +38,12 @@ public sealed class MoveBoardListCommandHandler(
 
         if (currentPosition < request.Position)
         {
-            await uow.BoardListRepository.ShiftPositions(
+            await uow.BoardListRepository.ShiftPositionsAsync(
                 boardList.BoardId, -1, currentPosition + 1, request.Position);
         }
         else
         {
-            await uow.BoardListRepository.ShiftPositions(
+            await uow.BoardListRepository.ShiftPositionsAsync(
                 boardList.BoardId, +1, request.Position, currentPosition - 1);
         }
 

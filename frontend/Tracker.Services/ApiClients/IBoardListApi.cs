@@ -7,14 +7,14 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardListApi
 {
     [Post("/api/board-lists/{boardId}")]
-    public Task<ApiResponse<BoardListDto>> CreateBoardListAsync(Guid boardId, CreateBoardListRequest request);
+    public Task<ApiResponse<BoardListDto>> CreateAsync(Guid boardId, CreateBoardListRequest request);
 
     [Post("/api/board-lists/{id}/move")]
-    public Task<ApiResponse<object>> MoveBoardListAsync(Guid id, MoveBoardListRequest request);
+    public Task<ApiResponse<object>> MoveAsync(Guid id, MoveBoardListRequest request);
 
     [Put("/api/board-lists/{id}")]
-    public Task<ApiResponse<object>> UpdateBoardListAsync(Guid id, UpdateBoardListRequest request);
+    public Task<ApiResponse<object>> UpdateAsync(Guid id, UpdateBoardListRequest request);
 
     [Delete("/api/board-lists/{id}")]
-    public Task<ApiResponse<object>> DeleteBoardListAsync(Guid id);
+    public Task<ApiResponse<object>> DeleteAsync(Guid id);
 }
