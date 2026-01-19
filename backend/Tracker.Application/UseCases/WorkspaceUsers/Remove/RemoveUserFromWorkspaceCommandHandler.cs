@@ -1,10 +1,7 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.UseCases.Boards;
-using Tracker.Application.UseCases.BoardUsers.Change;
 using Tracker.Application.UseCases.Workspaces;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
