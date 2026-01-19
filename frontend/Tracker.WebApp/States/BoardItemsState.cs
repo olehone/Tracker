@@ -50,7 +50,7 @@ public sealed class BoardItemsState(
             return;
         }
 
-        ApplyItemCreated(result.Value);
+        ApplyCreated(result.Value);
     }
 
     public async Task MoveAsync(Guid itemId, string toBoardListId, int position)
@@ -62,7 +62,7 @@ public sealed class BoardItemsState(
             Position = position
         };
 
-        ApplyItemMoved(request);
+        ApplyMoved(request);
 
         var result = await boardItemService.MoveAsync(request);
         if (result.IsFailure)
@@ -73,7 +73,7 @@ public sealed class BoardItemsState(
 
     public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyItemUpdated(itemId, request);
+        ApplyUpdated(itemId, request);
 
         var result = await boardItemService.UpdateAsync(itemId, request);
         if (result.IsFailure)
@@ -84,7 +84,7 @@ public sealed class BoardItemsState(
 
     public async Task DeleteAsync(Guid itemId)
     {
-        ApplyItemDeleted(itemId);
+        ApplyDeleted(itemId);
 
         var result = await boardItemService.DeleteAsync(itemId);
         if (result.IsFailure)
@@ -93,13 +93,13 @@ public sealed class BoardItemsState(
         }
     }
 
-    private void ApplyItemCreated(BoardItemDto newItem)
+    private void ApplyCreated(BoardItemDto newItem)
     {
         _boardItems.Add(newItem);
         Notify();
     }
 
-    private void ApplyItemMoved(MoveBoardItemRequest request)
+    private void ApplyMoved(MoveBoardItemRequest request)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
         if (item is null)
@@ -116,12 +116,12 @@ public sealed class BoardItemsState(
 
             if (item.Position > request.Position)
             {
-                ShiftItemsPosition(item.BoardListId, +1, request.Position, item.Position - 1);
+                ShiftIPosition(item.BoardListId, +1, request.Position, item.Position - 1);
                 item.Position = request.Position;
             }
             else
             {
-                ShiftItemsPosition(item.BoardListId, -1, item.Position + 1, request.Position);
+                ShiftIPosition(item.BoardListId, -1, item.Position + 1, request.Position);
                 item.Position = request.Position;
             }
         }
@@ -130,8 +130,8 @@ public sealed class BoardItemsState(
             var oldListId = item.BoardListId;
             var oldPosition = item.Position;
 
-            ShiftItemsPosition(oldListId, -1, oldPosition + 1);
-            ShiftItemsPosition(request.ToBoardListId, +1, request.Position);
+            ShiftIPosition(oldListId, -1, oldPosition + 1);
+            ShiftIPosition(request.ToBoardListId, +1, request.Position);
 
             item.BoardListId = request.ToBoardListId;
             item.Position = request.Position;
@@ -140,7 +140,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyItemUpdated(Guid itemId, UpdateBoardItemRequest request)
+    private void ApplyUpdated(Guid itemId, UpdateBoardItemRequest request)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -153,7 +153,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyItemDeleted(Guid itemId)
+    private void ApplyDeleted(Guid itemId)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -174,7 +174,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ShiftItemsPosition(Guid listId, int delta, int from)
+    private void ShiftIPosition(Guid listId, int delta, int from)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from))
         {
@@ -182,7 +182,7 @@ public sealed class BoardItemsState(
         }
     }
 
-    private void ShiftItemsPosition(Guid listId, int delta, int from, int to)
+    private void ShiftIPosition(Guid listId, int delta, int from, int to)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from && bi.Position <= to))
         {

@@ -45,7 +45,7 @@ public sealed class BoardListsState(
             return;
         }
 
-        ApplyListCreated(result.Value);
+        ApplyCreated(result.Value);
     }
 
     public async Task MoveAsync(Guid listId, int newPosition)
@@ -55,7 +55,7 @@ public sealed class BoardListsState(
             Position = newPosition
         };
 
-        ApplyListMoved(listId, newPosition);
+        ApplyMoved(listId, newPosition);
 
         var result = await boardListService.MoveAsync(listId, request);
         if (result.IsFailure)
@@ -66,7 +66,7 @@ public sealed class BoardListsState(
 
     public async Task UpdateAsync(Guid listId, UpdateBoardListRequest request)
     {
-        ApplyListUpdated(listId, request);
+        ApplyUpdated(listId, request);
 
         var result = await boardListService.UpdateAsync(listId, request);
         if (result.IsFailure)
@@ -77,7 +77,7 @@ public sealed class BoardListsState(
 
     public async Task DeleteAsync(Guid listId)
     {
-        ApplyListDeleted(listId);
+        ApplyDeleted(listId);
 
         var result = await boardListService.DeleteAsync(listId);
         if (result.IsFailure)
@@ -86,14 +86,14 @@ public sealed class BoardListsState(
         }
     }
 
-    private void ApplyListCreated(BoardListDto newList)
+    private void ApplyCreated(BoardListDto newList)
     {
         _boardLists.Add(newList);
         _boardLists.Sort((a, b) => a.Position.CompareTo(b.Position));
         Notify();
     }
 
-    private void ApplyListMoved(Guid listId, int newPosition)
+    private void ApplyMoved(Guid listId, int newPosition)
     {
         var list = _boardLists.FirstOrDefault(l => l.Id == listId);
         if (list is null)
@@ -127,7 +127,7 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
+    private void ApplyUpdated(Guid listId, UpdateBoardListRequest request)
     {
         var list = _boardLists.FirstOrDefault(bl => bl.Id == listId);
         if (list is null)
@@ -139,7 +139,7 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void ApplyListDeleted(Guid listId)
+    private void ApplyDeleted(Guid listId)
     {
         var list = _boardLists.FirstOrDefault(bl => bl.Id == listId);
         if (list is null)
