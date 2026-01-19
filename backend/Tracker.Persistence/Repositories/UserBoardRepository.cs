@@ -13,13 +13,13 @@ public class UserBoardRepository : Repository<UserBoard, Guid>, IUserBoardReposi
     {
     }
 
-    public async Task<UserBoard?> GetByUserAndBoardAsync(Guid userId, Guid boardId)
+    public async Task<UserBoard?> GetAsync(Guid userId, Guid boardId)
     {
         return await _dbSet.AsNoTracking()
             .FirstOrDefaultAsync(ub => ub.UserId == userId && ub.BoardId == boardId);
     }
 
-    public async Task<IReadOnlyList<UserBoard>> GetByBoardAsync(Guid boardId)
+    public async Task<IReadOnlyList<UserBoard>> GetAsync(Guid boardId)
     {
         return await _dbSet.AsNoTracking()
             .Include(ub => ub.User)
@@ -35,7 +35,7 @@ public class UserBoardRepository : Repository<UserBoard, Guid>, IUserBoardReposi
 
     public async Task<UserBoardRole> GetRoleAsync(Guid userId, Guid boardId)
     {
-        var userBoard = await GetByUserAndBoardAsync(userId, boardId);
+        var userBoard = await GetAsync(userId, boardId);
         if (userBoard is null)
         {
             return UserBoardRole.None;

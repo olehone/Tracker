@@ -25,7 +25,7 @@ public class DeleteBoardItemCommandHandler(
         var boardItem = listResult.Value;
 
         await uow.BoardItemRepository.RemoveAsync(boardItem.Id);
-        await uow.BoardItemRepository.ShiftPositions(
+        await uow.BoardItemRepository.ShiftPositionsAsync(
             boardItem.BoardListId, -1, boardItem.Position);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);

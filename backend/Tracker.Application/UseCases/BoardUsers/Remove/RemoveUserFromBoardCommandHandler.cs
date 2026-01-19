@@ -28,7 +28,7 @@ public class RemoveUserFromBoardCommandHandler(
         }
 
         var userBoard = await uow.UserBoardRepository
-            .GetByUserAndBoardAsync(request.UserId, request.BoardId);
+            .GetAsync(request.UserId, request.BoardId);
         if (userBoard is null)
         {
             return Error.NotFound("User", "board");

@@ -38,7 +38,7 @@ public static class BoardHelper
             return AuthErrors.Unauthenticated;
         }
 
-        var board = await uow.BoardRepository.GetBoardWithWorkspaceByListAsync(boardListId);
+        var board = await uow.BoardRepository.GetWithWorkspaceByListAsync(boardListId);
         if (board is null)
         {
             return Error.NotFound("Board");
@@ -67,7 +67,7 @@ public static class BoardHelper
             return AuthErrors.Unauthenticated;
         }
 
-        var board = await uow.BoardRepository.GetBoardWithWorkspaceByItemAsync(boardItemId);
+        var board = await uow.BoardRepository.GetWithWorkspaceByItemAsync(boardItemId);
         if (board is null)
         {
             return Error.NotFound("Board");
