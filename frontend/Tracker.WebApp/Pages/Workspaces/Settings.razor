@@ -10,15 +10,31 @@
 	<MudPaper Elevation="5"
 			  Class="my-5 pa-4">
 
-		@if (isLoading)
+		@if (isLoading || Workspace is null)
 		{
-			<MudProgressCircular Indeterminate
-								 Color="Color.Primary" />
+			<MudStack Row
+					  Justify="Justify.Center">
+				<MudProgressCircular Indeterminate
+									 Color="Color.Primary" />
+			</MudStack>
 		}
 		else if (model != null)
 		{
+			<MudStack Row
+					  AlignItems="AlignItems.Center"
+					  StretchItems="StretchItems.End"
+					  Class="mb-5">
+				<MudTooltip Text="Back to workspace">
+					<a href=@($"/workspaces/{Workspace.Id}/overview")>
+						<MudIcon Icon=@Icons.Material.Filled.KeyboardArrowLeft
+								 Color="Color.Inherit" />
+					</a>
+				</MudTooltip>
 
-			<MudText Typo="Typo.h5" Class="mb-4">Edit Workspace</MudText>
+				<MudText Typo="Typo.h5">
+					Edit @Workspace.Title
+				</MudText>
+			</MudStack>
 
 			<MudForm @ref=@_form
 					 Model=@model

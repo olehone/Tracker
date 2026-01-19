@@ -6,8 +6,11 @@
 
 @if (BoardState.IsLoading)
 {
-	<MudProgressCircular Indeterminate
-						 Size=@Size.Small />
+	<MudStack Row
+			  Justify="Justify.Center">
+		<MudProgressCircular Indeterminate
+							 Size=@Size.Large />
+	</MudStack>
 }
 else
 {

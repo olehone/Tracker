@@ -7,7 +7,37 @@
 <PageTitle>@PageTitle() overview</PageTitle>
 <WorkWindow>
 	<Header>
-		<WindowHeader Title=@Workspace?.Title />
+		<MudStack Row
+				  Spacing="3"
+				  AlignItems="AlignItems.Center"
+				  Class="mud-theme-secondary px-5 py-3 rounded-t">
+			@if (Workspace is null)
+			{
+				<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+							 Height="32px" />
+			}
+			else
+			{
+				<MudText Color="Color.Inherit"
+						 Typo="Typo.h6"
+						 Class="text-ellipsis">
+					@Workspace.Title
+				</MudText>
+				<MudSpacer/>
+				<MudTooltip Text="To settings">
+					<a href=@($"/workspaces/{Workspace.Id}/settings")>
+						<MudIcon Icon=@Icons.Material.Filled.Settings
+									   Color="Color.Inherit" />
+					</a>
+				</MudTooltip>
+				<MudTooltip Text="To members">
+					<a href=@($"/workspaces/{Workspace.Id}/members")>
+						<MudIcon Icon=@Icons.Material.Filled.People
+									   Color="Color.Inherit" />
+					</a>
+				</MudTooltip>
+			}
+		</MudStack>
 	</Header>
 
 	<Body>

@@ -15,13 +15,28 @@
 
 		@if (isLoading)
 		{
-			<MudProgressCircular Indeterminate
-								 Color="Color.Primary" />
+			<MudStack Justify="Justify.Center">
+				<MudProgressCircular Indeterminate
+									 Color="Color.Primary" />
+			</MudStack>
 		}
 		else if (Workspace != null)
 		{
-			<MudText Typo="Typo.h5"
-					 Class="mb-4">Workspace Members</MudText>
+			<MudStack Row
+					  AlignItems="AlignItems.Center"
+					  StretchItems="StretchItems.End"
+					  Class="mb-5">
+				<MudTooltip Text="Back to workspace">
+					<a href=@($"/workspaces/{Workspace.Id}/overview")>
+						<MudIcon Icon=@Icons.Material.Filled.KeyboardArrowLeft
+								 Color="Color.Inherit" />
+					</a>
+				</MudTooltip>
+
+				<MudText Typo="Typo.h5">
+					Workspace Members
+				</MudText>
+			</MudStack>
 
 			<MudPaper Elevation="0"
 					  Class="pa-4 mb-4">
