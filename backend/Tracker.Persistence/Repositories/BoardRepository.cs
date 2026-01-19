@@ -41,7 +41,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                     l.BoardItems.Any(bi => bi.Id == itemId)));
     }
 
-    public Task<Board?> GetByIdWithListsAndItemsAsync(Guid id)
+    public Task<Board?> GetByIdWithListsItemsUsersAsync(Guid id)
     {
         return _dbSet
             .AsNoTracking()
@@ -50,6 +50,8 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                 .ThenInclude(bl => bl.BoardItems
                     .OrderBy(bi => bi.Position))
             .Include(b => b.PermissionRoles)
+            .Include(b => b.UserBoards)
+                .ThenInclude(bu => bu.User)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 

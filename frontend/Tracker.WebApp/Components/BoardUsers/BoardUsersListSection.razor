@@ -14,7 +14,7 @@ else
 
 		<MudText Typo=@Typo.h6
 				 Class="mb-3">
-			Board Members (@Users.BoardUsers.Count)
+			Board Members (@UsersState.Users.Count)
 		</MudText>
 
 		<MudPaper Elevation="0"
@@ -25,7 +25,7 @@ else
 					 Dense
 					 ReadOnly>
 
-				@foreach (var boardUser in Users.BoardUsers.OrderByDescending(m => m.Role))
+				@foreach (var boardUser in UsersState.Users)
 				{
 					<BoardUserListItem @key=boardUser.User.Id BoardUser=boardUser />
 					<MudDivider />

@@ -19,7 +19,7 @@ public partial class BoardList
 
     private async Task CreateNewItem(string title)
     {
-        await BoardState.CreateBoardItemAsync(List.Id, title);
+        await BoardState.Items.CreateAsync(List.Id, title);
     }
 
     private async Task OpenListSettings()
@@ -32,8 +32,7 @@ public partial class BoardList
 
         var dialog = await DialogService.ShowAsync<BoardListSettingsDialog>(
             List.Title,
-            parameters,
-            new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true }
+            parameters
         );
 
         await dialog.Result;

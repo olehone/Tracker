@@ -44,11 +44,11 @@ public partial class BoardListSettingsDialog : IDisposable
             "Warning",
             "Deleting can not be undone!",
             yesText: "Delete!", cancelText: "Cancel");
-        if(result == null)
+        if (result == null)
         {
             return;
         }
-        await BoardState.DeleteBoardListAsync(List.Id);
+        await BoardState.Lists.DeleteAsync(List.Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
@@ -68,14 +68,10 @@ public partial class BoardListSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        var success = await BoardState.UpdateBoardListAsync(List.Id, model);
+        await BoardState.Lists.UpdateAsync(List.Id, model);
 
         isSubmitting = false;
-
-        if (success)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel() => MudDialog.Cancel();

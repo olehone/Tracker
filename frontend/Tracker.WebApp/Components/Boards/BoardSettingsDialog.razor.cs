@@ -1,6 +1,6 @@
+using MudBlazor;
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using Tracker.Domain.Requests.Board;
 using Tracker.Domain.ValueObjects;
 using Tracker.WebApp.States;
@@ -20,27 +20,25 @@ public partial class BoardSettingsDialog : IDisposable
     private UpdateBoardRequest model = null!;
     private readonly UpdateBoardRequestValidator validator = new();
     private bool isSubmitting = false;
+    private bool _disposed;
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.OnChange += StateHasChangedHandler;
 
-        if (BoardState.Board != null)
+        model = new UpdateBoardRequest
         {
-            model = new UpdateBoardRequest
+            Title = BoardState.Board.Title,
+            Description = BoardState.Board.Description,
+            Visibility = BoardState.Board.Visibility,
+            PermissionRoles = new BoardPermissionRoles
             {
-                Title = BoardState.Board.Title,
-                Description = BoardState.Board.Description,
-                Visibility = BoardState.Board.Visibility,
-                PermissionRoles = new BoardPermissionRoles
-                {
-                    MinCreateItemRole = BoardState.Board.PermissionRoles.MinCreateItemRole,
-                    MinChangeItemRole = BoardState.Board.PermissionRoles.MinChangeItemRole,
-                    MinCreateListRole = BoardState.Board.PermissionRoles.MinCreateListRole,
-                    MinChangeListRole = BoardState.Board.PermissionRoles.MinChangeListRole,
-                }
-            };
-        }
+                MinCreateItemRole = BoardState.Board.PermissionRoles.MinCreateItemRole,
+                MinChangeItemRole = BoardState.Board.PermissionRoles.MinChangeItemRole,
+                MinCreateListRole = BoardState.Board.PermissionRoles.MinCreateListRole,
+                MinChangeListRole = BoardState.Board.PermissionRoles.MinChangeListRole,
+            }
+        };
     }
 
     private async Task Delete()
@@ -53,11 +51,8 @@ public partial class BoardSettingsDialog : IDisposable
         {
             return;
         }
-        bool deleted = await BoardState.DeleteBoardAsync();
-        if (deleted)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
+        await BoardState.DeleteBoardAsync();
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private async Task Submit()
@@ -76,24 +71,10 @@ public partial class BoardSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        var success = await BoardState.UpdateBoardAsync(model);
+        await BoardState.UpdateBoardAsync(model);
 
         isSubmitting = false;
-
-        if (success)
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-    }
-
-    private void Cancel() => MudDialog.Cancel();
-
-    private bool IsDisabled() =>
-        BoardState.Board?.Permissions.CanChangeBoard != true;
-
-    void IDisposable.Dispose()
-    {
-        BoardState.OnChange -= StateHasChanged;
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     public class UpdateBoardRequestValidator : AbstractValidator<UpdateBoardRequest>
@@ -114,5 +95,33 @@ public partial class BoardSettingsDialog : IDisposable
             RuleFor(x => x.PermissionRoles)
                 .NotNull().WithMessage("Permission roles are required");
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                BoardState.OnChange -= StateHasChangedHandler;
+            }
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private bool IsDisabled() =>
+        BoardState.Board?.Permissions.CanChangeBoard != true;
+
+    private void StateHasChangedHandler()
+    {
+        InvokeAsync(StateHasChanged);
     }
 }
