@@ -6,5 +6,5 @@ namespace Tracker.Application.UseCases.Auth.Refresh;
 
 public class RefreshUserTokenCommand :IRequest<Result<TokensDto>>
 {
-    public string RefreshToken { get; set; } = string.Empty;
+    public required string RefreshToken { get; set; }
 }
