@@ -57,7 +57,7 @@ public sealed class BoardListsState(
 
         ApplyMoved(listId, newPosition);
 
-        var result = await boardListService.MoveAsync(listId, request);
+        var result = await boardListService.MoveAsync(Board.Id, listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -68,7 +68,7 @@ public sealed class BoardListsState(
     {
         ApplyUpdated(listId, request);
 
-        var result = await boardListService.UpdateAsync(listId, request);
+        var result = await boardListService.UpdateAsync(Board.Id, listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -79,7 +79,7 @@ public sealed class BoardListsState(
     {
         ApplyDeleted(listId);
 
-        var result = await boardListService.DeleteAsync(listId);
+        var result = await boardListService.DeleteAsync(Board.Id, listId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();

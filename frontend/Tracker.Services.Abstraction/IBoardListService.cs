@@ -1,14 +1,14 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Results;
 
 namespace Tracker.Services.Abstraction;
 
 public interface IBoardListService
 {
-    public Task<Result<BoardListDto>> CreateAsync(Guid boardId,
-        CreateBoardListRequest request);
-    public Task<Result> MoveAsync(Guid id, MoveBoardListRequest request);
-    public Task<Result> UpdateAsync(Guid id, UpdateBoardListRequest request);
-    public Task<Result> DeleteAsync(Guid id);
+    Task<Result<BoardListDto>> CreateAsync(Guid boardId, CreateBoardListRequest request);
+    Task<Result> MoveAsync(Guid boardId, Guid itemId, MoveBoardListRequest request);
+    Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardListRequest request);
+    Task<Result> DeleteAsync(Guid boardId, Guid itemId);
 }
