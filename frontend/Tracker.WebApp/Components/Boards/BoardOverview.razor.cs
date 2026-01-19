@@ -58,19 +58,6 @@ public partial class BoardOverview : IDisposable
         }
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.Items.OnChange -= OnBoardStateChanged;
-                BoardState.Lists.OnChange -= OnBoardStateChanged;
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
         Dispose(disposing: true);

@@ -45,7 +45,7 @@ public sealed class BoardItemsState(
             Title = title
         };
 
-        var result = await boardItemService.CreateAsync(boardListId, request);
+        var result = await boardItemService.CreateAsync(Board.Id, boardListId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -80,9 +80,9 @@ public sealed class BoardItemsState(
 
     public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyUpdated(itemId, request);
+        ApplyUpdated(itemId, request.Title, request.Description);
 
-        var result = await boardItemService.UpdateAsync(itemId, request);
+        var result = await boardItemService.UpdateAsync(Board.Id, itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -93,7 +93,7 @@ public sealed class BoardItemsState(
     {
         ApplyDeleted(itemId);
 
-        var result = await boardItemService.DeleteAsync(itemId);
+        var result = await boardItemService.DeleteAsync(Board.Id, itemId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -106,7 +106,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyItemCreated(evt.Item);
+        ApplyCreated(evt.Item);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -116,7 +116,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyItemMoved(evt.BoardItemId, evt.ToBoardListId, evt.Position);
+        ApplyMoved(evt.BoardItemId, evt.ToBoardListId, evt.Position);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -126,7 +126,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyItemUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
+        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -136,11 +136,11 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyItemDeleted(evt.BoardItemId);
+        ApplyDeleted(evt.BoardItemId);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
-    private void ApplyItemCreated(BoardItemDto newItem)
+    private void ApplyCreated(BoardItemDto newItem)
     {
         _boardItems.Add(newItem);
         Notify();
@@ -163,8 +163,8 @@ public sealed class BoardItemsState(
 
             if (item.Position > position)
             {
-                ShiftIPosition(item.BoardListId, +1, request.Position, item.Position - 1);
-                item.Position = request.Position;
+                ShiftPosition(item.BoardListId, +1, position, item.Position - 1);
+                item.Position = position;
             }
             else
             {
@@ -177,8 +177,8 @@ public sealed class BoardItemsState(
             var oldListId = item.BoardListId;
             var oldPosition = item.Position;
 
-            ShiftIPosition(oldListId, -1, oldPosition + 1);
-            ShiftIPosition(request.ToBoardListId, +1, request.Position);
+            ShiftPosition(oldListId, -1, oldPosition + 1);
+            ShiftPosition(toBoardListId, +1, position);
 
             item.BoardListId = toBoardListId;
             item.Position = position;
@@ -221,7 +221,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ShiftIPosition(Guid listId, int delta, int from)
+    private void ShiftPosition(Guid listId, int delta, int from)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from))
         {
@@ -229,7 +229,7 @@ public sealed class BoardItemsState(
         }
     }
 
-    private void ShiftIPosition(Guid listId, int delta, int from, int to)
+    private void ShiftPosition(Guid listId, int delta, int from, int to)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from && bi.Position <= to))
         {

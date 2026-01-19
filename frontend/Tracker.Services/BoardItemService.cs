@@ -22,7 +22,7 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
 
     public Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
+        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(boardId, itemId, request));
     }
 
     public Task<Result> DeleteAsync(Guid boardId, Guid itemId)
