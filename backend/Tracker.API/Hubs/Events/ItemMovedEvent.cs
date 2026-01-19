@@ -3,7 +3,7 @@
 public sealed record ItemMovedEvent(
     Guid UserId,
     Guid BoardId,
-    Guid ToBoardListId,
-    Guid BoardItemId,
+    Guid ToListId,
+    Guid ItemId,
     int Position
 );

@@ -11,12 +11,12 @@ using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.API.Controllers;
 
-[Route("api/board-lists")]
+[Route("api/board/{boardId:guid}/lists")]
 [ApiController]
 [Authorize]
 public class BoardListsController(IMediator mediator) : ControllerBase
 {
-    [HttpPost("{boardId:guid}")]
+    [HttpPost]
     public async Task<IActionResult> CreateAsync(Guid boardId,
         [FromBody] CreateBoardListRequest request)
     {
@@ -31,11 +31,12 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("{boardListId:guid}/move")]
-    public async Task<IActionResult> MoveAsync(Guid boardListId, 
+    public async Task<IActionResult> MoveAsync(Guid boardId, Guid boardListId,
         [FromBody] MoveBoardListRequest request)
     {
         var mediatorRequest = new MoveBoardListCommand
         {
+            BoardId = boardId,
             BoardListId = boardListId,
             Position = request.Position
         };
@@ -44,11 +45,12 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{boardListId:guid}")]
-    public async Task<IActionResult> UpdateAsync(Guid boardListId,
+    public async Task<IActionResult> UpdateAsync(Guid boardId, Guid boardListId,
         [FromBody] UpdateBoardListRequest request)
     {
         var mediatorRequest = new UpdateBoardListCommand
         {
+            BoardId = boardId,
             BoardListId = boardListId,
             Title = request.Title,
             Description = request.Description
@@ -58,9 +60,13 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{boardListId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid boardListId)
+    public async Task<IActionResult> DeleteAsync(Guid boardId, Guid boardListId)
     {
-        var mediatorRequest = new DeleteBoardListCommand { BoardListId = boardListId };
+        var mediatorRequest = new DeleteBoardListCommand
+        {
+            BoardId = boardId,
+            BoardListId = boardListId
+        };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }

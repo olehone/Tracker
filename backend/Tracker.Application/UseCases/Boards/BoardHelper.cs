@@ -31,7 +31,7 @@ public static class BoardHelper
     }
 
     public static async Task<Result<BoardList>> GetBoardListForActionAsync(IUnitOfWork uow, 
-        IUserContext userContext, Guid boardListId, BoardAction action)
+        IUserContext userContext, Guid boardListId, BoardAction action, Guid boardId)
     {
         if (userContext.IsUnauthenticated())
         {
@@ -44,10 +44,10 @@ public static class BoardHelper
             return Error.NotFound("Board");
         }
 
-        //if (board.Id != boardId)
-        //{
-        //    return Error.Validation("Board does not have this list");
-        //}
+        if (board.Id != boardId)
+        {
+            return Error.Validation("Board does not have this list");
+        }
 
         var isAllowed = await IsActionAllowed(uow, userContext, board, action);
         if (!isAllowed)

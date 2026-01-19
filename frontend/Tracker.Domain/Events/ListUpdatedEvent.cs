@@ -2,8 +2,8 @@
 
 namespace Tracker.Domain.Events;
 
-public sealed record ItemUpdatedEvent(
+public sealed record ListUpdatedEvent(
     Guid UserId,
     Guid BoardId,
-    BoardItemDto Item
+    BoardListDto List
 );

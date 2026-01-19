@@ -28,7 +28,9 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
         }
         catch (HttpRequestException ex)
         {
-            return ErrorMappingService.MapHttpRequestException(ex);
+            var error = ErrorMappingService.MapHttpRequestException(ex);
+            errorNotifier.NotifyNetworkError(error);
+            return error;
         }
     }
 
@@ -52,7 +54,9 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
         }
         catch (HttpRequestException ex)
         {
-            return ErrorMappingService.MapHttpRequestException(ex);
+            var error = ErrorMappingService.MapHttpRequestException(ex);
+            errorNotifier.NotifyNetworkError(error);
+            return error;
         }
     }
 }

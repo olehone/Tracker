@@ -1,9 +1,8 @@
 ﻿namespace Tracker.Domain.Events;
 
-public sealed record ItemMovedEvent(
+public sealed record ListMovedEvent(
     Guid UserId,
     Guid BoardId,
-    Guid ToListId,
-    Guid ItemId,
+    Guid ListId,
     int Position
 );

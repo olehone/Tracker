@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
-using Tracker.API.Hubs.Events;
 using Tracker.Domain.Events;
 using Tracker.Domain.Options;
 using Tracker.Services.Abstraction;
@@ -21,6 +20,11 @@ public class BoardHubService(
     public event Action<ItemMovedEvent>? OnItemMoved;
     public event Action<ItemUpdatedEvent>? OnItemUpdated;
     public event Action<ItemDeletedEvent>? OnItemDeleted;
+
+    public event Action<ListCreatedEvent>? OnListCreated;
+    public event Action<ListMovedEvent>? OnListMoved;
+    public event Action<ListUpdatedEvent>? OnListUpdated;
+    public event Action<ListDeletedEvent>? OnListDeleted;
 
     public async Task ConnectAndJoinBoardAsync(Guid boardId)
     {
@@ -47,25 +51,9 @@ public class BoardHubService(
             .WithAutomaticReconnect()
             .Build();
 
-        _hubConnection.On<ItemCreatedEvent>(BoardRealtimeMethods.ItemCreated, (evt) =>
-        {
-             OnItemCreated?.Invoke(evt);
-        });
+        RegisterItemEvents();
 
-        _hubConnection.On<ItemMovedEvent>(BoardRealtimeMethods.ItemMoved, (evt) =>
-        {
-             OnItemMoved?.Invoke(evt);
-        });
-
-        _hubConnection.On<ItemUpdatedEvent>(BoardRealtimeMethods.ItemUpdated, (evt) =>
-        {
-             OnItemUpdated?.Invoke(evt);
-        });
-
-        _hubConnection.On<ItemDeletedEvent>(BoardRealtimeMethods.ItemDeleted, (evt) =>
-        {
-             OnItemDeleted?.Invoke(evt);
-        });
+        RegisterListEvents();
 
         _hubConnection.Reconnected += async connectionId =>
         {
@@ -84,6 +72,7 @@ public class BoardHubService(
         await _hubConnection.InvokeAsync(BoardRealtimeMethods.JoinBoard, boardId);
         _currentBoardId = boardId;
     }
+
 
     public async Task DisconnectAsync()
     {
@@ -113,5 +102,48 @@ public class BoardHubService(
     {
         GC.SuppressFinalize(this);
         await DisconnectAsync();
+    }
+
+    private void RegisterItemEvents()
+    {
+        _hubConnection!.On<ItemCreatedEvent>(BoardRealtimeMethods.ItemCreated, (evt) =>
+        {
+            OnItemCreated?.Invoke(evt);
+        });
+
+        _hubConnection!.On<ItemMovedEvent>(BoardRealtimeMethods.ItemMoved, (evt) =>
+        {
+            OnItemMoved?.Invoke(evt);
+        });
+
+        _hubConnection!.On<ItemUpdatedEvent>(BoardRealtimeMethods.ItemUpdated, (evt) =>
+        {
+            OnItemUpdated?.Invoke(evt);
+        });
+
+        _hubConnection!.On<ItemDeletedEvent>(BoardRealtimeMethods.ItemDeleted, (evt) =>
+        {
+            OnItemDeleted?.Invoke(evt);
+        });
+    }
+
+    private void RegisterListEvents()
+    {
+        _hubConnection!.On<ListCreatedEvent>(BoardRealtimeMethods.ListCreated, (evt) =>
+        {
+            OnListCreated?.Invoke(evt);
+        });
+        _hubConnection!.On<ListMovedEvent>(BoardRealtimeMethods.ListMoved, (evt) =>
+        {
+            OnListMoved?.Invoke(evt);
+        });
+        _hubConnection!.On<ListUpdatedEvent>(BoardRealtimeMethods.ListUpdated, (evt) =>
+        {
+            OnListUpdated?.Invoke(evt);
+        });
+        _hubConnection!.On<ListDeletedEvent>(BoardRealtimeMethods.ListDeleted, (evt) =>
+        {
+            OnListDeleted?.Invoke(evt);
+        });
     }
 }
