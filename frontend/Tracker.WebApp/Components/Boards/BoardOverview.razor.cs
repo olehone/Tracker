@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Polly.Simmy.Behavior;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
@@ -14,8 +15,15 @@ public partial class BoardOverview
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.OnChange += OnBoardStateChanged;
     }
+
+    private void OnBoardStateChanged()
+    {
+        StateHasChanged();
+        _container?.Refresh();
+    }
+
     private List<BoardItemDto> Items()
     {
         return Board?.BoardLists.SelectMany(bl => bl.BoardItems).ToList() ?? [];
@@ -33,7 +41,6 @@ public partial class BoardOverview
             dropInfo.DropzoneIdentifier,
             dropInfo.IndexInZone + 1
         );
-        _container.Refresh();
     }
 
     private async Task CreateList(string title)
@@ -41,9 +48,4 @@ public partial class BoardOverview
         await BoardState.CreateBoardListAsync(title);
     }
 
-    private async Task CreateItemForList(BoardListDto list, string title)
-    {
-        await BoardState.CreateBoardItemAsync(list.Id, title);
-        _container.Refresh();
-    }
 }

@@ -1,5 +1,8 @@
 ﻿using MediatR;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Boards;
+using Tracker.Application.UseCases.Workspaces;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
@@ -8,6 +11,7 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.BoardLists.Create;
 
 public sealed class CreateBoardListCommandHandler(
+    IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<CreateBoardListCommand, Result<BoardListDto>>
 {
@@ -17,10 +21,11 @@ public sealed class CreateBoardListCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository.GetByIdAsync(request.BoardId);
-        if (board is null)
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext, request.BoardId, BoardAction.CreateList);
+
+        if (boardResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return boardResult.Error;
         }
 
         int upperLimit = await uow.BoardListRepository.GetMaxPositionByBoardId(request.BoardId);
@@ -32,6 +37,7 @@ public sealed class CreateBoardListCommandHandler(
             Title = request.Title,
             Description = request.Description
         };
+
         await uow.BoardListRepository.AddAsync(boardList);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);

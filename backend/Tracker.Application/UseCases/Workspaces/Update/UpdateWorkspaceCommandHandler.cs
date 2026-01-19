@@ -14,7 +14,7 @@ public class UpdateWorkspaceCommandHandler(
     public async Task<Result> Handle(UpdateWorkspaceCommand request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             return AuthErrors.Unauthenticated;
         }

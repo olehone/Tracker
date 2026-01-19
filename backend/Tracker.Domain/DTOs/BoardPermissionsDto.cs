@@ -12,16 +12,6 @@ public class BoardPermissionsDto
         CanChangeOwner = false,
     };
 
-    public static readonly BoardPermissionsDto All = new()
-    {
-        CanChangeBoard = true,
-        CanCreateItem = true,
-        CanChangeItem = true,
-        CanCreateList = true,
-        CanChangeList = true,
-        CanChangeOwner = true,
-    };
-
     public required bool CanChangeBoard { get; set; }
     public required bool CanCreateItem { get; set; }
     public required bool CanChangeItem { get; set; }

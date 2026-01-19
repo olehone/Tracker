@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
@@ -8,6 +10,7 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.BoardItems.Create;
 
 public class CreateBoardItemCommandHandler(
+    IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<CreateBoardItemCommand, Result<BoardItemDto>>
 {
@@ -17,11 +20,12 @@ public class CreateBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var boardList = await uow.BoardListRepository.GetByIdAsync(request.BoardListId);
-        if (boardList is null)
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.CreateItem);
+        if (listResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return listResult.Error;
         }
+
         int upperLimit = await uow.BoardItemRepository
             .GetMaxPositionByListIdAsync(request.BoardListId);
 

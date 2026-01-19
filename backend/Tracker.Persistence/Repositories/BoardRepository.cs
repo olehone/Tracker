@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using System.IO.Compression;
+using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Enums;
@@ -12,9 +14,36 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
-    public async Task<Board?> GetByIdWithListsAndItemsAsync(Guid id)
+    public Task<Board?> GetBoardWithWorkspaceAsync(Guid id)
     {
-        return await _dbSet
+        return _dbSet
+            .AsNoTracking()
+            .Include(b => b.Workspace)
+            .FirstOrDefaultAsync(b => b.Id == id);
+    }
+
+    public Task<Board?> GetBoardWithWorkspaceByListAsync(Guid listId)
+    {
+        return _dbSet
+            .AsNoTracking()
+            .Include(b => b.Workspace)
+            .FirstOrDefaultAsync(b =>
+                b.BoardLists.Any(l => l.Id == listId));
+    }
+
+    public Task<Board?> GetBoardWithWorkspaceByItemAsync(Guid itemId)
+    {
+        return _dbSet
+            .AsNoTracking()
+            .Include(b => b.Workspace)
+            .FirstOrDefaultAsync(b =>
+                b.BoardLists.Any(l =>
+                    l.BoardItems.Any(bi => bi.Id == itemId)));
+    }
+
+    public Task<Board?> GetByIdWithListsAndItemsAsync(Guid id)
+    {
+        return _dbSet
             .AsNoTracking()
             .Include(b => b.BoardLists
                 .OrderBy(bl => bl.Position))

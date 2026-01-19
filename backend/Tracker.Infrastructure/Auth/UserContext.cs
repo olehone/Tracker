@@ -44,6 +44,11 @@ public class UserContext(IHttpContextAccessor httpContextAccessor)
         return globalRole;
     }
 
+    public bool IsUnauthenticated()
+    {
+        return !IsAuthenticated();
+    }
+
     public bool IsAuthenticated()
     {
         return httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;

@@ -28,7 +28,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
             return Error.NotFound("Workspace");
         }
 
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             if (WorkspacePolicy.CanAnonView(workspace.Visibility))
             {

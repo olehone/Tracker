@@ -3,7 +3,6 @@ using Tracker.Domain.Requests.Board;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.States;
 
@@ -18,6 +17,7 @@ public sealed class BoardState
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
     public BoardUsersState Users { get; }
+
 
     public bool IsLoading { get; private set; }
     public event Action? OnChange;
@@ -57,24 +57,6 @@ public sealed class BoardState
         Notify();
     }
 
-    public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
-    {
-        if (_currentBoard is null)
-        {
-            return false;
-        }
-
-        var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
-
-        if (result.IsFailure)
-        {
-            return false;
-        }
-
-        ApplyBoardUpdated(request);
-        return true;
-    }
-
     public async Task<bool> CreateBoardListAsync(string title)
     {
         if (_currentBoard is null)
@@ -96,6 +78,40 @@ public sealed class BoardState
         ApplyListCreated(result.Value);
         return true;
     }
+
+    public async Task<bool> UpdateBoardAsync(UpdateBoardRequest request)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        var result = await _boardService.UpdateBoardAsync(_currentBoard.Id, request);
+
+        if (result.IsFailure)
+        {
+            return false;
+        }
+
+        ApplyBoardUpdated(request);
+        return true;
+    }
+
+    public async Task<bool> DeleteBoardAsync()
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        var result = await _boardService.DeleteBoardAsync(_currentBoard.Id);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+        return true;
+    }
+
 
     public async Task<bool> MoveBoardListAsync(Guid listId, int newPosition)
     {
@@ -136,16 +152,16 @@ public sealed class BoardState
         return true;
     }
 
-    public async Task<bool> DeleteBoardListAsync(Guid listId)
+    public async Task<bool> DeleteBoardListAsync(Guid itemId)
     {
         if (_currentBoard is null)
         {
             return false;
         }
 
-        ApplyListDeleted(listId);
+        ApplyListDeleted(itemId);
 
-        var result = await _boardListService.DeleteBoardListAsync(listId);
+        var result = await _boardListService.DeleteBoardListAsync(itemId);
         if (result.IsFailure)
         {
             return false;
@@ -201,6 +217,40 @@ public sealed class BoardState
         return true;
     }
 
+    public async Task<bool> UpdateBoardItemAsync(Guid itemId, UpdateBoardItemRequest request)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        ApplyItemUpdated(itemId, request);
+
+        var result = await _boardItemService.UpdateBoardItemAsync(itemId, request);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public async Task<bool> DeleteBoardItemAsync(Guid itemId)
+    {
+        if (_currentBoard is null)
+        {
+            return false;
+        }
+
+        ApplyItemDeleted(itemId);
+
+        var result = await _boardItemService.DeleteBoardItemAsync(itemId);
+        if (result.IsFailure)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private void ApplyBoardUpdated(UpdateBoardRequest request)
     {
         if (_currentBoard is null)
@@ -253,7 +303,6 @@ public sealed class BoardState
 
         Notify();
     }
-
 
     private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
     {
@@ -359,6 +408,51 @@ public sealed class BoardState
             item.Position = request.Position;
             toList.BoardItems.Insert(item.Position - 1, item);
         }
+
+        Notify();
+    }
+
+    private void ApplyItemUpdated(Guid itemId, UpdateBoardItemRequest request)
+    {
+        var item = Board.BoardLists.SelectMany(bl=> bl.BoardItems).FirstOrDefault(bi => bi.Id  == itemId);
+        if (item is null)
+        {
+            return;
+        }
+        item.Title = request.Title;
+        item.Description = request.Description;
+
+        Notify();
+    }
+
+    private void ApplyItemDeleted(Guid itemId)
+    {
+        if (_currentBoard is null)
+        {
+            return;
+        }
+
+        var list = _currentBoard.BoardLists
+            .FirstOrDefault(bl => bl.BoardItems.Any(bi => bi.Id == itemId));
+
+        if (list is null)
+        {
+            return;
+        }
+
+        var item = list.BoardItems.FirstOrDefault(bi => bi.Id == itemId);
+        if (item is null)
+        {
+            return;
+        }
+
+        var deletedPosition = item.Position;
+
+        list.BoardItems.Remove(item);
+        ShiftItemsPosition(list, -1, deletedPosition + 1);
+        list.BoardItems = list.BoardItems
+            .OrderBy(bi => bi.Position)
+            .ToList();
 
         Notify();
     }

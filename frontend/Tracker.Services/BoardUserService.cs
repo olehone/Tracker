@@ -1,5 +1,4 @@
-﻿using Tracker.API.Requests;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;

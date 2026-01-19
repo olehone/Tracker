@@ -8,5 +8,6 @@ public interface IUserContext
     GlobalRole GetUserRole();
     string GetUserEmail();
     bool IsAuthenticated();
+    bool IsUnauthenticated();
 }
 

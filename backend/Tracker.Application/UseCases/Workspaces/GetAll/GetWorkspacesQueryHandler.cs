@@ -17,7 +17,7 @@ public sealed class GetWorkspacesQueryHandler(
         GetWorkspacesQuery request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             return AuthErrors.Unauthenticated;
         }

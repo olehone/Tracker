@@ -12,12 +12,19 @@ public partial class BoardWindowHeader : IDisposable
     private BoardState BoardState { get; set; } = null!;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
-
+    [Inject] NavigationManager Nav { get; set; } = null!;
+   
     private BoardFullDto Board => BoardState.Board;
 
     protected override void OnInitialized()
     {
         BoardState.OnChange += StateHasChanged;
+    }
+
+    private void ToWorkspace()
+    {
+        var workspaceId = Board.WorkspaceId;
+        Nav.NavigateTo($"/{workspaceId}");
     }
 
     private async Task OpenSettings()

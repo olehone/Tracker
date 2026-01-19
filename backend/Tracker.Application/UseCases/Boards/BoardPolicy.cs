@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Tracker.Application.UseCases.Workspaces;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.ValueObjects;
 
@@ -13,19 +11,15 @@ public static class BoardPolicy
         UserBoardRole boardRole,
         GlobalRole globalRole = GlobalRole.None)
     {
-        if (globalRole >= GlobalRole.Admin ||
-            workspaceRole >= UserWorkspaceRole.Admin)
-        {
-            return BoardPermissionsDto.All;
-        }
+        var role = GetEffectivePermission(globalRole, workspaceRole, boardRole);
 
         return new BoardPermissionsDto
         {
             CanChangeBoard = CanChangeSettings(globalRole, workspaceRole, boardRole),
-            CanCreateItem = MapUserRoleToPermission(boardRole) >= permissionRoles.MinCreateItemRole,
-            CanChangeItem = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeItemRole,
-            CanCreateList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinCreateListRole,
-            CanChangeList = MapUserRoleToPermission(boardRole) >= permissionRoles.MinChangeListRole,
+            CanCreateItem = role >= permissionRoles.MinCreateItemRole,
+            CanChangeItem = role >= permissionRoles.MinChangeItemRole,
+            CanCreateList = role >= permissionRoles.MinCreateListRole,
+            CanChangeList = role >= permissionRoles.MinChangeListRole,
             CanChangeOwner = CanChangeOwner(globalRole, workspaceRole, boardRole),
         };
     }
@@ -90,16 +84,14 @@ public static class BoardPolicy
 
     public static bool CanChangeSettings(GlobalRole globalRole,
         UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole,
-        WorkspacePermissionsDto? workspacePermissions = null)
+        UserBoardRole boardRole)
     {
         if (globalRole >= GlobalRole.Admin)
         {
             return true;
         }
 
-        if (workspacePermissions is not null &&
-            WorkspacePolicy.IsActionAllowed(workspacePermissions, WorkspaceAction.ChangeBoard))
+        if (workspaceRole >= UserWorkspaceRole.Admin)
         {
             return true;
         }
@@ -127,6 +119,20 @@ public static class BoardPolicy
         };
     }
 
+    // Grand global admin or workspace admin same value as board owner
+    private static BoardPermissionRole GetEffectivePermission(
+        GlobalRole globalRole,
+        UserWorkspaceRole workspaceRole,
+        UserBoardRole boardRole)
+    {
+        if (globalRole >= GlobalRole.Admin || workspaceRole >= UserWorkspaceRole.Admin)
+        {
+            return BoardPermissionRole.Owner;
+        }
+
+        return MapUserRoleToPermission(boardRole);
+    }
+    
     private static BoardPermissionRole MapUserRoleToPermission(UserBoardRole userBoardRole,
         bool isWorkspaceMember = false)
     {

@@ -15,13 +15,11 @@ public sealed class CreateBoardCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<CreateBoardCommand, Result<BoardSummaryDto>>
 {
-    private const WorkspaceAction action = WorkspaceAction.CreateBoard;
-
     public async Task<Result<BoardSummaryDto>> Handle(
         CreateBoardCommand request,
         CancellationToken cancellationToken)
     {
-        if (!userContext.IsAuthenticated())
+        if (userContext.IsUnauthenticated())
         {
             return AuthErrors.Unauthenticated;
         }
@@ -43,7 +41,7 @@ public sealed class CreateBoardCommandHandler(
         var permissions = WorkspacePolicy
             .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
 
-        if (WorkspacePolicy.IsActionAllowed(permissions, action))
+        if (WorkspacePolicy.IsActionAllowed(permissions, WorkspaceAction.CreateBoard))
         {
             return await Create(userId, request, uow, cancellationToken);
         }
