@@ -17,7 +17,7 @@ namespace Tracker.API.Controllers;
 public class BoardListsController(IMediator mediator) : ControllerBase
 {
     [HttpPost("{boardId:guid}")]
-    public async Task<IActionResult> CreateBoardListAsync(Guid boardId,
+    public async Task<IActionResult> CreateAsync(Guid boardId,
         [FromBody] CreateBoardListRequest request)
     {
         var mediatorRequest = new CreateBoardListCommand
@@ -31,7 +31,7 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("{boardListId:guid}/move")]
-    public async Task<IActionResult> MoveBoardListAsync(Guid boardListId, 
+    public async Task<IActionResult> MoveAsync(Guid boardListId, 
         [FromBody] MoveBoardListRequest request)
     {
         var mediatorRequest = new MoveBoardListCommand
@@ -44,7 +44,7 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{boardListId:guid}")]
-    public async Task<IActionResult> UpdateBoardListAsync(Guid boardListId,
+    public async Task<IActionResult> UpdateAsync(Guid boardListId,
         [FromBody] UpdateBoardListRequest request)
     {
         var mediatorRequest = new UpdateBoardListCommand
@@ -58,7 +58,7 @@ public class BoardListsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{boardListId:guid}")]
-    public async Task<IActionResult> DeleteBoardListAsync(Guid boardListId)
+    public async Task<IActionResult> DeleteAsync(Guid boardListId)
     {
         var mediatorRequest = new DeleteBoardListCommand { BoardListId = boardListId };
         var response = await mediator.Send(mediatorRequest);

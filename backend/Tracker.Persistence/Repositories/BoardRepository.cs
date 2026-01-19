@@ -12,7 +12,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
-    public Task<Board?> GetBoardWithWorkspaceAsync(Guid id)
+    public Task<Board?> GetWithWorkspaceAsync(Guid id)
     {
         return _dbSet
             .AsNoTracking()
@@ -20,7 +20,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public Task<Board?> GetBoardWithWorkspaceByListAsync(Guid listId)
+    public Task<Board?> GetWithWorkspaceByListAsync(Guid listId)
     {
         return _dbSet
             .AsNoTracking()
@@ -29,7 +29,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                 b.BoardLists.Any(l => l.Id == listId));
     }
 
-    public Task<Board?> GetBoardWithWorkspaceByItemAsync(Guid itemId)
+    public Task<Board?> GetWithWorkspaceByItemAsync(Guid itemId)
     {
         return _dbSet
             .AsNoTracking()

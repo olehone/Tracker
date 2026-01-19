@@ -29,7 +29,7 @@ public class MoveBoardItemCommandHandler(
 
         int currentPosition = boardItem.Position;
         int maxNewPosition = await uow.BoardItemRepository
-            .GetMaxPositionByListIdAsync(request.ToBoardListId) + 1;
+            .GetMaxPositionAsync(request.ToBoardListId) + 1;
 
         if (maxNewPosition < request.Position)
         {
@@ -55,9 +55,9 @@ public class MoveBoardItemCommandHandler(
         }
         else
         {
-            await uow.BoardItemRepository.ShiftPositions(
+            await uow.BoardItemRepository.ShiftPositionsAsync(
                     boardItem.BoardListId, -1, currentPosition + 1);
-            await uow.BoardItemRepository.ShiftPositions(
+            await uow.BoardItemRepository.ShiftPositionsAsync(
                     request.ToBoardListId, +1, request.Position);
 
             boardItem.BoardListId = request.ToBoardListId;

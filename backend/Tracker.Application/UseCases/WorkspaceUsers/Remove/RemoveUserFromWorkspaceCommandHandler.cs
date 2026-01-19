@@ -29,7 +29,7 @@ public class RemoveUserFromWorkspaceCommandHandler(
         }
 
         var userWorkspace = await uow.UserWorkspaceRepository
-            .GetByUserAndWorkspaceAsync(request.UserId, request.WorkspaceId);
+            .GetAsync(request.UserId, request.WorkspaceId);
         if (userWorkspace is null)
         {
             return Error.NotFound("User", "workspace");

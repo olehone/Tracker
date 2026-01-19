@@ -34,7 +34,7 @@ public class AddUserToWorkspaceCommandHandler(
         }
 
         var userBoard = await uow.UserWorkspaceRepository
-            .GetByUserAndWorkspaceAsync(request.UserId, request.WorkspaceId);
+            .GetAsync(request.UserId, request.WorkspaceId);
         if (userBoard is not null)
         {
             return Error.AlreadyExists("User", "Workspace", user.Username);

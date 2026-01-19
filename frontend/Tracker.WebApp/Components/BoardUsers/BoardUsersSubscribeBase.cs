@@ -7,7 +7,7 @@ public partial class BoardUsersSubscribeBase : ComponentBase, IDisposable
 {
     [CascadingParameter]
     protected BoardState BoardState { get; set; } = null!;
-    protected BoardUsersState Users => BoardState.Users;
+    protected BoardUsersState UsersState => BoardState.Users;
 
     private bool _disposed;
 

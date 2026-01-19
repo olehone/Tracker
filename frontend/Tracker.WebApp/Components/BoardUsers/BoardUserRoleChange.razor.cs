@@ -25,6 +25,6 @@ public partial class BoardUserRoleChange : BoardUsersSubscribeBase
         {
             return;
         }
-        await Users.ChangeRoleAsync(BoardUser, _currentRole);
+        await UsersState.ChangeRoleAsync(BoardUser, _currentRole);
     }
 }

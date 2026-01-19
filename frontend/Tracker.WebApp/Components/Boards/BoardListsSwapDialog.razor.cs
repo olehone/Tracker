@@ -33,7 +33,7 @@ public partial class BoardListsSwapDialog : IDisposable
             return;
         }
 
-        await BoardState.Lists.MoveBoardListAsync(
+        await BoardState.Lists.MoveAsync(
             dropInfo.Item.Id,
             dropInfo.IndexInZone + 1
         );

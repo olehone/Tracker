@@ -19,7 +19,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
 
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetWorkspaceByIdAsync(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
         var mediatorRequest = new GetWorkspaceByIdQuery()
         {
@@ -47,7 +47,7 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
 
     [HttpGet("all")]
     [Authorize(Roles = "Admin,Owner")]
-    public async Task<IActionResult> GetWorkspacesAsync(
+    public async Task<IActionResult> GetAsync(
         [FromQuery] PaginatedSearchRequest request)
     {
         var mediatorRequest = new GetWorkspacesQuery()
@@ -61,14 +61,14 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("my")]
-    public async Task<IActionResult> GetWorkspacesForCurrentUserAsync()
+    public async Task<IActionResult> GetForCurrentUserAsync()
     {
         var response = await mediator.Send(new GetWorkspacesForCurrentUserQuery());
         return response.ToActionResult();
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateWorkspaceRequest request)
     {
         var mediatorRequest = new CreateWorkspaceCommand()
         {

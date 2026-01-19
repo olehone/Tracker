@@ -16,7 +16,7 @@ namespace Tracker.API.Controllers;
 public class BoardsUsersController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetUsersByBoardAsync(Guid boardId)
+    public async Task<IActionResult> GetByBoardAsync(Guid boardId)
     {
         var mediatorRequest = new GetUsersByBoardIdQuery { BoardId = boardId };
         var response = await mediator.Send(mediatorRequest);
@@ -24,7 +24,7 @@ public class BoardsUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("{userId:guid}")]
-    public async Task<IActionResult> AddUserToBoardAsync(Guid boardId, Guid userId,
+    public async Task<IActionResult> AddAsync(Guid boardId, Guid userId,
         [FromBody] BoardUserRoleRequest request)
     {
         var mediatorRequest = new AddUserToBoardCommand
@@ -38,7 +38,7 @@ public class BoardsUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{userId:guid}")]
-    public async Task<IActionResult> ChangeUserRoleAsync(Guid boardId, Guid userId,
+    public async Task<IActionResult> ChangeRoleAsync(Guid boardId, Guid userId,
         [FromBody] BoardUserRoleRequest request)
     {
         var mediatorRequest = new ChangeBoardUserRoleCommand
@@ -52,7 +52,7 @@ public class BoardsUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{userId:guid}")]
-    public async Task<IActionResult> RemoveUserFromBoardAsync(Guid boardId, Guid userId)
+    public async Task<IActionResult> RemoveAsync(Guid boardId, Guid userId)
     {
         var mediatorRequest = new RemoveUserFromBoardCommand
         {

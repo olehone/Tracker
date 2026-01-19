@@ -33,7 +33,7 @@ public class AddUserToBoardCommandHandler(
         }
 
         var userBoard = await uow.UserBoardRepository
-            .GetByUserAndBoardAsync(request.UserId, request.BoardId);
+            .GetAsync(request.UserId, request.BoardId);
         if (userBoard is not null)
         {
             return Error.AlreadyExists("User", "Board", user.Username);

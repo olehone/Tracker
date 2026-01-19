@@ -11,7 +11,7 @@ public class BoardListRepository : Repository<BoardList, Guid>, IBoardListReposi
     {
     }
 
-    public async Task<int> GetMaxPositionByBoardId(Guid boardId)
+    public async Task<int> GetMaxPositionAsync(Guid boardId)
     {
         return await _dbSet
             .AsNoTracking()
@@ -19,9 +19,9 @@ public class BoardListRepository : Repository<BoardList, Guid>, IBoardListReposi
             .MaxAsync(bl => (int?)bl.Position) ?? 0;
     }
 
-    public async Task ShiftPositions(Guid boardId, int delta, int from, int to)
+    public Task ShiftPositionsAsync(Guid boardId, int delta, int from, int to)
     {
-        await _dbSet
+        return _dbSet
             .AsNoTracking()
             .Where(bl => bl.BoardId == boardId)
             .Where(bl => bl.Position >= from && bl.Position <= to)

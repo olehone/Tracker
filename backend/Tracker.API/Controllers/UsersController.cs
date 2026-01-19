@@ -18,7 +18,7 @@ public class UserController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetUserByIdAsync(Guid id)
+    public async Task<IActionResult> GetCurrentAsync(Guid id)
     {
         var mediatorRequest = new GetUserByIdQuery { Id = id };
         var response = await mediator.Send(mediatorRequest);
@@ -42,7 +42,7 @@ public class UserController(IMediator mediator) : ControllerBase
 
     [HttpGet("{id:guid}/workspaces/all")]
     [Authorize(Roles = "Admin,Owner")]
-    public async Task<IActionResult> GetAllUserWorkspacesAsync(
+    public async Task<IActionResult> GetAllWorkspacesAsync(
         Guid id,
         [FromQuery] PaginatedSearchRequest request)
     {
@@ -58,7 +58,7 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<IActionResult> GetUsersAsync([FromQuery] PaginatedSearchRequest request)
+    public async Task<IActionResult> GetAsync([FromQuery] PaginatedSearchRequest request)
     {
         var mediatorRequest = new GetUsersQuery
         {
@@ -71,7 +71,7 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUserAsync()
+    public async Task<IActionResult> GetCurrentAsync()
     {
         var response = await mediator.Send(new GetCurrentUserQuery());
         return response.ToActionResult();

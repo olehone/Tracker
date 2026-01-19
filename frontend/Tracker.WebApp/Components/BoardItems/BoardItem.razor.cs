@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+
 using MudBlazor;
+
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
@@ -19,7 +21,7 @@ public partial class BoardItem
 
     private async Task OnIsDoneChanged(bool isDone)
     {
-        await BoardState.Items.UpdateBoardItemAsync(
+        await BoardState.Items.UpdateAsync(
             Item.Id,
             new UpdateBoardItemRequest
             {

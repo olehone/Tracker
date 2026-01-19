@@ -46,7 +46,7 @@ public sealed class BoardState : IAsyncDisposable
         IsLoading = true;
         Notify();
 
-        var boardResult = await _boardService.GetBoardByIdAsync(boardId);
+        var boardResult = await _boardService.GetByIdAsync(boardId);
 
         if (boardResult.IsFailure)
         {
@@ -86,7 +86,7 @@ public sealed class BoardState : IAsyncDisposable
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)
     {
-        var result = await _boardService.UpdateBoardAsync(Board.Id, request);
+        var result = await _boardService.UpdateAsync(Board.Id, request);
 
         if (result.IsFailure)
         {
@@ -97,7 +97,7 @@ public sealed class BoardState : IAsyncDisposable
 
     public async Task DeleteBoardAsync()
     {
-        var result = await _boardService.DeleteBoardAsync(Board.Id);
+        var result = await _boardService.DeleteAsync(Board.Id);
         if (result.IsSuccess)
         {
             OnBoardNotFound?.Invoke();

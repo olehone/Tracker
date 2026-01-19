@@ -24,7 +24,7 @@ public class BoardItemsController(IMediator mediator,
 {
 
     [HttpPost("{boardListId:guid}")]
-    public async Task<IActionResult> CreateBoardItemAsync(Guid boardId, Guid boardListId,
+    public async Task<IActionResult> CreateAsync(Guid boardId, Guid boardListId,
         [FromBody] CreateBoardItemRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
@@ -49,7 +49,7 @@ public class BoardItemsController(IMediator mediator,
     }
 
     [HttpPost("move/{itemId:guid}")]
-    public async Task<IActionResult> MoveBoardItemAsync(Guid boardId, Guid itemId, [FromBody] MoveBoardItemRequest request)
+    public async Task<IActionResult> MoveAsync(Guid boardId, Guid itemId, [FromBody] MoveBoardItemRequest request)
     {
         var mediatorRequest = new MoveBoardItemCommand()
         {
@@ -77,7 +77,7 @@ public class BoardItemsController(IMediator mediator,
 
 
     [HttpPut("{itemId:guid}")]
-    public async Task<IActionResult> UpdateBoardItemAsync(Guid boardId, Guid itemId,
+    public async Task<IActionResult> UpdateAsync(Guid boardId, Guid itemId,
         [FromBody] UpdateBoardItemRequest request)
     {
         var mediatorRequest = new UpdateBoardItemCommand
@@ -103,7 +103,7 @@ public class BoardItemsController(IMediator mediator,
     }
 
     [HttpDelete("{itemId:guid}")]
-    public async Task<IActionResult> DeleteBoardItemAsync(Guid boardId, Guid itemId)
+    public async Task<IActionResult> DeleteAsync(Guid boardId, Guid itemId)
     {
         var mediatorRequest = new DeleteBoardItemCommand { BoardId = boardId, BoardItemId = itemId };
         var response = await mediator.Send(mediatorRequest);

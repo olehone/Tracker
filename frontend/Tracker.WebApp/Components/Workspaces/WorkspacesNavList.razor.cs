@@ -31,7 +31,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         {
             Title = title
         };
-        var result = await WorkspaceService.CreateWorkspaceAsync(request);
+        var result = await WorkspaceService.CreateAsync(request);
         if (result.IsFailure)
         {
             return;
@@ -50,7 +50,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
             Workspaces = null;
         }
 
-        var result = await WorkspaceService.GetWorkspacesForCurrentUserAsync();
+        var result = await WorkspaceService.GetForCurrentUserAsync();
         if (result.IsFailure)
         {
             return;

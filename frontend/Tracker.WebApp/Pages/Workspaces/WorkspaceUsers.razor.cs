@@ -49,7 +49,7 @@ public partial class WorkspaceUsers
 
     private async Task LoadWorkspace()
     {
-        var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+        var result = await WorkspaceService.GetByIdAsync(WorkspaceId);
         if (result.IsSuccess)
         {
             Workspace = result.Value;
@@ -84,7 +84,7 @@ public partial class WorkspaceUsers
             AmountInPage = 5,
             Page = 1
         };
-        var result = await UserService.GetUsersAsync(request);
+        var result = await UserService.GetAsync(request);
 
         return result.IsSuccess
             ? result.Value.Items

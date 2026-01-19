@@ -41,7 +41,7 @@ public class GetUsersByBoardIdQueryHandler(
             return AuthErrors.Forbidden();
         }
 
-        var boardUsers = await uow.UserBoardRepository.GetByBoardAsync(board.Id);
+        var boardUsers = await uow.UserBoardRepository.GetAsync(board.Id);
 
         return boardUsers.Select(bm => new BoardUserDto
         {

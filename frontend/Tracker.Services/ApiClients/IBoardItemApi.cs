@@ -7,14 +7,14 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardItemApi
 {
     [Post("/api/board/{boardId}/items/{boardListId}")]
-    public Task<ApiResponse<BoardItemDto>> CreateBoardItemAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request);
+    Task<ApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request);
 
     [Post("/api/board/{boardId}/items/move/{itemId}")]
-    public Task<ApiResponse<object>> MoveBoardItemAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);
+    Task<ApiResponse<object>> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);
 
     [Put("/api/board/{boardId}/items/{itemId}")]
-    public Task<ApiResponse<object>> UpdateBoardItemAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
+    Task<ApiResponse<object>> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
 
     [Delete("/api/board/{boardId}/items/{itemId}")]
-    public Task<ApiResponse<object>> DeleteBoardItemAsync(Guid boardId, Guid itemId);
+    Task<ApiResponse<object>> DeleteAsync(Guid boardId, Guid itemId);
 }

@@ -31,69 +31,69 @@ public sealed class BoardListsState(
         _boardLists.AddRange(lists);
     }
 
-    public async Task CreateBoardListAsync(string title)
+    public async Task CreateAsync(string title)
     {
         var request = new CreateBoardListRequest
         {
             Title = title
         };
 
-        var result = await boardListService.CreateBoardListAsync(Board.Id, request);
+        var result = await boardListService.CreateAsync(Board.Id, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
             return;
         }
 
-        ApplyListCreated(result.Value);
+        ApplyCreated(result.Value);
     }
 
-    public async Task MoveBoardListAsync(Guid listId, int newPosition)
+    public async Task MoveAsync(Guid listId, int newPosition)
     {
         var request = new MoveBoardListRequest
         {
             Position = newPosition
         };
 
-        ApplyListMoved(listId, newPosition);
+        ApplyMoved(listId, newPosition);
 
-        var result = await boardListService.MoveBoardListAsync(listId, request);
+        var result = await boardListService.MoveAsync(listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task UpdateBoardListAsync(Guid listId, UpdateBoardListRequest request)
+    public async Task UpdateAsync(Guid listId, UpdateBoardListRequest request)
     {
-        ApplyListUpdated(listId, request);
+        ApplyUpdated(listId, request);
 
-        var result = await boardListService.UpdateBoardListAsync(listId, request);
+        var result = await boardListService.UpdateAsync(listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    public async Task DeleteBoardListAsync(Guid listId)
+    public async Task DeleteAsync(Guid listId)
     {
-        ApplyListDeleted(listId);
+        ApplyDeleted(listId);
 
-        var result = await boardListService.DeleteBoardListAsync(listId);
+        var result = await boardListService.DeleteAsync(listId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
     }
 
-    private void ApplyListCreated(BoardListDto newList)
+    private void ApplyCreated(BoardListDto newList)
     {
         _boardLists.Add(newList);
         _boardLists.Sort((a, b) => a.Position.CompareTo(b.Position));
         Notify();
     }
 
-    private void ApplyListMoved(Guid listId, int newPosition)
+    private void ApplyMoved(Guid listId, int newPosition)
     {
         var list = _boardLists.FirstOrDefault(l => l.Id == listId);
         if (list is null)
@@ -127,7 +127,7 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void ApplyListUpdated(Guid listId, UpdateBoardListRequest request)
+    private void ApplyUpdated(Guid listId, UpdateBoardListRequest request)
     {
         var list = _boardLists.FirstOrDefault(bl => bl.Id == listId);
         if (list is null)
@@ -139,7 +139,7 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void ApplyListDeleted(Guid listId)
+    private void ApplyDeleted(Guid listId)
     {
         var list = _boardLists.FirstOrDefault(bl => bl.Id == listId);
         if (list is null)

@@ -29,8 +29,8 @@ public class DeleteBoardListCommandHandler(
 
         await uow.BoardListRepository.RemoveAsync(boardList.Id);
         
-        var maxPosition = await uow.BoardListRepository.GetMaxPositionByBoardId(boardList.BoardId);
-        await uow.BoardListRepository.ShiftPositions(
+        var maxPosition = await uow.BoardListRepository.GetMaxPositionAsync(boardList.BoardId);
+        await uow.BoardListRepository.ShiftPositionsAsync(
             boardList.BoardId, -1, boardList.Position + 1, maxPosition);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);

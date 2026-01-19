@@ -40,7 +40,7 @@ public partial class Settings
         isLoading = true;
         try
         {
-            var result = await WorkspaceService.GetWorkspaceByIdAsync(WorkspaceId);
+            var result = await WorkspaceService.GetByIdAsync(WorkspaceId);
             if (result.IsFailure)
             {
                 return;

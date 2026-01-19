@@ -15,6 +15,28 @@ public sealed class BoardUsersState(
     private readonly List<Guid> _recentActiveUserIds = [];
     private Dictionary<Guid, BoardUserDto> _userLookup = [];
 
+    public IReadOnlyList<BoardUserDto> Users
+    {
+        get
+        {
+            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
+            return _sortedUsers;
+        }
+    }
+
+    public event Action? OnChange;
+
+    private BoardFullDto Board => boardState.Board!;
+
+    public void Reload()
+    {
+        var users = Board.BoardUsers;
+        _sortedUsers = null;
+        _boardUsers.Clear();
+        _boardUsers.AddRange(users);
+        _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
+    }
+
     public IReadOnlyList<BoardUserDto> RecentActiveUsers(int take = 5)
     {
         return _recentActiveUserIds
@@ -49,28 +71,6 @@ public sealed class BoardUsersState(
         }
     }
 
-    public IReadOnlyList<BoardUserDto> BoardUsers
-    {
-        get
-        {
-            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
-            return _sortedUsers;
-        }
-    }
-
-    public event Action? OnChange;
-
-    private BoardFullDto Board => boardState.Board!;
-
-    public void Reload()
-    {
-        var users = Board.BoardUsers;
-        _sortedUsers = null;
-        _boardUsers.Clear();
-        _boardUsers.AddRange(users);
-        _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
-    }
-
     public async Task<IEnumerable<UserDto>> SearchAsync(string value, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -85,15 +85,15 @@ public sealed class BoardUsersState(
             Page = 1
         };
 
-        var result = await userService.GetUsersAsync(request);
+        var result = await userService.GetAsync(request);
         return result.IsSuccess
             ? result.Value.Items
             : [];
     }
 
-    public async Task AddUserAsync(Guid userId, UserBoardRole role)
+    public async Task AddAsync(Guid userId, UserBoardRole role)
     {
-        var result = await boardUserService.AddUserToBoardAsync(Board.Id, userId, role);
+        var result = await boardUserService.AddAsync(Board.Id, userId, role);
         if (result.IsFailure)
         {
             return;
@@ -106,7 +106,7 @@ public sealed class BoardUsersState(
 
     public async Task ChangeRoleAsync(BoardUserDto boardUser, UserBoardRole newRole)
     {
-        var result = await boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, newRole);
+        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, newRole);
         if (result.IsFailure)
         {
             return;
@@ -116,14 +116,14 @@ public sealed class BoardUsersState(
         Notify();
     }
 
-    public async Task RemoveBoardUserAsync(BoardUserDto boardUser)
+    public async Task RemoveAsync(BoardUserDto boardUser)
     {
         if (boardUser.Role == UserBoardRole.Owner)
         {
             return;
         }
 
-        var result = await boardUserService.RemoveUserFromBoardAsync(Board.Id, boardUser.User.Id);
+        var result = await boardUserService.RemoveAsync(Board.Id, boardUser.User.Id);
         if (result.IsFailure)
         {
             return;
@@ -140,7 +140,7 @@ public sealed class BoardUsersState(
             return;
         }
 
-        var result = await boardUserService.ChangeUserRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
+        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
         if (result.IsFailure)
         {
             return;

@@ -18,7 +18,7 @@ public class BoardsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetBoardByIdAsync(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
         var mediatorRequest = new GetBoardByIdQuery() { Id = id };
         var response = await mediator.Send(mediatorRequest);
@@ -26,7 +26,7 @@ public class BoardsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateBoardAsync([FromBody] CreateBoardRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateBoardRequest request)
     {
         var mediatorRequest = new CreateBoardCommand()
         {
@@ -39,7 +39,7 @@ public class BoardsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:guid}/settings")]
-    public async Task<IActionResult> UpdateBoardAsync(Guid id,
+    public async Task<IActionResult> UpdateAsync(Guid id,
             [FromBody] UpdateBoardBodyRequest request)
     {
         var mediatorRequest = new UpdateBoardCommand
@@ -55,7 +55,7 @@ public class BoardsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteBoardAsync(Guid id)
+    public async Task<IActionResult> DeleteAsync(Guid id)
     {
         var mediatorRequest = new DeleteBoardCommand
         {
