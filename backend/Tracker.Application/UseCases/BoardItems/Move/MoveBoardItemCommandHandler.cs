@@ -17,12 +17,14 @@ public class MoveBoardItemCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.BoardItemId, BoardAction.ChangeItem);
-        if (listResult.IsFailure)
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
+            request.BoardItemId, BoardAction.ChangeItem, request.BoardId);
+        if (itemResult.IsFailure)
         {
-            return listResult.Error;
+            return itemResult.Error;
         }
-        var boardItem = listResult.Value;
+
+        var boardItem = itemResult.Value;
 
         int currentPosition = boardItem.Position;
         int maxNewPosition = await uow.BoardItemRepository

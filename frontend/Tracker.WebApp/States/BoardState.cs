@@ -4,13 +4,17 @@ using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
 
-public sealed class BoardState
+public sealed class BoardState : IAsyncDisposable
 {
     private readonly IBoardService _boardService;
+    private readonly AppState _appState;
     private BoardFullDto? _currentBoard;
+    private readonly IBoardRealtimeService _boardRealtime;
 
+    public Guid? MyId => _appState.CurrentUser?.Id;
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
+
     public BoardUsersState Users { get; }
     public BoardItemsState Items { get; }
     public BoardListsState Lists { get; }
@@ -20,17 +24,21 @@ public sealed class BoardState
     public event Action? OnBoardNotFound;
 
     public BoardState(
+        AppState appState,
         IBoardService boardService,
         IBoardListService boardListService,
         IBoardItemService boardItemService,
         IBoardUserService boardUserService,
-        IUserService userService)
+        IUserService userService,
+        IBoardRealtimeService boardRealtime)
     {
+        _appState = appState;
         _boardService = boardService;
 
         Users = new BoardUsersState(this, userService, boardUserService);
         Items = new BoardItemsState(this, boardItemService);
         Lists = new BoardListsState(this, boardListService);
+        _boardRealtime = boardRealtime;
     }
 
     public async Task LoadAsync(Guid boardId)
@@ -50,6 +58,7 @@ public sealed class BoardState
             Users.Reload();
             Items.Reload();
             Lists.Reload();
+            await ConnectRealtimeAsync();
         }
 
         IsLoading = false;
@@ -59,6 +68,20 @@ public sealed class BoardState
     public Task ReloadAsync()
     {
         return LoadAsync(Board.Id);
+    }
+
+    public async Task ConnectRealtimeAsync()
+    {
+        if (_appState.CurrentUser is null)
+        {
+            return;
+        }
+
+        await _boardRealtime.ConnectAndJoinBoardAsync(Board.Id);
+        _boardRealtime.OnItemCreated += Items.Apply;
+        _boardRealtime.OnItemMoved += Items.Apply;
+        _boardRealtime.OnItemUpdated += Items.Apply;
+        _boardRealtime.OnItemDeleted += Items.Apply;
     }
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)
@@ -92,4 +115,13 @@ public sealed class BoardState
     }
 
     private void Notify() => OnChange?.Invoke();
+
+    public async ValueTask DisposeAsync()
+    {
+        _boardRealtime.OnItemCreated -= Items.Apply;
+        _boardRealtime.OnItemMoved -= Items.Apply;
+        _boardRealtime.OnItemUpdated -= Items.Apply;
+        _boardRealtime.OnItemDeleted -= Items.Apply;
+        await _boardRealtime.DisconnectAsync();
+    }
 }

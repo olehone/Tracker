@@ -18,7 +18,8 @@ public class DeleteBoardListCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.ChangeList);
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, 
+            request.BoardListId, BoardAction.ChangeList);
         if (listResult.IsFailure)
         {
             return listResult.Error;

@@ -1,21 +1,20 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
-using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.Services.ApiClients;
 
 public interface IBoardItemApi
 {
-    [Post("/api/board-items/{id}")]
-    public Task<ApiResponse<BoardItemDto>> CreateAsync(Guid id, CreateBoardItemRequest request);
+    [Post("/api/board/{boardId}/items/{boardListId}")]
+    public Task<ApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request);
 
-    [Post("/api/board-items/move")]
-    public Task<ApiResponse<object>> MoveAsync(MoveBoardItemRequest request);
+    [Post("/api/board/{boardId}/items/move/{itemId}")]
+    public Task<ApiResponse<object>> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);
 
-    [Put("/api/board-items/{id}")]
-    public Task<ApiResponse<object>> UpdateAsync(Guid id, UpdateBoardItemRequest request);
+    [Put("/api/board/{boardId}/items/{itemId}")]
+    public Task<ApiResponse<object>> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
 
-    [Delete("/api/board-items/{id}")]
-    public Task<ApiResponse<object>> DeleteAsync(Guid id);
+    [Delete("/api/board/{boardId}/items/{itemId}")]
+    public Task<ApiResponse<object>> DeleteAsync(Guid boardId, Guid itemId);
 }

@@ -20,6 +20,7 @@ public partial class BoardWindowHeader : IDisposable
     protected override void OnInitialized()
     {
         BoardState.OnChange += OnBoardStateChanged;
+        BoardState.Users.OnChange += OnBoardStateChanged;
         BoardState.Lists.OnChange += OnBoardStateChanged;
         BoardState.OnBoardNotFound += ToWorkspace;
     }
@@ -29,8 +30,18 @@ public partial class BoardWindowHeader : IDisposable
         InvokeAsync(StateHasChanged);
     }
 
+    private string GetUsersKey()
+    {
+        return string.Join("-", BoardState.Users.RecentActiveUsers()
+        .Select(u => u.User.Id));
+    }
+
     private void ToWorkspace()
     {
+        if (BoardState.IsLoading)
+        {
+            return;
+        }
         var workspaceId = Board.WorkspaceId;
         Nav.NavigateTo($"workspaces/{workspaceId}/overview");
     }

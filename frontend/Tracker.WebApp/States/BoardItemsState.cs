@@ -1,12 +1,14 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Tracker.API.Hubs.Events;
+using Tracker.Domain.Dtos;
+using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
 
 public sealed class BoardItemsState(
-    BoardState boardState,
-    IBoardItemService boardItemService)
+        BoardState boardState,
+        IBoardItemService boardItemService)
 {
     private readonly List<BoardItemDto> _boardItems = [];
     private List<BoardItemDto>? _sortedItems;
@@ -43,7 +45,7 @@ public sealed class BoardItemsState(
             Title = title
         };
 
-        var result = await boardItemService.CreateAsync(boardListId, request);
+        var result = await boardItemService.CreateAsync(Board.Id, boardListId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -55,10 +57,15 @@ public sealed class BoardItemsState(
 
     public async Task MoveAsync(Guid itemId, string toBoardListId, int position)
     {
+        if (!Guid.TryParse(toBoardListId, out Guid boardListId))
+        {
+            await boardState.ReloadAsync();
+            return;
+        }
+
         var request = new MoveBoardItemRequest
         {
-            BoardItemId = itemId,
-            ToBoardListId = Guid.Parse(toBoardListId),
+            ToBoardListId = boardListId,
             Position = position
         };
 
@@ -73,9 +80,9 @@ public sealed class BoardItemsState(
 
     public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyUpdated(itemId, request);
+        ApplyUpdated(itemId, request.Title, request.Description);
 
-        var result = await boardItemService.UpdateAsync(itemId, request);
+        var result = await boardItemService.UpdateAsync(Board.Id, itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -86,11 +93,51 @@ public sealed class BoardItemsState(
     {
         ApplyDeleted(itemId);
 
-        var result = await boardItemService.DeleteAsync(itemId);
+        var result = await boardItemService.DeleteAsync(Board.Id, itemId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
+    }
+
+    public void Apply(ItemCreatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyCreated(evt.Item);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ItemMovedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyMoved(evt.BoardItemId, evt.ToBoardListId, evt.Position);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ItemUpdatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ItemDeletedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyDeleted(evt.BoardItemId);
+        boardState.Users.MarkActivity(evt.UserId);
     }
 
     private void ApplyCreated(BoardItemDto newItem)
@@ -99,30 +146,30 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyMoved(MoveBoardItemRequest request)
+    private void ApplyMoved(Guid boardItemId, Guid toBoardListId, int position)
     {
-        var item = _boardItems.FirstOrDefault(bi => bi.Id == request.BoardItemId);
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == boardItemId);
         if (item is null)
         {
             return;
         }
 
-        if (item.BoardListId == request.ToBoardListId)
+        if (item.BoardListId == toBoardListId)
         {
-            if (item.Position == request.Position)
+            if (item.Position == position)
             {
                 return;
             }
 
-            if (item.Position > request.Position)
+            if (item.Position > position)
             {
-                ShiftIPosition(item.BoardListId, +1, request.Position, item.Position - 1);
-                item.Position = request.Position;
+                ShiftPosition(item.BoardListId, +1, position, item.Position - 1);
+                item.Position = position;
             }
             else
             {
-                ShiftIPosition(item.BoardListId, -1, item.Position + 1, request.Position);
-                item.Position = request.Position;
+                ShiftPosition(item.BoardListId, -1, item.Position + 1, position);
+                item.Position = position;
             }
         }
         else
@@ -130,25 +177,25 @@ public sealed class BoardItemsState(
             var oldListId = item.BoardListId;
             var oldPosition = item.Position;
 
-            ShiftIPosition(oldListId, -1, oldPosition + 1);
-            ShiftIPosition(request.ToBoardListId, +1, request.Position);
+            ShiftPosition(oldListId, -1, oldPosition + 1);
+            ShiftPosition(toBoardListId, +1, position);
 
-            item.BoardListId = request.ToBoardListId;
-            item.Position = request.Position;
+            item.BoardListId = toBoardListId;
+            item.Position = position;
         }
 
         Notify();
     }
 
-    private void ApplyUpdated(Guid itemId, UpdateBoardItemRequest request)
+    private void ApplyUpdated(Guid itemId, string title, string description)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
         }
-        item.Title = request.Title;
-        item.Description = request.Description;
+        item.Title = title;
+        item.Description = description;
 
         Notify();
     }
@@ -174,7 +221,7 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ShiftIPosition(Guid listId, int delta, int from)
+    private void ShiftPosition(Guid listId, int delta, int from)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from))
         {
@@ -182,7 +229,7 @@ public sealed class BoardItemsState(
         }
     }
 
-    private void ShiftIPosition(Guid listId, int delta, int from, int to)
+    private void ShiftPosition(Guid listId, int delta, int from, int to)
     {
         foreach (var item in _boardItems.Where(bi => bi.BoardListId == listId && bi.Position >= from && bi.Position <= to))
         {

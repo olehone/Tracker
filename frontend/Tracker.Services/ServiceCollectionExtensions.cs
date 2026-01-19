@@ -11,6 +11,7 @@ using Tracker.Services.Abstraction.Auth;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Auth;
+using Tracker.Services.RealTime;
 using Tracker.Services.Results;
 
 namespace Tracker.Services;
@@ -44,6 +45,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBoardUserService, BoardUserService>();
         services.AddScoped<IBoardListService, BoardListService>();
         services.AddScoped<IBoardItemService, BoardItemService>();
+
+        services.AddScoped<IBoardRealtimeService, BoardHubService>();
         return services;
     }
 

@@ -11,16 +11,64 @@ public sealed class BoardUsersState(
     IBoardUserService boardUserService)
 {
     private readonly List<BoardUserDto> _boardUsers = [];
-    public IReadOnlyList<BoardUserDto> Users => _boardUsers;
-    private BoardFullDto Board => boardState.Board!;
+    private List<BoardUserDto>? _sortedUsers;
+    private readonly List<Guid> _recentActiveUserIds = [];
+    private Dictionary<Guid, BoardUserDto> _userLookup = [];
+
+    public IReadOnlyList<BoardUserDto> RecentActiveUsers(int take = 5)
+    {
+        return _recentActiveUserIds
+            .Select(GetUser)
+            .Where(u => u != null)
+            .Cast<BoardUserDto>()
+            .Take(take)
+            .ToList();
+    }
+
+    public BoardUserDto? GetUser(Guid userId)
+    {
+        return _userLookup != null && _userLookup.TryGetValue(userId, out var user)
+            ? user
+            : null;
+    }
+
+    public void MarkActivity(Guid userId)
+    {
+        _recentActiveUserIds.Remove(userId);
+        _recentActiveUserIds.Insert(0, userId);
+        Cleanup();
+        Notify();
+    }
+
+    private void Cleanup()
+    {
+        var max = 100;
+        if (_recentActiveUserIds.Count > max)
+        {
+            _recentActiveUserIds.RemoveRange(max, _recentActiveUserIds.Count - max);
+        }
+    }
+
+    public IReadOnlyList<BoardUserDto> BoardUsers
+    {
+        get
+        {
+            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
+            return _sortedUsers;
+        }
+    }
 
     public event Action? OnChange;
+
+    private BoardFullDto Board => boardState.Board!;
 
     public void Reload()
     {
         var users = Board.BoardUsers;
+        _sortedUsers = null;
         _boardUsers.Clear();
         _boardUsers.AddRange(users);
+        _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
     }
 
     public async Task<IEnumerable<UserDto>> SearchAsync(string value, CancellationToken ct)
@@ -52,6 +100,7 @@ public sealed class BoardUsersState(
         }
 
         _boardUsers.Add(result.Value);
+        _userLookup.Add(userId, result.Value);
         Notify();
     }
 
@@ -117,6 +166,7 @@ public sealed class BoardUsersState(
 
     private void Notify()
     {
+        _sortedUsers = null;
         OnChange?.Invoke();
     }
 }

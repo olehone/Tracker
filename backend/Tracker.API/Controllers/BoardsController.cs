@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Tracker.API.Hubs;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;

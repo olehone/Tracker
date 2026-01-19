@@ -1,4 +1,5 @@
 using Tracker.API;
+using Tracker.API.Hubs;
 using Tracker.Application;
 using Tracker.Database;
 using Tracker.Infrastructure;
@@ -31,6 +32,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -44,5 +46,6 @@ app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<BoardHub>("/hubs/board");
 
 await app.RunAsync();
