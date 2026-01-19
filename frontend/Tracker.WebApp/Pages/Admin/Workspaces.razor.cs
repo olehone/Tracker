@@ -14,7 +14,7 @@ public partial class Workspaces
     private async Task<Paginated<WorkspaceSummaryDto>> LoadWorkspaces(
         PaginatedSearchRequest request)
     {
-        var result = await WorkspaceService.GetWorkspacesAsync(request);
+        var result = await WorkspaceService.GetAsync(request);
         if (ErrorNotifier.NotifyIfError(result))
         {
             return Paginated<WorkspaceSummaryDto>.Empty();

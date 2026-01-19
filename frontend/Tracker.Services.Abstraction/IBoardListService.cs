@@ -6,9 +6,9 @@ namespace Tracker.Services.Abstraction;
 
 public interface IBoardListService
 {
-    public Task<Result<BoardListDto>> CreateBoardListAsync(Guid boardId,
+    public Task<Result<BoardListDto>> CreateAsync(Guid boardId,
         CreateBoardListRequest request);
-    public Task<Result> MoveBoardListAsync(Guid id, MoveBoardListRequest request);
-    public Task<Result> UpdateBoardListAsync(Guid id, UpdateBoardListRequest request);
-    public Task<Result> DeleteBoardListAsync(Guid id);
+    public Task<Result> MoveAsync(Guid id, MoveBoardListRequest request);
+    public Task<Result> UpdateAsync(Guid id, UpdateBoardListRequest request);
+    public Task<Result> DeleteAsync(Guid id);
 }

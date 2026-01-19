@@ -6,8 +6,8 @@ namespace Tracker.Services.Abstraction;
 
 public interface IBoardUserService
 {
-    Task<Result<List<BoardUserDto>>> GetUsersByBoardAsync(Guid boardId);
-    Task<Result<BoardUserDto>> AddUserToBoardAsync(Guid boardId, Guid userId, UserBoardRole role);
-    Task<Result> ChangeUserRoleAsync(Guid boardId, Guid userId, UserBoardRole role);
-    Task<Result> RemoveUserFromBoardAsync(Guid boardId, Guid userId);
+    Task<Result<List<BoardUserDto>>> GetByBoardAsync(Guid boardId);
+    Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, UserBoardRole role);
+    Task<Result> ChangeRoleAsync(Guid boardId, Guid userId, UserBoardRole role);
+    Task<Result> RemoveAsync(Guid boardId, Guid userId);
 }

@@ -55,7 +55,7 @@ public partial class Register
             return;
         }
 
-        var userResult = await UserService.GetCurrentUserAsync();
+        var userResult = await UserService.GetCurrentAsync();
         if (NotifyIfError(userResult))
         {
             return;

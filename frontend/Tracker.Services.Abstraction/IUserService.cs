@@ -6,10 +6,10 @@ namespace Tracker.Services.Abstraction;
 
 public interface IUserService
 {
-    Task<Result<UserDto>> GetCurrentUserAsync();
-    Task<Result<UserDto>> GetUserByIdAsync(Guid id);
-    Task<Result<Paginated<UserDto>>> GetUsersAsync(PaginatedSearchRequest request);
-    Task<Result<Paginated<WorkspaceSummaryDto>>> GetAllUserWorkspacesAsync(
+    Task<Result<UserDto>> GetCurrentAsync();
+    Task<Result<UserDto>> GetByIdAsync(Guid id);
+    Task<Result<Paginated<UserDto>>> GetAsync(PaginatedSearchRequest request);
+    Task<Result<Paginated<WorkspaceSummaryDto>>> GetAllWorkspacesAsync(
         Guid id, PaginatedSearchRequest request);
     Task<Result<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync(
         Guid id, PaginatedSearchRequest request);

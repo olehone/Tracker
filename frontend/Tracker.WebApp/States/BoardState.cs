@@ -41,7 +41,7 @@ public sealed class BoardState
         IsLoading = true;
         Notify();
 
-        var boardResult = await _boardService.GetBoardByIdAsync(boardId);
+        var boardResult = await _boardService.GetByIdAsync(boardId);
 
         if (boardResult.IsFailure)
         {
@@ -69,7 +69,7 @@ public sealed class BoardState
             Title = title
         };
 
-        var result = await _boardListService.CreateBoardListAsync(Board.Id, request);
+        var result = await _boardListService.CreateAsync(Board.Id, request);
         if (result.IsFailure)
         {
             return false;
@@ -86,7 +86,7 @@ public sealed class BoardState
             return false;
         }
 
-        var result = await _boardService.UpdateBoardAsync(_currentBoard.Id, request);
+        var result = await _boardService.UpdateAsync(_currentBoard.Id, request);
 
         if (result.IsFailure)
         {
@@ -104,7 +104,7 @@ public sealed class BoardState
             return false;
         }
 
-        var result = await _boardService.DeleteBoardAsync(_currentBoard.Id);
+        var result = await _boardService.DeleteAsync(_currentBoard.Id);
         if (result.IsFailure)
         {
             return false;
@@ -125,7 +125,7 @@ public sealed class BoardState
             Position = newPosition
         };
 
-        var result = await _boardListService.MoveBoardListAsync(listId, request);
+        var result = await _boardListService.MoveAsync(listId, request);
         if (result.IsFailure)
         {
             return false;
@@ -144,7 +144,7 @@ public sealed class BoardState
 
         ApplyListUpdated(listId, request);
 
-        var result = await _boardListService.UpdateBoardListAsync(listId, request);
+        var result = await _boardListService.UpdateAsync(listId, request);
         if (result.IsFailure)
         {
             return false;
@@ -161,7 +161,7 @@ public sealed class BoardState
 
         ApplyListDeleted(itemId);
 
-        var result = await _boardListService.DeleteBoardListAsync(itemId);
+        var result = await _boardListService.DeleteAsync(itemId);
         if (result.IsFailure)
         {
             return false;
@@ -181,7 +181,7 @@ public sealed class BoardState
             Title = title
         };
 
-        var result = await _boardItemService.CreateBoardItemAsync(boardListId, request);
+        var result = await _boardItemService.CreateAsync(boardListId, request);
         if (result.IsFailure)
         {
             return false;
@@ -207,7 +207,7 @@ public sealed class BoardState
 
         ApplyItemMoved(request);
 
-        var result = await _boardItemService.MoveBoardItemAsync(request);
+        var result = await _boardItemService.MoveAsync(request);
         if (result.IsFailure)
         {
             await LoadAsync(_currentBoard.Id);
@@ -226,7 +226,7 @@ public sealed class BoardState
 
         ApplyItemUpdated(itemId, request);
 
-        var result = await _boardItemService.UpdateBoardItemAsync(itemId, request);
+        var result = await _boardItemService.UpdateAsync(itemId, request);
         if (result.IsFailure)
         {
             return false;
@@ -243,7 +243,7 @@ public sealed class BoardState
 
         ApplyItemDeleted(itemId);
 
-        var result = await _boardItemService.DeleteBoardItemAsync(itemId);
+        var result = await _boardItemService.DeleteAsync(itemId);
         if (result.IsFailure)
         {
             return false;

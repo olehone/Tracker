@@ -13,7 +13,7 @@ public partial class Users
     private async Task<Paginated<UserDto>> LoadUsers(
         PaginatedSearchRequest request)
     {
-        var result = await UserService.GetUsersAsync(request);
+        var result = await UserService.GetAsync(request);
         if (ErrorNotifier.NotifyIfError(result))
         {
             return Paginated<UserDto>.Empty();

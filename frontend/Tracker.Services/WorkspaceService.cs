@@ -11,9 +11,9 @@ namespace Tracker.Services;
 public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi api)
     : IWorkspaceService
 {
-    public Task<Result<WorkspaceFullDto>> GetWorkspaceByIdAsync(Guid id)
+    public Task<Result<WorkspaceFullDto>> GetByIdAsync(Guid id)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.GetWorkspaceByIdAsync(id));
+        return apiErrorHandler.ExecuteAsync(() => api.GetByIdAsync(id));
     }
 
     public Task<Result> UpdateAsync(Guid id, UpdateWorkspaceRequest request)
@@ -21,18 +21,18 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
         return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
     }
 
-    public Task<Result<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync()
+    public Task<Result<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync()
     {
-        return apiErrorHandler.ExecuteAsync(api.GetWorkspacesForCurrentUserAsync);
+        return apiErrorHandler.ExecuteAsync(api.GetForCurrentUserAsync);
     }
 
-    public Task<Result<WorkspaceSummaryDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request)
+    public Task<Result<WorkspaceSummaryDto>> CreateAsync(CreateWorkspaceRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateWorkspaceAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(request));
     }
 
-    public Task<Result<Paginated<WorkspaceSummaryDto>>> GetWorkspacesAsync(PaginatedSearchRequest request)
+    public Task<Result<Paginated<WorkspaceSummaryDto>>> GetAsync(PaginatedSearchRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.GetWorkspacesAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.GetAsync(request));
     }
 }

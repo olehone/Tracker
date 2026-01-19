@@ -9,17 +9,17 @@ public interface IWorkspaceApi
 {
 
     [Get("/api/workspaces/{id}")]
-    Task<ApiResponse<WorkspaceFullDto>> GetWorkspaceByIdAsync(Guid id);
+    Task<ApiResponse<WorkspaceFullDto>> GetByIdAsync(Guid id);
 
     [Put("/api/workspaces/{id}/settings")]
     Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateWorkspaceRequest request);
 
     [Get("/api/workspaces/all")]
-    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetWorkspacesAsync([Query] PaginatedSearchRequest request);
+    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetAsync([Query] PaginatedSearchRequest request);
 
     [Get("/api/workspaces/my")]
-    Task<ApiResponse<List<WorkspaceSummaryDto>>> GetWorkspacesForCurrentUserAsync();
+    Task<ApiResponse<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
 
     [Post("/api/workspaces/")]
-    Task<ApiResponse<WorkspaceSummaryDto>> CreateWorkspaceAsync(CreateWorkspaceRequest request);
+    Task<ApiResponse<WorkspaceSummaryDto>> CreateAsync(CreateWorkspaceRequest request);
 }
