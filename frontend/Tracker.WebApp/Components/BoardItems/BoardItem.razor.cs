@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
-
 using MudBlazor;
-
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
