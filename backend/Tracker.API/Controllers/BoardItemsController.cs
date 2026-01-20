@@ -20,7 +20,8 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemsController(IMediator mediator,
     IHubContext<BoardHub, IClientBoardHub> hubContext,
-     IUserContext userContext) : ControllerBase
+     IUserContext userContext)
+    : ControllerBase
 {
 
     [HttpPost("{boardListId:guid}")]
