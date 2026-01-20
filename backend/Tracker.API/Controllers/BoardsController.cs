@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Tracker.API.Hubs;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Boards.Delete;
 using Tracker.Application.UseCases.Boards.GetById;
+using Tracker.Application.UseCases.Boards.GetForCurrentUser;
 using Tracker.Application.UseCases.Boards.Update;
 
 namespace Tracker.API.Controllers;
@@ -62,6 +62,13 @@ public class BoardsController(IMediator mediator) : ControllerBase
             BoardId = id,
         };
         var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpGet("my")]
+    public async Task<IActionResult> GetForCurrentUserAsync()
+    {
+        var response = await mediator.Send(new GetBoardsForCurrentUserQuery());
         return response.ToActionResult();
     }
 }

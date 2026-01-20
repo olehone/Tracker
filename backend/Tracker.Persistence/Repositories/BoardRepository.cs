@@ -12,6 +12,14 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
+    public async Task<IReadOnlyList<Board>> GetByUserAsync(Guid userId)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(b => b.UserBoards.Any(ub=> ub.UserId == userId))
+            .ToListAsync();
+    }
+
     public Task<Board?> GetWithWorkspaceAsync(Guid id)
     {
         return _dbSet
