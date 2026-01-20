@@ -52,7 +52,7 @@ public static class BoardPolicy
         UserWorkspaceRole workspaceRole,
         UserBoardRole boardRole)
     {
-        if (globalRole >= GlobalRole.Admin)
+        if (globalRole >= GlobalRole.Admin || workspaceRole >= UserWorkspaceRole.Admin)
         {
             return true;
         }

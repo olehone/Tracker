@@ -28,6 +28,7 @@ public class UpdateBoardItemCommandHandler(
 
         boardItem.Title = request.Title;
         boardItem.Description = request.Description;
+        boardItem.IsDone = request.IsDone;
 
         uow.BoardItemRepository.Update(boardItem);
         var result = await uow.SaveChangesAsync(cancellationToken);

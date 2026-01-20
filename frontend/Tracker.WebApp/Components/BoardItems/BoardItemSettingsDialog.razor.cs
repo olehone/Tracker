@@ -17,7 +17,7 @@ public partial class BoardItemSettingsDialog : IDisposable
     [Parameter]
     public BoardItemDto Item { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; }
+    [Inject] private IDialogService DialogService { get; set; } = null!
 
     private MudForm? _form;
     private UpdateBoardItemRequest model = null!;
@@ -34,6 +34,7 @@ public partial class BoardItemSettingsDialog : IDisposable
             {
                 Title = Item.Title,
                 Description = Item.Description ?? string.Empty,
+                IsDone = Item.IsDone,
             };
         }
     }
@@ -79,6 +80,13 @@ public partial class BoardItemSettingsDialog : IDisposable
     void IDisposable.Dispose()
     {
         BoardState.OnChange -= StateHasChanged;
+    }
+
+    private string Style()
+    {
+        return model.IsDone
+            ? "text-decoration: line-through;"
+            : "";
     }
 
     public class UpdateBoardItemRequestValidator : AbstractValidator<UpdateBoardItemRequest>

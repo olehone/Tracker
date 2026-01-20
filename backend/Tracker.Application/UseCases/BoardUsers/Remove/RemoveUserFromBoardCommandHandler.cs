@@ -50,7 +50,7 @@ public class RemoveUserFromBoardCommandHandler(
             return AuthErrors.Forbidden();
         }
 
-        if (userBoard.Role == UserBoardRole.Owner && userBoard.Id == userId)
+        if (userBoard.Role == UserBoardRole.Owner && userBoard.UserId == userId)
         {
             await uow.BoardRepository.RemoveAsync(board.Id);
         }

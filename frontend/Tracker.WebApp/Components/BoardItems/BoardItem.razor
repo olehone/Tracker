@@ -1,7 +1,17 @@
-<MudPaper Elevation="25"
-		  Class="pa-0 rounded-lg my-3">
+<MudPaper Elevation="25" Class="pa-0 rounded-lg my-3">
 	<MudButton FullWidth
-		OnClick=@OpenItemSettings>
-		@Item.Title
+			   OnClick="@OpenItemSettings">
+		<MudStack Row
+				  Justify="Justify.SpaceBetween"
+				  AlignItems="AlignItems.Center">
+
+			<MudCheckBox T=@bool
+						 Value="Item.IsDone"
+						 ValueChanged="OnIsDoneChanged" />
+
+			<MudText Style="@ItemStyle">
+				@Item.Title
+			</MudText>
+		</MudStack>
 	</MudButton>
 </MudPaper>

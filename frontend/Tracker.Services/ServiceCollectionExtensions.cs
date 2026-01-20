@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
 
         services.AddApiClientWithAuth<IUserApi>();
         services.AddApiClientWithAuth<IWorkspaceApi>();
+        services.AddApiClientWithAuth<IWorkspaceUserApi>();
         services.AddApiClientWithAuth<IBoardsApi>();
         services.AddApiClientWithAuth<IBoardUserApi>();
         services.AddApiClientWithAuth<IBoardListApi>();
@@ -41,6 +42,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWorkspaceService, WorkspaceService>();
+        services.AddScoped<IWorkspaceUserService, WorkspaceUserService>();
         services.AddScoped<IBoardService, BoardService>();
         services.AddScoped<IBoardUserService, BoardUserService>();
         services.AddScoped<IBoardListService, BoardListService>();

@@ -8,6 +8,7 @@ using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Pages.Workspaces;
+
 public partial class Settings
 {
     [Parameter]

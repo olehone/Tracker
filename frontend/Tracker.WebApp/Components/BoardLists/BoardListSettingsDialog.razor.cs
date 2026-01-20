@@ -23,6 +23,7 @@ public partial class BoardListSettingsDialog : IDisposable
     private UpdateBoardListRequest model = null!;
     private readonly UpdateBoardListRequestValidator validator = new();
     private bool isSubmitting = false;
+    private bool _disposed;
 
     protected override void OnInitialized()
     {
@@ -76,11 +77,6 @@ public partial class BoardListSettingsDialog : IDisposable
 
     private void Cancel() => MudDialog.Cancel();
 
-    void IDisposable.Dispose()
-    {
-        BoardState.OnChange -= StateHasChanged;
-    }
-
     public class UpdateBoardListRequestValidator : AbstractValidator<UpdateBoardListRequest>
     {
         public UpdateBoardListRequestValidator()
@@ -93,5 +89,23 @@ public partial class BoardListSettingsDialog : IDisposable
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                BoardState.OnChange -= StateHasChanged;
+            }
+            _disposed = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

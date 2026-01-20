@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Tracker.API.Hubs.Events;
 using Tracker.Application.UseCases.Boards.CheckRealtimeAccess;
 
 namespace Tracker.API.Hubs;

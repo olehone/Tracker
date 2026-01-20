@@ -69,9 +69,9 @@ public sealed class BoardItemsState(
             Position = position
         };
 
-        ApplyMoved(request);
+        ApplyMoved(itemId, boardListId, position);
 
-        var result = await boardItemService.MoveAsync(request);
+        var result = await boardItemService.MoveAsync(Board.Id, itemId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -80,7 +80,7 @@ public sealed class BoardItemsState(
 
     public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyUpdated(itemId, request.Title, request.Description);
+        ApplyUpdated(itemId, request.Title, request.Description, request.IsDone);
 
         var result = await boardItemService.UpdateAsync(Board.Id, itemId, request);
         if (result.IsFailure)
@@ -126,7 +126,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description);
+        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description, evt.Item.IsDone);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -146,15 +146,15 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyMoved(Guid boardItemId, Guid toBoardListId, int position)
+    private void ApplyMoved(Guid itemId, Guid boardListId, int position)
     {
-        var item = _boardItems.FirstOrDefault(bi => bi.Id == boardItemId);
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
         }
 
-        if (item.BoardListId == toBoardListId)
+        if (item.BoardListId == boardListId)
         {
             if (item.Position == position)
             {
@@ -178,16 +178,16 @@ public sealed class BoardItemsState(
             var oldPosition = item.Position;
 
             ShiftPosition(oldListId, -1, oldPosition + 1);
-            ShiftPosition(toBoardListId, +1, position);
+            ShiftPosition(boardListId, +1, position);
 
-            item.BoardListId = toBoardListId;
+            item.BoardListId = boardListId;
             item.Position = position;
         }
 
         Notify();
     }
 
-    private void ApplyUpdated(Guid itemId, string title, string description)
+    private void ApplyUpdated(Guid itemId, string title, string description, bool isDone)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -196,6 +196,7 @@ public sealed class BoardItemsState(
         }
         item.Title = title;
         item.Description = description;
+        item.IsDone = isDone;
 
         Notify();
     }

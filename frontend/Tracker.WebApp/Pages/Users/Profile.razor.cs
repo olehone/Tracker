@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
-using Tracker.Services;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Users;
 
@@ -13,9 +13,10 @@ public partial class Profile
     public Guid UserId { get; set; }
 
     [Inject] IUserService UserService { get; set; } = null!;
-    [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
     [Inject] IErrorNotifier ErrorNotifier { get; set; } = null!;
 
+    private bool IsOwnProfile => UserId == AppState.CurrentUser?.Id;
     private UserDto? User { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -63,6 +64,5 @@ public partial class Profile
         }
         return result.Value;
     }
-
 
 }

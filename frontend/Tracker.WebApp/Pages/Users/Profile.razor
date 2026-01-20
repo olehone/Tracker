@@ -23,17 +23,27 @@
 						 ApplyEffectsToContainer
 						 Class="mt-8"
 						 PanelClass="pa-0">
-					<AuthorizeView Policy="AdminOrHigher">
-						<MudTabPanel Text="All user workspaces">
+					@if (IsOwnProfile)
+					{
+						<MudTabPanel Text="My workspaces">
 							<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
 										   Height="40vh" />
 						</MudTabPanel>
-					</AuthorizeView>
+					}
+					else
+					{
+						<AuthorizeView Policy="AdminOrHigher">
+							<MudTabPanel Text="All user workspaces">
+								<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
+											   Height="40vh" />
+							</MudTabPanel>
+						</AuthorizeView>
 
-					<MudTabPanel Text="Shared workspaces">
-						<WorkspaceList LoadWorkspaces=@LoadWorkspaces
-									   Height="40vh" />
-					</MudTabPanel>
+						<MudTabPanel Text="Shared workspaces">
+							<WorkspaceList LoadWorkspaces=@LoadWorkspaces
+										   Height="40vh" />
+						</MudTabPanel>
+					}
 
 				</MudTabs>
 			</Body>

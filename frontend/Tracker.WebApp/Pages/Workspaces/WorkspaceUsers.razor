@@ -1,0 +1,171 @@
+﻿@page "/workspaces/{WorkspaceId:guid}/members"
+
+@using Microsoft.AspNetCore.Authorization
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.Users
+
+@attribute [Authorize]
+
+<PageTitle>@PageTitle() - Members</PageTitle>
+
+<MudContainer MaxWidth=MaxWidth.Medium>
+	<MudPaper Elevation="5"
+			  Class="my-5 pa-4">
+
+		@if (isLoading)
+		{
+			<MudStack Justify="Justify.Center">
+				<MudProgressCircular Indeterminate
+									 Color="Color.Primary" />
+			</MudStack>
+		}
+		else if (Workspace != null)
+		{
+			<MudStack Row
+					  AlignItems="AlignItems.Center"
+					  StretchItems="StretchItems.End"
+					  Class="mb-5">
+				<MudTooltip Text="Back to workspace">
+					<a href=@($"/workspaces/{Workspace.Id}/overview")>
+						<MudIcon Icon=@Icons.Material.Filled.KeyboardArrowLeft
+								 Color="Color.Inherit" />
+					</a>
+				</MudTooltip>
+
+				<MudText Typo="Typo.h5">
+					Workspace Members
+				</MudText>
+			</MudStack>
+
+			<MudPaper Elevation="0"
+					  Class="pa-4 mb-4">
+				<MudGrid Class="align-end">
+					<MudItem xs="12" md="8">
+						<MudAutocomplete T=@UserDto
+										 @bind-Value=@_selectedUser
+										 ResetValueOnEmptyText
+										 SelectValueOnTab
+										 Label="Search users to add"
+										 SearchFunc=@SearchAsync
+										 Dense
+										 ItemDisabledFunc=@IsUserMember
+										 AdornmentIcon=@Icons.Material.Filled.Search
+										 ToStringFunc=@(u => u == null ? null : $"{u.Username}")>
+							<ItemDisabledTemplate>
+								@context.Username
+							</ItemDisabledTemplate>
+						</MudAutocomplete>
+					</MudItem>
+
+					<MudItem xs="12" md="4">
+						<MudSelect @bind-Value=@_selectedRole
+								   Dense
+								   Variant=@Variant.Text>
+							<MudSelectItem Value=@UserWorkspaceRole.Member>
+								<MudStack Row>
+									<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Member) />
+									Member
+								</MudStack>
+							</MudSelectItem>
+
+							<MudSelectItem Value=@UserWorkspaceRole.Admin>
+								<MudStack Row>
+									<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Admin) />
+									Admin
+								</MudStack>
+							</MudSelectItem>
+						</MudSelect>
+					</MudItem>
+
+					<MudItem xs="12">
+						<MudButton Color=@Color.Primary
+								   Variant=@Variant.Outlined
+								   OnClick=@AddUserAsync
+								   Disabled=@(_selectedUser is null)
+								   FullWidth>
+							<MudText>Add user to workspace</MudText>
+
+							<MudDivider Vertical />
+
+							<MudIcon Icon=@Icons.Material.Filled.PersonAdd />
+						</MudButton>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+
+			<MudPaper Elevation="0" Class="pa-4">
+				<MudText Typo=@Typo.h6 Class="mb-3">
+					Members (@WorkspaceUsersList.Count)
+				</MudText>
+
+				<MudPaper Elevation="0"
+						  Style="max-height: 400px; overflow-y: auto;"
+						  Class="pa-2">
+					<MudList T=@WorkspaceUserDto
+							 Dense
+							 ReadOnly>
+						@foreach (var workspaceUser in WorkspaceUsersList)
+						{
+							<MudListItem T=@WorkspaceUserDto>
+								<MudStack Row
+										  Justify=@Justify.SpaceBetween
+										  Spacing="2">
+									<SmallUserInfo User=@workspaceUser.User />
+
+									<MudStack Row
+											  AlignItems="AlignItems.Stretch "
+											  Justify="Justify.FlexStart">
+										@if (CanChangeRole(workspaceUser))
+										{
+											<MudSelect T=@UserWorkspaceRole
+													   Value=@workspaceUser.Role
+													   ValueChanged=@(newRole => ChangeUserRoleAsync(workspaceUser, newRole))
+													   Dense
+													   Style="min-width: 160px; width: 160px;"
+													   Margin="Margin.None"
+													   Variant="Variant.Text">
+												<MudSelectItem Value=@UserWorkspaceRole.Member>
+													<MudStack Row>
+														<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Member) />
+														Member
+													</MudStack>
+												</MudSelectItem>
+
+												<MudSelectItem Value=@UserWorkspaceRole.Admin>
+													<MudStack Row>
+														<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Admin) />
+														Admin
+													</MudStack>
+												</MudSelectItem>
+											</MudSelect>
+
+											<MudIconButton Icon=@Icons.Material.Filled.Delete
+														   Color=@Color.Error
+														   Size=@Size.Medium
+														   OnClick=@(() => RemoveUserAsync(workspaceUser)) />
+										}
+										else
+										{
+											<MudChip T=@UserWorkspaceRole
+													 Icon=@GetRoleIcon(workspaceUser.Role)
+													 Color=@GetRoleColor(workspaceUser.Role)
+													 Size="Size.Small">
+												@workspaceUser.Role.ToString()
+											</MudChip>
+										}
+									</MudStack>
+								</MudStack>
+							</MudListItem>
+							<MudDivider />
+						}
+					</MudList>
+				</MudPaper>
+			</MudPaper>
+		}
+		else
+		{
+			<MudText>Workspace not found.</MudText>
+		}
+	</MudPaper>
+</MudContainer>

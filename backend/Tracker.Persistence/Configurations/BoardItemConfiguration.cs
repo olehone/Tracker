@@ -14,5 +14,8 @@ public class BoardItemConfiguration : IEntityTypeConfiguration<BoardItem>
 
         builder.Property(b => b.Title)
             .IsRequired();
+
+        builder.Property(b => b.IsDone)
+            .IsRequired();
     }
 }

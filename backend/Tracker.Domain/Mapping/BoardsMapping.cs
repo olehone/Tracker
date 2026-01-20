@@ -61,6 +61,7 @@ public static class BoardsMapping
             Id = boardItem.Id,
             BoardListId = boardItem.BoardListId,
             Position = boardItem.Position,
+            IsDone = boardItem.IsDone,
             Title = boardItem.Title,
             Description = boardItem.Description ?? string.Empty,
         };

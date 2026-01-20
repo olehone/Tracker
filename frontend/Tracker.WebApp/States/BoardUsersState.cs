@@ -15,6 +15,28 @@ public sealed class BoardUsersState(
     private readonly List<Guid> _recentActiveUserIds = [];
     private Dictionary<Guid, BoardUserDto> _userLookup = [];
 
+    public IReadOnlyList<BoardUserDto> Users
+    {
+        get
+        {
+            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
+            return _sortedUsers;
+        }
+    }
+
+    public event Action? OnChange;
+
+    private BoardFullDto Board => boardState.Board!;
+
+    public void Reload()
+    {
+        var users = Board.BoardUsers;
+        _sortedUsers = null;
+        _boardUsers.Clear();
+        _boardUsers.AddRange(users);
+        _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
+    }
+
     public IReadOnlyList<BoardUserDto> RecentActiveUsers(int take = 5)
     {
         return _recentActiveUserIds
@@ -47,28 +69,6 @@ public sealed class BoardUsersState(
         {
             _recentActiveUserIds.RemoveRange(max, _recentActiveUserIds.Count - max);
         }
-    }
-
-    public IReadOnlyList<BoardUserDto> BoardUsers
-    {
-        get
-        {
-            _sortedUsers ??= _boardUsers.OrderByDescending(bu => bu.Role).ToList();
-            return _sortedUsers;
-        }
-    }
-
-    public event Action? OnChange;
-
-    private BoardFullDto Board => boardState.Board!;
-
-    public void Reload()
-    {
-        var users = Board.BoardUsers;
-        _sortedUsers = null;
-        _boardUsers.Clear();
-        _boardUsers.AddRange(users);
-        _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
     }
 
     public async Task<IEnumerable<UserDto>> SearchAsync(string value, CancellationToken ct)

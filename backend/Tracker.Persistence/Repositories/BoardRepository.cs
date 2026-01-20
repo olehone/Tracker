@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO.Compression;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Enums;
