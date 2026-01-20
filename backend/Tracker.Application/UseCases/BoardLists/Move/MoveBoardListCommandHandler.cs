@@ -17,7 +17,8 @@ public sealed class MoveBoardListCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, request.BoardListId, BoardAction.ChangeList);
+        var listResult = await BoardHelper.GetBoardListForActionAsync(uow, userContext, 
+            request.BoardListId, BoardAction.ChangeList, request.BoardId);
         if (listResult.IsFailure)
         {
             return listResult.Error;
@@ -30,7 +31,7 @@ public sealed class MoveBoardListCommandHandler(
             return Result.Success();
         }
 
-        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionAsync(boardList.Id) + 1;
+        int maxNewPosition = await uow.BoardListRepository.GetMaxPositionAsync(request.BoardId) + 1;
         if (maxNewPosition < request.Position)
         {
             request.Position = maxNewPosition;

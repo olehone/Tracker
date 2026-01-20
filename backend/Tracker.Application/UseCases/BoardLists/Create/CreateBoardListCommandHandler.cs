@@ -20,7 +20,8 @@ public sealed class CreateBoardListCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext, request.BoardId, BoardAction.CreateList);
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext, 
+            request.BoardId, BoardAction.CreateList);
 
         if (boardResult.IsFailure)
         {

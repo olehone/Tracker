@@ -28,4 +28,9 @@ public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IB
     {
         return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(id));
     }
+
+    public Task<Result<List<BoardSummaryDto>>> GetForCurrentUserAsync()
+    {
+        return apiErrorHandler.ExecuteAsync(api.GetForCurrentUserAsync);
+    }
 }

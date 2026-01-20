@@ -41,7 +41,6 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:guid}/workspaces/all")]
-    [Authorize(Roles = "Admin,Owner")]
     public async Task<IActionResult> GetAllWorkspacesAsync(
         Guid id,
         [FromQuery] PaginatedSearchRequest request)

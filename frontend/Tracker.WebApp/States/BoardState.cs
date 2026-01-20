@@ -82,6 +82,11 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnItemMoved += Items.Apply;
         _boardRealtime.OnItemUpdated += Items.Apply;
         _boardRealtime.OnItemDeleted += Items.Apply;
+
+        _boardRealtime.OnListCreated += Lists.Apply;
+        _boardRealtime.OnListMoved += Lists.Apply;
+        _boardRealtime.OnListUpdated += Lists.Apply;
+        _boardRealtime.OnListDeleted += Lists.Apply;
     }
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)

@@ -17,4 +17,7 @@ public interface IBoardsApi
 
     [Delete("/api/boards/{id}")]
     Task<ApiResponse<object>> DeleteAsync(Guid id);
+
+    [Get("/api/boards/my")]
+    Task<ApiResponse<List<BoardSummaryDto>>> GetForCurrentUserAsync();
 }

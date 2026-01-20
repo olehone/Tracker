@@ -36,7 +36,8 @@ public sealed class RefreshUserTokenCommandHandler(
         refreshToken.Token = tokenProvider.GenerateRefreshToken();
         refreshToken.ExpiresAt = DateTimeOffset.UtcNow
             .AddDays(jwtOptions.Value.RefreshTokenExpirationDays);
-        
+
+        uow.RefreshTokenRepository.Update(refreshToken);
         await uow.SaveChangesAsync(cancellationToken);
 
         return new TokensDto()

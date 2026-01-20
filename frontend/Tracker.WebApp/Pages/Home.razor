@@ -1,15 +1,33 @@
 ﻿@page "/"
+@using Tracker.WebApp.Components.Boards
 
 <PageTitle>Home</PageTitle>
 <MudPaper Class="ma-4 pa-4"
-          Elevation="0">
-    <MudText Typo="Typo.h3"
-             GutterBottom="true">
-        Welcome to Tracker!
-    </MudText>
+		  Elevation="0">
+	<MudText Typo="Typo.h3"
+			 GutterBottom="true">
+		Welcome to Tracker!
+	</MudText>
 
-    <MudText Typo="Typo.h5"
-             GutterBottom="true">
-        Discover more!
-    </MudText>
+	<MudText Typo="Typo.h5"
+			 GutterBottom="true">
+		Discover more!
+	</MudText>
+
+	<MudSpacer />
+	@if (Boards.Any())
+	{
+		<MudText Typo="Typo.h4">
+			Your boards
+		</MudText>
+		<MudGrid Spacing="3">
+			@foreach (var board in Boards)
+			{
+				<MudItem xs="12" sm="6" lg="3" @key="board.Id">
+					<BoardSummary Board="@board" />
+				</MudItem>
+			}
+		</MudGrid>
+	}
 </MudPaper>
+

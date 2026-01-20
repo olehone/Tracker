@@ -15,19 +15,19 @@ public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi ap
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, request));
     }
 
-    public Task<Result> MoveAsync(Guid id, MoveBoardListRequest request)
+    public Task<Result> MoveAsync(Guid boardId, Guid itemId, MoveBoardListRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(id, request));
+        return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(boardId, itemId, request));
     }
 
-    public Task<Result> UpdateAsync(Guid id,
+    public Task<Result> UpdateAsync(Guid boardId, Guid itemId,
         UpdateBoardListRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));
+        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(boardId, itemId, request));
     }
 
-    public Task<Result> DeleteAsync(Guid id)
+    public Task<Result> DeleteAsync(Guid boardId, Guid itemId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(id));
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(boardId, itemId));
     }
 }

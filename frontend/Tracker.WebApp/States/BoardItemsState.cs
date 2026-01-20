@@ -1,5 +1,4 @@
-﻿using Tracker.API.Hubs.Events;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
@@ -116,7 +115,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyMoved(evt.BoardItemId, evt.ToBoardListId, evt.Position);
+        ApplyMoved(evt.ItemId, evt.ToListId, evt.Position);
         boardState.Users.MarkActivity(evt.UserId);
     }
 
@@ -136,7 +135,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyDeleted(evt.BoardItemId);
+        ApplyDeleted(evt.ItemId);
         boardState.Users.MarkActivity(evt.UserId);
     }
 

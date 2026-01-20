@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction;
 
@@ -57,7 +58,7 @@ public sealed class BoardListsState(
 
         ApplyMoved(listId, newPosition);
 
-        var result = await boardListService.MoveAsync(listId, request);
+        var result = await boardListService.MoveAsync(Board.Id, listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -66,9 +67,9 @@ public sealed class BoardListsState(
 
     public async Task UpdateAsync(Guid listId, UpdateBoardListRequest request)
     {
-        ApplyUpdated(listId, request);
+        ApplyUpdated(listId, request.Title, request.Description);
 
-        var result = await boardListService.UpdateAsync(listId, request);
+        var result = await boardListService.UpdateAsync(Board.Id, listId, request);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -79,11 +80,51 @@ public sealed class BoardListsState(
     {
         ApplyDeleted(listId);
 
-        var result = await boardListService.DeleteAsync(listId);
+        var result = await boardListService.DeleteAsync(Board.Id, listId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
         }
+    }
+
+    public void Apply(ListCreatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyCreated(evt.List);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ListMovedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyMoved(evt.ListId, evt.Position);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ListUpdatedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyUpdated(evt.List.Id, evt.List.Title, evt.List.Description);
+        boardState.Users.MarkActivity(evt.UserId);
+    }
+
+    public void Apply(ListDeletedEvent evt)
+    {
+        if (boardState.MyId == evt.UserId)
+        {
+            return;
+        }
+        ApplyDeleted(evt.ListId);
+        boardState.Users.MarkActivity(evt.UserId);
     }
 
     private void ApplyCreated(BoardListDto newList)
@@ -127,15 +168,15 @@ public sealed class BoardListsState(
         Notify();
     }
 
-    private void ApplyUpdated(Guid listId, UpdateBoardListRequest request)
+    private void ApplyUpdated(Guid listId, string title, string description)
     {
         var list = _boardLists.FirstOrDefault(bl => bl.Id == listId);
         if (list is null)
         {
             return;
         }
-        list.Title = request.Title;
-        list.Description = request.Description;
+        list.Title = title;
+        list.Description = description;
         Notify();
     }
 

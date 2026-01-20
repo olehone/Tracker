@@ -1,7 +1,7 @@
 ﻿namespace Tracker.API.Hubs.Events;
 
-public sealed record ItemDeletedEvent(
+public sealed record ListDeletedEvent(
     Guid UserId,
     Guid BoardId,
-    Guid ItemId
+    Guid ListId
 );

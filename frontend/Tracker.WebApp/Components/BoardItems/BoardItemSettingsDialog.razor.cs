@@ -17,7 +17,7 @@ public partial class BoardItemSettingsDialog : IDisposable
     [Parameter]
     public BoardItemDto Item { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; } = null!
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private MudForm? _form;
     private UpdateBoardItemRequest model = null!;

@@ -5,6 +5,7 @@ namespace Tracker.Application.UseCases.BoardLists.Move;
 
 public class MoveBoardListCommand: IRequest<Result>
 {
+    public required Guid BoardId { get; set; }
     public required Guid BoardListId { get; set; }
     public int Position { get; set; }
 }

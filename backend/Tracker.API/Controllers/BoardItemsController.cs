@@ -20,7 +20,8 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemsController(IMediator mediator,
     IHubContext<BoardHub, IClientBoardHub> hubContext,
-     IUserContext userContext) : ControllerBase
+     IUserContext userContext)
+    : ControllerBase
 {
 
     [HttpPost("{boardListId:guid}")]
@@ -66,8 +67,8 @@ public class BoardItemsController(IMediator mediator,
             var evt = new ItemMovedEvent(
                 UserId: userId,
                 BoardId: boardId,
-                ToBoardListId: request.ToBoardListId,
-                BoardItemId: itemId,
+                ToListId: request.ToBoardListId,
+                ItemId: itemId,
                 Position: request.Position
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemMoved(evt);
@@ -113,7 +114,7 @@ public class BoardItemsController(IMediator mediator,
             var evt = new ItemDeletedEvent(
                 UserId: userId,
                 BoardId: boardId,
-                BoardItemId: itemId
+                ItemId: itemId
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemDeleted(evt);
         }
