@@ -42,4 +42,15 @@ public class UserBoardRepository : Repository<UserBoard, Guid>, IUserBoardReposi
         }
         return userBoard.Role;
     }
+
+    public new async Task RemoveAsync(Guid id)
+    {
+        var entity = await GetByIdAsync(id);
+        if (entity != null)
+        {
+            var assignees = _dbContext.BoardItemAssignees.Where(bia => bia.BoardUserId == id);
+            _dbContext.BoardItemAssignees.RemoveRange(assignees);
+            _dbSet.Remove(entity);
+        }
+    }
 }

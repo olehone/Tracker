@@ -10,4 +10,5 @@ public class BoardItem : BaseEntity
     public required string Title { get; set; }
     public string? Description { get; set; }
     public BoardList? BoardList { get; set; }
+    public List<BoardItemAssignee> Assignees { get; set; } = [];
 }

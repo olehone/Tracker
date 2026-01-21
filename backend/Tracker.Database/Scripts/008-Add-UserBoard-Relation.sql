@@ -14,5 +14,4 @@
     CONSTRAINT FK_UserBoards_Boards
         FOREIGN KEY (BoardId)
         REFERENCES [dbo].[Boards](Id)
-        ON DELETE CASCADE
 )
