@@ -11,6 +11,22 @@ public class BoardItemRepository : Repository<BoardItem, Guid>, IBoardItemReposi
     {
     }
 
+    public Task<List<BoardItem>> GetAssignedForUserAsync(Guid userId)
+    {
+        return _dbSet.AsNoTracking()
+            .Where(bi => bi.Assignees
+                .Any(bia => bia.BoardUser.UserId == userId))
+            .ToListAsync();
+    }
+
+    public Task<List<BoardItem>> GetAssignedInBoardAsync(Guid boardUserId)
+    {
+        return _dbSet.AsNoTracking()
+            .Where(bi => bi.Assignees
+                .Any(bia => bia.BoardUser.Id == boardUserId))
+            .ToListAsync();
+    }
+
     public async Task<int> GetMaxPositionAsync(Guid boardListId)
     {
         return await _dbSet

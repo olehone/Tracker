@@ -7,6 +7,8 @@ using Tracker.API.Hubs.Events;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.Common.Auth;
+using Tracker.Application.UseCases.BoardItemAssignees.Add;
+using Tracker.Application.UseCases.BoardItemAssignees.Remove;
 using Tracker.Application.UseCases.BoardItems.Create;
 using Tracker.Application.UseCases.BoardItems.Delete;
 using Tracker.Application.UseCases.BoardItems.Move;
@@ -117,6 +119,54 @@ public class BoardItemsController(IMediator mediator,
                 ItemId: itemId
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemDeleted(evt);
+        }
+        return response.ToActionResult();
+    }
+
+    [HttpPost("{itemId:guid}/assign/{userId:guid}")]
+    public async Task<IActionResult> AssignAsync(Guid boardId, Guid itemId, Guid userId)
+    {
+        var mediatorRequest = new AddAssigneeToItemCommand
+        {
+            BoardId = boardId,
+            BoardItemId = itemId,
+            UserId = userId,
+        };
+        var response = await mediator.Send(mediatorRequest);
+
+        if (response.IsSuccess)
+        {
+            var currentUserId = userContext.GetUserId();
+            var evt = new ItemUpdatedEvent(
+                UserId: currentUserId,
+                BoardId: boardId,
+                Item: response.Value
+            );
+            await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
+        }
+        return response.ToActionResult();
+    }
+
+    [HttpDelete("{itemId:guid}/assign/{userId:guid}")]
+    public async Task<IActionResult> RemoveAsync(Guid boardId, Guid itemId, Guid userId)
+    {
+        var mediatorRequest = new RemoveAssigneeFromItemCommand
+        {
+            BoardId = boardId,
+            BoardItemId = itemId,
+            UserId = userId,
+        };
+        var response = await mediator.Send(mediatorRequest);
+
+        if (response.IsSuccess)
+        {
+            var currentUserId = userContext.GetUserId();
+            var evt = new ItemUpdatedEvent(
+                UserId: currentUserId,
+                BoardId: boardId,
+                Item: response.Value
+            );
+            await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
         }
         return response.ToActionResult();
     }
