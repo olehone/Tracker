@@ -1,57 +1,77 @@
-﻿<CascadingValue Value="BoardState">
-	<MudDialog>
-		<DialogContent>
-			<MudForm @ref=@_form
-					 Model=@model
-					 Validation=@validator
-					 ValidationDelay="300">
-				<MudStack Row
-						  AlignItems="AlignItems.Center"
-						  StretchItems="StretchItems.End">
-					<MudCheckBox @bind-Value=@model.IsDone
-								 Size="Size.Large"></MudCheckBox>
+﻿@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+<CascadingValue Value="BoardState">
+	@if (isExists)
+	{
+		<MudForm @ref=@_form
+				 Model=@model
+				 Validation=@validator
+				 ValidationDelay="300">
+			<MudDialog>
+				<DialogContent>
+					<MudStack>
+						<MudStack Row
+								  Justify="Justify.SpaceBetween"
+								  AlignItems="AlignItems.Center">
+							<MudStack Row
+									  AlignItems="AlignItems.Center"
+									  StretchItems="StretchItems.End">
+								<MudCheckBox @bind-Value=@model.IsDone
+											 Size="Size.Large"></MudCheckBox>
 
-					<MudTextField @bind-Value=@model.Title
-								  Label="Title"
-								  Required
-								  Variant="Variant.Outlined"
-								  Style=@Style() />
-				</MudStack>
+								<MudTextField @bind-Value=@model.Title
+											  Typo="Typo.h5"
+											  Required
+											  Underline=false
+											  Variant="Variant.Text"
+											  Style=@Style() />
+							</MudStack>
+							<MudStack Row
+									  AlignItems="AlignItems.Center">
+								<MudMenu Icon=@Icons.Material.Filled.MoreVert
+										 AriaLabel="Open item menu">
+									<MudMenuItem Label="Delete"
+												 OnClick=@Delete />
+								</MudMenu>
+								<MudIconButton Icon=@Icons.Material.Filled.Close
+											   OnClick=@Cancel />
+							</MudStack>
+						</MudStack>
 
-				<MudTextField @bind-Value=@model.Description
-							  Label="Description"
-							  Lines="3"
-							  Variant="Variant.Outlined" />
+						<MudTextField @bind-Value=@model.Description
+									  Label="Description"
+									  Lines="3"
+									  Variant="Variant.Outlined" />
+						<MudButton Disabled=@(isSubmitting)
+								   OnClick=@Submit
+								   Variant="Variant.Filled"
+								   Color="Color.Primary">
+							@if (isSubmitting)
+							{
+								<MudProgressCircular Size="Size.Small"
+													 Indeterminate
+													 Color="Color.Inherit" />
+							}
+							else
+							{
+								<MudText>Save</MudText>
+							}
+						</MudButton>
 
-			</MudForm>
+						<MudAvatarGroup>
+							@foreach (var assignee in Item.Assignees)
+							{
+							}
+						</MudAvatarGroup>
+						<MudDivider />
 
-			<MudDivider />
-
-			<MudButton Variant="Variant.Filled"
-					   Color="Color.Error"
-					   FullWidth
-					   OnClick=@Delete>Delete</MudButton>
-		</DialogContent>
-		<DialogActions>
-			<MudButton OnClick="Cancel">
-				<MudText>Cancel</MudText>
-			</MudButton>
-
-			<MudButton Disabled=@(isSubmitting)
-					   OnClick=@Submit
-					   Variant="Variant.Filled"
-					   Color="Color.Primary">
-				@if (isSubmitting)
-				{
-					<MudProgressCircular Size="Size.Small"
-										 Indeterminate
-										 Color="Color.Inherit" />
-				}
-				else
-				{
-					<MudText>Save</MudText>
-				}
-			</MudButton>
-		</DialogActions>
-	</MudDialog>
+					</MudStack>
+				</DialogContent>
+			</MudDialog>
+		</MudForm>
+	}
+	else
+	{
+		<ErrorDialog Message="This item is no longer exists" />
+	}
 </CascadingValue>

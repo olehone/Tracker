@@ -41,10 +41,16 @@ public partial class BoardItem
             { nameof(BoardItemSettingsDialog.BoardState), BoardState },
             { nameof(BoardItemSettingsDialog.Item), Item }
         };
-
+        var options = new DialogOptions
+        {
+            CloseButton = false,
+            NoHeader = true,
+            MaxWidth=MaxWidth.Small
+        };
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
             Item.Title,
-            parameters);
+            parameters,
+            options);
 
         await dialog.Result;
     }

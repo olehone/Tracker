@@ -15,7 +15,7 @@ public partial class BoardItemSettingsDialog : IDisposable
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
     [Parameter]
-    public BoardItemDto Item { get; set; } = null!;
+    public BoardItemDto Item { get; set; }
 
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
@@ -23,11 +23,11 @@ public partial class BoardItemSettingsDialog : IDisposable
     private UpdateBoardItemRequest model = null!;
     private readonly UpdateBoardItemRequestValidator validator = new();
     private bool isSubmitting = false;
+    private bool isExists => BoardState.Items.BoardItems.Any(i=> i.Id == Item.Id);
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
-
+        BoardState.Items.OnChange += StateHasChanged;
         if (BoardState.Board != null)
         {
             model = new UpdateBoardItemRequest
@@ -69,7 +69,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        await BoardState.Items.UpdateAsync(Item.Id, model);
+        await BoardState.Items.UpdateAsync(Item!.Id, model);
 
         isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
@@ -79,7 +79,7 @@ public partial class BoardItemSettingsDialog : IDisposable
 
     void IDisposable.Dispose()
     {
-        BoardState.OnChange -= StateHasChanged;
+        BoardState.Items.OnChange -= StateHasChanged;
     }
 
     private string Style()
