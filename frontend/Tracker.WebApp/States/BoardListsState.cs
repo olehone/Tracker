@@ -94,7 +94,7 @@ public sealed class BoardListsState(
             return;
         }
         ApplyCreated(evt.List);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ListMovedEvent evt)
@@ -104,7 +104,7 @@ public sealed class BoardListsState(
             return;
         }
         ApplyMoved(evt.ListId, evt.Position);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ListUpdatedEvent evt)
@@ -114,7 +114,7 @@ public sealed class BoardListsState(
             return;
         }
         ApplyUpdated(evt.List.Id, evt.List.Title, evt.List.Description);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ListDeletedEvent evt)
@@ -124,7 +124,7 @@ public sealed class BoardListsState(
             return;
         }
         ApplyDeleted(evt.ListId);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     private void ApplyCreated(BoardListDto newList)

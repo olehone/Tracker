@@ -29,4 +29,14 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
     {
         return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(boardId, itemId));
     }
+
+    Task<Result<BoardItemDto>> IBoardItemService.AssignAsync(Guid boardId, Guid itemId, Guid userId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.AssignAsync(boardId, itemId, userId));
+    }
+
+    Task<Result<BoardItemDto>> IBoardItemService.RemoveAsync(Guid boardId, Guid itemId, Guid userId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.RemoveAsync(boardId, itemId, userId));
+    }
 }

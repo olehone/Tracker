@@ -32,20 +32,20 @@ else
 		<MudStack Row
 				  Spacing="3"
 				  AlignItems="AlignItems.Center">
-			@if (BoardState.Users.RecentActiveUsers().Any())
+			@if (BoardState.UsersState.RecentActiveUsers().Any())
 			{
 				<MudAvatarGroup Spacing="4" Max="5" @key="@GetUsersKey()">
-					@foreach (var boardUser in BoardState.Users.RecentActiveUsers())
+					@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
 					{
 						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
 						Console.WriteLine(color);
-						<UserAvatarSmall @key=@boardUser.User.Id
-										 User=@boardUser.User
-										 Color=color />
+						<UserAvatarSmallWithLookup @key=@boardUser.User.Id
+												   User=@boardUser.User
+												   Color=color />
 					}
 				</MudAvatarGroup>
 			}
-			@if (Board.Permissions.CanChangeList && BoardState.Lists.BoardLists.Count > 1)
+			@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
 			{
 				<MudTooltip Text="Move lists">
 					<MudIconButton Icon=@Icons.Material.Filled.SwapHoriz

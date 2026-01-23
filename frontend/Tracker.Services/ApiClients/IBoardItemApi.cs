@@ -1,4 +1,5 @@
-﻿using Refit;
+﻿using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 
@@ -17,4 +18,10 @@ public interface IBoardItemApi
 
     [Delete("/api/board/{boardId}/items/{itemId}")]
     Task<ApiResponse<object>> DeleteAsync(Guid boardId, Guid itemId);
+
+    [Post("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
+    Task<ApiResponse<BoardItemDto>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
+
+    [Delete("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
+    Task<ApiResponse<BoardItemDto>> RemoveAsync(Guid boardId, Guid itemId, Guid userId);
 }

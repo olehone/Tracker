@@ -19,7 +19,7 @@ public partial class BoardList
 
     private async Task CreateNewItem(string title)
     {
-        await BoardState.Items.CreateAsync(List.Id, title);
+        await BoardState.ItemsState.CreateAsync(List.Id, title);
     }
 
     private async Task OpenListSettings()

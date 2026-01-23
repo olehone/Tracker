@@ -15,9 +15,9 @@ public sealed class BoardState : IAsyncDisposable
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
 
-    public BoardUsersState Users { get; }
-    public BoardItemsState Items { get; }
-    public BoardListsState Lists { get; }
+    public BoardUsersState UsersState { get; }
+    public BoardItemsState ItemsState { get; }
+    public BoardListsState ListsState { get; }
 
     public bool IsLoading { get; private set; }
     public event Action? OnChange;
@@ -35,9 +35,9 @@ public sealed class BoardState : IAsyncDisposable
         _appState = appState;
         _boardService = boardService;
 
-        Users = new BoardUsersState(this, userService, boardUserService);
-        Items = new BoardItemsState(this, boardItemService);
-        Lists = new BoardListsState(this, boardListService);
+        UsersState = new BoardUsersState(this, userService, boardUserService);
+        ItemsState = new BoardItemsState(this, boardItemService);
+        ListsState = new BoardListsState(this, boardListService);
         _boardRealtime = boardRealtime;
     }
 
@@ -55,9 +55,9 @@ public sealed class BoardState : IAsyncDisposable
         else
         {
             _currentBoard = boardResult.Value;
-            Users.Reload();
-            Items.Reload();
-            Lists.Reload();
+            UsersState.Reload();
+            ItemsState.Reload();
+            ListsState.Reload();
             await ConnectRealtimeAsync();
         }
 
@@ -78,15 +78,15 @@ public sealed class BoardState : IAsyncDisposable
         }
 
         await _boardRealtime.ConnectAndJoinBoardAsync(Board.Id);
-        _boardRealtime.OnItemCreated += Items.Apply;
-        _boardRealtime.OnItemMoved += Items.Apply;
-        _boardRealtime.OnItemUpdated += Items.Apply;
-        _boardRealtime.OnItemDeleted += Items.Apply;
+        _boardRealtime.OnItemCreated += ItemsState.Apply;
+        _boardRealtime.OnItemMoved += ItemsState.Apply;
+        _boardRealtime.OnItemUpdated += ItemsState.Apply;
+        _boardRealtime.OnItemDeleted += ItemsState.Apply;
 
-        _boardRealtime.OnListCreated += Lists.Apply;
-        _boardRealtime.OnListMoved += Lists.Apply;
-        _boardRealtime.OnListUpdated += Lists.Apply;
-        _boardRealtime.OnListDeleted += Lists.Apply;
+        _boardRealtime.OnListCreated += ListsState.Apply;
+        _boardRealtime.OnListMoved += ListsState.Apply;
+        _boardRealtime.OnListUpdated += ListsState.Apply;
+        _boardRealtime.OnListDeleted += ListsState.Apply;
     }
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)
@@ -123,10 +123,10 @@ public sealed class BoardState : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        _boardRealtime.OnItemCreated -= Items.Apply;
-        _boardRealtime.OnItemMoved -= Items.Apply;
-        _boardRealtime.OnItemUpdated -= Items.Apply;
-        _boardRealtime.OnItemDeleted -= Items.Apply;
+        _boardRealtime.OnItemCreated -= ItemsState.Apply;
+        _boardRealtime.OnItemMoved -= ItemsState.Apply;
+        _boardRealtime.OnItemUpdated -= ItemsState.Apply;
+        _boardRealtime.OnItemDeleted -= ItemsState.Apply;
         await _boardRealtime.DisconnectAsync();
     }
 }

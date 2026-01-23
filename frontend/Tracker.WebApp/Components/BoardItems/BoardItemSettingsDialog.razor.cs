@@ -23,11 +23,17 @@ public partial class BoardItemSettingsDialog : IDisposable
     private UpdateBoardItemRequest model = null!;
     private readonly UpdateBoardItemRequestValidator validator = new();
     private bool isSubmitting = false;
-    private bool isExists => BoardState.Items.BoardItems.Any(i=> i.Id == Item.Id);
+    private bool _openAssign;
 
+    private bool isExists => BoardState.ItemsState.BoardItems.Any(i=> i.Id == Item.Id);
+
+    private void ToggleAssign()
+    {
+        _openAssign = !_openAssign;
+    }
     protected override void OnInitialized()
     {
-        BoardState.Items.OnChange += StateHasChanged;
+        BoardState.ItemsState.OnChange += StateHasChanged;
         if (BoardState.Board != null)
         {
             model = new UpdateBoardItemRequest
@@ -49,7 +55,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         {
             return;
         }
-        await BoardState.Items.DeleteAsync(Item.Id);
+        await BoardState.ItemsState.DeleteAsync(Item.Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
@@ -69,7 +75,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        await BoardState.Items.UpdateAsync(Item!.Id, model);
+        await BoardState.ItemsState.UpdateAsync(Item!.Id, model);
 
         isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
@@ -79,7 +85,7 @@ public partial class BoardItemSettingsDialog : IDisposable
 
     void IDisposable.Dispose()
     {
-        BoardState.Items.OnChange -= StateHasChanged;
+        BoardState.ItemsState.OnChange -= StateHasChanged;
     }
 
     private string Style()

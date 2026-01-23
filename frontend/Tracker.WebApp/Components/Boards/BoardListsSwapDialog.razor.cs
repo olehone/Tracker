@@ -13,12 +13,12 @@ public partial class BoardListsSwapDialog : IDisposable
     public BoardState BoardState { get; set; } = null!;
 
     private IReadOnlyList<BoardListDto> Lists => 
-        BoardState.Lists.BoardLists;
+        BoardState.ListsState.BoardLists;
     private bool _disposed;
 
     protected override void OnInitialized()
     {
-        BoardState.Lists.OnChange += OnStateChanged;
+        BoardState.ListsState.OnChange += OnStateChanged;
     }
 
     private void OnStateChanged()
@@ -33,7 +33,7 @@ public partial class BoardListsSwapDialog : IDisposable
             return;
         }
 
-        await BoardState.Lists.MoveAsync(
+        await BoardState.ListsState.MoveAsync(
             dropInfo.Item.Id,
             dropInfo.IndexInZone + 1
         );
@@ -45,7 +45,7 @@ public partial class BoardListsSwapDialog : IDisposable
         {
             if (disposing)
             {
-                BoardState.Lists.OnChange -= OnStateChanged;
+                BoardState.ListsState.OnChange -= OnStateChanged;
             }
             _disposed = true;
         }

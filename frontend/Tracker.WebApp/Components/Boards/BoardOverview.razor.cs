@@ -15,8 +15,8 @@ public partial class BoardOverview : IDisposable
 
     protected override void OnInitialized()
     {
-        BoardState.Items.OnChange += OnBoardStateChanged;
-        BoardState.Lists.OnChange += OnBoardStateChanged;
+        BoardState.ItemsState.OnChange += OnBoardStateChanged;
+        BoardState.ListsState.OnChange += OnBoardStateChanged;
     }
 
     private void OnBoardStateChanged()
@@ -35,14 +35,14 @@ public partial class BoardOverview : IDisposable
             return;
         }
 
-        await BoardState.Items.MoveAsync(dropInfo.Item.Id,
+        await BoardState.ItemsState.MoveAsync(dropInfo.Item.Id,
             dropInfo.DropzoneIdentifier,
             dropInfo.IndexInZone + 1);
     }
 
     private async Task CreateList(string title)
     {
-        await BoardState.Lists.CreateAsync(title);
+        await BoardState.ListsState.CreateAsync(title);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -51,8 +51,8 @@ public partial class BoardOverview : IDisposable
         {
             if (disposing)
             {
-                BoardState.Items.OnChange -= OnBoardStateChanged;
-                BoardState.Lists.OnChange -= OnBoardStateChanged;
+                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
+                BoardState.ListsState.OnChange -= OnBoardStateChanged;
             }
             _disposed = true;
         }

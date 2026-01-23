@@ -19,7 +19,7 @@ public partial class BoardItem
 
     private async Task OnIsDoneChanged(bool isDone)
     {
-        await BoardState.Items.UpdateAsync(
+        await BoardState.ItemsState.UpdateAsync(
             Item.Id,
             new UpdateBoardItemRequest
             {

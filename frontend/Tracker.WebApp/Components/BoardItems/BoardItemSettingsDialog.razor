@@ -1,6 +1,8 @@
-﻿@using Tracker.WebApp.Components.Shared
+﻿@using Tracker.WebApp.Components.BoardUsers
+@using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
-<CascadingValue Value="BoardState">
+
+<CascadingValue Value=@BoardState>
 	@if (isExists)
 	{
 		<MudForm @ref=@_form
@@ -38,6 +40,31 @@
 							</MudStack>
 						</MudStack>
 
+						<MudStack Row>
+							@if (!Item.Assignees.Any())
+							{
+								<MudButton Size="Size.Small"
+										   Variant="Variant.Outlined"
+										   StartIcon=@Icons.Material.Filled.PersonAdd
+										   OnClick=@ToggleAssign>
+									Assign
+								</MudButton>
+								<MudPopover Open=@_openAssign
+											AnchorOrigin="Origin.BottomCenter"
+											TransformOrigin="Origin.TopCenter">
+									<BoardUserSelect BoardState=@BoardState
+													 Close=@(() => _openAssign = false) />
+								</MudPopover>
+							}
+
+						</MudStack>
+
+						@if (!Item.Assignees.Any())
+						{
+							<MudStack Row
+									  Wrap="Wrap.Wrap">
+							</MudStack>
+						}
 						<MudTextField @bind-Value=@model.Description
 									  Label="Description"
 									  Lines="3"
