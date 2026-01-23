@@ -9,46 +9,49 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemSettingsDialog : IDisposable
 {
+    private static readonly UpdateBoardItemRequestValidator Validator = new();
+
+    private MudForm? _form;
+    private UpdateBoardItemRequest _model = null!;
+    private bool _isSubmitting;
+    private bool _openAssign;
+    private bool _disposed;
+
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
     [Parameter]
-    public BoardItemDto Item { get; set; }
+    public BoardItemDto Item { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] IDialogService DialogService { get; set; } = null!;
 
-    private MudForm? _form;
-    private UpdateBoardItemRequest model = null!;
-    private readonly UpdateBoardItemRequestValidator validator = new();
-    private bool isSubmitting = false;
-    private bool _openAssign;
-
-    private bool isExists => BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
+    private bool IsItemExists =>
+        BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
 
     private void ToggleAssign()
     {
         _openAssign = !_openAssign;
     }
 
-    private IReadOnlyList<BoardUserDto> AssignedUsers()
+    private IEnumerable<UserDto> AssignedUsers()
     {
-        return BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id)).ToList();
+        return Item.Assignees.Count != 0
+            ? BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id)).Select(bu => bu.User)
+            : [];
     }
 
     protected override void OnInitialized()
     {
         BoardState.ItemsState.OnChange += StateHasChanged;
-        if (BoardState.Board != null)
+
+        _model = new UpdateBoardItemRequest
         {
-            model = new UpdateBoardItemRequest
-            {
-                Title = Item.Title,
-                Description = Item.Description ?? string.Empty,
-                IsDone = Item.IsDone,
-            };
-        }
+            Title = Item.Title,
+            Description = Item.Description ?? string.Empty,
+            IsDone = Item.IsDone,
+        };
     }
 
     private async Task Delete()
@@ -56,18 +59,21 @@ public partial class BoardItemSettingsDialog : IDisposable
         bool? result = await DialogService.ShowMessageBox(
             "Warning",
             "Deleting can not be undone!",
-            yesText: "Delete!", cancelText: "Cancel");
-        if (result == null)
+            yesText: "Delete!",
+            cancelText: "Cancel");
+
+        if (result != true)
         {
             return;
         }
+
         await BoardState.ItemsState.DeleteAsync(Item.Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
     private async Task Submit()
     {
-        if (_form is null || model is null)
+        if (_form is null)
         {
             return;
         }
@@ -78,27 +84,39 @@ public partial class BoardItemSettingsDialog : IDisposable
             return;
         }
 
-        isSubmitting = true;
+        _isSubmitting = true;
         StateHasChanged();
 
-        await BoardState.ItemsState.UpdateAsync(Item!.Id, model);
+        await BoardState.ItemsState.UpdateAsync(Item.Id, _model);
 
-        isSubmitting = false;
+        _isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel() => MudDialog.Cancel();
 
-    void IDisposable.Dispose()
+    private string GetTitleStyle() =>
+        _model.IsDone ? "text-decoration: line-through;" : string.Empty;
+
+    protected virtual void Dispose(bool disposing)
     {
-        BoardState.ItemsState.OnChange -= StateHasChanged;
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            BoardState.ItemsState.OnChange -= StateHasChanged;
+        }
+
+        _disposed = true;
     }
 
-    private string Style()
+    public void Dispose()
     {
-        return model.IsDone
-            ? "text-decoration: line-through;"
-            : "";
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public class UpdateBoardItemRequestValidator : AbstractValidator<UpdateBoardItemRequest>

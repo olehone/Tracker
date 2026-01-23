@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 
@@ -9,6 +10,14 @@ public class BoardItemRepository : Repository<BoardItem, Guid>, IBoardItemReposi
     public BoardItemRepository(ApplicationDbContext applicationDbContext)
         : base(applicationDbContext)
     {
+    }
+
+    public new async Task<BoardItem?> GetByIdAsync(Guid id)
+    {
+        return await _dbSet.AsNoTracking()
+            .Include(bi=> bi.Assignees)
+                .ThenInclude(bia => bia.BoardUser)
+            .FirstOrDefaultAsync(bi => bi.Id == id);
     }
 
     public Task<List<BoardItem>> GetAssignedForUserAsync(Guid userId)

@@ -7,54 +7,39 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemAssignees : IDisposable
 {
+    private bool _disposed;
+
     [Parameter, EditorRequired]
     public BoardState BoardState { get; set; } = null!;
+
     [Parameter, EditorRequired]
     public EventCallback Close { get; set; }
+
     [Parameter, EditorRequired]
-    public BoardItemDto Item { get; set; }
+    public BoardItemDto Item { get; set; } = null!;
 
     protected BoardUsersState UsersState => BoardState.UsersState;
-    private string _search = string.Empty;
 
-    private string Search
+    private string Search { get; set; } = string.Empty;
+
+    private IEnumerable<BoardUserDto> FilteredUsers()
     {
-        get { return _search; }
-        set
+        if (string.IsNullOrWhiteSpace(Search))
         {
-            _assignedUsers = null;
-            _unassignedUsers = null;
-            _search = value;
+            return UsersState.Users;
         }
-    }
-    private bool _disposed;
-    private IReadOnlyList<BoardUserDto>? _assignedUsers = null;
-    private IReadOnlyList<BoardUserDto>? _unassignedUsers = null;
 
-    private IEnumerable<BoardUserDto> Users()
-    {
-        return UsersState.Users.Where(bu => bu.User.Username
-            .Contains(_search, StringComparison.OrdinalIgnoreCase));
+        return UsersState.Users.Where(bu =>
+            bu.User.Username.Contains(Search, StringComparison.OrdinalIgnoreCase));
     }
 
-    private IReadOnlyList<BoardUserDto> AssignedUsers
-    {
-        get
-        {
-            _assignedUsers ??= Users().Where(bu => Item.Assignees.Contains(bu.User.Id)).ToList();
-            return _assignedUsers;
-        }
-    }
+    private IEnumerable<UserDto> AssignedUsers =>
+        FilteredUsers().Where(bu => Item.Assignees.Contains(bu.User.Id)).Select(bu => bu.User);
 
-    private IReadOnlyList<BoardUserDto> UnassignedUsers
-    {
-        get
-        {
-            _unassignedUsers ??= Users().Where(bu => !Item.Assignees.Contains(bu.User.Id)).ToList();
-            return _unassignedUsers;
-        }
-    }
-    protected override void OnParametersSet()
+    private IEnumerable<UserDto> UnassignedUsers =>
+        FilteredUsers().Where(bu => !Item.Assignees.Contains(bu.User.Id)).Select(bu => bu.User);
+
+    protected override void OnInitialized()
     {
         BoardState.ItemsState.OnChange += StateHasChangedHandler;
         BoardState.UsersState.OnChange += StateHasChangedHandler;
@@ -62,8 +47,6 @@ public partial class BoardItemAssignees : IDisposable
 
     private void StateHasChangedHandler()
     {
-        _assignedUsers = null;
-        _unassignedUsers = null;
         InvokeAsync(StateHasChanged);
     }
 
@@ -74,8 +57,9 @@ public partial class BoardItemAssignees : IDisposable
             return;
         }
 
-        if (BoardState?.UsersState != null)
+        if (disposing)
         {
+            BoardState.ItemsState.OnChange -= StateHasChangedHandler;
             BoardState.UsersState.OnChange -= StateHasChangedHandler;
         }
 

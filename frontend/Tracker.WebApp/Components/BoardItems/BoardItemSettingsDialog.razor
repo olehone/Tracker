@@ -3,30 +3,31 @@
 @using Tracker.WebApp.Components.Users
 
 <CascadingValue Value=@BoardState>
-	@if (isExists)
+	@if (IsItemExists)
 	{
 		<MudForm @ref=@_form
-				 Model=@model
-				 Validation=@validator
+				 Model=@_model
+				 Validation=@Validator
 				 ValidationDelay="300">
 			<MudDialog>
 				<DialogContent>
 					<MudStack>
+						@* Header *@
 						<MudStack Row
 								  Justify="Justify.SpaceBetween"
 								  AlignItems="AlignItems.Center">
 							<MudStack Row
 									  AlignItems="AlignItems.Center"
 									  StretchItems="StretchItems.End">
-								<MudCheckBox @bind-Value=@model.IsDone
-											 Size="Size.Large"></MudCheckBox>
+								<MudCheckBox @bind-Value=@_model.IsDone
+											 Size="Size.Large" />
 
-								<MudTextField @bind-Value=@model.Title
+								<MudTextField @bind-Value=@_model.Title
 											  Typo="Typo.h5"
 											  Required
 											  Underline=false
 											  Variant="Variant.Text"
-											  Style=@Style() />
+											  Style=@GetTitleStyle() />
 							</MudStack>
 							<MudStack Row
 									  AlignItems="AlignItems.Center">
@@ -40,6 +41,7 @@
 							</MudStack>
 						</MudStack>
 
+						@* Buttons to add something new *@
 						<MudStack Row>
 							@if (!Item.Assignees.Any())
 							{
@@ -61,20 +63,22 @@
 
 						</MudStack>
 
+						@* Assignees part *@
 						@if (Item.Assignees.Any())
 						{
 							<MudText Typo="Typo.body2">
 								Assigned users
 							</MudText>
+
 							<MudStack Row
 									  Wrap="Wrap.Wrap"
 									  Spacing="1">
 								@foreach (var user in AssignedUsers())
 								{
-									<UserAvatarSmallWithLookup User=@user.User>
+									<UserAvatarSmallWithLookup @key=@user.Id
+															User=@user>
 										<AdditionalActions>
-											<MudDivider Class="my-3" />
-											<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.User.Id))>
+											<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
 												Unassign user from this item
 											</MudButton>
 										</AdditionalActions>
@@ -85,6 +89,7 @@
 									<MudIconButton Icon=@Icons.Material.Filled.Add
 												   OnClick=@ToggleAssign />
 								</MudAvatar>
+
 								<MudPopover Open=@_openAssign
 											AnchorOrigin="Origin.TopRight"
 											TransformOrigin="Origin.CenterRight">
@@ -94,15 +99,16 @@
 								</MudPopover>
 							</MudStack>
 						}
-						<MudTextField @bind-Value=@model.Description
+
+						<MudTextField @bind-Value=@_model.Description
 									  Label="Description"
 									  Lines="3"
 									  Variant="Variant.Outlined" />
-						<MudButton Disabled=@(isSubmitting)
+						<MudButton Disabled=@_isSubmitting
 								   OnClick=@Submit
 								   Variant="Variant.Filled"
 								   Color="Color.Primary">
-							@if (isSubmitting)
+							@if (_isSubmitting)
 							{
 								<MudProgressCircular Size="Size.Small"
 													 Indeterminate

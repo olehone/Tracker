@@ -38,7 +38,6 @@ else
 					@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
 					{
 						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
-						Console.WriteLine(color);
 						<UserAvatarSmallWithLookup @key=@boardUser.User.Id
 												   User=@boardUser.User
 												   Color=color />

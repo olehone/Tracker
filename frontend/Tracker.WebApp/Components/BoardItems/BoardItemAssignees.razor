@@ -6,9 +6,11 @@
 	<MudStack Row
 			  AlignItems="AlignItems.Center"
 			  Justify="Justify.SpaceBetween">
+
 		<MudText Typo="Typo.h6">
 			Assign
 		</MudText>
+
 		<MudIconButton Icon=@Icons.Material.Filled.Close
 					   OnClick=@Close />
 	</MudStack>
@@ -24,14 +26,17 @@
 			<MudText Typo="Typo.body2">
 				Assigned
 			</MudText>
+
 			@foreach (var user in AssignedUsers)
 			{
-				<MudStack Row
+				<MudStack @key=@user.Id
+						  Row
 						  Justify="Justify.SpaceBetween"
 						  AlignItems="AlignItems.Center">
-					<SmallUserInfo User=@user.User />
+					<SmallUserInfo User=@user />
+
 					<MudIconButton Icon=@Icons.Material.Filled.Close
-								   OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.User.Id)) />
+								   OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id)) />
 				</MudStack>
 			}
 		}
@@ -42,10 +47,11 @@
 			</MudText>
 			@foreach (var user in UnassignedUsers)
 			{
-				<MudButton FullWidth
+				<MudButton @key=@user.Id
+						   FullWidth
 						   Class="justify-start"
-						   OnClick=@(() => BoardState.ItemsState.AssignAsync(Item.Id, user.User.Id))>
-					<SmallUserInfo User=@user.User />
+						   OnClick=@(() => BoardState.ItemsState.AssignAsync(Item.Id, user.Id))>
+					<SmallUserInfo User=@user />
 				</MudButton>
 			}
 		}
