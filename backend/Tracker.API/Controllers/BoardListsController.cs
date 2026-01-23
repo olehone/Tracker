@@ -12,7 +12,6 @@ using Tracker.Application.UseCases.BoardLists.Create;
 using Tracker.Application.UseCases.BoardLists.Delete;
 using Tracker.Application.UseCases.BoardLists.Move;
 using Tracker.Application.UseCases.BoardLists.Update;
-using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.API.Controllers;
 

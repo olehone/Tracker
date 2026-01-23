@@ -1,4 +1,4 @@
-﻿namespace Tracker.Domain.Requests.BoardList;
+﻿namespace Tracker.API.Requests;
 
 public class UpdateBoardListRequest
 {

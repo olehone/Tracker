@@ -17,5 +17,8 @@ public class BoardItemConfiguration : IEntityTypeConfiguration<BoardItem>
 
         builder.Property(b => b.IsDone)
             .IsRequired();
+
+        builder.Property(b => b.DueDate)
+            .HasPrecision(0);
     }
 }

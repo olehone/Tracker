@@ -1,4 +1,6 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
+
+namespace Tracker.Domain.Dtos;
 
 public class BoardItemDto
 {
@@ -6,6 +8,8 @@ public class BoardItemDto
     public required Guid BoardListId { get; set; }
     public required int Position { get; set; }
     public required bool IsDone { get; set; }
+    public DateTimeOffset? DueDate { get; set; }
+    public required BoardItemImportance Importance { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required IReadOnlySet<Guid> Assignees { get; set; }
