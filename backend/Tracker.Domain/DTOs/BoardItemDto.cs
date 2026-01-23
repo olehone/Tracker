@@ -8,5 +8,5 @@ public class BoardItemDto
     public required bool IsDone { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
-    public IReadOnlyList<Guid> Assignees { get; set; } = [];
+    public required IReadOnlySet<Guid> Assignees { get; set; }
 }

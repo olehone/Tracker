@@ -13,4 +13,10 @@ public static class BoardErrors
         ErrorType.Conflict,
         "This user is not assigned to the item"
     );
+
+    public static readonly Error UserAlreadyAssigned = new(
+        "BoardItem.UserAlreadyAssigned",
+        ErrorType.Conflict,
+        "This user is already assigned to the item"
+    );
 }

@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿    using MediatR;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
@@ -30,15 +30,20 @@ public class AddAssigneeToItemCommandHandler(
         {
             return BoardErrors.UserNotInBoard;
         }
+        var assignee = await uow.BoardItemAssigneeRepository
+            .GetByUserAndItemAsync(request.UserId, request.BoardItemId);
+        if (assignee is not null)
+        {
+            return BoardErrors.UserAlreadyAssigned;
+        }
 
-        var boardItem = itemResult.Value;
-        var assignee = new BoardItemAssignee
+        var newAssignee = new BoardItemAssignee
         {
             BoardItemId = request.BoardItemId,
             BoardUserId = boardUser.Id,
         };
 
-        await uow.BoardItemAssigneeRepository.AddAsync(assignee);
+        await uow.BoardItemAssigneeRepository.AddAsync(newAssignee);
         var result = await uow.SaveChangesAsync(cancellationToken);
 
         var item = await uow.BoardItemRepository.GetByIdAsync(request.BoardItemId);

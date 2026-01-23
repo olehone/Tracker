@@ -16,7 +16,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
         return await _dbSet
             .AsNoTracking()
-            .Where(b => b.UserBoards.Any(ub=> ub.UserId == userId))
+            .Where(b => b.UserBoards.Any(ub => ub.UserId == userId))
             .ToListAsync();
     }
 
@@ -51,10 +51,12 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
         return _dbSet
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(b => b.BoardLists
                 .OrderBy(bl => bl.Position))
-                .ThenInclude(bl => bl.BoardItems
-                    .OrderBy(bi => bi.Position))
+                .ThenInclude(bl => bl.BoardItems)
+                    .ThenInclude(bi => bi.Assignees)
+                        .ThenInclude(bi => bi.BoardUser)
             .Include(b => b.PermissionRoles)
             .Include(b => b.UserBoards)
                 .ThenInclude(bu => bu.User)
