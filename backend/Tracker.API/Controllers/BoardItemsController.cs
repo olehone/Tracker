@@ -13,6 +13,7 @@ using Tracker.Application.UseCases.BoardItems.Create;
 using Tracker.Application.UseCases.BoardItems.Delete;
 using Tracker.Application.UseCases.BoardItems.Move;
 using Tracker.Application.UseCases.BoardItems.Update;
+using Tracker.Domain.Enums;
 
 namespace Tracker.API.Controllers;
 [Route("api/board/{boardId:guid}/items")]
@@ -77,7 +78,7 @@ public class BoardItemsController(IMediator mediator,
     }
 
 
-    [HttpPut("{itemId:guid}")]
+    [HttpPatch("{itemId:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid boardId, Guid itemId,
         [FromBody] UpdateBoardItemRequest request)
     {
@@ -87,7 +88,9 @@ public class BoardItemsController(IMediator mediator,
             BoardItemId = itemId,
             Title = request.Title,
             Description = request.Description,
-            IsDone = request.IsDone
+            IsDone = request.IsDone,
+            DueDate = request.DueDate,
+            Importance = request.Importance,
         };
         var response = await mediator.Send(mediatorRequest);
         if (response.IsSuccess)
@@ -96,7 +99,8 @@ public class BoardItemsController(IMediator mediator,
             var evt = new ItemUpdatedEvent(
                 UserId: userId,
                 BoardId: boardId,
-                Item: response.Value
+                ItemId: itemId,
+                ChangedFields: request
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
         }
@@ -135,10 +139,14 @@ public class BoardItemsController(IMediator mediator,
         if (response.IsSuccess)
         {
             var currentUserId = userContext.GetUserId();
+            var changedFields = new UpdateBoardItemRequest
+            {
+                Assignees = response.Value
+            };
             var evt = new ItemUpdatedEvent(
                 UserId: currentUserId,
-                BoardId: boardId,
-                Item: response.Value
+                BoardId: boardId, ItemId: itemId,
+                ChangedFields: changedFields
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
         }
@@ -159,10 +167,15 @@ public class BoardItemsController(IMediator mediator,
         if (response.IsSuccess)
         {
             var currentUserId = userContext.GetUserId();
+            var changedFields = new UpdateBoardItemRequest
+            {
+                Assignees = response.Value
+            };
             var evt = new ItemUpdatedEvent(
                 UserId: currentUserId,
                 BoardId: boardId,
-                Item: response.Value
+                ItemId: itemId,
+                ChangedFields: changedFields
             );
             await hubContext.Clients.Group($"board:{boardId}").ItemUpdated(evt);
         }

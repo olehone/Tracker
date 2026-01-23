@@ -12,9 +12,9 @@ namespace Tracker.Application.UseCases.BoardItemAssignees.Add;
 public class AddAssigneeToItemCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<AddAssigneeToItemCommand, Result<BoardItemDto>>
+    : IRequestHandler<AddAssigneeToItemCommand, Result<IReadOnlySet<Guid>>>
 {
-    public async Task<Result<BoardItemDto>> Handle(AddAssigneeToItemCommand request,
+    public async Task<Result<IReadOnlySet<Guid>>> Handle(AddAssigneeToItemCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -51,6 +51,6 @@ public class AddAssigneeToItemCommandHandler(
         {
             return Error.Unknown;
         }
-        return item.ToDto();
+        return item.Assignees.Select(a => a.BoardUser.UserId).ToHashSet();
     }
 }

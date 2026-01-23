@@ -80,13 +80,13 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
 
-    [HttpPost("{workspaceId:guid}/boards")]
-    public async Task<IActionResult> CreateBoardAsync(Guid workspaceId,
+    [HttpPost("{id:guid}/boards")]
+    public async Task<IActionResult> CreateBoardAsync(Guid id,
         [FromBody] CreateWithTitleRequest request)
     {
         var mediatorRequest = new CreateBoardCommand()
         {
-            WorkspaceId = workspaceId,
+            WorkspaceId = id,
             Title = request.Title,
         };
         var response = await mediator.Send(mediatorRequest);
