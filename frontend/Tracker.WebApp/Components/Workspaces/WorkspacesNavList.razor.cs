@@ -27,11 +27,11 @@ public partial class WorkspacesNavList : IAsyncDisposable
 
     private async Task CreateWorkspace(string title)
     {
-        var request = new CreateWorkspaceRequest
+        if (string.IsNullOrWhiteSpace(title))
         {
-            Title = title
-        };
-        var result = await WorkspaceService.CreateAsync(request);
+            return;
+        }
+        var result = await WorkspaceService.CreateAsync(title);
         if (result.IsFailure)
         {
             return;

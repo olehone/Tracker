@@ -11,8 +11,5 @@ public class CreateWorkspaceCommandValidator : AbstractValidator<CreateWorkspace
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(options.Value.TitleMaximumLength);
-
-        RuleFor(x => x.Description)
-            .MaximumLength(options.Value.DescriptionMaximumLength);
     }
 }

@@ -9,9 +9,6 @@ public interface IBoardsApi
     [Get("/api/boards/{id}")]
     Task<ApiResponse<BoardFullDto>> GetByIdAsync(Guid id);
 
-    [Post("/api/boards/")]
-    Task<ApiResponse<BoardSummaryDto>> CreateAsync(CreateBoardRequest request);
-
     [Put("/api/boards/{id}/settings")]
     Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateBoardRequest request);
 

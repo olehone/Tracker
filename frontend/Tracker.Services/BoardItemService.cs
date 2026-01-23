@@ -1,4 +1,6 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Tracker.API.Requests;
+using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -10,8 +12,9 @@ namespace Tracker.Services;
 public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi api)
     : IBoardItemService
 {
-    public Task<Result<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request)
+    public Task<Result<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, string title)
     {
+        var request = new CreateWithTitleRequest{ Title = title };
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, boardListId, request));
     }
 

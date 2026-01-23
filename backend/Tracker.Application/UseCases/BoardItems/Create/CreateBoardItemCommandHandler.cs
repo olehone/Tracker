@@ -30,12 +30,11 @@ public class CreateBoardItemCommandHandler(
         int upperLimit = await uow.BoardItemRepository
             .GetMaxPositionAsync(request.BoardListId);
 
-        var boardItem = new BoardItem()
+        var boardItem = new BoardItem
         {
             BoardListId = request.BoardListId,
             Position = upperLimit + 1,
             Title = request.Title,
-            Description = request.Description
         };
         await uow.BoardItemRepository.AddAsync(boardItem);
 

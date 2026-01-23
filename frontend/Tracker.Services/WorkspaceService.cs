@@ -1,5 +1,7 @@
-﻿using Tracker.API.Requests;
+﻿using Refit;
+using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -26,9 +28,15 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
         return apiErrorHandler.ExecuteAsync(api.GetForCurrentUserAsync);
     }
 
-    public Task<Result<WorkspaceSummaryDto>> CreateAsync(CreateWorkspaceRequest request)
+    public Task<Result<WorkspaceSummaryDto>> CreateAsync(string title)
     {
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(request));
+    }
+
+
+    public Task<Result<BoardSummaryDto>> CreateBoardAsync(Guid workspaceId, string title)
+    {
+
     }
 
     public Task<Result<Paginated<WorkspaceSummaryDto>>> GetAsync(PaginatedSearchRequest request)

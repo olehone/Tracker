@@ -34,12 +34,8 @@ public sealed class BoardListsState(
 
     public async Task CreateAsync(string title)
     {
-        var request = new CreateBoardListRequest
-        {
-            Title = title
-        };
 
-        var result = await boardListService.CreateAsync(Board.Id, request);
+        var result = await boardListService.CreateAsync(Board.Id, title);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();

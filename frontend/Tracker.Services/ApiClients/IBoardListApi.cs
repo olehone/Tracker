@@ -1,5 +1,6 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.Services.ApiClients;
@@ -7,7 +8,7 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardListApi
 {
     [Post("/api/board/{boardId}/lists")]
-    public Task<ApiResponse<BoardListDto>> CreateAsync(Guid boardId, CreateBoardListRequest request);
+    public Task<ApiResponse<BoardListDto>> CreateAsync(Guid boardId, CreateWithTitleRequest request);
 
     [Post("/api/board/{boardId}/lists/{listId}/move")]
     public Task<ApiResponse<object>> MoveAsync(Guid boardId, Guid listId, MoveBoardListRequest request);

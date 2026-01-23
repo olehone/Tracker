@@ -28,7 +28,6 @@ public sealed class CreateWorkspaceCommandHandler(
         var workspace = new Workspace
         {
             Title = request.Title,
-            Description = request.Description,
         };
 
         var userWorkspace = new UserWorkspace

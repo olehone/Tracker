@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Refit;
+﻿using Refit;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardItem;
 
 namespace Tracker.Services.ApiClients;
@@ -8,7 +8,7 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardItemApi
 {
     [Post("/api/board/{boardId}/items/{boardListId}")]
-    Task<ApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateBoardItemRequest request);
+    Task<ApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateWithTitleRequest request);
 
     [Post("/api/board/{boardId}/items/move/{itemId}")]
     Task<ApiResponse<object>> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);

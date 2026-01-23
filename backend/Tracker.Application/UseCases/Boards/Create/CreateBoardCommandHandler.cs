@@ -58,7 +58,6 @@ public sealed class CreateBoardCommandHandler(
         {
             WorkspaceId = request.WorkspaceId,
             Title = request.Title,
-            Description = request.Description
         };
 
         var userBoard = new UserBoard

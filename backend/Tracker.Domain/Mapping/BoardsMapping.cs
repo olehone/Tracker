@@ -62,6 +62,8 @@ public static class BoardsMapping
             BoardListId = boardItem.BoardListId,
             Position = boardItem.Position,
             IsDone = boardItem.IsDone,
+            DueDate = boardItem.DueDate,
+            Importance = boardItem.Importance,
             Title = boardItem.Title,
             Description = boardItem.Description ?? string.Empty,
             Assignees = boardItem.Assignees.Select(a => a.BoardUser.UserId).ToHashSet()

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
+using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Workspaces.Create;
 using Tracker.Application.UseCases.Workspaces.GetAll;
 using Tracker.Application.UseCases.Workspaces.GetById;
@@ -17,13 +18,13 @@ namespace Tracker.API.Controllers;
 public class WorkspaceController(IMediator mediator) : ControllerBase
 {
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{workspaceId:guid}")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetByIdAsync(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid workspaceId)
     {
         var mediatorRequest = new GetWorkspaceByIdQuery()
         {
-            Id = id
+            Id = workspaceId
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
@@ -68,12 +69,25 @@ public class WorkspaceController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateWorkspaceRequest request)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateWithTitleRequest request)
     {
         var mediatorRequest = new CreateWorkspaceCommand()
         {
             Title = request.Title,
-            Description = request.Description ?? string.Empty
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+
+    [HttpPost("{workspaceId:guid}/boards")]
+    public async Task<IActionResult> CreateBoardAsync(Guid workspaceId,
+        [FromBody] CreateWithTitleRequest request)
+    {
+        var mediatorRequest = new CreateBoardCommand()
+        {
+            WorkspaceId = workspaceId,
+            Title = request.Title,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

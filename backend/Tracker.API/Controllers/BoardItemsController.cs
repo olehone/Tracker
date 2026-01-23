@@ -27,14 +27,13 @@ public class BoardItemsController(IMediator mediator,
 
     [HttpPost("{boardListId:guid}")]
     public async Task<IActionResult> CreateAsync(Guid boardId, Guid boardListId,
-        [FromBody] CreateBoardItemRequest request)
+        [FromBody] CreateWithTitleRequest request)
     {
         var mediatorRequest = new CreateBoardItemCommand()
         {
             BoardId = boardId,
             BoardListId = boardListId,
             Title = request.Title,
-            Description = request.Description
         };
         var response = await mediator.Send(mediatorRequest);
         if (response.IsSuccess)

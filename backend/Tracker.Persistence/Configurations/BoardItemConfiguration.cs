@@ -10,15 +10,15 @@ public class BoardItemConfiguration : IEntityTypeConfiguration<BoardItem>
     {
         builder.ToTable("BoardItems");
 
-        builder.HasKey(b => b.Id);
+        builder.HasKey(bi => bi.Id);
 
-        builder.Property(b => b.Title)
+        builder.Property(bi => bi.Title)
             .IsRequired();
 
-        builder.Property(b => b.IsDone)
+        builder.Property(bi => bi.IsDone)
             .IsRequired();
 
-        builder.Property(b => b.DueDate)
+        builder.Property(bi => bi.DueDate)
             .HasPrecision(0);
     }
 }
