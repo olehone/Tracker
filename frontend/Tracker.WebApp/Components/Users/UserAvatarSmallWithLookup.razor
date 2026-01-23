@@ -1,0 +1,30 @@
+<UserAvatarSmall User=@User
+				 Color=@Color
+				 HandleHovering=@HandleHovering />
+
+<MudPopover Open="_open"
+			AnchorOrigin="Origin.BottomCenter"
+			TransformOrigin="Origin.TopCenter"
+			Class="pa-3"
+			@onmouseenter=@(() => HandleHovering(true))
+			@onmouseleave=@(() => HandleHovering(false))>
+
+	<MudStack Spacing="1" AlignItems="AlignItems.Center">
+		<MudStack Row>
+			<UserAvatarSmall User=@User
+							 Size="Size.Large" />
+
+			<MudText Typo="Typo.h6">
+				@User.Username
+			</MudText>
+		</MudStack>
+		<MudDivider Class="my-3" />
+		<a href=@($"/users/{User.Id}")>
+			<MudButton FullWidth>
+				Profile
+			</MudButton>
+		</a>
+	</MudStack>
+
+</MudPopover>
+
