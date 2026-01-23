@@ -10,7 +10,7 @@ public interface IBoardItemService
     Task<Result> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);
     Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
     Task<Result> DeleteAsync(Guid boardId, Guid itemId);
-    Task<Result<BoardItemDto>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
-    Task<Result<BoardItemDto>> UnassignAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<Result<HashSet<Guid>>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<Result<HashSet<Guid>>> UnassignAsync(Guid boardId, Guid itemId, Guid userId);
 
 }

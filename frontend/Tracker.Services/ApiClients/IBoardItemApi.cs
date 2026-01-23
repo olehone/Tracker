@@ -20,8 +20,8 @@ public interface IBoardItemApi
     Task<IApiResponse> DeleteAsync(Guid boardId, Guid itemId);
 
     [Post("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
-    Task<IApiResponse<BoardItemDto>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<IApiResponse<HashSet<Guid>>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
 
     [Delete("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
-    Task<IApiResponse<BoardItemDto>> UnassingAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<IApiResponse<HashSet<Guid>>> UnassingAsync(Guid boardId, Guid itemId, Guid userId);
 }

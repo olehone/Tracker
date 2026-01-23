@@ -42,6 +42,11 @@ public partial class BoardWindowHeader : IDisposable
         {
             return;
         }
+        if (BoardState is null)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
         var workspaceId = Board.WorkspaceId;
         Nav.NavigateTo($"workspaces/{workspaceId}/overview");
     }

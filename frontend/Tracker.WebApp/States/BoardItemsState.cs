@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardItem;
@@ -76,7 +77,7 @@ public sealed class BoardItemsState(
 
     public async Task UpdateAsync(Guid itemId, UpdateBoardItemRequest request)
     {
-        ApplyUpdated(itemId, request.Title, request.Description, request.IsDone);
+        ApplyUpdated(itemId, request);
 
         var result = await boardItemService.UpdateAsync(Board.Id, itemId, request);
         if (result.IsFailure)
@@ -167,7 +168,7 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description, evt.Item.IsDone, evt.Item.Assignees);
+        ApplyUpdated(evt.ItemId, evt.ChangedFields);
         boardState.UsersState.MarkActivity(evt.UserId);
     }
 
@@ -228,21 +229,39 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyUpdated(Guid itemId, string title, string description, bool isDone,
-        HashSet<Guid>? assignees = null)
+    private void ApplyUpdated(Guid itemId, UpdateBoardItemRequest request)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
         {
             return;
         }
-        item.Title = title;
-        item.Description = description;
-        item.IsDone = isDone;
-        if (assignees is not null)
+
+        if (request.Title is not null)
         {
-            item.Assignees = assignees;
+            item.Title = request.Title;
         }
+        if (request.Description is not null)
+        {
+            item.Description = request.Description;
+        }
+        if (request.IsDone is not null)
+        {
+            item.IsDone = (bool)request.IsDone;
+        }
+        if (request.DueDate is not null)
+        {
+            item.DueDate = request.DueDate;
+        }
+        if (request.Importance is not null)
+        {
+            item.Importance = (BoardItemImportance)request.Importance;
+        }
+        if (request.Assignees is not null)
+        {
+            item.Assignees = request.Assignees;
+        }
+
         Notify();
     }
 

@@ -12,10 +12,8 @@
 			<MudDialog>
 				<DialogContent>
 					<MudStack>
-						<BoardItemSettingsHeader Item=@Item
-												 Model=@_model />
+						<BoardItemSettingsHeader Item=@Item/>
 
-						@* Buttons to add something new *@
 						<MudStack Row>
 							@if (!Item.Assignees.Any())
 							{

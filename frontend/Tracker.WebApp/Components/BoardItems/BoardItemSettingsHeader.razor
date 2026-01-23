@@ -4,19 +4,24 @@
 
 <MudStack Row
 		  Justify="Justify.SpaceBetween"
+		  StretchItems="StretchItems.Start"
 		  AlignItems="AlignItems.Center">
 	<MudStack Row
 			  AlignItems="AlignItems.Center"
 			  StretchItems="StretchItems.End">
-		<MudCheckBox @bind-Value=@Model.IsDone
+		<MudCheckBox Value="@_isDone"
+					 ValueChanged=@((bool isDone) => ChangeIsDone(isDone))
 					 Size="Size.Large" />
 
-		<MudTextField @bind-Value=@Model.Title
+		<MudTextField @bind-Value=@_title
 					  Typo="Typo.h5"
+					  FullWidth
 					  Required
-					  Underline=false
+					  Underline="false"
 					  Variant="Variant.Text"
-					  Style=@GetTitleStyle() />
+					  Style=@GetTitleStyle()
+					  @onblur=@TitleBlurred
+					  @onfocus=@TitleFocused/>
 	</MudStack>
 	<MudStack Row
 			  AlignItems="AlignItems.Center">

@@ -10,7 +10,7 @@ public record class UpdateBoardItemRequest
     public bool? IsDone { get; set; }
     public DateTimeOffset? DueDate { get; set; }
     public BoardItemImportance? Importance { get; set; }
-    public IReadOnlySet<Guid>? Assignees { get; set; }
+    public HashSet<Guid>? Assignees { get; set; }
 
     public UpdateBoardItemRequest() : base() { }
     public UpdateBoardItemRequest(BoardItemDto original, BoardItemDto changed)
