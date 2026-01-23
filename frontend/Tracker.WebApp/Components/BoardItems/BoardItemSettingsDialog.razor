@@ -49,11 +49,13 @@
 										   OnClick=@ToggleAssign>
 									Assign
 								</MudButton>
+
 								<MudPopover Open=@_openAssign
 											AnchorOrigin="Origin.BottomCenter"
 											TransformOrigin="Origin.TopCenter">
-									<BoardUserSelect BoardState=@BoardState
-													 Close=@(() => _openAssign = false) />
+									<BoardItemAssignees BoardState=@BoardState
+														Close=@(() => _openAssign = false)
+														Item=@Item />
 								</MudPopover>
 							}
 
@@ -63,6 +65,13 @@
 						{
 							<MudStack Row
 									  Wrap="Wrap.Wrap">
+								@foreach (var user in AssignedUsers())
+								{
+									<UserAvatarSmallWithLookup User=@user.User />
+								}
+								<MudIconButton Icon=@Icons.Material.Filled.Add
+											   OnClick=@ToggleAssign
+											   Variant=@(_openAssign? Variant.Filled : Variant.Outlined) />
 							</MudStack>
 						}
 						<MudTextField @bind-Value=@model.Description

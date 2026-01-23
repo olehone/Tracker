@@ -34,6 +34,11 @@ public partial class BoardItem
     private string ItemStyle =>
         Item.IsDone ? "text-decoration: line-through;" : string.Empty;
 
+    private List<BoardUserDto> AssignedUsers()
+    {
+        return BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id)).ToList();
+    }
+
     private async Task OpenItemSettings()
     {
         var parameters = new DialogParameters
@@ -45,7 +50,7 @@ public partial class BoardItem
         {
             CloseButton = false,
             NoHeader = true,
-            MaxWidth=MaxWidth.Small
+            MaxWidth = MaxWidth.Small
         };
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
             Item.Title,

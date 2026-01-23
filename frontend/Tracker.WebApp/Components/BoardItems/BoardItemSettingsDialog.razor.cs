@@ -25,12 +25,18 @@ public partial class BoardItemSettingsDialog : IDisposable
     private bool isSubmitting = false;
     private bool _openAssign;
 
-    private bool isExists => BoardState.ItemsState.BoardItems.Any(i=> i.Id == Item.Id);
+    private bool isExists => BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
 
     private void ToggleAssign()
     {
         _openAssign = !_openAssign;
     }
+
+    private IReadOnlyList<BoardUserDto> AssignedUsers()
+    {
+        return BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id)).ToList();
+    }
+
     protected override void OnInitialized()
     {
         BoardState.ItemsState.OnChange += StateHasChanged;

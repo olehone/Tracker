@@ -1,17 +1,25 @@
+@using Tracker.WebApp.Components.Users
 <MudPaper Elevation="25" Class="pa-0 rounded-lg my-3">
 	<MudButton FullWidth
 			   OnClick="@OpenItemSettings">
-		<MudStack Row
-				  Justify="Justify.SpaceBetween"
-				  AlignItems="AlignItems.Center">
+		<MudCheckBox T=@bool
+					 Value="Item.IsDone"
+					 ValueChanged="OnIsDoneChanged" />
 
-			<MudCheckBox T=@bool
-						 Value="Item.IsDone"
-						 ValueChanged="OnIsDoneChanged" />
+		<MudSpacer />
 
-			<MudText Style="@ItemStyle">
-				@Item.Title
-			</MudText>
-		</MudStack>
+		<MudText Style="@ItemStyle">
+			@Item.Title
+		</MudText>
+
+		<MudSpacer />
+
+		<MudAvatarGroup Max="5"
+						Spacing="4">
+			@foreach (var user in AssignedUsers())
+			{
+				<UserAvatarSmall User=@user.User />
+			}
+		</MudAvatarGroup>
 	</MudButton>
 </MudPaper>
