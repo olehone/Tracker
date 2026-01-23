@@ -25,7 +25,6 @@ public partial class BoardItemSettingsDialog : IDisposable
     [Parameter]
     public BoardItemDto Item { get; set; } = null!;
 
-    [Inject] IDialogService DialogService { get; set; } = null!;
 
     private bool IsItemExists =>
         BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
@@ -33,13 +32,6 @@ public partial class BoardItemSettingsDialog : IDisposable
     private void ToggleAssign()
     {
         _openAssign = !_openAssign;
-    }
-
-    private IEnumerable<UserDto> AssignedUsers()
-    {
-        return Item.Assignees.Count != 0
-            ? BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id)).Select(bu => bu.User)
-            : [];
     }
 
     protected override void OnInitialized()
@@ -52,23 +44,6 @@ public partial class BoardItemSettingsDialog : IDisposable
             Description = Item.Description ?? string.Empty,
             IsDone = Item.IsDone,
         };
-    }
-
-    private async Task Delete()
-    {
-        bool? result = await DialogService.ShowMessageBox(
-            "Warning",
-            "Deleting can not be undone!",
-            yesText: "Delete!",
-            cancelText: "Cancel");
-
-        if (result != true)
-        {
-            return;
-        }
-
-        await BoardState.ItemsState.DeleteAsync(Item.Id);
-        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private async Task Submit()
@@ -92,11 +67,6 @@ public partial class BoardItemSettingsDialog : IDisposable
         _isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
     }
-
-    private void Cancel() => MudDialog.Cancel();
-
-    private string GetTitleStyle() =>
-        _model.IsDone ? "text-decoration: line-through;" : string.Empty;
 
     protected virtual void Dispose(bool disposing)
     {

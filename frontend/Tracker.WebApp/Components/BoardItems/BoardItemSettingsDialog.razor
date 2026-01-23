@@ -12,34 +12,8 @@
 			<MudDialog>
 				<DialogContent>
 					<MudStack>
-						@* Header *@
-						<MudStack Row
-								  Justify="Justify.SpaceBetween"
-								  AlignItems="AlignItems.Center">
-							<MudStack Row
-									  AlignItems="AlignItems.Center"
-									  StretchItems="StretchItems.End">
-								<MudCheckBox @bind-Value=@_model.IsDone
-											 Size="Size.Large" />
-
-								<MudTextField @bind-Value=@_model.Title
-											  Typo="Typo.h5"
-											  Required
-											  Underline=false
-											  Variant="Variant.Text"
-											  Style=@GetTitleStyle() />
-							</MudStack>
-							<MudStack Row
-									  AlignItems="AlignItems.Center">
-								<MudMenu Icon=@Icons.Material.Filled.MoreVert
-										 AriaLabel="Open item menu">
-									<MudMenuItem Label="Delete"
-												 OnClick=@Delete />
-								</MudMenu>
-								<MudIconButton Icon=@Icons.Material.Filled.Close
-											   OnClick=@Cancel />
-							</MudStack>
-						</MudStack>
+						<BoardItemSettingsHeader Item=@Item
+												 Model=@_model />
 
 						@* Buttons to add something new *@
 						<MudStack Row>
@@ -52,53 +26,21 @@
 									Assign
 								</MudButton>
 
-								<MudPopover Open=@_openAssign
-											AnchorOrigin="Origin.TopRight"
-											TransformOrigin="Origin.CenterRight">
-									<BoardItemAssignees BoardState=@BoardState
-														Close=@(() => _openAssign = false)
-														Item=@Item />
-								</MudPopover>
 							}
-
 						</MudStack>
 
 						@* Assignees part *@
-						@if (Item.Assignees.Any())
-						{
-							<MudText Typo="Typo.body2">
-								Assigned users
-							</MudText>
+						<MudPopover Open=@_openAssign
+									AnchorOrigin="Origin.TopRight"
+									TransformOrigin="Origin.CenterRight">
+							<BoardItemAssignees BoardState=@BoardState
+												Close=@(() => _openAssign = false)
+												Item=@Item />
+						</MudPopover>
 
-							<MudStack Row
-									  Wrap="Wrap.Wrap"
-									  Spacing="1">
-								@foreach (var user in AssignedUsers())
-								{
-									<UserAvatarSmallWithLookup @key=@user.Id
-															User=@user>
-										<AdditionalActions>
-											<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
-												Unassign user from this item
-											</MudButton>
-										</AdditionalActions>
-									</UserAvatarSmallWithLookup>
-								}
-								<MudAvatar Color=@(_openAssign? Color.Info : Color.Surface )
-										   Variant=@(_openAssign? Variant.Filled : Variant.Text)>
-									<MudIconButton Icon=@Icons.Material.Filled.Add
-												   OnClick=@ToggleAssign />
-								</MudAvatar>
-
-								<MudPopover Open=@_openAssign
-											AnchorOrigin="Origin.TopRight"
-											TransformOrigin="Origin.CenterRight">
-									<BoardItemAssignees BoardState=@BoardState
-														Close=@(() => _openAssign = false)
-														Item=@Item />
-								</MudPopover>
-							</MudStack>
-						}
+						<BoardItemAssigneesList Item=@Item
+												ToggleAssign=@ToggleAssign
+												OpenAssign=@_openAssign />
 
 						<MudTextField @bind-Value=@_model.Description
 									  Label="Description"
