@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Refit;
+﻿using Refit;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
@@ -11,20 +10,20 @@ public interface IWorkspaceApi
 {
 
     [Get("/api/workspaces/{id}")]
-    Task<ApiResponse<WorkspaceFullDto>> GetByIdAsync(Guid id);
+    Task<IApiResponse<WorkspaceFullDto>> GetByIdAsync(Guid id);
 
     [Put("/api/workspaces/{workspaceId}/settings")]
-    Task<ApiResponse<object>> UpdateAsync(Guid workspaceId, [Body] UpdateWorkspaceRequest request);
+    Task<IApiResponse> UpdateAsync(Guid workspaceId, [Body] UpdateWorkspaceRequest request);
 
     [Get("/api/workspaces/all")]
-    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetAsync([Query] PaginatedSearchRequest request);
+    Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetAsync([Query] PaginatedSearchRequest request);
 
     [Get("/api/workspaces/my")]
-    Task<ApiResponse<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
+    Task<IApiResponse<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
 
     [Post("/api/workspaces")]
-    Task<ApiResponse<WorkspaceSummaryDto>> CreateAsync(CreateWithTitleRequest request);
+    Task<IApiResponse<WorkspaceSummaryDto>> CreateAsync(CreateWithTitleRequest request);
 
-    [Post("/api/workspaces/{workspaceId}/boards")]
-    Task<ApiResponse<BoardSummaryDto>> CreateBoardAsync(Guid workspaceId, CreateWithTitleRequest request);
+    [Post("/api/workspaces/{id}/boards")]
+    Task<IApiResponse<BoardSummaryDto>> CreateBoardAsync(Guid id, CreateWithTitleRequest request);
 }

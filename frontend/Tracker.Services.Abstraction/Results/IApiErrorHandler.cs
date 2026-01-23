@@ -5,7 +5,7 @@ namespace Tracker.Services.Abstraction.Results;
 
 public interface IApiErrorHandler
 {
-    Task<Result> ExecuteAsync(Func<Task<ApiResponse<object>>> apiCall);
+    Task<Result> ExecuteAsync(Func<Task<IApiResponse>> apiCall);
 
-    Task<Result<TResponse>> ExecuteAsync<TResponse>(Func<Task<ApiResponse<TResponse>>> apiCall);
+    Task<Result<TResponse>> ExecuteAsync<TResponse>(Func<Task<IApiResponse<TResponse>>> apiCall);
 }

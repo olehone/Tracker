@@ -7,14 +7,14 @@ namespace Tracker.Services.ApiClients;
 public interface IBoardsApi
 {
     [Get("/api/boards/{id}")]
-    Task<ApiResponse<BoardFullDto>> GetByIdAsync(Guid id);
+    Task<IApiResponse<BoardFullDto>> GetByIdAsync(Guid id);
 
     [Put("/api/boards/{id}/settings")]
-    Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateBoardRequest request);
+    Task<IApiResponse> UpdateAsync(Guid id, [Body] UpdateBoardRequest request);
 
     [Delete("/api/boards/{id}")]
-    Task<ApiResponse<object>> DeleteAsync(Guid id);
+    Task<IApiResponse> DeleteAsync(Guid id);
 
     [Get("/api/boards/my")]
-    Task<ApiResponse<List<BoardSummaryDto>>> GetForCurrentUserAsync();
+    Task<IApiResponse<List<BoardSummaryDto>>> GetForCurrentUserAsync();
 }

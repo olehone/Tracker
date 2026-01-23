@@ -12,7 +12,8 @@ public class BoardListService(IApiErrorHandler apiErrorHandler, IBoardListApi ap
 {
     public Task<Result<BoardListDto>> CreateAsync(Guid boardId, string title)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId,
+            new Domain.Requests.CreateWithTitleRequest { Title = title }));
     }
 
     public Task<Result> MoveAsync(Guid boardId, Guid itemId, MoveBoardListRequest request)

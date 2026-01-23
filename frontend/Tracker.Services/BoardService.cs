@@ -14,11 +14,6 @@ public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IB
         return apiErrorHandler.ExecuteAsync(() => api.GetByIdAsync(id));
     }
 
-    public Task<Result<BoardSummaryDto>> CreateAsync(string title)
-    {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(request));
-    }
-
     public Task<Result> UpdateAsync(Guid id, UpdateBoardRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(id, request));

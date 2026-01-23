@@ -7,7 +7,7 @@ namespace Tracker.Services.Results;
 
 public static class ErrorMappingService
 {
-    public static Error MapApiResponse<T>(ApiResponse<T> response)
+    public static Error MapApiResponse(IApiResponse response)
     {
         var statusCode = response.StatusCode;
         var content = response.Error?.Content;

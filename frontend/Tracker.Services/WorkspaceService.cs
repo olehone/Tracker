@@ -30,13 +30,14 @@ public class WorkspaceService(IApiErrorHandler apiErrorHandler, IWorkspaceApi ap
 
     public Task<Result<WorkspaceSummaryDto>> CreateAsync(string title)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(request));
+        return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(
+            new CreateWithTitleRequest { Title = title }));
     }
 
-
-    public Task<Result<BoardSummaryDto>> CreateBoardAsync(Guid workspaceId, string title)
+    public Task<Result<BoardSummaryDto>> CreateBoardAsync(Guid id, string title)
     {
-
+        return apiErrorHandler.ExecuteAsync(() => api.CreateBoardAsync(id,
+            new CreateWithTitleRequest { Title = title }));
     }
 
     public Task<Result<Paginated<WorkspaceSummaryDto>>> GetAsync(PaginatedSearchRequest request)
