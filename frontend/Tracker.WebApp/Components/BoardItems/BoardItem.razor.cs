@@ -8,6 +8,13 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItem
 {
+    private static readonly DialogOptions DialogOptions = new()
+    {
+        CloseButton = false,
+        NoHeader = true,
+        MaxWidth = MaxWidth.Small
+    };
+
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
@@ -17,22 +24,27 @@ public partial class BoardItem
     [Inject]
     private IDialogService DialogService { get; set; } = null!;
 
-    private async Task OnIsDoneChanged(bool isDone)
+    private Task OnIsDoneChanged(bool isDone)
     {
-        await BoardState.Items.UpdateAsync(
-            Item.Id,
-            new UpdateBoardItemRequest
-            {
-                Title = Item.Title,
-                Description = Item.Description,
-                IsDone = isDone
-            });
-        Item.IsDone = isDone;
-        StateHasChanged();
+        var request = new UpdateBoardItemRequest
+        {
+            Title = Item.Title,
+            Description = Item.Description,
+            IsDone = isDone
+        };
+
+        return BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
     private string ItemStyle =>
         Item.IsDone ? "text-decoration: line-through;" : string.Empty;
+
+    private IEnumerable<BoardUserDto> AssignedUsers()
+    {
+        return Item.Assignees.Count != 0
+            ? BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id))
+            : [];
+    }
 
     private async Task OpenItemSettings()
     {
@@ -44,7 +56,8 @@ public partial class BoardItem
 
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
             Item.Title,
-            parameters);
+            parameters,
+            DialogOptions);
 
         await dialog.Result;
     }

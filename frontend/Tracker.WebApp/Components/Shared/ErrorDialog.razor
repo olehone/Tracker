@@ -1,0 +1,18 @@
+@using Tracker.WebApp.Components.Users
+
+<MudDialog>
+	<DialogContent>
+		<MudStack Row
+				  Justify="Justify.Center">
+			<MudAlert Severity="Severity.Error"
+			Class="my-3">
+				@Message
+			</MudAlert>
+		</MudStack>
+	</DialogContent>
+</MudDialog>
+
+@code {
+	[Parameter, EditorRequired]
+	public string Message { get; set; }
+}

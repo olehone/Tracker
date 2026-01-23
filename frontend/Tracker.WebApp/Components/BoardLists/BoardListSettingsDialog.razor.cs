@@ -49,7 +49,7 @@ public partial class BoardListSettingsDialog : IDisposable
         {
             return;
         }
-        await BoardState.Lists.DeleteAsync(List.Id);
+        await BoardState.ListsState.DeleteAsync(List.Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
@@ -69,7 +69,7 @@ public partial class BoardListSettingsDialog : IDisposable
         isSubmitting = true;
         StateHasChanged();
 
-        await BoardState.Lists.UpdateAsync(List.Id, model);
+        await BoardState.ListsState.UpdateAsync(List.Id, model);
 
         isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));

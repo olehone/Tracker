@@ -20,8 +20,8 @@ public partial class BoardWindowHeader : IDisposable
     protected override void OnInitialized()
     {
         BoardState.OnChange += OnBoardStateChanged;
-        BoardState.Users.OnChange += OnBoardStateChanged;
-        BoardState.Lists.OnChange += OnBoardStateChanged;
+        BoardState.UsersState.OnChange += OnBoardStateChanged;
+        BoardState.ListsState.OnChange += OnBoardStateChanged;
         BoardState.OnBoardNotFound += ToWorkspace;
     }
 
@@ -32,7 +32,7 @@ public partial class BoardWindowHeader : IDisposable
 
     private string GetUsersKey()
     {
-        return string.Join("-", BoardState.Users.RecentActiveUsers()
+        return string.Join("-", BoardState.UsersState.RecentActiveUsers()
         .Select(u => u.User.Id));
     }
 
@@ -100,8 +100,8 @@ public partial class BoardWindowHeader : IDisposable
         {
             if (disposing)
             {
-                BoardState.Items.OnChange -= OnBoardStateChanged;
-                BoardState.Lists.OnChange -= OnBoardStateChanged;
+                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
+                BoardState.ListsState.OnChange -= OnBoardStateChanged;
             }
             _disposed = true;
         }

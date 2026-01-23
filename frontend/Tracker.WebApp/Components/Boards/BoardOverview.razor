@@ -6,22 +6,19 @@
 
 @if (BoardState.IsLoading)
 {
-	<MudStack Row
-			  Justify="Justify.Center">
-		<MudProgressCircular Indeterminate
-							 Size=@Size.Large />
-	</MudStack>
+	<MudProgressLinear Color="Color.Primary"
+					   Indeterminate />
 }
 else
 {
 	<MudDropContainer @ref=@_container
 					  T=@BoardItemDto
-					  Items=@BoardState.Items.BoardItems
+					  Items=@BoardState.ItemsState.BoardItems
 					  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
 					  ItemDropped=@ItemDropped
 					  Class="d-flex flex-row flex-nowrap">
 		<ChildContent>
-			@foreach (var list in BoardState.Lists.BoardLists)
+			@foreach (var list in BoardState.ListsState.BoardLists)
 			{
 				<BoardList List=@list />
 			}
@@ -42,4 +39,3 @@ else
 		</ItemRenderer>
 	</MudDropContainer>
 }
-

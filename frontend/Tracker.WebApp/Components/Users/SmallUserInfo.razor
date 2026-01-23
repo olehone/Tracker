@@ -2,18 +2,11 @@
 @using Tracker.WebApp.Components.Users
 
 <MudStack Row
-		  AlignItems=@AlignItems.Start>
+		  AlignItems="AlignItems.Center">
 
-	<UserAvatarSmall User=@User
-					 Size=@Size.Small />
+	<UserAvatarSmallWithLookup User=@User />
 
 	<MudText>@User.Username</MudText>
-
-	<a href=@($"/users/{User.Id}")>
-		<MudIcon Icon=@Icons.Material.Filled.OpenInNew
-				 Size=@Size.Small
-				 Color=@Color.Primary />
-	</a>
 
 </MudStack>
 

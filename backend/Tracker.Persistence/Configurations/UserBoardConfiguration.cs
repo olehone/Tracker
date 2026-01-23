@@ -10,6 +10,8 @@ public class UserBoardConfiguration : IEntityTypeConfiguration<UserBoard>
     {
         builder.ToTable("UserBoards");
 
+        builder.HasKey(x => x.Id);
+
         builder.Property(ub => ub.Role)
             .IsRequired();
 
@@ -21,6 +23,7 @@ public class UserBoardConfiguration : IEntityTypeConfiguration<UserBoard>
             .WithMany(u => u.UserBoards)
             .HasForeignKey(ub => ub.BoardId);
 
-        builder.HasKey(ub => new { ub.UserId, ub.BoardId });
+        builder.HasIndex(x => new { x.UserId, x.BoardId })
+               .IsUnique();
     }
 }

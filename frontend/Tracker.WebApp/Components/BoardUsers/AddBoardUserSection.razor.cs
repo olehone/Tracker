@@ -15,6 +15,7 @@ public partial class AddBoardUserSection
         {
             return;
         }
-        await BoardState.Users.AddAsync(_selectedUser.Id, _selectedRole);
+        await BoardState.UsersState.AddAsync(_selectedUser.Id, _selectedRole);
+        _selectedUser = null;
     }
 }

@@ -2,7 +2,9 @@
 {
 	<MudAvatar Style=@CustomColor
 			   Variant="Variant.Outlined"
-			   Size=@Size>
+			   Size=@Size
+			   @onmouseenter=@(() => HandleHovering.InvokeAsync(true))
+			   @onmouseleave=@(() => HandleHovering.InvokeAsync(false))>
 		@FirstLetter()
 	</MudAvatar>
 }

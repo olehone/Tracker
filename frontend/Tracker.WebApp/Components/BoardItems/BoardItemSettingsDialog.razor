@@ -1,57 +1,76 @@
-﻿<CascadingValue Value="BoardState">
-	<MudDialog>
-		<DialogContent>
-			<MudForm @ref=@_form
-					 Model=@model
-					 Validation=@validator
-					 ValidationDelay="300">
-				<MudStack Row
-						  AlignItems="AlignItems.Center"
-						  StretchItems="StretchItems.End">
-					<MudCheckBox @bind-Value=@model.IsDone
-								 Size="Size.Large"></MudCheckBox>
+﻿@using Tracker.WebApp.Components.BoardUsers
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
 
-					<MudTextField @bind-Value=@model.Title
-								  Label="Title"
-								  Required
-								  Variant="Variant.Outlined"
-								  Style=@Style() />
-				</MudStack>
+<CascadingValue Value=@BoardState>
+	@if (IsItemExists)
+	{
+		<MudForm @ref=@_form
+				 Model=@_model
+				 Validation=@Validator
+				 ValidationDelay="300">
+			<MudDialog>
+				<DialogContent>
+					<MudStack>
+						<BoardItemSettingsHeader Item=@Item
+												 Model=@_model />
 
-				<MudTextField @bind-Value=@model.Description
-							  Label="Description"
-							  Lines="3"
-							  Variant="Variant.Outlined" />
+						@* Buttons to add something new *@
+						<MudStack Row>
+							@if (!Item.Assignees.Any())
+							{
+								<MudButton Size="Size.Small"
+										   Variant="Variant.Outlined"
+										   StartIcon=@Icons.Material.Filled.PersonAdd
+										   OnClick=@ToggleAssign>
+									Assign
+								</MudButton>
 
-			</MudForm>
+							}
+						</MudStack>
 
-			<MudDivider />
+						@* Assignees part *@
+						<MudPopover Open=@_openAssign
+									AnchorOrigin="Origin.TopRight"
+									TransformOrigin="Origin.CenterRight">
+							<BoardItemAssignees BoardState=@BoardState
+												Close=@(() => _openAssign = false)
+												Item=@Item />
+						</MudPopover>
 
-			<MudButton Variant="Variant.Filled"
-					   Color="Color.Error"
-					   FullWidth
-					   OnClick=@Delete>Delete</MudButton>
-		</DialogContent>
-		<DialogActions>
-			<MudButton OnClick="Cancel">
-				<MudText>Cancel</MudText>
-			</MudButton>
+						<BoardItemAssigneesList Item=@Item
+												ToggleAssign=@ToggleAssign
+												OpenAssign=@_openAssign />
 
-			<MudButton Disabled=@(isSubmitting)
-					   OnClick=@Submit
-					   Variant="Variant.Filled"
-					   Color="Color.Primary">
-				@if (isSubmitting)
-				{
-					<MudProgressCircular Size="Size.Small"
-										 Indeterminate
-										 Color="Color.Inherit" />
-				}
-				else
-				{
-					<MudText>Save</MudText>
-				}
-			</MudButton>
-		</DialogActions>
-	</MudDialog>
+						<MudTextField @bind-Value=@_model.Description
+									  Label="Description"
+									  Lines="3"
+									  Variant="Variant.Outlined" />
+						<MudButton Disabled=@_isSubmitting
+								   OnClick=@Submit
+								   Variant="Variant.Filled"
+								   Color="Color.Primary">
+							@if (_isSubmitting)
+							{
+								<MudProgressCircular Size="Size.Small"
+													 Indeterminate
+													 Color="Color.Inherit" />
+							}
+							else
+							{
+								<MudText>Save</MudText>
+							}
+						</MudButton>
+
+						<MudDivider />
+
+					</MudStack>
+				</DialogContent>
+			</MudDialog>
+		</MudForm>
+	}
+	else
+	{
+		<ErrorDialog Message="This item is no longer exists" />
+	}
 </CascadingValue>

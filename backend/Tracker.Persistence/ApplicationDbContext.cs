@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Board> Boards => Set<Board>();
     public DbSet<BoardList> BoardLists => Set<BoardList>();
     public DbSet<BoardItem> BoardItems => Set<BoardItem>();
+    public DbSet<BoardItemAssignee> BoardItemAssignees => Set<BoardItemAssignee>();
     public DbSet<UserWorkspace> UserWorkspaces => Set<UserWorkspace>();
     public DbSet<UserBoard> UserBoards => Set<UserBoard>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

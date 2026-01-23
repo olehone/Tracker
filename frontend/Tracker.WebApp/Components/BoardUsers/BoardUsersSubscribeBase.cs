@@ -7,13 +7,13 @@ public partial class BoardUsersSubscribeBase : ComponentBase, IDisposable
 {
     [CascadingParameter]
     protected BoardState BoardState { get; set; } = null!;
-    protected BoardUsersState UsersState => BoardState.Users;
+    protected BoardUsersState UsersState => BoardState.UsersState;
 
     private bool _disposed;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        BoardState.Users.OnChange += StateHasChangedHandler;
+        BoardState.UsersState.OnChange += StateHasChangedHandler;
     }
 
     private void StateHasChangedHandler()
@@ -23,14 +23,17 @@ public partial class BoardUsersSubscribeBase : ComponentBase, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposed)
+        if (_disposed)
         {
-            if (disposing)
-            {
-                BoardState.Users.OnChange -= StateHasChangedHandler;
-            }
-            _disposed = true;
+            return;
         }
+
+        if (BoardState?.UsersState != null)
+        {
+            BoardState.UsersState.OnChange -= StateHasChangedHandler;
+        }
+
+        _disposed = true;
     }
 
     public void Dispose()

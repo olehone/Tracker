@@ -9,6 +9,14 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemSettingsDialog : IDisposable
 {
+    private static readonly UpdateBoardItemRequestValidator Validator = new();
+
+    private MudForm? _form;
+    private UpdateBoardItemRequest _model = null!;
+    private bool _isSubmitting;
+    private bool _openAssign;
+    private bool _disposed;
+
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -17,45 +25,30 @@ public partial class BoardItemSettingsDialog : IDisposable
     [Parameter]
     public BoardItemDto Item { get; set; } = null!;
 
-    [Inject] private IDialogService DialogService { get; set; } = null!;
 
-    private MudForm? _form;
-    private UpdateBoardItemRequest model = null!;
-    private readonly UpdateBoardItemRequestValidator validator = new();
-    private bool isSubmitting = false;
+    private bool IsItemExists =>
+        BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
+
+    private void ToggleAssign()
+    {
+        _openAssign = !_openAssign;
+    }
 
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.ItemsState.OnChange += StateHasChanged;
 
-        if (BoardState.Board != null)
+        _model = new UpdateBoardItemRequest
         {
-            model = new UpdateBoardItemRequest
-            {
-                Title = Item.Title,
-                Description = Item.Description ?? string.Empty,
-                IsDone = Item.IsDone,
-            };
-        }
-    }
-
-    private async Task Delete()
-    {
-        bool? result = await DialogService.ShowMessageBox(
-            "Warning",
-            "Deleting can not be undone!",
-            yesText: "Delete!", cancelText: "Cancel");
-        if (result == null)
-        {
-            return;
-        }
-        await BoardState.Items.DeleteAsync(Item.Id);
-        MudDialog.Close(DialogResult.Ok(true));
+            Title = Item.Title,
+            Description = Item.Description ?? string.Empty,
+            IsDone = Item.IsDone,
+        };
     }
 
     private async Task Submit()
     {
-        if (_form is null || model is null)
+        if (_form is null)
         {
             return;
         }
@@ -66,27 +59,34 @@ public partial class BoardItemSettingsDialog : IDisposable
             return;
         }
 
-        isSubmitting = true;
+        _isSubmitting = true;
         StateHasChanged();
 
-        await BoardState.Items.UpdateAsync(Item.Id, model);
+        await BoardState.ItemsState.UpdateAsync(Item.Id, _model);
 
-        isSubmitting = false;
+        _isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private void Cancel() => MudDialog.Cancel();
-
-    void IDisposable.Dispose()
+    protected virtual void Dispose(bool disposing)
     {
-        BoardState.OnChange -= StateHasChanged;
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            BoardState.ItemsState.OnChange -= StateHasChanged;
+        }
+
+        _disposed = true;
     }
 
-    private string Style()
+    public void Dispose()
     {
-        return model.IsDone
-            ? "text-decoration: line-through;"
-            : "";
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public class UpdateBoardItemRequestValidator : AbstractValidator<UpdateBoardItemRequest>

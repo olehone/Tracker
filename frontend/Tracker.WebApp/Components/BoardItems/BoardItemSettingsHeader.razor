@@ -1,0 +1,31 @@
+@using Tracker.WebApp.Components.BoardUsers
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+
+<MudStack Row
+		  Justify="Justify.SpaceBetween"
+		  AlignItems="AlignItems.Center">
+	<MudStack Row
+			  AlignItems="AlignItems.Center"
+			  StretchItems="StretchItems.End">
+		<MudCheckBox @bind-Value=@Model.IsDone
+					 Size="Size.Large" />
+
+		<MudTextField @bind-Value=@Model.Title
+					  Typo="Typo.h5"
+					  Required
+					  Underline=false
+					  Variant="Variant.Text"
+					  Style=@GetTitleStyle() />
+	</MudStack>
+	<MudStack Row
+			  AlignItems="AlignItems.Center">
+		<MudMenu Icon=@Icons.Material.Filled.MoreVert
+				 AriaLabel="Open item menu">
+			<MudMenuItem Label="Delete"
+						 OnClick=@Delete />
+		</MudMenu>
+		<MudIconButton Icon=@Icons.Material.Filled.Close
+					   OnClick=@Cancel />
+	</MudStack>
+</MudStack>

@@ -10,4 +10,5 @@ public class UserBoard : BaseEntity
     public required UserBoardRole Role { get; set; }
     public User User { get; set; } = null!;
     public Board Board { get; set; } = null!;
+    public List<BoardItemAssignee> AssignedItems { get; set; } = [];
 }

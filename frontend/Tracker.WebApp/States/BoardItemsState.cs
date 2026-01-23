@@ -1,4 +1,5 @@
-﻿using Tracker.Domain.Dtos;
+﻿using System.Runtime.CompilerServices;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
@@ -99,6 +100,40 @@ public sealed class BoardItemsState(
         }
     }
 
+    public async Task AssignAsync(Guid itemId, Guid userId)
+    {
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
+        if (item is null)
+        {
+            return;
+        }
+        item.Assignees.Add(userId);
+        Notify();
+
+        var result = await boardItemService.AssignAsync(Board.Id, itemId, userId);
+        if (result.IsFailure)
+        {
+            await boardState.ReloadAsync();
+        }
+    }
+
+    public async Task UnassignAsync(Guid itemId, Guid userId)
+    {
+        var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
+        if (item is null)
+        {
+            return;
+        }
+        item.Assignees.Remove(userId);
+        Notify();
+
+        var result = await boardItemService.UnassignAsync(Board.Id, itemId, userId);
+        if (result.IsFailure)
+        {
+            await boardState.ReloadAsync();
+        }
+    }
+
     public void Apply(ItemCreatedEvent evt)
     {
         if (boardState.MyId == evt.UserId)
@@ -106,7 +141,7 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyCreated(evt.Item);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemMovedEvent evt)
@@ -116,7 +151,7 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyMoved(evt.ItemId, evt.ToListId, evt.Position);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemUpdatedEvent evt)
@@ -125,8 +160,8 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description, evt.Item.IsDone);
-        boardState.Users.MarkActivity(evt.UserId);
+        ApplyUpdated(evt.Item.Id, evt.Item.Title, evt.Item.Description, evt.Item.IsDone, evt.Item.Assignees);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemDeletedEvent evt)
@@ -136,7 +171,7 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyDeleted(evt.ItemId);
-        boardState.Users.MarkActivity(evt.UserId);
+        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     private void ApplyCreated(BoardItemDto newItem)
@@ -186,7 +221,8 @@ public sealed class BoardItemsState(
         Notify();
     }
 
-    private void ApplyUpdated(Guid itemId, string title, string description, bool isDone)
+    private void ApplyUpdated(Guid itemId, string title, string description, bool isDone,
+        HashSet<Guid>? assignees = null)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -196,7 +232,10 @@ public sealed class BoardItemsState(
         item.Title = title;
         item.Description = description;
         item.IsDone = isDone;
-
+        if (assignees is not null)
+        {
+            item.Assignees = assignees;
+        }
         Notify();
     }
 

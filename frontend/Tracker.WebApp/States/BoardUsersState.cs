@@ -49,7 +49,11 @@ public sealed class BoardUsersState(
 
     public BoardUserDto? GetUser(Guid userId)
     {
-        return _userLookup != null && _userLookup.TryGetValue(userId, out var user)
+        if (_userLookup is null)
+        {
+            _userLookup = _boardUsers.ToDictionary(u => u.User.Id);
+        }
+        return _userLookup.TryGetValue(userId, out var user)
             ? user
             : null;
     }

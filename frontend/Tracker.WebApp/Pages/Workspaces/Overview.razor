@@ -41,11 +41,14 @@
 	</Header>
 
 	<Body>
-		<MudStack Class="mud-background pa-4"
+		<MudStack Class="pa-4"
 				  Style="overflow-y: auto;">
 			<MudGrid Spacing="3">
 				@if (Workspace is null)
 				{
+					<MudProgressLinear Color="Color.Primary"
+									   Indeterminate
+									   Class="my-0"/>
 					@for (var i = 0; i < UiHelper.RandomItemCount(); i++)
 					{
 						<MudItem xs="12"

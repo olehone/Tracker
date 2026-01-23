@@ -64,6 +64,7 @@ public static class BoardsMapping
             IsDone = boardItem.IsDone,
             Title = boardItem.Title,
             Description = boardItem.Description ?? string.Empty,
+            Assignees = boardItem.Assignees.Select(a => a.BoardUser.UserId).ToHashSet()
         };
     }
 }
