@@ -148,7 +148,7 @@ public class BoardItemsController(IMediator mediator,
     }
 
     [HttpDelete("{itemId:guid}/assign/{userId:guid}")]
-    public async Task<IActionResult> RemoveAsync(Guid boardId, Guid itemId, Guid userId)
+    public async Task<IActionResult> UnassignAsync(Guid boardId, Guid itemId, Guid userId)
     {
         var mediatorRequest = new RemoveAssigneeFromItemCommand
         {

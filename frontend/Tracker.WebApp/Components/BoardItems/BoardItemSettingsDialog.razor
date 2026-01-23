@@ -51,8 +51,8 @@
 								</MudButton>
 
 								<MudPopover Open=@_openAssign
-											AnchorOrigin="Origin.BottomCenter"
-											TransformOrigin="Origin.TopCenter">
+											AnchorOrigin="Origin.TopRight"
+											TransformOrigin="Origin.CenterRight">
 									<BoardItemAssignees BoardState=@BoardState
 														Close=@(() => _openAssign = false)
 														Item=@Item />
@@ -61,17 +61,37 @@
 
 						</MudStack>
 
-						@if (!Item.Assignees.Any())
+						@if (Item.Assignees.Any())
 						{
+							<MudText Typo="Typo.body2">
+								Assigned users
+							</MudText>
 							<MudStack Row
-									  Wrap="Wrap.Wrap">
+									  Wrap="Wrap.Wrap"
+									  Spacing="1">
 								@foreach (var user in AssignedUsers())
 								{
-									<UserAvatarSmallWithLookup User=@user.User />
+									<UserAvatarSmallWithLookup User=@user.User>
+										<AdditionalActions>
+											<MudDivider Class="my-3" />
+											<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.User.Id))>
+												Unassign user from this item
+											</MudButton>
+										</AdditionalActions>
+									</UserAvatarSmallWithLookup>
 								}
-								<MudIconButton Icon=@Icons.Material.Filled.Add
-											   OnClick=@ToggleAssign
-											   Variant=@(_openAssign? Variant.Filled : Variant.Outlined) />
+								<MudAvatar Color=@(_openAssign? Color.Info : Color.Surface )
+										   Variant=@(_openAssign? Variant.Filled : Variant.Text)>
+									<MudIconButton Icon=@Icons.Material.Filled.Add
+												   OnClick=@ToggleAssign />
+								</MudAvatar>
+								<MudPopover Open=@_openAssign
+											AnchorOrigin="Origin.TopRight"
+											TransformOrigin="Origin.CenterRight">
+									<BoardItemAssignees BoardState=@BoardState
+														Close=@(() => _openAssign = false)
+														Item=@Item />
+								</MudPopover>
 							</MudStack>
 						}
 						<MudTextField @bind-Value=@model.Description
@@ -94,11 +114,6 @@
 							}
 						</MudButton>
 
-						<MudAvatarGroup>
-							@foreach (var assignee in Item.Assignees)
-							{
-							}
-						</MudAvatarGroup>
 						<MudDivider />
 
 					</MudStack>

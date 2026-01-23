@@ -18,7 +18,7 @@
 						Spacing="4">
 			@foreach (var user in AssignedUsers())
 			{
-				<UserAvatarSmall User=@user.User />
+				<UserAvatarSmallWithLookup User=@user.User />
 			}
 		</MudAvatarGroup>
 	</MudButton>

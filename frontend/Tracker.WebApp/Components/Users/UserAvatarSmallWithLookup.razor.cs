@@ -10,6 +10,8 @@ public partial class UserAvatarSmallWithLookup
     public required UserDto User { get; set; } = null!;
     [Parameter]
     public Color Color { get; set; } = Color.Default;
+    [Parameter]
+    public RenderFragment? AdditionalActions { get; set; }
 
     private bool _open;
     private bool _isHovering;

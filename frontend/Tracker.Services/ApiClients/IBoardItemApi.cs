@@ -23,5 +23,5 @@ public interface IBoardItemApi
     Task<ApiResponse<BoardItemDto>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
 
     [Delete("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
-    Task<ApiResponse<BoardItemDto>> RemoveAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<ApiResponse<BoardItemDto>> UnassingAsync(Guid boardId, Guid itemId, Guid userId);
 }

@@ -35,8 +35,8 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
         return apiErrorHandler.ExecuteAsync(() => api.AssignAsync(boardId, itemId, userId));
     }
 
-    Task<Result<BoardItemDto>> IBoardItemService.RemoveAsync(Guid boardId, Guid itemId, Guid userId)
+    Task<Result<BoardItemDto>> IBoardItemService.UnassignAsync(Guid boardId, Guid itemId, Guid userId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.RemoveAsync(boardId, itemId, userId));
+        return apiErrorHandler.ExecuteAsync(() => api.UnassingAsync(boardId, itemId, userId));
     }
 }

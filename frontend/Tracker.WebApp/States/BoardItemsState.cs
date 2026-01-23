@@ -117,7 +117,7 @@ public sealed class BoardItemsState(
         }
     }
 
-    public async Task RemoveAsync(Guid itemId, Guid userId)
+    public async Task UnassignAsync(Guid itemId, Guid userId)
     {
         var item = _boardItems.FirstOrDefault(bi => bi.Id == itemId);
         if (item is null)
@@ -127,7 +127,7 @@ public sealed class BoardItemsState(
         item.Assignees.Remove(userId);
         Notify();
 
-        var result = await boardItemService.RemoveAsync(Board.Id, itemId, userId);
+        var result = await boardItemService.UnassignAsync(Board.Id, itemId, userId);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();

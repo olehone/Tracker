@@ -11,6 +11,6 @@ public interface IBoardItemService
     Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
     Task<Result> DeleteAsync(Guid boardId, Guid itemId);
     Task<Result<BoardItemDto>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
-    Task<Result<BoardItemDto>> RemoveAsync(Guid boardId, Guid itemId, Guid userId);
+    Task<Result<BoardItemDto>> UnassignAsync(Guid boardId, Guid itemId, Guid userId);
 
 }
