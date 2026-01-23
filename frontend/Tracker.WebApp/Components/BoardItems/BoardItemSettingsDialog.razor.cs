@@ -1,6 +1,4 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
@@ -9,22 +7,16 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemSettingsDialog : IDisposable
 {
-    private static readonly UpdateBoardItemRequestValidator Validator = new();
-
-    private MudForm? _form;
-    private UpdateBoardItemRequest _model = null!;
-    private bool _isSubmitting;
     private bool _openAssign;
     private bool _disposed;
-
-    [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; } = null!;
+    private string _description = string.Empty;
+    private bool _isEditingDescription = false;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
+
     [Parameter]
     public BoardItemDto Item { get; set; } = null!;
-
 
     private bool IsItemExists =>
         BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
@@ -36,36 +28,40 @@ public partial class BoardItemSettingsDialog : IDisposable
 
     protected override void OnInitialized()
     {
-        BoardState.ItemsState.OnChange += StateHasChanged;
-
-        _model = new UpdateBoardItemRequest
-        {
-            Title = Item.Title,
-            Description = Item.Description ?? string.Empty,
-            IsDone = Item.IsDone,
-        };
+        BoardState.ItemsState.OnChange += OnChange;
+        _description = Item.Description;
     }
 
-    private async Task Submit()
+    private void OnChange()
     {
-        if (_form is null)
-        {
-            return;
-        }
-
-        await _form.Validate();
-        if (!_form.IsValid)
-        {
-            return;
-        }
-
-        _isSubmitting = true;
+        _description = Item.Description;
         StateHasChanged();
+    }
 
-        await BoardState.ItemsState.UpdateAsync(Item.Id, _model);
+    protected override void OnParametersSet()
+    {
+        if (!_isEditingDescription && _description != Item.Description)
+        {
+            _description = Item.Description;
+        }
+    }
 
-        _isSubmitting = false;
-        MudDialog.Close(DialogResult.Ok(true));
+    private void DescriptionFocused()
+    {
+        _isEditingDescription = true;
+    }
+
+    private async Task DescriptionBlurred()
+    {
+        _isEditingDescription = false;
+
+        if (_description == Item.Description)
+        {
+            return;
+        }
+
+        var request = new UpdateBoardItemRequest { Description = _description };
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -87,19 +83,5 @@ public partial class BoardItemSettingsDialog : IDisposable
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
-    }
-
-    public class UpdateBoardItemRequestValidator : AbstractValidator<UpdateBoardItemRequest>
-    {
-        public UpdateBoardItemRequestValidator()
-        {
-            RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .MinimumLength(3)
-                .MaximumLength(100).WithMessage("Title can't exceed 100 characters");
-
-            RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
-        }
     }
 }

@@ -1,71 +1,45 @@
 ﻿@using Tracker.WebApp.Components.BoardUsers
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
-
 <CascadingValue Value=@BoardState>
 	@if (IsItemExists)
 	{
-		<MudForm @ref=@_form
-				 Model=@_model
-				 Validation=@Validator
-				 ValidationDelay="300">
-			<MudDialog>
-				<DialogContent>
-					<MudStack>
-						<BoardItemSettingsHeader Item=@Item/>
-
-						<MudStack Row>
-							@if (!Item.Assignees.Any())
-							{
-								<MudButton Size="Size.Small"
-										   Variant="Variant.Outlined"
-										   StartIcon=@Icons.Material.Filled.PersonAdd
-										   OnClick=@ToggleAssign>
-									Assign
-								</MudButton>
-
-							}
-						</MudStack>
-
-						@* Assignees part *@
-						<MudPopover Open=@_openAssign
-									AnchorOrigin="Origin.TopRight"
-									TransformOrigin="Origin.CenterRight">
-							<BoardItemAssignees BoardState=@BoardState
-												Close=@(() => _openAssign = false)
-												Item=@Item />
-						</MudPopover>
-
-						<BoardItemAssigneesList Item=@Item
-												ToggleAssign=@ToggleAssign
-												OpenAssign=@_openAssign />
-
-						<MudTextField @bind-Value=@_model.Description
-									  Label="Description"
-									  Lines="3"
-									  Variant="Variant.Outlined" />
-						<MudButton Disabled=@_isSubmitting
-								   OnClick=@Submit
-								   Variant="Variant.Filled"
-								   Color="Color.Primary">
-							@if (_isSubmitting)
-							{
-								<MudProgressCircular Size="Size.Small"
-													 Indeterminate
-													 Color="Color.Inherit" />
-							}
-							else
-							{
-								<MudText>Save</MudText>
-							}
-						</MudButton>
-
-						<MudDivider />
-
+		<MudDialog>
+			<DialogContent>
+				<MudStack>
+					<BoardItemSettingsHeader Item=@Item />
+					<MudStack Row>
+						@if (!Item.Assignees.Any())
+						{
+							<MudButton Size="Size.Small"
+									   Variant="Variant.Outlined"
+									   StartIcon=@Icons.Material.Filled.PersonAdd
+									   OnClick=@ToggleAssign>
+								Assign
+							</MudButton>
+						}
 					</MudStack>
-				</DialogContent>
-			</MudDialog>
-		</MudForm>
+					@* Assignees part *@
+					<MudPopover Open=@_openAssign
+								AnchorOrigin="Origin.TopRight"
+								TransformOrigin="Origin.CenterRight">
+						<BoardItemAssignees BoardState=@BoardState
+											Close=@(() => _openAssign = false)
+											Item=@Item />
+					</MudPopover>
+					<BoardItemAssigneesList Item=@Item
+											ToggleAssign=@ToggleAssign
+											OpenAssign=@_openAssign />
+					<MudTextField @bind-Value=@_description
+								  Label="Description"
+								  Lines="3"
+								  Variant="Variant.Outlined"
+								  @onfocus=@DescriptionFocused
+								  @onblur=@DescriptionBlurred />
+					<MudDivider />
+				</MudStack>
+			</DialogContent>
+		</MudDialog>
 	}
 	else
 	{

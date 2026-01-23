@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
@@ -60,7 +59,6 @@ public partial class BoardItemSettingsHeader
 
     private async Task ChangeIsDone(bool isDone)
     {
-        _isDone = isDone;
         var request = new UpdateBoardItemRequest { IsDone = isDone };
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
@@ -81,8 +79,6 @@ public partial class BoardItemSettingsHeader
 
         var request = new UpdateBoardItemRequest { Title = _title };
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
-
-        Item.Title = _title;
     }
 
     private void Cancel() => MudDialog.Cancel();

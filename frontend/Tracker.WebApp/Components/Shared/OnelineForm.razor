@@ -16,7 +16,7 @@
     <MudStack Row
               Spacing="2">
 
-        <MudButton Disabled=@(_processing || !IsInputInvalid())
+        <MudButton Disabled=@(_processing || IsInputInvalid())
                    OnClick=@CompleteEdit
                    Size=@Size
                    Variant="Variant.Filled"
