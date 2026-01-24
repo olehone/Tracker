@@ -21,21 +21,21 @@ else
 						   Color="Color.Inherit"
 						   OnClick=@ToWorkspace />
 		</MudTooltip>
-		@if (Board.Permissions.CanChangeBoard)
-		{
-			<MudText Typo="Typo.h6"
-					 Color="Color.Inherit"
-					 Class="text-ellipsis">
-				@Board.Title
-			</MudText>
-		}
+
+		<MudText Typo="Typo.h6"
+				 Color="Color.Inherit"
+				 Class="text-ellipsis">
+			@Board.Title
+		</MudText>
 
 		<MudStack Row
 				  Spacing="3"
 				  AlignItems="AlignItems.Center">
 			@if (BoardState.UsersState.RecentActiveUsers().Any())
 			{
-				<MudAvatarGroup Spacing="3" Max="5" @key="@GetUsersKey()">
+				<MudAvatarGroup @key=@GetUsersKey()
+								Spacing="3"
+								Max="5">
 					@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
 					{
 						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);

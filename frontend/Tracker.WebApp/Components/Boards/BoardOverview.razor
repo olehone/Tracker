@@ -13,6 +13,7 @@ else
 {
 	<MudDropContainer @ref=@_container
 					  T=@BoardItemDto
+					  ItemDisabled=@ItemDisabled
 					  Items=@BoardState.ItemsState.BoardItems
 					  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
 					  ItemDropped=@ItemDropped

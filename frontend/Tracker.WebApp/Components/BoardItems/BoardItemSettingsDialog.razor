@@ -19,7 +19,7 @@
 								Assign
 							</MudButton>
 						}
-						@if (!_openDate)
+						@if (_date is null && !_openDate)
 						{
 							<MudButton Size="Size.Small"
 									   Variant="Variant.Outlined"
@@ -30,13 +30,20 @@
 						}
 					</MudStack>
 					@* Assignees part *@
-					<MudPopover Open=@_openAssign
-								AnchorOrigin="Origin.TopRight"
-								TransformOrigin="Origin.CenterRight">
-						<BoardItemAssignees BoardState=@BoardState
-											Close=@(() => _openAssign = false)
-											Item=@Item />
-					</MudPopover>
+					@if (_openAssign)
+					{
+						<MudOverlay Visible="true"
+									AutoClose="true"
+									OnClosed="@(() => _openAssign = false)"
+									DarkBackground="false" />
+						<MudPopover Open
+									AnchorOrigin="Origin.TopRight"
+									TransformOrigin="Origin.CenterRight">
+							<BoardItemAssignees BoardState=@BoardState
+												Close=@(() => _openAssign = false)
+												Item=@Item />
+						</MudPopover>
+					}
 
 					<BoardItemAssigneesList Item=@Item
 											ToggleAssign=@ToggleAssign

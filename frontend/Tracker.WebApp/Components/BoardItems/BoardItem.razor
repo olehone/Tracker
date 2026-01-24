@@ -6,14 +6,14 @@
 	<MudButton FullWidth
 			   Style="background-color: inherit;box-shadow: none;"
 			   Class="mud-no-hover"
-			   OnClick="@OpenItemSettings">
+			   OnClick=@OpenItemSettings>
 		<MudPaper Width="100%" Elevation="0">
 			<MudStack Row
 					  AlignItems="AlignItems.Center"
 					  StretchItems="StretchItems.Middle">
 				<MudCheckBox T=@bool
-							 Value="Item.IsDone"
-							 ValueChanged="OnIsDoneChanged" />
+							 Value=@Item.IsDone
+							 ValueChanged=@OnIsDoneChanged />
 				<MudText Class="text-ellipsis"
 						 Style="@ItemStyle">
 					@Item.Title
@@ -22,7 +22,8 @@
 										 HasAttention=@IsOwn() />
 			</MudStack>
 			<MudStack Row>
-				<MudAvatarGroup Max="3"
+				<MudAvatarGroup @key=@GetUsersKey()
+								Max="3"
 								Spacing="3">
 					@foreach (var user in AssignedUsers())
 					{

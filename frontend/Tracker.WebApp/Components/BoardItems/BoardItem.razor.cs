@@ -55,6 +55,10 @@ public partial class BoardItem
         return Item.Assignees.Contains(AppState.CurrentUser.Id);
     }
 
+    private string GetUsersKey()
+    {
+        return string.Join("-", Item.Assignees);
+    }
     private int GetElevation()
     {
         return IsOwn() ? 3 : 0;
