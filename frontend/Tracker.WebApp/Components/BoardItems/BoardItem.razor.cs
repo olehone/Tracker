@@ -21,8 +21,8 @@ public partial class BoardItem
     [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; } = null!;
 
-    [Inject]
-    private IDialogService DialogService { get; set; } = null!;
+    [Inject] IDialogService DialogService { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
 
     private Task OnIsDoneChanged(bool isDone)
     {
@@ -44,6 +44,20 @@ public partial class BoardItem
         return Item.Assignees.Count != 0
             ? BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id))
             : [];
+    }
+
+    private bool IsOwn()
+    {
+        if (AppState.CurrentUser is null)
+        {
+            return false;
+        }
+        return Item.Assignees.Contains(AppState.CurrentUser.Id);
+    }
+
+    private int GetElevation()
+    {
+        return IsOwn() ? 3 : 0;
     }
 
     private async Task OpenItemSettings()

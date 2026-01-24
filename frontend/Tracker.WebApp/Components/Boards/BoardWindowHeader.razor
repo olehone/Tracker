@@ -35,13 +35,14 @@ else
 				  AlignItems="AlignItems.Center">
 			@if (BoardState.UsersState.RecentActiveUsers().Any())
 			{
-				<MudAvatarGroup Spacing="4" Max="5" @key="@GetUsersKey()">
+				<MudAvatarGroup Spacing="3" Max="5" @key="@GetUsersKey()">
 					@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
 					{
 						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
-						<UserAvatarSmallWithLookup @key=@boardUser.User.Id
-												   User=@boardUser.User
-												   Color=color />
+						<UserAvatarWithLookup @key=@boardUser.User.Id
+											  User=@boardUser.User
+											  Color=color
+											  Size="Size.Medium" />
 					}
 				</MudAvatarGroup>
 			}

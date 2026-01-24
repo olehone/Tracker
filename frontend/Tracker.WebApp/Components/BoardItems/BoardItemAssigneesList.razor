@@ -14,14 +14,15 @@
 				  Spacing="1">
 			@foreach (var user in AssignedUsers())
 			{
-				<UserAvatarSmallWithLookup @key=@user.Id
-										User=@user>
+				<UserAvatarWithLookup @key=@user.Id
+									  User=@user
+									  Size="Size.Medium">
 					<AdditionalActions>
 						<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
 							Unassign user from this item
 						</MudButton>
 					</AdditionalActions>
-				</UserAvatarSmallWithLookup>
+				</UserAvatarWithLookup>
 			}
 			<MudAvatar Color=@(OpenAssign? Color.Info : Color.Surface )
 					   Variant=@(OpenAssign? Variant.Filled : Variant.Text)>

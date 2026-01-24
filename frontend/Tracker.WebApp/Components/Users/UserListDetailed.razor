@@ -2,7 +2,7 @@
 
 <MudTable T=@UserDto
 		  ServerData=@LoadServerData
-		  FixedHeader 
+		  FixedHeader
 		  Height="70vh"
 		  Dense
 		  Hover
@@ -33,7 +33,8 @@
 		@if (context is not null)
 		{
 			<MudTd>
-				<UserAvatarSmallWithLookup User=@context/>
+				<UserAvatarWithLookup User=@context
+									  Size="Size.Medium" />
 			</MudTd>
 
 			<MudTd Class="text-ellipsis"

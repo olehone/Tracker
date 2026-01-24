@@ -19,12 +19,12 @@
 								Assign
 							</MudButton>
 						}
-						@if (Item.DueDate is null)
+						@if (!_openDate)
 						{
 							<MudButton Size="Size.Small"
 									   Variant="Variant.Outlined"
 									   StartIcon=@Icons.Material.Filled.EditCalendar
-									   OnClick=@(() => _date = DateTime.Now)>
+									   OnClick=@(() => _openDate = true)>
 								Set due date
 							</MudButton>
 						}
@@ -42,8 +42,9 @@
 											ToggleAssign=@ToggleAssign
 											OpenAssign=@_openAssign />
 					<MudStack Row
-							  AlignItems="AlignItems.Center">
-						@if (_date is not null)
+							  AlignItems="AlignItems.Center"
+							  StretchItems="StretchItems.End">
+						@if (_date is not null || _openDate)
 						{
 							<MudStack Spacing="0">
 								<MudText Typo="Typo.body2">
@@ -69,9 +70,15 @@
 								@foreach (BoardItemImportance importance in Enum.GetValues(typeof(BoardItemImportance)))
 								{
 									<MudSelectItem Value=@importance>
-										<MudIcon Icon=@BoardItemImportanceHelper.GetImportanceIcon(importance)
-												 Color=@BoardItemImportanceHelper.GetImportanceColor(importance) />
-										@importance
+										<MudStack Row
+												  Justify="Justify.SpaceBetween"
+												  StretchItems="StretchItems.End">
+											<MudIcon Icon=@BoardItemImportanceHelper.GetImportanceIcon(importance)
+													 Color=@BoardItemImportanceHelper.GetImportanceColor(importance) />
+											<MudText>
+												@importance
+											</MudText>
+										</MudStack>
 									</MudSelectItem>
 								}
 							</MudSelect>

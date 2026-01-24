@@ -14,6 +14,7 @@ public partial class BoardItemSettingsDialog : IDisposable
     private DateTime? _date;
     private BoardItemImportance _importance;
     private bool _isEditingDescription = false;
+    private bool _openDate = false;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
@@ -72,6 +73,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         {
             ClearDueDate = true
         };
+        _openDate = false;
 
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }

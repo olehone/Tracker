@@ -4,12 +4,14 @@ using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Components.Users;
 
-public partial class UserAvatarSmallWithLookup
+public partial class UserAvatarWithLookup
 {
-    [Parameter]
-    public required UserDto User { get; set; } = null!;
+    [Parameter, EditorRequired]
+    public UserDto User { get; set; } 
     [Parameter]
     public Color Color { get; set; } = Color.Default;
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
     [Parameter]
     public RenderFragment? AdditionalActions { get; set; }
 

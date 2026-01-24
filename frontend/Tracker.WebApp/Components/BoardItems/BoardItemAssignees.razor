@@ -33,7 +33,7 @@
 						  Row
 						  Justify="Justify.SpaceBetween"
 						  AlignItems="AlignItems.Center">
-					<SmallUserInfo User=@user />
+					<BriefUserInfo User=@user />
 
 					<MudIconButton Icon=@Icons.Material.Filled.Close
 								   OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id)) />
@@ -51,7 +51,7 @@
 						   FullWidth
 						   Class="justify-start"
 						   OnClick=@(() => BoardState.ItemsState.AssignAsync(Item.Id, user.Id))>
-					<SmallUserInfo User=@user />
+					<BriefUserInfo User=@user />
 				</MudButton>
 			}
 		}
