@@ -23,7 +23,7 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
         return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(boardId, itemId, request));
     }
 
-    public Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
+    public Task<Result<BoardItemDto>> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(boardId, itemId, request));
     }

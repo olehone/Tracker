@@ -10,6 +10,7 @@ public partial class BoardItemSettingsDialog : IDisposable
     private bool _openAssign;
     private bool _disposed;
     private string _description = string.Empty;
+    private DateTime? _date;
     private bool _isEditingDescription = false;
 
     [Parameter]
@@ -30,22 +31,19 @@ public partial class BoardItemSettingsDialog : IDisposable
     {
         BoardState.ItemsState.OnChange += OnChange;
         _description = Item.Description;
+        _date = Item?.DueDate?.UtcDateTime;
     }
 
     private void OnChange()
-    {
-        _description = Item.Description;
-        StateHasChanged();
-    }
-
-    protected override void OnParametersSet()
     {
         if (!_isEditingDescription && _description != Item.Description)
         {
             _description = Item.Description;
         }
-    }
 
+        _date = Item.DueDate?.UtcDateTime;
+        StateHasChanged();
+    }
     private void DescriptionFocused()
     {
         _isEditingDescription = true;
@@ -64,6 +62,37 @@ public partial class BoardItemSettingsDialog : IDisposable
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
+    private async Task RemoveDueDate()
+    {
+        var request = new UpdateBoardItemRequest
+        {
+            ClearDueDate = true
+        };
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private async Task DateSelected(DateTime? date)
+    {
+        if (date is null)
+        {
+            return;
+        }
+        if (_date == date)
+        {
+            return;
+        }
+        _date = date;
+
+        var dueDate = new DateTimeOffset(date.Value.ToUniversalTime());
+        var request = new UpdateBoardItemRequest
+        {
+            DueDate = dueDate
+        };
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -73,7 +102,7 @@ public partial class BoardItemSettingsDialog : IDisposable
 
         if (disposing)
         {
-            BoardState.ItemsState.OnChange -= StateHasChanged;
+            BoardState.ItemsState.OnChange -= OnChange;
         }
 
         _disposed = true;

@@ -18,6 +18,15 @@
 								Assign
 							</MudButton>
 						}
+						@if (Item.DueDate is null)
+						{
+							<MudButton Size="Size.Small"
+									   Variant="Variant.Outlined"
+									   StartIcon=@Icons.Material.Filled.EditCalendar
+									   OnClick=@(() => _date = DateTime.Now)>
+								Set due date
+							</MudButton>
+						}
 					</MudStack>
 					@* Assignees part *@
 					<MudPopover Open=@_openAssign
@@ -27,9 +36,28 @@
 											Close=@(() => _openAssign = false)
 											Item=@Item />
 					</MudPopover>
+
 					<BoardItemAssigneesList Item=@Item
 											ToggleAssign=@ToggleAssign
 											OpenAssign=@_openAssign />
+					@if (_date is not null)
+					{
+						<MudStack Spacing="0">
+							<MudText Typo="Typo.body2">
+								Due date
+							</MudText>
+							<MudStack Row
+									  AlignItems="AlignItems.Center">
+								<MudDatePicker Date=@_date
+											   DateChanged=@((DateTime? date) => DateSelected(date))
+											   ShowToolbar="false" />
+								<MudIconButton Icon=@Icons.Material.Filled.Close
+											   OnClick=@RemoveDueDate />
+							</MudStack>
+						</MudStack>
+					}
+
+
 					<MudTextField @bind-Value=@_description
 								  Label="Description"
 								  Lines="3"

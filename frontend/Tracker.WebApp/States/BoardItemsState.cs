@@ -253,6 +253,10 @@ public sealed class BoardItemsState(
         {
             item.DueDate = request.DueDate;
         }
+        if (request.ClearDueDate)
+        {
+            item.DueDate = null;
+        }
         if (request.Importance is not null)
         {
             item.Importance = (BoardItemImportance)request.Importance;

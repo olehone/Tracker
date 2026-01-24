@@ -41,7 +41,21 @@ public class UpdateBoardItemCommandHandler(
         }
         if (request.DueDate is not null)
         {
-            boardItem.DueDate = request.DueDate;
+            var requestDate = request.DueDate.Value;
+            var endOfDay = new DateTimeOffset(
+                requestDate.Year,
+                requestDate.Month,
+                requestDate.Day,
+                23,
+                59,
+                0,
+                requestDate.Offset);
+
+            boardItem.DueDate = endOfDay;
+        }
+        if (request.ClearDueDate)
+        {
+            boardItem.DueDate = null;
         }
         if (request.Importance is not null)
         {

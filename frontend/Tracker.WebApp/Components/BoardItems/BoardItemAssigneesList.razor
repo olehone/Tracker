@@ -4,30 +4,30 @@
 
 @if (Item.Assignees.Any())
 {
-	<MudText Typo="Typo.body2">
-		Assigned users
-	</MudText>
+	<MudStack Spacing="0">
+		<MudText Typo="Typo.body2">
+			Assigned users
+		</MudText>
 
-	<MudStack Row
-			  Wrap="Wrap.Wrap"
-			  Spacing="1">
-		@foreach (var user in AssignedUsers())
-		{
-			<UserAvatarSmallWithLookup @key=@user.Id
-									User=@user>
-				<AdditionalActions>
-					<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
-						Unassign user from this item
-					</MudButton>
-				</AdditionalActions>
-			</UserAvatarSmallWithLookup>
-		}
-		<MudAvatar Color=@(OpenAssign? Color.Info : Color.Surface )
-				   Variant=@(OpenAssign? Variant.Filled : Variant.Text)>
-			<MudIconButton Icon=@Icons.Material.Filled.Add
-						   OnClick=@ToggleAssign/>
-		</MudAvatar>
-
-		
+		<MudStack Row
+				  Wrap="Wrap.Wrap"
+				  Spacing="1">
+			@foreach (var user in AssignedUsers())
+			{
+				<UserAvatarSmallWithLookup @key=@user.Id
+										User=@user>
+					<AdditionalActions>
+						<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
+							Unassign user from this item
+						</MudButton>
+					</AdditionalActions>
+				</UserAvatarSmallWithLookup>
+			}
+			<MudAvatar Color=@(OpenAssign? Color.Info : Color.Surface )
+					   Variant=@(OpenAssign? Variant.Filled : Variant.Text)>
+				<MudIconButton Icon=@Icons.Material.Filled.Add
+							   OnClick=@ToggleAssign/>
+			</MudAvatar>
+		</MudStack>
 	</MudStack>
 }

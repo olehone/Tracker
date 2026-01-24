@@ -14,7 +14,7 @@ public interface IBoardItemApi
     Task<IApiResponse> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);
 
     [Patch("/api/board/{boardId}/items/{itemId}")]
-    Task<IApiResponse> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
+    Task<IApiResponse<BoardItemDto>> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request);
 
     [Delete("/api/board/{boardId}/items/{itemId}")]
     Task<IApiResponse> DeleteAsync(Guid boardId, Guid itemId);
