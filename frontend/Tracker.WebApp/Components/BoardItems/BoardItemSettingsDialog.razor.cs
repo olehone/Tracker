@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
@@ -11,12 +12,13 @@ public partial class BoardItemSettingsDialog : IDisposable
     private bool _disposed;
     private string _description = string.Empty;
     private DateTime? _date;
+    private BoardItemImportance _importance;
     private bool _isEditingDescription = false;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; } = null!;
 
     private bool IsItemExists =>
@@ -31,7 +33,8 @@ public partial class BoardItemSettingsDialog : IDisposable
     {
         BoardState.ItemsState.OnChange += OnChange;
         _description = Item.Description;
-        _date = Item?.DueDate?.UtcDateTime;
+        _date = Item.DueDate?.UtcDateTime;
+        _importance = Item.Importance;
     }
 
     private void OnChange()
@@ -42,6 +45,7 @@ public partial class BoardItemSettingsDialog : IDisposable
         }
 
         _date = Item.DueDate?.UtcDateTime;
+        _importance = Item.Importance;
         StateHasChanged();
     }
     private void DescriptionFocused()
@@ -83,11 +87,33 @@ public partial class BoardItemSettingsDialog : IDisposable
             return;
         }
         _date = date;
-
-        var dueDate = new DateTimeOffset(date.Value.ToUniversalTime());
+        var localOffset = TimeZoneInfo.Local.GetUtcOffset(date.Value);
+        var dueDate = new DateTimeOffset(
+            date.Value.Year,
+            date.Value.Month,
+            date.Value.Day,
+            23,
+            59,
+            59,
+            localOffset);
         var request = new UpdateBoardItemRequest
         {
             DueDate = dueDate
+        };
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private async Task ImportanceSelected(BoardItemImportance importance)
+    {
+        if (_importance == importance)
+        {
+            return;
+        }
+        _importance = importance;
+        var request = new UpdateBoardItemRequest
+        {
+            Importance = importance
         };
 
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
