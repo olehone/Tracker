@@ -10,3 +10,18 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
+
+.icon-rotate-90 svg,
+.icon-rotate-90 .mud-icon-root {
+    transform: rotate(90deg);
+}
+
+.icon-rotate-180 svg,
+.icon-rotate-180 .mud-icon-root {
+    transform: rotate(180deg);
+}
+
+.secondary-color {
+    background-color: var(--mud-palette-secondary);
+    color: var(--mud-palette-text-secondary);
+}

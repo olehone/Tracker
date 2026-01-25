@@ -11,16 +11,13 @@
 }
 else
 {
-	<MudStack Row
-			  Justify="Justify.SpaceBetween"
-			  Spacing="0"
-			  AlignItems="AlignItems.Center"
-			  Class="mud-theme-secondary px-5 py-3 rounded-t">
+	<MudToolBar Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
 		<MudTooltip Text="To workspace">
 			<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
 						   Color="Color.Inherit"
 						   OnClick=@ToWorkspace />
 		</MudTooltip>
+		<MudSpacer />
 
 		<MudText Typo="Typo.h6"
 				 Color="Color.Inherit"
@@ -28,9 +25,24 @@ else
 			@Board.Title
 		</MudText>
 
+		<MudSpacer />
+
 		<MudStack Row
 				  Spacing="3"
 				  AlignItems="AlignItems.Center">
+
+			<MudTabs Elevation="0"
+					 MinimumTabWidth="20px"
+					 ActivePanelIndex=@TabIndex
+					 ActivePanelIndexChanged=@OnTabIndexChanged
+					 Color="Color.Secondary">
+				<MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
+				<MudTabPanel Icon=@Icons.Material.Filled.CalendarToday ToolTip="Calendar" />
+				<MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
+			</MudTabs>
+
+			<MudDivider Vertical FlexItem />
+
 			@if (BoardState.UsersState.RecentActiveUsers().Any())
 			{
 				<MudAvatarGroup @key=@GetUsersKey()
@@ -45,6 +57,8 @@ else
 											  Size="Size.Medium" />
 					}
 				</MudAvatarGroup>
+
+				<MudDivider Vertical FlexItem />
 			}
 			@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
 			{
@@ -77,5 +91,5 @@ else
 				</MudTooltip>
 			}
 		</MudStack>
-	</MudStack>
+	</MudToolBar>
 }
