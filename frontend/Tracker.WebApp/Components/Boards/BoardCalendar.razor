@@ -1,0 +1,41 @@
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.BoardItems
+@using Tracker.WebApp.Components.BoardLists
+@using Tracker.WebApp.Components.Shared;
+@using Tracker.WebApp.Components.Boards;
+@using Heron.MudCalendar
+
+@if (BoardState.IsLoading)
+{
+	<MudProgressLinear Color="Color.Primary"
+					   Indeterminate />
+}
+else
+{
+
+	<MudCalendar T=@CalendarItem
+				 ShowMonth
+				 ShowDay="false"
+				 ShowWeek="false"
+				 Items=@Items
+				 MonthCellMinHeight="100">
+		<CellTemplate>
+			<BoardCalendarItem Item=@context />
+		</CellTemplate>
+		<ToolbarContent>
+			<MudToggleGroup T="bool"
+							@bind-Value=@_onlySelf
+							Outlined
+							Delimiters
+							Disabled=@IsUnauthorized()>
+				<MudToggleItem Value=false>
+					All
+				</MudToggleItem>
+
+				<MudToggleItem Value=true>
+					Assigned to me
+				</MudToggleItem>
+			</MudToggleGroup>
+		</ToolbarContent>
+	</MudCalendar>
+}

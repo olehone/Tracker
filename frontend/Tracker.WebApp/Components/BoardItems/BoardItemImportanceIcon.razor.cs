@@ -13,14 +13,14 @@ public partial class BoardItemImportanceIcon
 
     private string GetIcon()
     {
-        return BoardItemImportanceHelper
-            .GetImportanceIcon(Importance);
+        return ImportanceHelper
+            .GetIcon(Importance);
     }
 
     private Color GetColor()
     {
-        return BoardItemImportanceHelper
-            .GetImportanceColor(Importance);
+        return ImportanceHelper
+            .GetColor(Importance);
     }
 
     private Variant GetVariant()

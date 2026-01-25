@@ -3,9 +3,9 @@ using Tracker.Domain.Enums;
 
 namespace Tracker.WebApp.Components.BoardItems;
 
-internal static class BoardItemImportanceHelper
+internal static class ImportanceHelper
 {
-    public static Color GetImportanceColor(BoardItemImportance importance)
+    public static Color GetColor(BoardItemImportance importance)
     {
         return importance switch
         {
@@ -16,7 +16,7 @@ internal static class BoardItemImportanceHelper
         };
     }
 
-    public static string GetImportanceIcon(BoardItemImportance importance)
+    public static string GetIcon(BoardItemImportance importance)
     {
         return importance switch
         {

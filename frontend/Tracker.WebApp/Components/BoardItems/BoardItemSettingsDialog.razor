@@ -80,8 +80,8 @@
 										<MudStack Row
 												  Justify="Justify.SpaceBetween"
 												  StretchItems="StretchItems.End">
-											<MudIcon Icon=@BoardItemImportanceHelper.GetImportanceIcon(importance)
-													 Color=@BoardItemImportanceHelper.GetImportanceColor(importance) />
+											<MudIcon Icon=@ImportanceHelper.GetIcon(importance)
+													 Color=@ImportanceHelper.GetColor(importance) />
 											<MudText>
 												@importance
 											</MudText>

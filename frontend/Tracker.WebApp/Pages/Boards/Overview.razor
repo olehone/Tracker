@@ -15,7 +15,6 @@
 		</Header>
 		
 		<Body>
-			@activeIndex
 			@switch (activeIndex)
 			{
 				case 0:
@@ -26,7 +25,7 @@
 					</MudStack>
 					break;
 				case 1:
-					<MudText>Calendar</MudText>
+					<BoardCalendar />
 					break;
 				case 2:
 					<MudText>Matrix</MudText>
