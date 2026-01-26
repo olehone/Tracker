@@ -1,0 +1,40 @@
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Shared
+
+@inherits ListItemSubscribeBase
+
+<MudPaper Elevation="5"
+		  Width="400px"
+		  Class="my-3 mx-2"
+		  Style="align-self: flex-start;">
+	<MudStack Spacing="1"
+			  Justify="Justify.FlexStart"
+			  Class="pa-1">
+		<MudDropZone T="BoardItemDto"
+					 Identifier="BoardItems"
+					 Style="min-height: 60px; max-height: 500px; overflow-y: auto;"
+					 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
+
+		@if (BoardState.Board.Permissions.CanCreateItem)
+		{
+			<MudSelect T="BoardListDto"
+					   Label="List"
+					   Required
+					   @bind-SelectedValue=@SelectedList>
+				@foreach (var list in Lists)
+				{
+					<MudSelectItem T="BoardListDto"
+								   Value="@list">
+						@list.Title
+					</MudSelectItem>
+				}
+			</MudSelect>
+			@if (SelectedList is not null)
+			{
+				<OneLineCreateButton Title="Add new item"
+									 OnCreate=@CreateNewItem />
+			}
+		}
+	</MudStack>
+
+</MudPaper>

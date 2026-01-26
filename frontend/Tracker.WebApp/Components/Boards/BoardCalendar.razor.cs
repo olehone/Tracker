@@ -51,10 +51,7 @@ public partial class BoardCalendar : IDisposable
 
     private void OnBoardStateChanged()
     {
-        InvokeAsync(() =>
-        {
-            StateHasChanged();
-        });
+        InvokeAsync(StateHasChanged);
     }
 
     protected virtual void Dispose(bool disposing)
