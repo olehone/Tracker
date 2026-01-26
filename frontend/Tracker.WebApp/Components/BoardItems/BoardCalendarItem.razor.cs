@@ -1,4 +1,3 @@
-using Heron.MudCalendar;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
@@ -19,12 +18,12 @@ public partial class BoardCalendarItem
     private BoardState BoardState { get; set; } = null!;
 
     [Parameter, EditorRequired]
-    public CalendarItem Item { get; set; } = null!;
+    public BoardCalendarItemModel Item { get; set; } = null!;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
 
-    private BoardItemDto BoardItem => ((BoardCalendarItemModel)Item).BoardItem;
+    private BoardItemDto BoardItem => Item.BoardItem;
 
     private string ItemStyle =>
         BoardItem.IsDone ? "text-decoration: line-through; width: 100%" : "width: 100%";

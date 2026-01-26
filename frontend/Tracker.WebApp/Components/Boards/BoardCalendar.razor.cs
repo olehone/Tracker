@@ -1,7 +1,7 @@
-using Heron.MudCalendar;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.Components.BoardItems;
 using Tracker.WebApp.States;
 
@@ -15,10 +15,10 @@ public partial class BoardCalendar : IDisposable
     [Inject] AppState AppState { get; set; } = null!;
 
     private bool _disposed;
-    private bool _showNotOwn = false;
-    private bool _showNotCompleted = false;
+    private bool _showNotOwn = true;
+    private bool _showNotCompleted = true;
 
-    private List<CalendarItem> Items = [];
+    private List<BoardCalendarItemModel> Items = [];
 
     private bool IsUnauthorized()
     {
@@ -43,6 +43,24 @@ public partial class BoardCalendar : IDisposable
         ReloadItems();
     }
 
+    private async Task OnItemChanged(BoardCalendarItemModel item)
+    {
+        var localOffset = TimeZoneInfo.Local.GetUtcOffset(item.Start);
+        var dueDate = new DateTimeOffset(
+            item.Start.Year,
+            item.Start.Month,
+            item.Start.Day,
+            23,
+            59,
+            59,
+            localOffset);
+        var request = new UpdateBoardItemRequest
+        {
+            DueDate = dueDate
+        };
+        await BoardState.ItemsState.UpdateAsync(item.BoardItem.Id, request);
+    }
+
     private void ReloadItems()
     {
         Items = BoardState.ItemsState.BoardItems
@@ -50,7 +68,6 @@ public partial class BoardCalendar : IDisposable
             .Where(OwnFilter)
             .Where(CompletedFilter)
             .Select(bi => new BoardCalendarItemModel(bi))
-            .Cast<CalendarItem>()
             .ToList();
     }
 

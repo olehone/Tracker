@@ -7,6 +7,10 @@ public class BoardCalendarItemModel : CalendarItem
 {
     public BoardItemDto BoardItem { get; set; }
 
+    public BoardCalendarItemModel() : base()
+    {
+    }
+
     public BoardCalendarItemModel(BoardItemDto item)
     {
         if (!item.DueDate.HasValue)

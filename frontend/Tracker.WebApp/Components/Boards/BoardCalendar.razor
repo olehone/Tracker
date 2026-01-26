@@ -13,11 +13,13 @@
 else
 {
 	<MudStack Row>
-		<MudCalendar T=@CalendarItem
+		<MudCalendar T=@BoardCalendarItemModel
 					 ShowMonth
 					 ShowDay="false"
 					 ShowWeek="false"
 					 Items=@Items
+					 ItemChanged=@OnItemChanged
+					 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
 					 MonthCellMinHeight="100">
 			<CellTemplate>
 				<BoardCalendarItem Item=@context />
