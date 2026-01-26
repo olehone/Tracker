@@ -13,32 +13,48 @@
 else
 {
 	<MudStack Row>
-	<MudCalendar T=@CalendarItem
-				 ShowMonth
-				 ShowDay="false"
-				 ShowWeek="false"
-				 Items=@Items
-				 MonthCellMinHeight="100">
-		<CellTemplate>
-			<BoardCalendarItem Item=@context />
-		</CellTemplate>
-		<ToolbarContent>
-			<MudToggleGroup T="bool"
-							@bind-Value=@_onlySelf
-							Outlined
-							Delimiters
-							Disabled=@IsUnauthorized()>
-				<MudToggleItem Value=false>
-					All
-				</MudToggleItem>
+		<MudCalendar T=@CalendarItem
+					 ShowMonth
+					 ShowDay="false"
+					 ShowWeek="false"
+					 Items=@Items
+					 MonthCellMinHeight="100">
+			<CellTemplate>
+				<BoardCalendarItem Item=@context />
+			</CellTemplate>
+			<ToolbarContent>
+				<MudStack Row>
+					<MudToggleGroup T="bool"
+									Value=@_showNotOwn
+									ValueChanged=@OnNotOwnChanged
+									Outlined
+									Delimiters
+									Disabled=@IsUnauthorized()>
+						<MudToggleItem Value=true>
+							All
+						</MudToggleItem>
 
-				<MudToggleItem Value=true>
-					Assigned to me
-				</MudToggleItem>
-			</MudToggleGroup>
-		</ToolbarContent>
-	</MudCalendar>
+						<MudToggleItem Value=false>
+							Assigned to me
+						</MudToggleItem>
+					</MudToggleGroup>
 
-	<BoardItemsList />
+					<MudToggleGroup T="bool"
+									Value=@_showNotCompleted
+									ValueChanged=@OnNotCompletedChanged
+									Outlined
+									Delimiters>
+						<MudToggleItem Value=true>
+							All
+						</MudToggleItem>
+
+						<MudToggleItem Value=false>
+							Not completed
+						</MudToggleItem>
+					</MudToggleGroup>
+				</MudStack>
+			</ToolbarContent>
+		</MudCalendar>
+
 	</MudStack>
 }

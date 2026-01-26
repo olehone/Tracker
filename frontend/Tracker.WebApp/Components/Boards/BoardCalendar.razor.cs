@@ -15,7 +15,8 @@ public partial class BoardCalendar : IDisposable
     [Inject] AppState AppState { get; set; } = null!;
 
     private bool _disposed;
-    private bool _onlySelf = false;
+    private bool _showNotOwn = false;
+    private bool _showNotCompleted = false;
 
     private List<CalendarItem> Items = [];
 
@@ -27,17 +28,35 @@ public partial class BoardCalendar : IDisposable
     protected override void OnInitialized()
     {
         BoardState.ItemsState.OnChange += OnBoardStateChanged;
+        ReloadItems();
+    }
+
+    private void OnNotOwnChanged()
+    {
+        _showNotOwn = !_showNotOwn;
+        ReloadItems();
+    }
+
+    private void OnNotCompletedChanged()
+    {
+        _showNotCompleted = !_showNotCompleted;
+        ReloadItems();
+    }
+
+    private void ReloadItems()
+    {
         Items = BoardState.ItemsState.BoardItems
             .Where(bi => bi.DueDate.HasValue)
-            .Where(IsOwn)
+            .Where(OwnFilter)
+            .Where(CompletedFilter)
             .Select(bi => new BoardCalendarItemModel(bi))
             .Cast<CalendarItem>()
             .ToList();
     }
 
-    private bool IsOwn(BoardItemDto item)
+    private bool OwnFilter(BoardItemDto item)
     {
-        if (!_onlySelf)
+        if (_showNotOwn)
         {
             return true;
         }
@@ -48,10 +67,19 @@ public partial class BoardCalendar : IDisposable
         return item.Assignees.Contains(AppState.CurrentUser.Id);
     }
 
+    private bool CompletedFilter(BoardItemDto item)
+    {
+        if (_showNotCompleted)
+        {
+            return true;
+        }
+        return !item.IsDone;
+    }
 
     private void OnBoardStateChanged()
     {
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
+        ReloadItems();
     }
 
     protected virtual void Dispose(bool disposing)
