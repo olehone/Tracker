@@ -1,0 +1,2 @@
+﻿ALTER TABLE [dbo].[BoardItems] 
+ADD DueDate DATETIMEOFFSET(0) NULL;

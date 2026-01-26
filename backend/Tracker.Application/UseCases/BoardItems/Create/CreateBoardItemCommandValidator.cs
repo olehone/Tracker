@@ -14,8 +14,5 @@ public class CreateBoardItemCommandValidator : AbstractValidator<CreateBoardItem
         RuleFor(bi => bi.Title)
             .NotEmpty()
             .MaximumLength(options.Value.TitleMaximumLength);
-
-        RuleFor(x => x.Description)
-            .MaximumLength(options.Value.DescriptionMaximumLength);
     }
 }

@@ -6,6 +6,5 @@ namespace Tracker.Application.UseCases.Workspaces.Create;
 
 public class CreateWorkspaceCommand : IRequest<Result<WorkspaceFullDto>>
 {
-    public string Title { get; set;} = string.Empty;
-    public string Description { get; set;} = string.Empty;
+    public required string Title { get; set;}
 }

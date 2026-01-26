@@ -30,12 +30,11 @@ public sealed class CreateBoardListCommandHandler(
 
         int upperLimit = await uow.BoardListRepository.GetMaxPositionAsync(request.BoardId);
 
-        var boardList = new BoardList()
+        var boardList = new BoardList
         {
             BoardId = request.BoardId,
             Position = upperLimit + 1,
             Title = request.Title,
-            Description = request.Description
         };
 
         await uow.BoardListRepository.AddAsync(boardList);

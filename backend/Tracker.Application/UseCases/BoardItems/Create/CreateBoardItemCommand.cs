@@ -9,5 +9,4 @@ public class CreateBoardItemCommand: IRequest<Result<BoardItemDto>>
     public required Guid BoardId { get; set; }
     public required Guid BoardListId { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string? Description { get; set; }
 }

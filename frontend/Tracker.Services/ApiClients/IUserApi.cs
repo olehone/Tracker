@@ -9,19 +9,19 @@ namespace Tracker.Services.ApiClients;
 public interface IUserApi
 {
     [Get("/api/users/me")]
-    Task<ApiResponse<UserDto>> GetCurrentAsync();
+    Task<IApiResponse<UserDto>> GetCurrentAsync();
 
     [Get("/api/users/{id}")]
-    Task<ApiResponse<UserDto>> GetByIdAsync(Guid id);
+    Task<IApiResponse<UserDto>> GetByIdAsync(Guid id);
 
     [Get("/api/users/all")]
-    Task<ApiResponse<Paginated<UserDto>>> GetAsync([Query] PaginatedSearchRequest request);
+    Task<IApiResponse<Paginated<UserDto>>> GetAsync([Query] PaginatedSearchRequest request);
 
     [Get("/api/users/{id}/workspaces/all")]
-    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetAllWorkspacesAsync([FromRoute] Guid id,
+    Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetAllWorkspacesAsync([FromRoute] Guid id,
         [FromQuery] PaginatedSearchRequest request);
 
     [Get("/api/users/{id}/workspaces")]
-    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync([FromRoute] Guid id,
+    Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync([FromRoute] Guid id,
         [FromQuery] PaginatedSearchRequest request);
 }

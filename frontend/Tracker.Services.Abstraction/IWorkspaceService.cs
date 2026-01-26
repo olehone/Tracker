@@ -11,5 +11,6 @@ public interface IWorkspaceService
     Task<Result> UpdateAsync(Guid id, UpdateWorkspaceRequest request);
     Task<Result<Paginated<WorkspaceSummaryDto>>> GetAsync(PaginatedSearchRequest request);
     Task<Result<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
-    Task<Result<WorkspaceSummaryDto>> CreateAsync(CreateWorkspaceRequest request);
+    Task<Result<WorkspaceSummaryDto>> CreateAsync(string request);
+    Task<Result<BoardSummaryDto>> CreateBoardAsync(Guid workspaceId, string title);
 }

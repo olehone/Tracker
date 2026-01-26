@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -12,7 +11,6 @@ using Tracker.Application.UseCases.BoardLists.Create;
 using Tracker.Application.UseCases.BoardLists.Delete;
 using Tracker.Application.UseCases.BoardLists.Move;
 using Tracker.Application.UseCases.BoardLists.Update;
-using Tracker.Domain.Requests.BoardList;
 
 namespace Tracker.API.Controllers;
 
@@ -26,13 +24,12 @@ public class BoardListsController(IMediator mediator,
 {
     [HttpPost]
     public async Task<IActionResult> CreateAsync(Guid boardId,
-        [FromBody] CreateBoardListRequest request)
+        [FromBody] CreateWithTitleRequest request)
     {
         var mediatorRequest = new CreateBoardListCommand
         {
             BoardId = boardId,
             Title = request.Title,
-            Description = request.Description
         };
         var response = await mediator.Send(mediatorRequest);
 

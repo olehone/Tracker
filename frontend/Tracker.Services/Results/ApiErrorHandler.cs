@@ -12,12 +12,12 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
     // await apiErrorHandler.ExecuteAsync(api.WithoutArgumentsCall);
     // await apiErrorHandler.ExecuteAsync(() => api.WithoutArgumentsCall(arg1, arg2, arg3));
     public async Task<Result> ExecuteAsync(
-    Func<Task<ApiResponse<object>>> apiCall)
+    Func<Task<IApiResponse>> apiCall)
     {
         try
         {
             var result = await apiCall();
-            if (!result.IsSuccessStatusCode)
+            if (!result.IsSuccessful)
             {
                 var error = ErrorMappingService.MapApiResponse(result);
                 errorNotifier.NotifyActionError(error);
@@ -38,12 +38,12 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
     // var result = await apiErrorHandler.ExecuteAsync(api.GetAllUsers);
     // var result = await apiErrorHandler.ExecuteAsync(() => api.GetUserById(userId));
     public async Task<Result<TResult>> ExecuteAsync<TResult>(
-        Func<Task<ApiResponse<TResult>>> apiCall)
+        Func<Task<IApiResponse<TResult>>> apiCall)
     {
         try
         {
             var result = await apiCall();
-            if (!result.IsSuccessStatusCode)
+            if (!result.IsSuccessful)
             {
                 var error = ErrorMappingService.MapApiResponse(result);
                 errorNotifier.NotifyActionError(error);

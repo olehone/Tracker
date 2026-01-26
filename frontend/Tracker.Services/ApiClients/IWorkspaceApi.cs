@@ -1,6 +1,7 @@
 ﻿using Refit;
 using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.Workspace;
 
 namespace Tracker.Services.ApiClients;
@@ -9,17 +10,20 @@ public interface IWorkspaceApi
 {
 
     [Get("/api/workspaces/{id}")]
-    Task<ApiResponse<WorkspaceFullDto>> GetByIdAsync(Guid id);
+    Task<IApiResponse<WorkspaceFullDto>> GetByIdAsync(Guid id);
 
-    [Put("/api/workspaces/{id}/settings")]
-    Task<ApiResponse<object>> UpdateAsync(Guid id, [Body] UpdateWorkspaceRequest request);
+    [Put("/api/workspaces/{workspaceId}/settings")]
+    Task<IApiResponse> UpdateAsync(Guid workspaceId, [Body] UpdateWorkspaceRequest request);
 
     [Get("/api/workspaces/all")]
-    Task<ApiResponse<Paginated<WorkspaceSummaryDto>>> GetAsync([Query] PaginatedSearchRequest request);
+    Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetAsync([Query] PaginatedSearchRequest request);
 
     [Get("/api/workspaces/my")]
-    Task<ApiResponse<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
+    Task<IApiResponse<List<WorkspaceSummaryDto>>> GetForCurrentUserAsync();
 
-    [Post("/api/workspaces/")]
-    Task<ApiResponse<WorkspaceSummaryDto>> CreateAsync(CreateWorkspaceRequest request);
+    [Post("/api/workspaces")]
+    Task<IApiResponse<WorkspaceSummaryDto>> CreateAsync(CreateWithTitleRequest request);
+
+    [Post("/api/workspaces/{id}/boards")]
+    Task<IApiResponse<BoardSummaryDto>> CreateBoardAsync(Guid id, CreateWithTitleRequest request);
 }

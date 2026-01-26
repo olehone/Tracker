@@ -11,7 +11,6 @@ public partial class Overview
     public Guid WorkspaceId { get; set; }
 
     [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
-    [Inject] private IBoardService BoardService { get; set; } = null!;
 
     private WorkspaceFullDto? Workspace { get; set; }
 
@@ -45,12 +44,11 @@ public partial class Overview
 
     private async Task CreateBoard(string title)
     {
-        var request = new CreateBoardRequest
+        if (Workspace is null || string.IsNullOrWhiteSpace(title))
         {
-            WorkspaceId = WorkspaceId,
-            Title = title
-        };
-        var result = await BoardService.CreateAsync(request);
+            return;
+        }
+        var result = await WorkspaceService.CreateBoardAsync(Workspace.Id, title);
         if (result.IsFailure)
         {
             return;

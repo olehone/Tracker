@@ -20,9 +20,13 @@
     <EmbeddedResource Include="Scripts\003-Add-Role-Column.sql" />
     <EmbeddedResource Include="Scripts\001-Create-User.sql" />
     <EmbeddedResource Include="Scripts\002-Add-Refresh-Tokens.sql" />
+    <EmbeddedResource Include="Scripts\019-Descriptions-Not-Null.sql" />
+    <EmbeddedResource Include="Scripts\018-Item-Importance-Not-Null.sql" />
+    <EmbeddedResource Include="Scripts\017-Add-Item-Importance.sql" />
     <EmbeddedResource Include="Scripts\006-Add-RoleEnum-To-User.sql" />
     <EmbeddedResource Include="Scripts\008-Add-UserBoard-Relation.sql" />
     <EmbeddedResource Include="Scripts\009-Add-UserWorkspace-Relation.sql" />
+    <EmbeddedResource Include="Scripts\016-Add-Item-Due-Date.sql" />
     <EmbeddedResource Include="Scripts\015-Add-BoardItemAssignee.sql" />
     <EmbeddedResource Include="Scripts\014-Make-Status-Not-Null-Set-Default.sql" />
     <EmbeddedResource Include="Scripts\013-Add-Status-To-Task.sql" />

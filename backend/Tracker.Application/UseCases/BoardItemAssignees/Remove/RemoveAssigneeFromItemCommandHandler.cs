@@ -2,8 +2,6 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
-using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -12,9 +10,9 @@ namespace Tracker.Application.UseCases.BoardItemAssignees.Remove;
 public class RemoveAssigneeFromItemCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<RemoveAssigneeFromItemCommand, Result<BoardItemDto>>
+    : IRequestHandler<RemoveAssigneeFromItemCommand, Result<IReadOnlySet<Guid>>>
 {
-    public async Task<Result<BoardItemDto>> Handle(RemoveAssigneeFromItemCommand request,
+    public async Task<Result<IReadOnlySet<Guid>>> Handle(RemoveAssigneeFromItemCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -45,6 +43,6 @@ public class RemoveAssigneeFromItemCommandHandler(
         {
             return Error.Unknown;
         }
-        return item.ToDto();
+        return item.Assignees.Select(a => a.BoardUser.UserId).ToHashSet();
     }
 }

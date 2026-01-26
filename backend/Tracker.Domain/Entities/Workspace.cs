@@ -7,7 +7,7 @@ namespace Tracker.Domain.Entities;
 public class Workspace : BaseEntity
 {
     public required string Title { get; set; }
-    public string? Description { get; set; }
+    public string Description { get; set; } = string.Empty;
     public List<Board> Boards { get; set; } = [];
     public WorkspaceVisibility Visibility { get; set; }
         = WorkspaceVisibility.Private;

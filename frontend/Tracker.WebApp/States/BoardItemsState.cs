@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Events;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 
@@ -40,12 +41,7 @@ public sealed class BoardItemsState(
 
     public async Task CreateAsync(Guid boardListId, string title)
     {
-        var request = new CreateBoardItemRequest
-        {
-            Title = title
-        };
-
-        var result = await boardItemService.CreateAsync(Board.Id, boardListId, request);
+        var result = await boardItemService.CreateAsync(Board.Id, boardListId, title);
         if (result.IsFailure)
         {
             await boardState.ReloadAsync();
@@ -107,7 +103,13 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        item.Assignees.Add(userId);
+
+        if (item.Assignees.Contains(userId))
+        {
+            return;
+        }
+
+        item.Assignees = item.Assignees.Append(userId).ToHashSet();
         Notify();
 
         var result = await boardItemService.AssignAsync(Board.Id, itemId, userId);
@@ -124,7 +126,12 @@ public sealed class BoardItemsState(
         {
             return;
         }
-        item.Assignees.Remove(userId);
+        if (!item.Assignees.Contains(userId))
+        {
+            return;
+        }
+
+        item.Assignees = item.Assignees.Where(bia => bia != userId).ToHashSet();
         Notify();
 
         var result = await boardItemService.UnassignAsync(Board.Id, itemId, userId);

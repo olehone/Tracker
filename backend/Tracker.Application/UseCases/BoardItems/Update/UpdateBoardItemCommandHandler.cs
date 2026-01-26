@@ -3,6 +3,7 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -26,9 +27,26 @@ public class UpdateBoardItemCommandHandler(
         }
         var boardItem = itemResult.Value;
 
-        boardItem.Title = request.Title;
-        boardItem.Description = request.Description;
-        boardItem.IsDone = request.IsDone;
+        if (request.Title is not null)
+        {
+            boardItem.Title = request.Title;
+        }
+        if (request.Description is not null)
+        {
+            boardItem.Description = request.Description;
+        }
+        if (request.IsDone is not null)
+        {
+            boardItem.IsDone = (bool)request.IsDone;
+        }
+        if (request.DueDate is not null)
+        {
+            boardItem.DueDate = request.DueDate;
+        }
+        if (request.Importance is not null)
+        {
+            boardItem.Importance = (BoardItemImportance)request.Importance;
+        }
 
         uow.BoardItemRepository.Update(boardItem);
         var result = await uow.SaveChangesAsync(cancellationToken);

@@ -25,19 +25,6 @@ public class BoardsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreateBoardRequest request)
-    {
-        var mediatorRequest = new CreateBoardCommand()
-        {
-            WorkspaceId = request.WorkspaceId,
-            Title = request.Title,
-            Description = request.Description
-        };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
     [HttpPut("{id:guid}/settings")]
     public async Task<IActionResult> UpdateAsync(Guid id,
             [FromBody] UpdateBoardBodyRequest request)
