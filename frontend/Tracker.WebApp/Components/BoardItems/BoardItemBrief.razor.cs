@@ -5,7 +5,7 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.BoardItems;
 
-public partial class BoardCalendarItem
+public partial class BoardItemBrief
 {
     private static readonly DialogOptions DialogOptions = new()
     {
@@ -18,15 +18,10 @@ public partial class BoardCalendarItem
     private BoardState BoardState { get; set; } = null!;
 
     [Parameter, EditorRequired]
-    public BoardCalendarItemModel Item { get; set; } = null!;
+    public BoardItemDto Item { get; set; } = null!;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
-
-    private BoardItemDto BoardItem => Item.BoardItem;
-
-    private string ItemStyle =>
-        BoardItem.IsDone ? "text-decoration: line-through; width: 100%" : "width: 100%";
 
     private bool IsOwn()
     {
@@ -34,16 +29,20 @@ public partial class BoardCalendarItem
         {
             return false;
         }
-        return BoardItem.Assignees.Contains(AppState.CurrentUser.Id);
+        return Item.Assignees.Contains(AppState.CurrentUser.Id);
     }
 
+    private string GetStyle()
+    {
+        return Item.IsDone ? "text-decoration: line-through; width: 90%" : "width: 90%";
+    }
     private Color GetColor()
     {
-        if (BoardItem.IsDone)
+        if (Item.IsDone)
         {
             return Color.Success;
         }
-        return ImportanceHelper.GetColor(BoardItem.Importance);
+        return ImportanceHelper.GetColor(Item.Importance);
     }
 
     private Variant GetVariant()
@@ -58,11 +57,11 @@ public partial class BoardCalendarItem
         var parameters = new DialogParameters
         {
             { nameof(BoardItemSettingsDialog.BoardState), BoardState },
-            { nameof(BoardItemSettingsDialog.Item), BoardItem }
+            { nameof(BoardItemSettingsDialog.Item), Item }
         };
 
         var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
-            BoardItem.Title,
+            Item.Title,
             parameters,
             DialogOptions);
 

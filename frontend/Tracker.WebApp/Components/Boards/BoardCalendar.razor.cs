@@ -19,6 +19,7 @@ public partial class BoardCalendar : IDisposable
     private bool _showNotCompleted = true;
 
     private List<BoardCalendarItemModel> Items = [];
+    private List<BoardItemDto> AllItems() => BoardState.ItemsState.BoardItems.ToList();
 
     private bool IsUnauthorized()
     {
@@ -59,6 +60,27 @@ public partial class BoardCalendar : IDisposable
             DueDate = dueDate
         };
         await BoardState.ItemsState.UpdateAsync(item.BoardItem.Id, request);
+    }
+
+    private async Task OnItemDroppedBetweenZones(MudItemDropInfo<BoardItemDto> dropInfo)
+    {
+        var item = dropInfo.Item;
+
+        if (dropInfo.DropzoneIdentifier == "BoardItems")
+        {
+            var request = new UpdateBoardItemRequest { DueDate = null };
+            await BoardState.ItemsState.UpdateAsync(item.Id, request);
+        }
+    }
+
+    private bool GetItemsForDropzone(BoardItemDto item, string dropzone)
+    {
+        if (dropzone == "BoardItems")
+        {
+            return !item.DueDate.HasValue;
+        }
+
+        return item.DueDate.HasValue;
     }
 
     private void ReloadItems()

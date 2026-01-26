@@ -5,8 +5,11 @@
 
 <MudPaper Elevation="5"
 		  Width="400px"
-		  Class="my-3 mx-2"
-		  Style="align-self: flex-start;">
+		  Class="my-3 mx-2">
+	<MudText Typo="Typo.h5"
+			 Class="ma-3">
+		Items without due date
+	</MudText>
 	<MudStack Spacing="1"
 			  Justify="Justify.FlexStart"
 			  Class="pa-1">
@@ -15,7 +18,7 @@
 					 Style="min-height: 60px; max-height: 500px; overflow-y: auto;"
 					 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
 
-		@if (BoardState.Board.Permissions.CanCreateItem)
+		@if (!CanCreate || BoardState.Board.Permissions.CanCreateItem)
 		{
 			<MudSelect T="BoardListDto"
 					   Label="List"
@@ -36,5 +39,4 @@
 			}
 		}
 	</MudStack>
-
 </MudPaper>

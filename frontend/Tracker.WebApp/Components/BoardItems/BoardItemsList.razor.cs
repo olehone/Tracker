@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
@@ -5,6 +6,9 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemsList
 {
+    [Parameter]
+    public bool CanCreate { get; set; } = true;
+
     private BoardListDto? SelectedList { get; set; }
 
     protected override void OnParametersSet()
