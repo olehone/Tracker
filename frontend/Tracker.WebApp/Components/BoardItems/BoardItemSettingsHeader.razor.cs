@@ -53,8 +53,8 @@ public partial class BoardItemSettingsHeader
             return;
         }
 
-        await BoardState.ItemsState.DeleteAsync(Item.Id);
         MudDialog.Close(DialogResult.Ok(true));
+        await BoardState.ItemsState.DeleteAsync(Item.Id);
     }
 
     private async Task ChangeIsDone(bool isDone)
