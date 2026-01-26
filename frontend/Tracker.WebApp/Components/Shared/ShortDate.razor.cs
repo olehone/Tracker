@@ -52,24 +52,6 @@ public partial class ShortDate
         return Color.Default;
     }
 
-    public static Color GetDateColor(DateTime? date, bool isDone)
-    {
-        if (isDone)
-        {
-            return Color.Success;
-        }
-        if (date < DateTime.Now)
-        {
-            return Color.Error;
-        }
-        if (date < DateTimeOffset.Now.AddDays(1))
-        {
-            return Color.Warning;
-        }
-
-        return Color.Default;
-    }
-
     private Variant GetVariant()
     {
         return HasAttention
