@@ -117,8 +117,8 @@ public partial class BoardCalendar : IDisposable
 
     private void OnBoardStateChanged()
     {
-        StateHasChanged();
         ReloadItems();
+        StateHasChanged();
     }
 
     protected virtual void Dispose(bool disposing)
