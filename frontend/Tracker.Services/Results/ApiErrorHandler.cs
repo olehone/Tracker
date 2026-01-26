@@ -11,8 +11,7 @@ public class ApiErrorHandler(IErrorNotifier errorNotifier) : IApiErrorHandler
     // Without response body
     // await apiErrorHandler.ExecuteAsync(api.WithoutArgumentsCall);
     // await apiErrorHandler.ExecuteAsync(() => api.WithoutArgumentsCall(arg1, arg2, arg3));
-    public async Task<Result> ExecuteAsync(
-    Func<Task<IApiResponse>> apiCall)
+    public async Task<Result> ExecuteAsync(Func<Task<IApiResponse>> apiCall)
     {
         try
         {

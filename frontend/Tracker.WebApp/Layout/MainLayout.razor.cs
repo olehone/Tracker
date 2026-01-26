@@ -12,6 +12,7 @@ public partial class MainLayout : IDisposable
     private AppState AppState { get; set; } = null!;
 
     [Inject] private NavigationManager Nav { get; set; } = null!;
+
     protected override void OnInitialized()
     {
         AppState.OnUserChange += StateHasChanged;
@@ -34,6 +35,11 @@ public partial class MainLayout : IDisposable
     private void GoToRegister()
     {
         Nav.NavigateTo("/register");
+    }
+
+    private void GoToHome()
+    {
+        Nav.NavigateTo("/");
     }
 
 }

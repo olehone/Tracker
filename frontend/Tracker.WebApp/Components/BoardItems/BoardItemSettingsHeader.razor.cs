@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
@@ -15,10 +16,29 @@ public partial class BoardItemSettingsHeader
 
     [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; }
-    [Parameter, EditorRequired]
-    public UpdateBoardItemRequest Model { get; set; }
 
     [Inject] IDialogService DialogService { get; set; } = null!;
+
+
+    private string? _title;
+    private bool _isDone;
+    private bool _isEditingTitle = false;
+
+    protected override void OnInitialized()
+    {
+        _title = Item.Title;
+        _isDone = Item.IsDone;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!_isEditingTitle && _title != Item.Title)
+        {
+            _title = Item.Title;
+        }
+
+        _isDone = Item.IsDone;
+    }
 
     private async Task Delete()
     {
@@ -37,9 +57,33 @@ public partial class BoardItemSettingsHeader
         MudDialog.Close(DialogResult.Ok(true));
     }
 
+    private async Task ChangeIsDone(bool isDone)
+    {
+        var request = new UpdateBoardItemRequest { IsDone = isDone };
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private void TitleFocused()
+    {
+        _isEditingTitle = true;
+    }
+
+    private async Task TitleBlurred(FocusEventArgs args)
+    {
+        _isEditingTitle = false;
+
+        if (string.IsNullOrWhiteSpace(_title) || _title == Item.Title)
+        {
+            return;
+        }
+
+        var request = new UpdateBoardItemRequest { Title = _title };
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
     private void Cancel() => MudDialog.Cancel();
 
     private string GetTitleStyle() =>
-        Model.IsDone ? "text-decoration: line-through;" : string.Empty;
+        Item.IsDone ? "text-decoration: line-through;" : string.Empty;
 
 }

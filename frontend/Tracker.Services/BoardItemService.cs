@@ -23,7 +23,7 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
         return apiErrorHandler.ExecuteAsync(() => api.MoveAsync(boardId, itemId, request));
     }
 
-    public Task<Result> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
+    public Task<Result<BoardItemDto>> UpdateAsync(Guid boardId, Guid itemId, UpdateBoardItemRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(boardId, itemId, request));
     }
@@ -33,12 +33,12 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
         return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(boardId, itemId));
     }
 
-    Task<Result<BoardItemDto>> IBoardItemService.AssignAsync(Guid boardId, Guid itemId, Guid userId)
+    Task<Result<HashSet<Guid>>> IBoardItemService.AssignAsync(Guid boardId, Guid itemId, Guid userId)
     {
         return apiErrorHandler.ExecuteAsync(() => api.AssignAsync(boardId, itemId, userId));
     }
 
-    Task<Result<BoardItemDto>> IBoardItemService.UnassignAsync(Guid boardId, Guid itemId, Guid userId)
+    Task<Result<HashSet<Guid>>> IBoardItemService.UnassignAsync(Guid boardId, Guid itemId, Guid userId)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UnassingAsync(boardId, itemId, userId));
     }

@@ -90,6 +90,7 @@ public class BoardItemsController(IMediator mediator,
             Description = request.Description,
             IsDone = request.IsDone,
             DueDate = request.DueDate,
+            ClearDueDate = request.ClearDueDate,
             Importance = request.Importance,
         };
         var response = await mediator.Send(mediatorRequest);

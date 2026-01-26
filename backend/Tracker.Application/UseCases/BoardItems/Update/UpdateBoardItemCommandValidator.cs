@@ -10,7 +10,6 @@ public class UpdateBoardItemCommandValidator
     public UpdateBoardItemCommandValidator(IOptions<EntityOptions> options)
     {
         RuleFor(x => x.Title)
-            .NotEmpty()
             .MaximumLength(options.Value.TitleMaximumLength);
 
         RuleFor(x => x.Description)

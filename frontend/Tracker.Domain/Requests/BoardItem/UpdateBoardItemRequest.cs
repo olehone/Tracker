@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Enums;
 
-namespace Tracker.API.Requests;
+namespace Tracker.Domain.Requests.BoardItem;
 
 public record class UpdateBoardItemRequest
 {
@@ -8,7 +8,7 @@ public record class UpdateBoardItemRequest
     public string? Description { get; set; }
     public bool? IsDone { get; set; }
     public DateTimeOffset? DueDate { get; set; }
-    public bool ClearDueDate { get; set; }
+    public bool ClearDueDate { get; set; } = false;
     public BoardItemImportance? Importance { get; set; }
-    public IReadOnlySet<Guid>? Assignees { get; set; }
+    public HashSet<Guid>? Assignees { get; set; }
 }

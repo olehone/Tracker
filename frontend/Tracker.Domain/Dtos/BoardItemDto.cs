@@ -12,5 +12,5 @@ public class BoardItemDto
     public required bool IsDone { get; set; }
     public DateTimeOffset? DueDate { get; set; }
     public required BoardItemImportance Importance { get; set; }
-    public required IReadOnlySet<Guid> Assignees { get; set; }
+    public required HashSet<Guid> Assignees { get; set; }
 }

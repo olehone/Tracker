@@ -1,7 +1,6 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
@@ -9,22 +8,19 @@ namespace Tracker.WebApp.Components.BoardItems;
 
 public partial class BoardItemSettingsDialog : IDisposable
 {
-    private static readonly UpdateBoardItemRequestValidator Validator = new();
-
-    private MudForm? _form;
-    private UpdateBoardItemRequest _model = null!;
-    private bool _isSubmitting;
     private bool _openAssign;
     private bool _disposed;
-
-    [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; } = null!;
+    private string _description = string.Empty;
+    private DateTime? _date;
+    private BoardItemImportance _importance;
+    private bool _isEditingDescription = false;
+    private bool _openDate = false;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
-    [Parameter]
-    public BoardItemDto Item { get; set; } = null!;
 
+    [Parameter, EditorRequired]
+    public BoardItemDto Item { get; set; } = null!;
 
     private bool IsItemExists =>
         BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
@@ -36,36 +32,93 @@ public partial class BoardItemSettingsDialog : IDisposable
 
     protected override void OnInitialized()
     {
-        BoardState.ItemsState.OnChange += StateHasChanged;
-
-        _model = new UpdateBoardItemRequest
-        {
-            Title = Item.Title,
-            Description = Item.Description ?? string.Empty,
-            IsDone = Item.IsDone,
-        };
+        BoardState.ItemsState.OnChange += OnChange;
+        _description = Item.Description;
+        _date = Item.DueDate?.UtcDateTime;
+        _importance = Item.Importance;
     }
 
-    private async Task Submit()
+    private void OnChange()
     {
-        if (_form is null)
+        if (!_isEditingDescription && _description != Item.Description)
         {
-            return;
+            _description = Item.Description;
         }
 
-        await _form.Validate();
-        if (!_form.IsValid)
-        {
-            return;
-        }
-
-        _isSubmitting = true;
+        _date = Item.DueDate?.UtcDateTime;
+        _importance = Item.Importance;
         StateHasChanged();
+    }
+    private void DescriptionFocused()
+    {
+        _isEditingDescription = true;
+    }
 
-        await BoardState.ItemsState.UpdateAsync(Item.Id, _model);
+    private async Task DescriptionBlurred()
+    {
+        _isEditingDescription = false;
 
-        _isSubmitting = false;
-        MudDialog.Close(DialogResult.Ok(true));
+        if (_description == Item.Description)
+        {
+            return;
+        }
+
+        var request = new UpdateBoardItemRequest { Description = _description };
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private async Task RemoveDueDate()
+    {
+        var request = new UpdateBoardItemRequest
+        {
+            ClearDueDate = true
+        };
+        _openDate = false;
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private async Task DateSelected(DateTime? date)
+    {
+        if (date is null)
+        {
+            return;
+        }
+        if (_date == date)
+        {
+            return;
+        }
+        _date = date;
+        var localOffset = TimeZoneInfo.Local.GetUtcOffset(date.Value);
+        var dueDate = new DateTimeOffset(
+            date.Value.Year,
+            date.Value.Month,
+            date.Value.Day,
+            23,
+            59,
+            59,
+            localOffset);
+        var request = new UpdateBoardItemRequest
+        {
+            DueDate = dueDate
+        };
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
+    private async Task ImportanceSelected(BoardItemImportance importance)
+    {
+        if (_importance == importance)
+        {
+            return;
+        }
+        _importance = importance;
+        var request = new UpdateBoardItemRequest
+        {
+            Importance = importance
+        };
+
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -77,7 +130,7 @@ public partial class BoardItemSettingsDialog : IDisposable
 
         if (disposing)
         {
-            BoardState.ItemsState.OnChange -= StateHasChanged;
+            BoardState.ItemsState.OnChange -= OnChange;
         }
 
         _disposed = true;
@@ -87,19 +140,5 @@ public partial class BoardItemSettingsDialog : IDisposable
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
-    }
-
-    public class UpdateBoardItemRequestValidator : AbstractValidator<UpdateBoardItemRequest>
-    {
-        public UpdateBoardItemRequestValidator()
-        {
-            RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title is required")
-                .MinimumLength(3)
-                .MaximumLength(100).WithMessage("Title can't exceed 100 characters");
-
-            RuleFor(x => x.Description)
-                .MaximumLength(500).WithMessage("Description can't exceed 500 characters");
-        }
     }
 }

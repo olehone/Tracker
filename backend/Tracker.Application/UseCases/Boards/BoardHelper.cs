@@ -65,8 +65,10 @@ public static class BoardHelper
     }
     
     public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow, 
-        IUserContext userContext, Guid boardItemId, BoardAction action, Guid boardId)
+        IUserContext userContext, Guid boardItemId, Guid boardId)
     {
+        BoardAction action = BoardAction.ChangeItem;
+
         if (userContext.IsUnauthenticated())
         {
             return AuthErrors.Unauthenticated;
@@ -83,16 +85,19 @@ public static class BoardHelper
             return Error.Validation("Board does not have this item");
         }
 
-        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
-        if (!isAllowed)
-        {
-            return AuthErrors.Forbidden();
-        }
-
         var boardItem = await uow.BoardItemRepository.GetByIdAsync(boardItemId);
         if (boardItem is null)
         {
             return Error.NotFound("Board item");
+        }
+
+        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
+        var assigned = boardItem.Assignees
+            .Any(bia => bia.BoardUser.UserId == userContext.GetUserId());
+
+        if (!isAllowed && !assigned)
+        {
+            return AuthErrors.Forbidden();
         }
 
         return boardItem;

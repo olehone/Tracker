@@ -1,27 +1,45 @@
+@using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 
-<MudPaper Elevation="25" Class="pa-0 rounded-lg my-3">
+<MudPaper Elevation=@GetElevation()
+		  Class="pa-0 rounded-lg my-3">
 	<MudButton FullWidth
-			   OnClick="@OpenItemSettings">
-		<MudCheckBox T=@bool
-					 Value="Item.IsDone"
-					 ValueChanged="OnIsDoneChanged" />
+			   Style="background-color: inherit; box-shadow: none;"
+			   OnClick=@OpenItemSettings>
+		<MudPaper Width="100%" Elevation="0">
+			<MudStack Row
+					  AlignItems="AlignItems.Center"
+					  StretchItems="StretchItems.Middle">
+				<MudCheckBox T=@bool
+							 Value=@Item.IsDone
+							 ValueChanged=@OnIsDoneChanged />
+				<MudText Class="text-ellipsis"
+						 Style="@ItemStyle">
+					@Item.Title
+				</MudText>
+				<BoardItemImportanceIcon Importance=@Item.Importance
+										 HasAttention=@IsOwn() />
+			</MudStack>
+			<MudStack Row>
+				<MudAvatarGroup @key=@GetUsersKey()
+								Max="3"
+								Spacing="3">
+					@foreach (var user in AssignedUsers())
+					{
+						<UserAvatarWithLookup User=@user.User
+											  Size=@Size.Medium />
+					}
+				</MudAvatarGroup>
 
-		<MudSpacer />
+				<MudSpacer />
 
-		<MudText Class="text-ellipsis"
-				 Style="@ItemStyle">
-			@Item.Title
-		</MudText>
-
-		<MudSpacer />
-
-		<MudAvatarGroup Max="3"
-						Spacing="4">
-			@foreach (var user in AssignedUsers())
-			{
-				<UserAvatarSmallWithLookup User=@user.User />
-			}
-		</MudAvatarGroup>
+				@if (Item.DueDate is not null)
+				{
+					<ShortDate Value=@Item.DueDate.Value
+							   IsDone=@Item.IsDone
+							   HasAttention=@IsOwn() />
+				}
+			</MudStack>
+		</MudPaper>
 	</MudButton>
 </MudPaper>

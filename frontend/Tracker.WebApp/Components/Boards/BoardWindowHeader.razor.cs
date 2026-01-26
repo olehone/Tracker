@@ -14,6 +14,11 @@ public partial class BoardWindowHeader : IDisposable
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
+    [Parameter, EditorRequired]
+    public int TabIndex { get; set; }
+    [Parameter]
+    public EventCallback<int> TabIndexChanged { get; set; }
+
     private BoardFullDto Board => BoardState.Board;
     private bool _disposed;
 
@@ -40,6 +45,11 @@ public partial class BoardWindowHeader : IDisposable
     {
         if (BoardState.IsLoading)
         {
+            return;
+        }
+        if (BoardState is null)
+        {
+            Nav.NavigateTo("/");
             return;
         }
         var workspaceId = Board.WorkspaceId;
@@ -92,6 +102,12 @@ public partial class BoardWindowHeader : IDisposable
         );
 
         await dialog.Result;
+    }
+
+    private void OnTabIndexChanged(int index)
+    {
+        TabIndex = index;
+        TabIndexChanged.InvokeAsync(index);
     }
 
     protected virtual void Dispose(bool disposing)

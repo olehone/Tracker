@@ -1,73 +1,108 @@
-﻿@using Tracker.WebApp.Components.BoardUsers
+﻿@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components.BoardUsers
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
-
 <CascadingValue Value=@BoardState>
 	@if (IsItemExists)
 	{
-		<MudForm @ref=@_form
-				 Model=@_model
-				 Validation=@Validator
-				 ValidationDelay="300">
-			<MudDialog>
-				<DialogContent>
-					<MudStack>
-						<BoardItemSettingsHeader Item=@Item
-												 Model=@_model />
-
-						@* Buttons to add something new *@
-						<MudStack Row>
-							@if (!Item.Assignees.Any())
-							{
-								<MudButton Size="Size.Small"
-										   Variant="Variant.Outlined"
-										   StartIcon=@Icons.Material.Filled.PersonAdd
-										   OnClick=@ToggleAssign>
-									Assign
-								</MudButton>
-
-							}
-						</MudStack>
-
-						@* Assignees part *@
-						<MudPopover Open=@_openAssign
+		<MudDialog>
+			<DialogContent>
+				<MudStack>
+					<BoardItemSettingsHeader Item=@Item />
+					<MudStack Row>
+						@if (!Item.Assignees.Any())
+						{
+							<MudButton Size="Size.Small"
+									   Variant="Variant.Outlined"
+									   StartIcon=@Icons.Material.Filled.PersonAdd
+									   OnClick=@ToggleAssign>
+								Assign
+							</MudButton>
+						}
+						@if (_date is null && !_openDate)
+						{
+							<MudButton Size="Size.Small"
+									   Variant="Variant.Outlined"
+									   StartIcon=@Icons.Material.Filled.EditCalendar
+									   OnClick=@(() => _openDate = true)>
+								Set due date
+							</MudButton>
+						}
+					</MudStack>
+					@* Assignees part *@
+					@if (_openAssign)
+					{
+						<MudOverlay Visible="true"
+									AutoClose="true"
+									OnClosed="@(() => _openAssign = false)"
+									DarkBackground="false" />
+						<MudPopover Open
 									AnchorOrigin="Origin.TopRight"
 									TransformOrigin="Origin.CenterRight">
 							<BoardItemAssignees BoardState=@BoardState
 												Close=@(() => _openAssign = false)
 												Item=@Item />
 						</MudPopover>
+					}
 
-						<BoardItemAssigneesList Item=@Item
-												ToggleAssign=@ToggleAssign
-												OpenAssign=@_openAssign />
-
-						<MudTextField @bind-Value=@_model.Description
-									  Label="Description"
-									  Lines="3"
-									  Variant="Variant.Outlined" />
-						<MudButton Disabled=@_isSubmitting
-								   OnClick=@Submit
-								   Variant="Variant.Filled"
-								   Color="Color.Primary">
-							@if (_isSubmitting)
-							{
-								<MudProgressCircular Size="Size.Small"
-													 Indeterminate
-													 Color="Color.Inherit" />
-							}
-							else
-							{
-								<MudText>Save</MudText>
-							}
-						</MudButton>
-
-						<MudDivider />
+					<BoardItemAssigneesList Item=@Item
+											ToggleAssign=@ToggleAssign
+											OpenAssign=@_openAssign />
+					<MudStack Row
+							  AlignItems="AlignItems.Center"
+							  StretchItems="StretchItems.End">
+						@if (_date is not null || _openDate)
+						{
+							<MudStack Spacing="0">
+								<MudText Typo="Typo.body2">
+									Due date
+								</MudText>
+								<MudStack Row
+										  AlignItems="AlignItems.Center">
+									<MudDatePicker Date=@_date
+												   DateChanged=@((DateTime? date) => DateSelected(date))
+												   ShowToolbar="false" />
+									<MudIconButton Icon=@Icons.Material.Filled.Close
+												   OnClick=@RemoveDueDate />
+								</MudStack>
+							</MudStack>
+						}
+						<MudStack Spacing="0">
+							<MudText Typo="Typo.body2">
+								Importance
+							</MudText>
+							<MudSelect FullWidth
+									   Value=@_importance
+									   ValueChanged=@((BoardItemImportance importance) => ImportanceSelected(importance))>
+								@foreach (BoardItemImportance importance in Enum.GetValues(typeof(BoardItemImportance)))
+								{
+									<MudSelectItem Value=@importance>
+										<MudStack Row
+												  Justify="Justify.SpaceBetween"
+												  StretchItems="StretchItems.End">
+											<MudIcon Icon=@ImportanceHelper.GetIcon(importance)
+													 Color=@ImportanceHelper.GetColor(importance) />
+											<MudText>
+												@importance
+											</MudText>
+										</MudStack>
+									</MudSelectItem>
+								}
+							</MudSelect>
+						</MudStack>
 
 					</MudStack>
-				</DialogContent>
-			</MudDialog>
-		</MudForm>
+
+					<MudTextField @bind-Value=@_description
+								  Label="Description"
+								  Lines="3"
+								  Variant="Variant.Outlined"
+								  @onfocus=@DescriptionFocused
+								  @onblur=@DescriptionBlurred />
+					<MudDivider />
+				</MudStack>
+			</DialogContent>
+		</MudDialog>
 	}
 	else
 	{

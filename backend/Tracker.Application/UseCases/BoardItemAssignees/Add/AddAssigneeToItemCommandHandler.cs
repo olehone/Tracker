@@ -20,7 +20,7 @@ public class AddAssigneeToItemCommandHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
-            request.BoardItemId, BoardAction.ChangeItem, request.BoardId);
+            request.BoardItemId, request.BoardId);
         if (itemResult.IsFailure)
         {
             return itemResult.Error;

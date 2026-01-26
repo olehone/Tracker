@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.BoardItems;
 
-public partial class BoardItem
+public partial class BoardItemBrief
 {
     private static readonly DialogOptions DialogOptions = new()
     {
@@ -24,28 +23,6 @@ public partial class BoardItem
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
 
-    private Task OnIsDoneChanged(bool isDone)
-    {
-        var request = new UpdateBoardItemRequest
-        {
-            Title = Item.Title,
-            Description = Item.Description,
-            IsDone = isDone
-        };
-
-        return BoardState.ItemsState.UpdateAsync(Item.Id, request);
-    }
-
-    private string ItemStyle =>
-        Item.IsDone ? "text-decoration: line-through;" : string.Empty;
-
-    private IEnumerable<BoardUserDto> AssignedUsers()
-    {
-        return Item.Assignees.Count != 0
-            ? BoardState.UsersState.Users.Where(bu => Item.Assignees.Contains(bu.User.Id))
-            : [];
-    }
-
     private bool IsOwn()
     {
         if (AppState.CurrentUser is null)
@@ -55,13 +32,24 @@ public partial class BoardItem
         return Item.Assignees.Contains(AppState.CurrentUser.Id);
     }
 
-    private string GetUsersKey()
+    private string GetStyle()
     {
-        return string.Join("-", Item.Assignees);
+        return Item.IsDone ? "text-decoration: line-through; width: 90%" : "width: 90%";
     }
-    private int GetElevation()
+    private Color GetColor()
     {
-        return IsOwn() ? 3 : 0;
+        if (Item.IsDone)
+        {
+            return Color.Success;
+        }
+        return ImportanceHelper.GetColor(Item.Importance);
+    }
+
+    private Variant GetVariant()
+    {
+        return IsOwn()
+            ? Variant.Filled
+            : Variant.Outlined;
     }
 
     private async Task OpenItemSettings()

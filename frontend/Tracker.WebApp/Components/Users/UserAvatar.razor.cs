@@ -5,7 +5,7 @@ using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Users;
 
-public partial class UserAvatarSmall
+public partial class UserAvatar
 {
     [Parameter, EditorRequired]
     public UserDto User { get; set; }

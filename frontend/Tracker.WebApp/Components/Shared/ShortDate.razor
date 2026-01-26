@@ -1,0 +1,15 @@
+@using Tracker.WebApp.Components.Users
+
+<MudChip T="string"
+		 Color=@GetDateColor()
+		 Variant=GetVariant()
+		 Label="true">
+	<MudStack Row
+			  Justify="Justify.SpaceBetween">
+		<MudIcon Icon=@Icons.Material.Filled.AccessTime />
+
+		<MudText>
+			@GetFromattedDate()
+		</MudText>
+	</MudStack>
+</MudChip>

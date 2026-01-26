@@ -19,7 +19,7 @@ public partial class Overview
     [Inject] IUserService UserService { get; set; } = null!;
 
     private BoardState BoardState { get; set; } = null!;
-
+    private int activeIndex = 0;
     protected override async Task OnInitializedAsync()
     {
         BoardState = new BoardState(

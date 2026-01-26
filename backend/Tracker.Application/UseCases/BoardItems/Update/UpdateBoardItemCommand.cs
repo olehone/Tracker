@@ -13,5 +13,6 @@ public class UpdateBoardItemCommand : IRequest<Result<BoardItemDto>>
     public string? Description { get; set; }
     public bool? IsDone { get; set; }
     public DateTimeOffset? DueDate { get; set; }
+    public bool ClearDueDate { get; set; }
     public BoardItemImportance? Importance { get; set; }
 }
