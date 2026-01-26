@@ -13,28 +13,37 @@
 		<Header>
 			<BoardWindowHeader @bind-TabIndex=@activeIndex />
 		</Header>
-		
+
 		<Body>
-			@switch (activeIndex)
+			@if (BoardState.IsLoading)
 			{
-				case 0:
-					<MudStack StretchItems="StretchItems.None"
-							  AlignItems="AlignItems.Start"
-							  Style="overflow-x: auto;">
-						<BoardKanban />
-					</MudStack>
-					break;
-				case 1:
-					<BoardCalendar />
-					break;
-				case 2:
-					<MudText>Matrix</MudText>
-					break;
-				default:
-					<MudAlert Severity="Severity.Error">
-						There no such index!
-					</MudAlert>
-					break;
+				<MudProgressLinear Color="Color.Primary"
+								   Indeterminate />
+			}
+			else
+			{
+				@switch (activeIndex)
+				{
+					case 0:
+						<MudStack StretchItems="StretchItems.None"
+								  AlignItems="AlignItems.Start"
+								  Style="overflow-x: auto;">
+							<BoardKanban />
+						</MudStack>
+						break;
+					case 1:
+						<BoardCalendar />
+						break;
+					case 2:
+						<MudText>Matrix</MudText>
+						break;
+					default:
+						<MudAlert Severity="Severity.Error">
+							There no such index!
+						</MudAlert>
+						break;
+				}
+
 			}
 		</Body>
 	</WorkWindow>

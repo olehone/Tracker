@@ -4,39 +4,31 @@
 @using Tracker.WebApp.Components.Shared;
 @using Tracker.WebApp.Components.Boards;
 
-@if (BoardState.IsLoading)
-{
-	<MudProgressLinear Color="Color.Primary"
-					   Indeterminate />
-}
-else
-{
-	<MudDropContainer @ref=@_container
-					  T=@BoardItemDto
-					  ItemDisabled=@ItemDisabled
-					  Items=@BoardState.ItemsState.BoardItems
-					  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
-					  ItemDropped=@ItemDropped
-					  Class="d-flex flex-row flex-nowrap">
-		<ChildContent>
-			@foreach (var list in BoardState.ListsState.BoardLists)
-			{
-				<BoardList List=@list />
-			}
-			@if (Board.Permissions.CanCreateList)
-			{
-				<MudPaper Elevation="5"
-						  Width="400px"
-						  Style="align-self: flex-start;"
-						  Class="my-3 mx-2">
-					<OneLineCreateButton Title="Add new list"
-										 OnCreate=@CreateList />
-				</MudPaper>
-			}
-		</ChildContent>
+<MudDropContainer @ref=@_container
+				  T=@BoardItemDto
+				  ItemDisabled=@ItemDisabled
+				  Items=@BoardState.ItemsState.BoardItems
+				  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
+				  ItemDropped=@ItemDropped
+				  Class="d-flex flex-row flex-nowrap">
+	<ChildContent>
+		@foreach (var list in BoardState.ListsState.BoardLists)
+		{
+			<BoardList List=@list />
+		}
+		@if (Board.Permissions.CanCreateList)
+		{
+			<MudPaper Elevation="5"
+					  Width="400px"
+					  Style="align-self: flex-start;"
+					  Class="my-3 mx-2">
+				<OneLineCreateButton Title="Add new list"
+									 OnCreate=@CreateList />
+			</MudPaper>
+		}
+	</ChildContent>
 
-		<ItemRenderer>
-			<BoardItem Item=@context />
-		</ItemRenderer>
-	</MudDropContainer>
-}
+	<ItemRenderer>
+		<BoardItem Item=@context />
+	</ItemRenderer>
+</MudDropContainer>
