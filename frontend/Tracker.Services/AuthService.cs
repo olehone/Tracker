@@ -25,7 +25,7 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(() => api.LoginAsync(request));
         if (result.IsFailure)
         {
-            await DoLogoutAsync();
+            await LogoutAsync();
             return result.Error;
         }
 
@@ -44,7 +44,7 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(() => api.RegisterAsync(request));
         if (result.IsFailure)
         {
-            await DoLogoutAsync();
+            await LogoutAsync();
             return result.Error;
         }
 
@@ -58,13 +58,7 @@ public sealed class AuthService(
         return Result.Success();
     }
 
-    public async Task<Result> LogoutAsync()
-    {
-        await DoLogoutAsync();
-        return Result.Success();
-    }
-
-    private async Task DoLogoutAsync()
+    public async Task LogoutAsync()
     {
         await storage.ClearAsync();
         await OnLogout.InvokeAsync();
@@ -75,7 +69,6 @@ public sealed class AuthService(
         var accessToken = await GetAccessTokenAsync();
         if (accessToken is null)
         {
-            await DoLogoutAsync();
             return new ClaimsPrincipal(new ClaimsIdentity());
         }
 
@@ -123,7 +116,7 @@ public sealed class AuthService(
 
             if (result == null || result.IsFailure)
             {
-                await DoLogoutAsync();
+                await LogoutAsync();
                 return null;
             }
 
@@ -133,7 +126,7 @@ public sealed class AuthService(
         }
         catch (Exception)
         {
-            await DoLogoutAsync();
+            await LogoutAsync();
             return null;
         }
         finally
