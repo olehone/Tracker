@@ -20,12 +20,13 @@ public class RemoveUserFromBoardCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository
-            .GetByIdAsync(request.BoardId);
-        if (board is null)
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext,
+            request.BoardId, BoardAction.ChangeBoard);
+        if (boardResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return boardResult.Error;
         }
+        var board = boardResult.Value;
 
         var userBoard = await uow.BoardUserRepository
             .GetAsync(request.UserId, request.BoardId);
@@ -33,22 +34,7 @@ public class RemoveUserFromBoardCommandHandler(
         {
             return Error.NotFound("User", "board");
         }
-
         var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.BoardUserRepository
-            .GetRoleAsync(userId, board.Id);
-
-        var permissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
-
-
-        if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeBoard))
-        {
-            return AuthErrors.Forbidden();
-        }
 
         if (userBoard.Role == BoardUserRole.Owner && userBoard.UserId == userId)
         {

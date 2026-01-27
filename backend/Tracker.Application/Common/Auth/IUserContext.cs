@@ -5,8 +5,6 @@ namespace Tracker.Application.Common.Auth;
 public interface IUserContext
 {
     Guid GetUserId();
-    GlobalRole GetUserRole();
-    string GetUserEmail();
     bool IsAuthenticated();
     bool IsUnauthenticated();
 }

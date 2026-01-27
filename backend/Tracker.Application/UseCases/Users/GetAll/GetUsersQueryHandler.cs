@@ -14,6 +14,7 @@ public sealed class GetUsersQueryHandler(
         GetUsersQuery request,
         CancellationToken cancellationToken)
     {
+
         await using var uow = unitOfWorkFactory.Create();
 
         int skip = (request.Page - 1) * request.AmountInPage;

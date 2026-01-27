@@ -26,27 +26,16 @@ public sealed class CreateBoardCommandHandler(
 
         await using var uow = unitOfWorkFactory.Create();
 
-        var workspace = await uow.WorkspaceRepository.GetByIdAsync(request.WorkspaceId);
+        var workspace = await WorkspaceHelper.GetWorkspaceForActionAsync(uow, userContext,
+            request.WorkspaceId, WorkspaceAction.CreateBoard);
 
-        if (workspace is null)
+        if (workspace.IsFailure)
         {
-            return Error.NotFound("Workspace");
+            return workspace.Error;
         }
 
         var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, request.WorkspaceId);
-
-        var permissions = WorkspacePolicy
-            .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
-
-        if (WorkspacePolicy.IsActionAllowed(permissions, WorkspaceAction.CreateBoard))
-        {
-            return await Create(userId, request, uow, cancellationToken);
-        }
-
-        return AuthErrors.Forbidden();
+        return await Create(userId, request, uow, cancellationToken);
     }
 
     private static async Task<Result<BoardSummaryDto>> Create(Guid userId,

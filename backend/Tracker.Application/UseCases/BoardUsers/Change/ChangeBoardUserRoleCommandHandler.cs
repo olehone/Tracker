@@ -19,10 +19,15 @@ public class ChangeBoardUserRoleCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository.GetByIdAsync(request.BoardId);
-        if (board is null)
+        var action = request.Role == BoardUserRole.Owner
+            ? BoardAction.ChangeOwner
+            : BoardAction.ChangeBoard;
+
+        var boardResult = await BoardHelper.GetBoardForActionAsync(uow, userContext,
+            request.BoardId, action);
+        if (boardResult.IsFailure)
         {
-            return Error.NotFound("Board");
+            return boardResult.Error;
         }
 
         var user = await uow.UserRepository.GetByIdAsync(request.UserId);
@@ -31,16 +36,6 @@ public class ChangeBoardUserRoleCommandHandler(
             return Error.NotFound("User");
         }
 
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.BoardUserRepository
-            .GetRoleAsync(userId, board.Id);
-
-        var permissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
-
         var boardUser = new BoardUser
         {
             UserId = request.UserId,
@@ -48,17 +43,8 @@ public class ChangeBoardUserRoleCommandHandler(
             Role = request.Role,
         };
 
-        if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeBoard))
+        if (action == BoardAction.ChangeOwner)
         {
-            return AuthErrors.Forbidden();
-        }
-
-        if (request.Role == BoardUserRole.Owner)
-        {
-            if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeOwner))
-            {
-                return AuthErrors.Forbidden();
-            }
             await ChangeOwner(request, uow);
         }
         else

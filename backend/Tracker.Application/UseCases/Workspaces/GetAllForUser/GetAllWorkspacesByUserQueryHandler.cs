@@ -21,13 +21,20 @@ public sealed class GetAllWorkspacesByUserQueryHandler(
         {
             return AuthErrors.Unauthenticated;
         }
+        
+        await using var uow = unitOfWorkFactory.Create();
+        var userId = userContext.GetUserId();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            return AuthErrors.Unauthenticated;
+        }
 
-        var userRole = userContext.GetUserRole();
+        var userRole = user.Role;
         if (userRole < GlobalRole.Admin)
         {
             return AuthErrors.Forbidden();
         }
-        await using var uow = unitOfWorkFactory.Create();
 
         int skip = (request.Page - 1) * request.AmountInPage;
 
