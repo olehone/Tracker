@@ -31,7 +31,7 @@ public static class BoardsMapping
             BoardLists = board.BoardLists
                               .Select(boardList => boardList.ToDto())
                               .ToList(),
-            BoardUsers = board.UserBoards.Select(bm =>
+            BoardUsers = board.BoardUsers.Select(bm =>
                 new BoardUserDto
                 {
                     User = bm.User.ToDto(),

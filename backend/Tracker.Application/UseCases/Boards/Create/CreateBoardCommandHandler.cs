@@ -35,7 +35,7 @@ public sealed class CreateBoardCommandHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, request.WorkspaceId);
 
         var permissions = WorkspacePolicy
@@ -60,15 +60,15 @@ public sealed class CreateBoardCommandHandler(
             Title = request.Title,
         };
 
-        var userBoard = new UserBoard
+        var userBoard = new BoardUser
         {
             UserId = userId,
             BoardId = board.Id,
-            Role = UserBoardRole.Owner
+            Role = BoardUserRole.Owner
         };
 
         await uow.BoardRepository.AddAsync(board);
-        await uow.UserBoardRepository.AddAsync(userBoard);
+        await uow.BoardUserRepository.AddAsync(userBoard);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 

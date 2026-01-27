@@ -23,7 +23,7 @@ public class RemoveAssigneeFromItemCommandHandler(
         {
             return itemResult.Error;
         }
-        var boardUser = await uow.UserBoardRepository.GetAsync(request.UserId, request.BoardId);
+        var boardUser = await uow.BoardUserRepository.GetAsync(request.UserId, request.BoardId);
         if (boardUser is null)
         {
             return BoardErrors.UserNotInBoard;

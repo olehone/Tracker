@@ -4,21 +4,21 @@ using Tracker.Domain.Entities;
 
 namespace Tracker.Persistence.Configurations;
 
-public class UserWorkspaceConfiguration : IEntityTypeConfiguration<UserWorkspace>
+public class WorkspaceUserConfiguration : IEntityTypeConfiguration<WorkspaceUser>
 {
-    public void Configure(EntityTypeBuilder<UserWorkspace> builder)
+    public void Configure(EntityTypeBuilder<WorkspaceUser> builder)
     {
-        builder.ToTable("UserWorkspaces");
+        builder.ToTable("WorkspaceUsers");
 
         builder.Property(uw => uw.Role)
             .IsRequired();
 
         builder.HasOne(uw => uw.User)
-            .WithMany(uw => uw.UserWorkspaces)
+            .WithMany(uw => uw.WorkspaceUsers)
             .HasForeignKey(uw => uw.UserId);
 
         builder.HasOne(uw => uw.User)
-            .WithMany(uw => uw.UserWorkspaces)
+            .WithMany(uw => uw.WorkspaceUsers)
             .HasForeignKey(uw=> uw.UserId);
 
         builder.HasKey(ub => new { ub.UserId, ub.WorkspaceId });

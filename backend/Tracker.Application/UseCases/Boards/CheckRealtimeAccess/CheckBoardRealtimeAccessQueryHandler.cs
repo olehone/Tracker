@@ -27,9 +27,9 @@ public class CheckBoardRealtimeAccessQueryHandler(
         }
 
         var userRole = user.Role;
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(user.Id, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
+        var boardRole = await uow.BoardUserRepository
             .GetRoleAsync(user.Id, board.Id);
 
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))

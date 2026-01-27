@@ -32,7 +32,7 @@ public class AddUserToBoardCommandHandler(
             return Error.NotFound("User");
         }
 
-        var userBoard = await uow.UserBoardRepository
+        var userBoard = await uow.BoardUserRepository
             .GetAsync(request.UserId, request.BoardId);
         if (userBoard is not null)
         {
@@ -41,9 +41,9 @@ public class AddUserToBoardCommandHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
+        var boardRole = await uow.BoardUserRepository
             .GetRoleAsync(userId, board.Id);
 
         var permissions = BoardPolicy
@@ -54,13 +54,13 @@ public class AddUserToBoardCommandHandler(
         {
             return AuthErrors.Forbidden();
         }
-        var boardUser = new UserBoard
+        var boardUser = new BoardUser
         {
             UserId = request.UserId,
             BoardId = request.BoardId,
             Role = request.Role,
         };
-        await uow.UserBoardRepository.AddAsync(boardUser);
+        await uow.BoardUserRepository.AddAsync(boardUser);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
         var dto = new BoardUserDto

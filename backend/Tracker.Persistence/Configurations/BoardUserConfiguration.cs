@@ -4,11 +4,11 @@ using Tracker.Domain.Entities;
 
 namespace Tracker.Persistence.Configurations;
 
-public class UserBoardConfiguration : IEntityTypeConfiguration<UserBoard>
+public class BoardUserConfiguration : IEntityTypeConfiguration<BoardUser>
 {
-    public void Configure(EntityTypeBuilder<UserBoard> builder)
+    public void Configure(EntityTypeBuilder<BoardUser> builder)
     {
-        builder.ToTable("UserBoards");
+        builder.ToTable("BoardUsers");
 
         builder.HasKey(x => x.Id);
 
@@ -16,11 +16,11 @@ public class UserBoardConfiguration : IEntityTypeConfiguration<UserBoard>
             .IsRequired();
 
         builder.HasOne(ub => ub.User)
-            .WithMany(u => u.UserBoards)
+            .WithMany(u => u.BoardUsers)
             .HasForeignKey(ub => ub.UserId);
 
         builder.HasOne(ub => ub.Board)
-            .WithMany(u => u.UserBoards)
+            .WithMany(u => u.BoardUsers)
             .HasForeignKey(ub => ub.BoardId);
 
         builder.HasIndex(x => new { x.UserId, x.BoardId })

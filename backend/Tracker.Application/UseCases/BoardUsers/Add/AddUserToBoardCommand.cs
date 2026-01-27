@@ -9,5 +9,5 @@ public class AddUserToBoardCommand : IRequest<Result<BoardUserDto>>
 {
     public required Guid BoardId { get; set; }
     public required Guid UserId { get; set; }
-    public required UserBoardRole Role { get; set; }
+    public required BoardUserRole Role { get; set; }
 }

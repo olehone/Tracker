@@ -5,22 +5,22 @@ using Tracker.Domain.Enums;
 
 namespace Tracker.Persistence.Repositories;
 
-public class UserWorkspaceRepository : Repository<UserWorkspace, Guid>, IUserWorkspaceRepository
+public class WorkspaceUserRepository : Repository<WorkspaceUser, Guid>, IWorkspaceUserRepository
 {
 
-    public UserWorkspaceRepository(ApplicationDbContext applicationDbContext)
+    public WorkspaceUserRepository(ApplicationDbContext applicationDbContext)
         : base(applicationDbContext)
     {
     }
 
-    public async Task<UserWorkspace?> GetAsync(Guid userId, Guid workspaceId)
+    public async Task<WorkspaceUser?> GetAsync(Guid userId, Guid workspaceId)
     {
         return await _dbSet
             .AsNoTracking()
             .FirstOrDefaultAsync(uw => uw.UserId == userId && uw.WorkspaceId == workspaceId);
     }
 
-    public async Task<IReadOnlyList<UserWorkspace>> GetAsync(Guid workspaceId)
+    public async Task<IReadOnlyList<WorkspaceUser>> GetAsync(Guid workspaceId)
     {
         return await _dbSet.AsNoTracking()
             .Include(uw => uw.User)
@@ -28,18 +28,18 @@ public class UserWorkspaceRepository : Repository<UserWorkspace, Guid>, IUserWor
             .ToListAsync();
     }
 
-    public async Task<UserWorkspace?> GetOwnerAsync(Guid workspaceId)
+    public async Task<WorkspaceUser?> GetOwnerAsync(Guid workspaceId)
     {
         return await _dbSet.AsNoTracking()
-            .FirstOrDefaultAsync(uw => uw.WorkspaceId == workspaceId && uw.Role == UserWorkspaceRole.Owner);
+            .FirstOrDefaultAsync(uw => uw.WorkspaceId == workspaceId && uw.Role == WorkspaceUserRole.Owner);
     }
 
-    public async Task<UserWorkspaceRole> GetRoleAsync(Guid userId, Guid workspaceId)
+    public async Task<WorkspaceUserRole> GetRoleAsync(Guid userId, Guid workspaceId)
     {
         var userWorkspace = await GetAsync(userId, workspaceId);
         if (userWorkspace is null)
         {
-            return UserWorkspaceRole.None;
+            return WorkspaceUserRole.None;
         }
         return userWorkspace.Role;
     }

@@ -26,7 +26,7 @@ public class GetUsersByWorkspaceIdQueryHandler(
             return workspace.Error;
         }
 
-        var workspaceUsers = await uow.UserWorkspaceRepository.GetAsync(request.WorkspaceId);
+        var workspaceUsers = await uow.WorkspaceUserRepository.GetAsync(request.WorkspaceId);
 
         return workspaceUsers.Select(wu => new WorkspaceUserDto
         {

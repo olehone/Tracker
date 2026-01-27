@@ -1,6 +1,6 @@
 ﻿namespace Tracker.Domain.Enums;
 
-public enum UserBoardRole
+public enum BoardUserRole
 {
     None = 1,
     Observer = 20,

@@ -40,7 +40,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, workspace.Id);
 
         if (!WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
@@ -62,7 +62,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
         IReadOnlyList<Board> boards,
         Guid userId,
         GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole
+        WorkspaceUserRole workspaceRole
         )
     {
         return new WorkspaceFullDto
@@ -77,13 +77,13 @@ public sealed class GetWorkspaceByIdQueryHandler(
             // Select only boards that user can view
             // Use separate method to not mix permission logic
             Boards = boards
-                .Where(b => BoardPolicy.CanView(globalRole, b.Visibility, workspaceRole, b.UserBoards
-                    .FirstOrDefault(ub => ub.UserId == userId)?.Role ?? UserBoardRole.None))
+                .Where(b => BoardPolicy.CanView(globalRole, b.Visibility, workspaceRole, b.BoardUsers
+                    .FirstOrDefault(ub => ub.UserId == userId)?.Role ?? BoardUserRole.None))
                 .Select(b => new BoardSummaryDto
                 {
                     Id = b.Id,
                     Title = b.Title,
-                    IsParticipating = b.UserBoards.Any(ub => ub.UserId == userId),
+                    IsParticipating = b.BoardUsers.Any(ub => ub.UserId == userId),
                     Visibility = b.Visibility
                 })
                 .OrderBy(b => b.IsParticipating)

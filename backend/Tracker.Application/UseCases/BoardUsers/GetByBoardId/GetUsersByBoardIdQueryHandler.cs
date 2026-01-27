@@ -27,9 +27,9 @@ public class GetUsersByBoardIdQueryHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
+        var boardRole = await uow.BoardUserRepository
             .GetRoleAsync(userId, board.Id);
 
         var permissions = BoardPolicy
@@ -41,7 +41,7 @@ public class GetUsersByBoardIdQueryHandler(
             return AuthErrors.Forbidden();
         }
 
-        var boardUsers = await uow.UserBoardRepository.GetAsync(board.Id);
+        var boardUsers = await uow.BoardUserRepository.GetAsync(board.Id);
 
         return boardUsers.Select(bm => new BoardUserDto
         {

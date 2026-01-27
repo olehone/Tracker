@@ -12,5 +12,5 @@ public class Workspace : BaseEntity
     public WorkspaceVisibility Visibility { get; set; }
         = WorkspaceVisibility.Private;
     public WorkspacePermissionRoles PermissionRoles { get; set; } = new();
-    public List<UserWorkspace> UserWorkspaces { get; set; } = [];
+    public List<WorkspaceUser> UserWorkspaces { get; set; } = [];
 }

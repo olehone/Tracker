@@ -110,8 +110,8 @@ public static class BoardHelper
     {
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository.GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository.GetRoleAsync(userId, board.Id);
+        var workspaceRole = await uow.WorkspaceUserRepository.GetRoleAsync(userId, board.WorkspaceId);
+        var boardRole = await uow.BoardUserRepository.GetRoleAsync(userId, board.Id);
         var permissions = BoardPolicy
             .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
 

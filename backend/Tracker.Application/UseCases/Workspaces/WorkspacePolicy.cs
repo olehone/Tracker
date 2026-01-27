@@ -7,7 +7,7 @@ namespace Tracker.Application.UseCases.Workspaces;
 public static class WorkspacePolicy
 {
     public static WorkspacePermissionsDto GetPermissions(WorkspacePermissionRoles permissionRoles,
-        UserWorkspaceRole workspaceRole,
+        WorkspaceUserRole workspaceRole,
         GlobalRole globalRole = GlobalRole.None)
     {
         var role = GetEffectivePermission(globalRole, workspaceRole);
@@ -29,7 +29,7 @@ public static class WorkspacePolicy
     }
     public static bool CanView(GlobalRole globalRole,
         WorkspaceVisibility visibility,
-        UserWorkspaceRole workspaceRole)
+        WorkspaceUserRole workspaceRole)
     {
         if (globalRole >= GlobalRole.Admin)
         {
@@ -41,7 +41,7 @@ public static class WorkspacePolicy
             return true;
         }
 
-        if (workspaceRole >= UserWorkspaceRole.None)
+        if (workspaceRole >= WorkspaceUserRole.None)
         {
             return true;
         }
@@ -50,13 +50,13 @@ public static class WorkspacePolicy
     }
 
     public static bool CanChangeSettings(GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole)
+        WorkspaceUserRole workspaceRole)
     {
         if (globalRole >= GlobalRole.Admin)
         {
             return true;
         }
-        if (workspaceRole >= UserWorkspaceRole.Admin)
+        if (workspaceRole >= WorkspaceUserRole.Admin)
         {
             return true;
         }
@@ -78,7 +78,7 @@ public static class WorkspacePolicy
     // Grand global admin same value as workspace owner
     private static WorkspacePermissionRole GetEffectivePermission(
         GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole)
+        WorkspaceUserRole workspaceRole)
     {
         if (globalRole >= GlobalRole.Admin)
         {
@@ -87,14 +87,14 @@ public static class WorkspacePolicy
 
         return MapUserRoleToPermission(workspaceRole);
     }
-    private static WorkspacePermissionRole MapUserRoleToPermission(UserWorkspaceRole userWorkspaceRole)
+    private static WorkspacePermissionRole MapUserRoleToPermission(WorkspaceUserRole userWorkspaceRole)
     {
         return userWorkspaceRole switch
         {
-            UserWorkspaceRole.Observer => WorkspacePermissionRole.Observer,
-            UserWorkspaceRole.Member => WorkspacePermissionRole.Member,
-            UserWorkspaceRole.Admin => WorkspacePermissionRole.Admin,
-            UserWorkspaceRole.Owner => WorkspacePermissionRole.Owner,
+            WorkspaceUserRole.Observer => WorkspacePermissionRole.Observer,
+            WorkspaceUserRole.Member => WorkspacePermissionRole.Member,
+            WorkspaceUserRole.Admin => WorkspacePermissionRole.Admin,
+            WorkspaceUserRole.Owner => WorkspacePermissionRole.Owner,
             _ => WorkspacePermissionRole.Any
         };
     }

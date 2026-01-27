@@ -27,7 +27,7 @@ public class RemoveUserFromBoardCommandHandler(
             return Error.NotFound("Board");
         }
 
-        var userBoard = await uow.UserBoardRepository
+        var userBoard = await uow.BoardUserRepository
             .GetAsync(request.UserId, request.BoardId);
         if (userBoard is null)
         {
@@ -36,9 +36,9 @@ public class RemoveUserFromBoardCommandHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
+        var boardRole = await uow.BoardUserRepository
             .GetRoleAsync(userId, board.Id);
 
         var permissions = BoardPolicy
@@ -50,13 +50,13 @@ public class RemoveUserFromBoardCommandHandler(
             return AuthErrors.Forbidden();
         }
 
-        if (userBoard.Role == UserBoardRole.Owner && userBoard.UserId == userId)
+        if (userBoard.Role == BoardUserRole.Owner && userBoard.UserId == userId)
         {
             await uow.BoardRepository.RemoveAsync(board.Id);
         }
         else
         {
-            await uow.UserBoardRepository.RemoveAsync(userBoard.Id);
+            await uow.BoardUserRepository.RemoveAsync(userBoard.Id);
         }
 
         var sc = await uow.SaveChangesAsync(cancellationToken);

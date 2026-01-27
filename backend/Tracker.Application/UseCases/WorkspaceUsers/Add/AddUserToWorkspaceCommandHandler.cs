@@ -33,21 +33,21 @@ public class AddUserToWorkspaceCommandHandler(
             return Error.NotFound("User");
         }
 
-        var userBoard = await uow.UserWorkspaceRepository
+        var userBoard = await uow.WorkspaceUserRepository
             .GetAsync(request.UserId, request.WorkspaceId);
         if (userBoard is not null)
         {
             return Error.AlreadyExists("User", "Workspace", user.Username);
         }
 
-        var workspaceUser = new UserWorkspace
+        var workspaceUser = new WorkspaceUser
         {
             UserId = request.UserId,
             WorkspaceId = request.WorkspaceId,
             Role = request.Role,
         };
 
-        await uow.UserWorkspaceRepository.AddAsync(workspaceUser);
+        await uow.WorkspaceUserRepository.AddAsync(workspaceUser);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
         var dto = new WorkspaceUserDto
