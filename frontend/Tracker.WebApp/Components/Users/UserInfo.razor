@@ -18,7 +18,7 @@
 			<MudText Typo="Typo.h5">@User.Username</MudText>
 
 			<MudText>@User.Email</MudText>
-			@if (IsOwn())
+			@if (CurrentUser.IsMyId(User.Id))
 			{
 				<MudButton Variant="Variant.Filled">
 					Change settings

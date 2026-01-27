@@ -5,6 +5,7 @@ namespace Tracker.WebApp.States;
 public class AppState(){
 
     private UserDto? _currentUser;
+
     public UserDto? CurrentUser
     {
         get => _currentUser;

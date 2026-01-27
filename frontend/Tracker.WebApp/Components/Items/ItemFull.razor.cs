@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
+using Tracker.Services.Abstraction.Auth;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Items;
@@ -24,7 +25,6 @@ public partial class ItemFull
     public bool OneLine { get; set; } = false;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
-    [Inject] AppState AppState { get; set; } = null!;
 
     private Task OnIsDoneChanged(bool isDone)
     {
@@ -48,11 +48,11 @@ public partial class ItemFull
 
     private bool IsOwn()
     {
-        if (AppState.CurrentUser is null)
+        if (BoardState.IsUnauthenticated)
         {
             return false;
         }
-        return Item.Assignees.Contains(AppState.CurrentUser.Id);
+        return Item.Assignees.Contains(BoardState.CurrentUserId);
     }
 
     private string GetUsersKey()
@@ -79,5 +79,4 @@ public partial class ItemFull
 
         await dialog.Result;
     }
-
 }

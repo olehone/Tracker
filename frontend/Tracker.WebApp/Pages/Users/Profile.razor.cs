@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
@@ -13,10 +14,9 @@ public partial class Profile
     public Guid UserId { get; set; }
 
     [Inject] IUserService UserService { get; set; } = null!;
-    [Inject] AppState AppState { get; set; } = null!;
+    [Inject] ICurrentUser CurrentUser { get; set; } = null!;
     [Inject] IErrorNotifier ErrorNotifier { get; set; } = null!;
 
-    private bool IsOwnProfile => UserId == AppState.CurrentUser?.Id;
     private UserDto? User { get; set; }
 
     protected override async Task OnInitializedAsync()

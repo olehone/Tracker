@@ -12,19 +12,12 @@ public partial class Calendar : IDisposable
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
-    [Inject] AppState AppState { get; set; } = null!;
-
     private bool _disposed;
     private bool _showNotOwn = true;
     private bool _showNotCompleted = true;
 
     private List<CalendarItemWrapper> ItemsWithDate = [];
     private List<BoardItemDto> ItemsWithoutDate = [];
-
-    private bool IsUnauthorized()
-    {
-        return AppState.CurrentUser is null;
-    }
 
     protected override void OnInitialized()
     {
@@ -83,11 +76,11 @@ public partial class Calendar : IDisposable
         {
             return true;
         }
-        if (AppState.CurrentUser is null)
+        if (BoardState.IsUnauthenticated)
         {
             return false;
         }
-        return item.Assignees.Contains(AppState.CurrentUser.Id);
+        return item.Assignees.Contains(BoardState.CurrentUserId);
     }
 
     private bool CompletedFilter(BoardItemDto item)

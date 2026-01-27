@@ -1,17 +1,20 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 
 namespace Tracker.WebApp.States;
 
 public sealed class BoardState : IAsyncDisposable
 {
     private readonly IBoardService _boardService;
-    private readonly AppState _appState;
+    private readonly ICurrentUser _currentUser;
     private BoardFullDto? _currentBoard;
     private readonly IBoardRealtimeService _boardRealtime;
 
-    public Guid? MyId => _appState.CurrentUser?.Id;
+    public bool IsUnauthenticated => _currentUser.IsUnauthenticated;
+    public Guid CurrentUserId => _currentUser.Id;
+
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
 
@@ -24,7 +27,7 @@ public sealed class BoardState : IAsyncDisposable
     public event Action? OnBoardNotFound;
 
     public BoardState(
-        AppState appState,
+        ICurrentUser currentUser,
         IBoardService boardService,
         IBoardListService boardListService,
         IBoardItemService boardItemService,
@@ -32,7 +35,7 @@ public sealed class BoardState : IAsyncDisposable
         IUserService userService,
         IBoardRealtimeService boardRealtime)
     {
-        _appState = appState;
+        _currentUser = currentUser;
         _boardService = boardService;
 
         UsersState = new BoardUsersState(this, userService, boardUserService);
@@ -72,7 +75,7 @@ public sealed class BoardState : IAsyncDisposable
 
     public async Task ConnectRealtimeAsync()
     {
-        if (_appState.CurrentUser is null)
+        if (IsUnauthenticated)
         {
             return;
         }
@@ -119,7 +122,7 @@ public sealed class BoardState : IAsyncDisposable
         Notify();
     }
 
-    private void Notify() => OnChange?.Invoke();
+    public bool IsMyId(Guid checkedId) => _currentUser.IsMyId(checkedId);
 
     public async ValueTask DisposeAsync()
     {
@@ -134,4 +137,6 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnListDeleted -= ListsState.Apply;
         await _boardRealtime.DisconnectAsync();
     }
+
+    private void Notify() => OnChange?.Invoke();
 }

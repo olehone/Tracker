@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Auth;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
@@ -12,7 +13,8 @@ public partial class Overview
     [Parameter, SupplyParameterFromQuery(Name = "item")]
     public Guid? ItemId { get; set; }
 
-    [Inject] AppState AppState { get; set; } = null!;
+
+    [Inject] ICurrentUser CurrentUser { get; set; } = null!;
     [Inject] IBoardRealtimeService BoardRealtime { get; set; } = null!;
     [Inject] IBoardService BoardService { get; set; } = null!;
     [Inject] IBoardListService BoardListService { get; set; } = null!;
@@ -26,7 +28,7 @@ public partial class Overview
     protected override async Task OnInitializedAsync()
     {
         BoardState = new BoardState(
-            AppState,
+            CurrentUser,
             BoardService,
             BoardListService,
             BoardItemService,
