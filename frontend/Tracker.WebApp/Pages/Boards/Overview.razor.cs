@@ -9,6 +9,8 @@ public partial class Overview
 {
     [Parameter]
     public Guid BoardId { get; set; }
+    [Parameter, SupplyParameterFromQuery(Name = "item")]
+    public Guid? ItemId { get; set; }
 
     [Inject] AppState AppState { get; set; } = null!;
     [Inject] IBoardRealtimeService BoardRealtime { get; set; } = null!;
@@ -20,6 +22,7 @@ public partial class Overview
 
     private BoardState BoardState { get; set; } = null!;
     private int activeIndex = 0;
+
     protected override async Task OnInitializedAsync()
     {
         BoardState = new BoardState(
@@ -31,6 +34,12 @@ public partial class Overview
             UserService,
             BoardRealtime);
         await BoardState.LoadAsync(BoardId);
+
+        if (ItemId.HasValue)
+        {
+            activeIndex = 0;
+        }
+        
         BoardState.OnChange += StateHasChanged;
     }
 

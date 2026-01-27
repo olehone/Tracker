@@ -7,39 +7,83 @@
 			   Style="background-color: inherit; box-shadow: none;"
 			   OnClick=@OpenItemSettings>
 		<MudPaper Width="100%" Elevation="0">
-			<MudStack Row
-					  AlignItems="AlignItems.Center"
-					  StretchItems="StretchItems.Middle">
-				<MudCheckBox T=@bool
-							 Value=@Item.IsDone
-							 ValueChanged=@OnIsDoneChanged />
-				<MudText Class="text-ellipsis"
-						 Style="@ItemStyle">
-					@Item.Title
-				</MudText>
-				<BoardItemImportanceIcon Importance=@Item.Importance
-										 HasAttention=@IsOwn() />
-			</MudStack>
-			<MudStack Row>
-				<MudAvatarGroup @key=@GetUsersKey()
-								Max="3"
-								Spacing="3">
-					@foreach (var user in AssignedUsers())
+			@if (OneLine)
+			{
+				<MudStack Row
+						  AlignItems="AlignItems.Center"
+						  StretchItems="StretchItems.Middle">
+					<MudCheckBox T=@bool
+								 Value=@Item.IsDone
+								 ValueChanged=@OnIsDoneChanged />
+
+					<MudText Class="text-ellipsis"
+							 Style="@ItemStyle">
+						@Item.Title
+					</MudText>
+
+					<MudSpacer />
+
+
+					<MudAvatarGroup @key=@GetUsersKey()
+									Max="3"
+									Spacing="3">
+						@foreach (var user in AssignedUsers())
+						{
+							<UserAvatarWithLookup User=@user.User
+												  Size=@Size.Medium />
+						}
+					</MudAvatarGroup>
+
+					<MudSpacer />
+
+					@if (Item.DueDate is not null)
 					{
-						<UserAvatarWithLookup User=@user.User
-											  Size=@Size.Medium />
+						<ShortDate Value=@Item.DueDate.Value
+								   IsDone=@Item.IsDone
+								   HasAttention=@IsOwn() />
 					}
-				</MudAvatarGroup>
+					<BoardItemImportanceIcon Importance=@Item.Importance
+											 HasAttention=@IsOwn() />
+				</MudStack>
+			}
+			else
+			{
+				<MudStack Row
+						  AlignItems="AlignItems.Center"
+						  StretchItems="StretchItems.Middle">
+					<MudCheckBox T=@bool
+								 Value=@Item.IsDone
+								 ValueChanged=@OnIsDoneChanged />
 
-				<MudSpacer />
+					<MudText Class="text-ellipsis"
+							 Style="@ItemStyle">
+						@Item.Title
+					</MudText>
 
-				@if (Item.DueDate is not null)
-				{
-					<ShortDate Value=@Item.DueDate.Value
-							   IsDone=@Item.IsDone
-							   HasAttention=@IsOwn() />
-				}
-			</MudStack>
+					<BoardItemImportanceIcon Importance=@Item.Importance
+											 HasAttention=@IsOwn() />
+				</MudStack>
+				<MudStack Row>
+					<MudAvatarGroup @key=@GetUsersKey()
+									Max="3"
+									Spacing="3">
+						@foreach (var user in AssignedUsers())
+						{
+							<UserAvatarWithLookup User=@user.User
+												  Size=@Size.Medium />
+						}
+					</MudAvatarGroup>
+
+					<MudSpacer />
+
+					@if (Item.DueDate is not null)
+					{
+						<ShortDate Value=@Item.DueDate.Value
+								   IsDone=@Item.IsDone
+								   HasAttention=@IsOwn() />
+					}
+				</MudStack>
+			}
 		</MudPaper>
 	</MudButton>
 </MudPaper>

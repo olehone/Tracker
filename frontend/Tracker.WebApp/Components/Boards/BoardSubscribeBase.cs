@@ -2,27 +2,30 @@
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Boards;
 
-public partial class ListItemSubscribeBase : ComponentBase, IDisposable
+public partial class BoardSubscribeBase : ComponentBase, IDisposable
 {
     [CascadingParameter]
     protected BoardState BoardState { get; set; } = null!;
 
-    protected IReadOnlyList<BoardItemDto> Items => BoardState.ItemsState.BoardItems;
-    protected IReadOnlyList<BoardListDto> Lists => BoardState.ListsState.BoardLists;
+    protected BoardFullDto Board => BoardState.Board;
 
     private bool _disposed;
 
     protected override void OnParametersSet()
     {
-        BoardState.ListsState.OnChange += StateHasChangedHandler;
-        BoardState.ItemsState.OnChange += StateHasChangedHandler;
+        BoardState.OnChange += StateHasChangedHandler;
     }
 
     protected virtual void StateHasChangedHandler()
     {
         StateHasChanged();
+    }
+
+    protected virtual void InsideDispose()
+    {
+        BoardState.OnChange -= StateHasChangedHandler;
     }
 
     protected virtual void Dispose(bool disposing)
@@ -34,8 +37,7 @@ public partial class ListItemSubscribeBase : ComponentBase, IDisposable
 
         if (BoardState != null)
         {
-            BoardState.ListsState.OnChange -= StateHasChangedHandler;
-            BoardState.ItemsState.OnChange -= StateHasChangedHandler;
+            InsideDispose();
         }
 
         _disposed = true;

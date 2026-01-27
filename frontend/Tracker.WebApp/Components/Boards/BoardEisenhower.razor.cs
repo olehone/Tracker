@@ -5,14 +5,10 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardEisenhower : IDisposable
+public partial class BoardEisenhower
 {
-    [CascadingParameter]
-    private BoardState BoardState { get; set; } = null!;
-
     [Inject] AppState AppState { get; set; } = null!;
 
-    private bool _disposed;
     private List<BoardItemDto> UrgentImportant = [];
     private List<BoardItemDto> UrgentUnimportant = [];
     private List<BoardItemDto> UnurgentImportant = [];
@@ -20,7 +16,8 @@ public partial class BoardEisenhower : IDisposable
 
     protected override void OnInitialized()
     {
-        BoardState.ItemsState.OnChange += OnBoardStateChanged;
+        base.OnInitialized();
+        BoardState.ItemsState.OnChange += StateHasChangedHandler;
         ReloadItems();
     }
 
@@ -62,27 +59,15 @@ public partial class BoardEisenhower : IDisposable
         return item.Importance > BoardItemImportance.Medium;
     }
 
-    private void OnBoardStateChanged()
+    protected override void StateHasChangedHandler()
     {
         ReloadItems();
-        StateHasChanged();
+        base.StateHasChangedHandler();
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected override void InsideDispose()
     {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
-            }
-            _disposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        base.InsideDispose();
+        BoardState.ItemsState.OnChange -= StateHasChangedHandler;
     }
 }

@@ -5,30 +5,17 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardKanban : IDisposable
+public partial class BoardKanban
 {
-    [CascadingParameter]
-    private BoardState BoardState { get; set; } = null!;
-
     [Inject] AppState AppState { get; set; } = null!;
 
     private BoardFullDto Board => BoardState.Board!;
     private MudDropContainer<BoardItemDto> _container = null!;
-    private bool _disposed;
 
-    protected override void OnInitialized()
+    protected override void StateHasChangedHandler()
     {
-        BoardState.ItemsState.OnChange += OnBoardStateChanged;
-        BoardState.ListsState.OnChange += OnBoardStateChanged;
-    }
-
-    private void OnBoardStateChanged()
-    {
-        InvokeAsync(() =>
-        {
-            StateHasChanged();
-            _container?.Refresh();
-        });
+        StateHasChanged();
+        _container?.Refresh();
     }
 
     private bool ItemDisabled(BoardItemDto item)
@@ -63,24 +50,5 @@ public partial class BoardKanban : IDisposable
     private async Task CreateList(string title)
     {
         await BoardState.ListsState.CreateAsync(title);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
-                BoardState.ListsState.OnChange -= OnBoardStateChanged;
-            }
-            _disposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }

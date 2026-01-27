@@ -12,7 +12,6 @@
 					@if (!Disabled)
 					{
 						<MudStack Row>
-
 							@if (!Item.Assignees.Any())
 							{
 								<MudButton Size="Size.Small"
@@ -37,8 +36,9 @@
 						{
 							<MudOverlay Visible="true"
 										AutoClose="true"
-										OnClosed="@(() => _openAssign = false)"
+										OnClosed=@(() => _openAssign = false)
 										DarkBackground="false" />
+
 							<MudPopover Open
 										AnchorOrigin="Origin.TopRight"
 										TransformOrigin="Origin.CenterRight">
@@ -62,12 +62,14 @@
 								<MudText Typo="Typo.body2">
 									Due date
 								</MudText>
+
 								<MudStack Row
 										  AlignItems="AlignItems.Center">
 									<MudDatePicker Date=@_date
 												   Disabled=@Disabled
 												   DateChanged=@((DateTime? date) => DateSelected(date))
 												   ShowToolbar="false" />
+
 									<MudIconButton Icon=@Icons.Material.Filled.Close
 												   OnClick=@RemoveDueDate />
 								</MudStack>
@@ -77,6 +79,7 @@
 							<MudText Typo="Typo.body2">
 								Importance
 							</MudText>
+
 							<MudSelect FullWidth
 									   Value=@_importance
 									   ValueChanged=@((BoardItemImportance importance) => ImportanceSelected(importance))>
@@ -89,6 +92,7 @@
 												  StretchItems="StretchItems.End">
 											<MudIcon Icon=@ImportanceHelper.GetIcon(importance)
 													 Color=@ImportanceHelper.GetColor(importance) />
+
 											<MudText>
 												@importance
 											</MudText>
@@ -107,6 +111,7 @@
 								  Variant="Variant.Outlined"
 								  @onfocus=@DescriptionFocused
 								  @onblur=@DescriptionBlurred />
+								  
 					<MudDivider />
 				</MudStack>
 			</DialogContent>

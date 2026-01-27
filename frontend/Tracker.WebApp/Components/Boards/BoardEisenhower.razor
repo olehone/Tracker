@@ -1,6 +1,8 @@
 @using Tracker.WebApp.Components.BoardItems
 @using MudBlazor
 
+@inherits BoardSubscribeBase
+
 <MudContainer MaxWidth="MaxWidth.False" Class="pa-0">
     <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="3">
         <BoardItemsQuadrant Items=UrgentImportant
