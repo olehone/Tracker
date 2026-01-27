@@ -24,6 +24,9 @@ public partial class BoardItemSettingsHeader
     private bool _isDone;
     private bool _isEditingTitle = false;
 
+    private bool Disabled =>
+        !BoardState.Board.Permissions.CanChangeItem;
+
     protected override void OnInitialized()
     {
         _title = Item.Title;

@@ -7,21 +7,29 @@
 @using Tracker.WebApp.Components.Boards;
 
 <PageTitle>@PageTitle()</PageTitle>
-<CascadingValue Value=@BoardState>
+
+@if (BoardState.IsLoading)
+{
 	<WorkWindow>
-
 		<Header>
-			<BoardWindowHeader @bind-TabIndex=@activeIndex />
+			<BoardWindowHeaderSkeleton />
 		</Header>
-
 		<Body>
-			@if (BoardState.IsLoading)
-			{
-				<MudProgressLinear Color="Color.Primary"
-								   Indeterminate />
-			}
-			else
-			{
+			<MudProgressLinear Color="Color.Primary"
+							   Indeterminate />
+			<div />
+		</Body>
+	</WorkWindow>
+}
+else
+{
+	<CascadingValue Value=@BoardState>
+
+		<WorkWindow>
+			<Header>
+				<BoardWindowHeader @bind-TabIndex=@activeIndex />
+			</Header>
+			<Body>
 				@switch (activeIndex)
 				{
 					case 0:
@@ -35,7 +43,7 @@
 						<BoardCalendar />
 						break;
 					case 2:
-						<MudText>Matrix</MudText>
+						<BoardEisenhower />
 						break;
 					default:
 						<MudAlert Severity="Severity.Error">
@@ -43,8 +51,7 @@
 						</MudAlert>
 						break;
 				}
-
-			}
-		</Body>
-	</WorkWindow>
-</CascadingValue>
+			</Body>
+		</WorkWindow>
+	</CascadingValue>
+}

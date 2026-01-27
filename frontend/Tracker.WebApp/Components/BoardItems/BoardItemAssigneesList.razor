@@ -14,21 +14,33 @@
 				  Spacing="1">
 			@foreach (var user in AssignedUsers())
 			{
-				<UserAvatarWithLookup @key=@user.Id
+				@if (Disabled)
+				{
+					<UserAvatarWithLookup @key=@user.Id
 									  User=@user
-									  Size="Size.Medium">
-					<AdditionalActions>
-						<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
-							Unassign user from this item
-						</MudButton>
-					</AdditionalActions>
-				</UserAvatarWithLookup>
+					Size="Size.Medium"/>
+				}
+				else
+				{
+					<UserAvatarWithLookup @key=@user.Id
+										  User=@user
+										  Size="Size.Medium">
+						<AdditionalActions>
+							<MudButton OnClick=@(() => BoardState.ItemsState.UnassignAsync(Item.Id, user.Id))>
+								Unassign user from this item
+							</MudButton>
+						</AdditionalActions>
+					</UserAvatarWithLookup>
+				}
 			}
-			<MudAvatar Color=@(OpenAssign? Color.Info : Color.Surface )
-					   Variant=@(OpenAssign? Variant.Filled : Variant.Text)>
-				<MudIconButton Icon=@Icons.Material.Filled.Add
-							   OnClick=@ToggleAssign/>
-			</MudAvatar>
+			@if (!Disabled)
+			{
+				<MudAvatar Color=@(OpenAssign? Color.Info : Color.Surface )
+							Variant=@(OpenAssign? Variant.Filled : Variant.Text)>
+					<MudIconButton Icon=@Icons.Material.Filled.Add
+									OnClick=@ToggleAssign/>
+				</MudAvatar>
+			}
 		</MudStack>
 	</MudStack>
 }
