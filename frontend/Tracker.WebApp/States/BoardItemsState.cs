@@ -1,8 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Events;
-using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 
@@ -34,7 +32,7 @@ public sealed class BoardItemsState(
 
     public void Reload()
     {
-        var items = Board.BoardLists.SelectMany(bl => bl.BoardItems).ToList();
+        var items = Board.BoardItems;
         _sortedItems = null;
         _boardItems.Clear();
         _boardItems.AddRange(items);

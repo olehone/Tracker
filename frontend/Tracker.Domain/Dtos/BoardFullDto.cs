@@ -13,5 +13,6 @@ public class BoardFullDto
     public required BoardPermissionRoles PermissionRoles { get; set; }
     public required BoardPermissionsDto Permissions { get; set; }
     public required List<BoardListDto> BoardLists { get; set; }
+    public required List<BoardItemDto> BoardItems { get; set; }
     public required List<BoardUserDto> BoardUsers { get; set; }
 }

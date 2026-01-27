@@ -29,8 +29,14 @@ public static class BoardsMapping
             Permissions = permissions,
             PermissionRoles = board.PermissionRoles,
             BoardLists = board.BoardLists
-                              .Select(boardList => boardList.ToDto())
-                              .ToList(),
+                .Select(boardList => boardList.ToDto())
+                .ToList(),
+
+            BoardItems = board.BoardLists
+                .SelectMany(boardList => boardList.BoardItems)
+                .Select(boardItem => boardItem.ToDto())
+                .ToList(),
+
             BoardUsers = board.BoardUsers.Select(bm =>
                 new BoardUserDto
                 {
@@ -48,9 +54,6 @@ public static class BoardsMapping
             Position = boardList.Position,
             Title = boardList.Title,
             Description = boardList.Description ?? string.Empty,
-            BoardItems = boardList.BoardItems
-                                  .Select(boardItem => boardItem.ToDto())
-                                  .ToList()
         };
     }
 
