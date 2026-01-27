@@ -9,11 +9,6 @@ namespace Tracker.Services;
 
 public class BoardUserService(IApiErrorHandler apiErrorHandler, IBoardUserApi api) : IBoardUserService
 {
-    public Task<Result<List<BoardUserDto>>> GetByBoardAsync(Guid boardId)
-    {
-        return apiErrorHandler.ExecuteAsync(() => api.GetByBoardAsync(boardId));
-    }
-
     public Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, BoardUserRole role)
     {
         return apiErrorHandler.ExecuteAsync(() => api.AddAsync(boardId, userId, role));
