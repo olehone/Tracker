@@ -30,8 +30,6 @@ public partial class ItemFull
     {
         var request = new UpdateBoardItemRequest
         {
-            Title = Item.Title,
-            Description = Item.Description,
             IsDone = isDone
         };
 
