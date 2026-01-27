@@ -5,37 +5,54 @@
 @using Tracker.WebApp.Components.BoardLists
 @using Tracker.WebApp.Components.Shared;
 @using Tracker.WebApp.Components.Boards;
+@using Microsoft.AspNetCore.Components.Routing
 
 <PageTitle>@PageTitle()</PageTitle>
-<CascadingValue Value=@BoardState>
-	<WorkWindow>
 
+@if (BoardState.IsLoading)
+{
+	<WorkWindow>
 		<Header>
-			<BoardWindowHeader @bind-TabIndex=@activeIndex />
+			<BoardWindowHeaderSkeleton />
 		</Header>
-		
 		<Body>
-			@switch (activeIndex)
-			{
-				case 0:
-					<MudStack StretchItems="StretchItems.None"
-							  AlignItems="AlignItems.Start"
-							  Style="overflow-x: auto;">
-						<BoardKanban />
-					</MudStack>
-					break;
-				case 1:
-					<BoardCalendar />
-					break;
-				case 2:
-					<MudText>Matrix</MudText>
-					break;
-				default:
-					<MudAlert Severity="Severity.Error">
-						There no such index!
-					</MudAlert>
-					break;
-			}
+			<MudProgressLinear Color="Color.Primary"
+							   Indeterminate />
+			<div />
 		</Body>
 	</WorkWindow>
-</CascadingValue>
+}
+else
+{
+	<CascadingValue Value=@BoardState>
+
+		<WorkWindow>
+			<Header>
+				<BoardWindowHeader @bind-TabIndex=@activeIndex />
+			</Header>
+			<Body>
+				@switch (activeIndex)
+				{
+					case 0:
+						<MudStack StretchItems="StretchItems.None"
+								  AlignItems="AlignItems.Start"
+								  Style="overflow-x: auto;">
+							<BoardKanban />
+						</MudStack>
+						break;
+					case 1:
+						<BoardCalendar />
+						break;
+					case 2:
+						<BoardEisenhower />
+						break;
+					default:
+						<MudAlert Severity="Severity.Error">
+							There no such index!
+						</MudAlert>
+						break;
+				}
+			</Body>
+		</WorkWindow>
+	</CascadingValue>
+}

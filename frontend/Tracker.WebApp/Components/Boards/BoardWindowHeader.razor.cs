@@ -6,33 +6,27 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardWindowHeader : IDisposable
+public partial class BoardWindowHeader
 {
-    [CascadingParameter]
-    private BoardState BoardState { get; set; } = null!;
-
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
     [Parameter, EditorRequired]
     public int TabIndex { get; set; }
+
     [Parameter]
     public EventCallback<int> TabIndexChanged { get; set; }
 
-    private BoardFullDto Board => BoardState.Board;
-    private bool _disposed;
-
     protected override void OnInitialized()
     {
-        BoardState.OnChange += OnBoardStateChanged;
-        BoardState.UsersState.OnChange += OnBoardStateChanged;
-        BoardState.ListsState.OnChange += OnBoardStateChanged;
+        base.OnInitialized();
         BoardState.OnBoardNotFound += ToWorkspace;
     }
 
-    private void OnBoardStateChanged()
+    protected override void InsideDispose()
     {
-        InvokeAsync(StateHasChanged);
+        base.InsideDispose();
+        BoardState.OnBoardNotFound -= ToWorkspace;
     }
 
     private string GetUsersKey()
@@ -108,24 +102,5 @@ public partial class BoardWindowHeader : IDisposable
     {
         TabIndex = index;
         TabIndexChanged.InvokeAsync(index);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
-                BoardState.ListsState.OnChange -= OnBoardStateChanged;
-            }
-            _disposed = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }

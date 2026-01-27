@@ -5,73 +5,55 @@
 @using Tracker.WebApp.Components.Boards;
 @using Heron.MudCalendar
 
-@if (BoardState.IsLoading)
-{
-	<MudProgressLinear Color="Color.Primary"
-					   Indeterminate />
-}
-else
-{
-	<MudDropContainer T="BoardItemDto"
-					  Items=@AllItems()
-					  ItemsSelector=@GetItemsForDropzone
-					  ItemDropped=@OnItemDroppedBetweenZones>
-		<ChildContent>
+<MudStack Row>
+	<MudCalendar T="CalendarItemWrapper"
+				 ShowMonth
+				 ShowDay="false"
+				 ShowWeek="false"
+				 ShowTodayButton
+				 ShowCurrentTime
+				 Items=@ItemsWithDate
+				 ItemChanged=@OnItemChanged
+				 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
+				 MonthCellMinHeight="0">
+		<CellTemplate>
+			<BoardItemBrief Item=@context.Item
+							Size="Size.Small" />
+		</CellTemplate>
+		<ToolbarContent>
 			<MudStack Row>
-				<MudStack Style="flex: 1;">
-					<MudCalendar T=@BoardCalendarItemModel
-								 ShowMonth
-								 ShowDay="false"
-								 ShowWeek="false"
-								 ShowTodayButton
-								 ShowCurrentTime
-								 Items=@Items
-								 ItemChanged=@OnItemChanged
-								 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
-								 MonthCellMinHeight="100">
-						<CellTemplate>
-							<BoardItemBrief Item=@context.BoardItem />
-						</CellTemplate>
-						<ToolbarContent>
-							<MudStack Row>
-								<MudToggleGroup T="bool"
-												Value=@_showNotOwn
-												ValueChanged=@OnNotOwnChanged
-												Outlined
-												Delimiters
-												Disabled=@IsUnauthorized()>
-									<MudToggleItem Value=true>
-										All
-									</MudToggleItem>
+				<MudToggleGroup T="bool"
+								Value=@_showNotOwn
+								ValueChanged=@OnNotOwnChanged
+								Outlined
+								Delimiters
+								Disabled=@IsUnauthorized()>
+					<MudToggleItem Value=true>
+						All
+					</MudToggleItem>
 
-									<MudToggleItem Value=false>
-										Assigned to me
-									</MudToggleItem>
-								</MudToggleGroup>
+					<MudToggleItem Value=false>
+						Assigned to me
+					</MudToggleItem>
+				</MudToggleGroup>
 
-								<MudToggleGroup T="bool"
-												Value=@_showNotCompleted
-												ValueChanged=@OnNotCompletedChanged
-												Outlined
-												Delimiters>
-									<MudToggleItem Value=true>
-										All
-									</MudToggleItem>
+				<MudToggleGroup T="bool"
+								Value=@_showNotCompleted
+								ValueChanged=@OnNotCompletedChanged
+								Outlined
+								Delimiters>
+					<MudToggleItem Value=true>
+						All
+					</MudToggleItem>
 
-									<MudToggleItem Value=false>
-										Not completed
-									</MudToggleItem>
-								</MudToggleGroup>
-							</MudStack>
-						</ToolbarContent>
-					</MudCalendar>
-				</MudStack>
-
-				<BoardItemsList />
+					<MudToggleItem Value="false">
+						Not completed
+					</MudToggleItem>
+				</MudToggleGroup>
 			</MudStack>
-		</ChildContent>
-		<ItemRenderer>
-			<BoardItemBrief Item=@context />
-		</ItemRenderer>
-	</MudDropContainer>
-}
+		</ToolbarContent>
+	</MudCalendar>
+
+	<BoardItemsList Items=@ItemsWithoutDate
+					Title="Items without date" />
+</MudStack>

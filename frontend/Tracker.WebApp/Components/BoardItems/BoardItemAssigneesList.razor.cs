@@ -19,6 +19,8 @@ public partial class BoardItemAssigneesList
     public bool OpenAssign { get; set; }
     [Parameter, EditorRequired]
     public EventCallback ToggleAssign { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; } = true;
 
     private IEnumerable<UserDto> AssignedUsers()
     {

@@ -18,8 +18,8 @@ public partial class BoardCalendar : IDisposable
     private bool _showNotOwn = true;
     private bool _showNotCompleted = true;
 
-    private List<BoardCalendarItemModel> Items = [];
-    private List<BoardItemDto> AllItems() => BoardState.ItemsState.BoardItems.ToList();
+    private List<CalendarItemWrapper> ItemsWithDate = [];
+    private List<BoardItemDto> ItemsWithoutDate = [];
 
     private bool IsUnauthorized()
     {
@@ -44,52 +44,36 @@ public partial class BoardCalendar : IDisposable
         ReloadItems();
     }
 
-    private async Task OnItemChanged(BoardCalendarItemModel item)
+    private async Task OnItemChanged(CalendarItemWrapper item)
     {
         var localOffset = TimeZoneInfo.Local.GetUtcOffset(item.Start);
         var dueDate = new DateTimeOffset(
             item.Start.Year,
             item.Start.Month,
             item.Start.Day,
-            23,
-            59,
-            59,
+            23, 59, 59,
             localOffset);
+
         var request = new UpdateBoardItemRequest
         {
             DueDate = dueDate
         };
-        await BoardState.ItemsState.UpdateAsync(item.BoardItem.Id, request);
-    }
-
-    private async Task OnItemDroppedBetweenZones(MudItemDropInfo<BoardItemDto> dropInfo)
-    {
-        var item = dropInfo.Item;
-
-        if (dropInfo.DropzoneIdentifier == "BoardItems")
-        {
-            var request = new UpdateBoardItemRequest { DueDate = null };
-            await BoardState.ItemsState.UpdateAsync(item.Id, request);
-        }
-    }
-
-    private bool GetItemsForDropzone(BoardItemDto item, string dropzone)
-    {
-        if (dropzone == "BoardItems")
-        {
-            return !item.DueDate.HasValue;
-        }
-
-        return item.DueDate.HasValue;
+        await BoardState.ItemsState.UpdateAsync(item.Item.Id, request);
     }
 
     private void ReloadItems()
     {
-        Items = BoardState.ItemsState.BoardItems
-            .Where(bi => bi.DueDate.HasValue)
+        var items = BoardState.ItemsState.BoardItems
             .Where(OwnFilter)
-            .Where(CompletedFilter)
-            .Select(bi => new BoardCalendarItemModel(bi))
+            .Where(CompletedFilter);
+
+        ItemsWithDate = items
+            .Where(bi => bi.DueDate.HasValue)
+            .Select(bi => new CalendarItemWrapper(bi))
+            .ToList();
+
+        ItemsWithoutDate = items
+            .Where(bi => !bi.DueDate.HasValue)
             .ToList();
     }
 
@@ -117,8 +101,8 @@ public partial class BoardCalendar : IDisposable
 
     private void OnBoardStateChanged()
     {
-        StateHasChanged();
         ReloadItems();
+        StateHasChanged();
     }
 
     protected virtual void Dispose(bool disposing)

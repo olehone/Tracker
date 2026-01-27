@@ -10,10 +10,12 @@
 			  AlignItems="AlignItems.Center"
 			  StretchItems="StretchItems.End">
 		<MudCheckBox Value="@_isDone"
+					 Disabled=@Disabled
 					 ValueChanged=@((bool isDone) => ChangeIsDone(isDone))
 					 Size="Size.Large" />
 
 		<MudTextField @bind-Value=@_title
+					  Disabled=@Disabled
 					  Typo="Typo.h5"
 					  FullWidth
 					  Required
@@ -21,13 +23,14 @@
 					  Variant="Variant.Text"
 					  Style=@GetTitleStyle()
 					  @onblur=@TitleBlurred
-					  @onfocus=@TitleFocused/>
+					  @onfocus=@TitleFocused />
 	</MudStack>
 	<MudStack Row
 			  AlignItems="AlignItems.Center">
 		<MudMenu Icon=@Icons.Material.Filled.MoreVert
 				 AriaLabel="Open item menu">
 			<MudMenuItem Label="Delete"
+						 Disabled=@Disabled
 						 OnClick=@Delete />
 		</MudMenu>
 		<MudIconButton Icon=@Icons.Material.Filled.Close

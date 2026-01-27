@@ -20,6 +20,8 @@ public partial class BoardItem
 
     [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; } = null!;
+    [Parameter]
+    public bool OneLine { get; set; } = false;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
@@ -79,4 +81,5 @@ public partial class BoardItem
 
         await dialog.Result;
     }
+
 }

@@ -1,0 +1,24 @@
+@using Tracker.WebApp.Components.BoardItems
+@using MudBlazor
+
+@inherits BoardSubscribeBase
+
+<MudContainer MaxWidth="MaxWidth.False" Class="pa-0">
+    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="3">
+        <BoardItemsQuadrant Items=UrgentImportant
+                            Color=@Colors.Red.Darken2
+                            Title="DO - Urgent & Important" />
+
+        <BoardItemsQuadrant Items=UnurgentImportant
+                            Color=@Colors.Blue.Darken2
+                            Title="PLAN - Not Urgent & Important" />
+
+        <BoardItemsQuadrant Items=UrgentUnimportant
+                            Color=@Colors.Orange.Darken2
+                            Title="DELEGATE - Urgent & Not Important" />
+
+        <BoardItemsQuadrant Items=UnurgentUnimportant
+                            Color=@Colors.Lime.Darken1
+                            Title="ELIMINATE - Not Urgent & Not Important" />
+    </MudStack>
+</MudContainer>

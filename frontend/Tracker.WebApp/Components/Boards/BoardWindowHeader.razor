@@ -5,91 +5,86 @@
 @using Tracker.WebApp.Components.Users
 @using Tracker.WebApp.Shared
 
-@if (BoardState.IsLoading)
-{
-	<BoardWindowHeaderSkeleton />
-}
-else
-{
-	<MudToolBar Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
-		<MudTooltip Text="To workspace">
-			<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
-						   Color="Color.Inherit"
-						   OnClick=@ToWorkspace />
-		</MudTooltip>
-		<MudSpacer />
+@inherits BoardSubscribeBase
 
-		<MudText Typo="Typo.h6"
-				 Color="Color.Inherit"
-				 Class="text-ellipsis">
-			@Board.Title
-		</MudText>
+<MudToolBar Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+	<MudTooltip Text="To workspace">
+		<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
+					   Color="Color.Inherit"
+					   OnClick=@ToWorkspace />
+	</MudTooltip>
+	<MudSpacer />
 
-		<MudSpacer />
+	<MudText Typo="Typo.h6"
+			 Color="Color.Inherit"
+			 Class="text-ellipsis">
+		@Board.Title
+	</MudText>
 
-		<MudStack Row
-				  Spacing="3"
-				  AlignItems="AlignItems.Center">
+	<MudSpacer />
 
-			<MudTabs Elevation="0"
-					 MinimumTabWidth="20px"
-					 ActivePanelIndex=@TabIndex
-					 ActivePanelIndexChanged=@OnTabIndexChanged
-					 Color="Color.Secondary">
-				<MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
-				<MudTabPanel Icon=@Icons.Material.Filled.CalendarToday ToolTip="Calendar" />
-				<MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
-			</MudTabs>
+	<MudStack Row
+			  Spacing="3"
+			  AlignItems="AlignItems.Center">
+
+		<MudTabs Elevation="0"
+				 MinimumTabWidth="20px"
+				 ActivePanelIndex=@TabIndex
+				 ActivePanelIndexChanged=@OnTabIndexChanged
+				 Color="Color.Secondary">
+			<MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
+			<MudTabPanel Icon=@Icons.Material.Filled.CalendarToday ToolTip="Calendar" />
+			<MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
+		</MudTabs>
+
+		<MudDivider Vertical FlexItem />
+
+		@if (BoardState.UsersState.RecentActiveUsers().Any())
+		{
+			<MudAvatarGroup @key=@GetUsersKey()
+							Spacing="3"
+							Max="5">
+				@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
+				{
+					var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
+					<UserAvatarWithLookup @key=@boardUser.User.Id
+										  User=@boardUser.User
+										  Color=color
+										  Size="Size.Medium" />
+				}
+			</MudAvatarGroup>
 
 			<MudDivider Vertical FlexItem />
+		}
+		@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
+		{
+			<MudTooltip Text="Move lists">
+				<MudIconButton Icon=@Icons.Material.Filled.SwapHoriz
+							   Color="Color.Inherit"
+							   OnClick=@OpenListsSwap />
+			</MudTooltip>
+		}
+		@if (Board.Permissions.CanChangeBoard)
+		{
+			<MudTooltip Text="Members">
+				<MudIconButton Icon=@Icons.Material.Outlined.People
+							   Color="Color.Inherit"
+							   OnClick=@OpenMembers />
+			</MudTooltip>
 
-			@if (BoardState.UsersState.RecentActiveUsers().Any())
-			{
-				<MudAvatarGroup @key=@GetUsersKey()
-								Spacing="3"
-								Max="5">
-					@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
-					{
-						var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
-						<UserAvatarWithLookup @key=@boardUser.User.Id
-											  User=@boardUser.User
-											  Color=color
-											  Size="Size.Medium" />
-					}
-				</MudAvatarGroup>
-
-				<MudDivider Vertical FlexItem />
-			}
-			@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
-			{
-				<MudTooltip Text="Move lists">
-					<MudIconButton Icon=@Icons.Material.Filled.SwapHoriz
-								   Color="Color.Inherit"
-								   OnClick=@OpenListsSwap />
-				</MudTooltip>
-			}
-			@if (Board.Permissions.CanChangeBoard)
-			{
-				<MudTooltip Text="Members">
-					<MudIconButton Icon=@Icons.Material.Outlined.People
-								   Color="Color.Inherit"
-								   OnClick=@OpenMembers />
-				</MudTooltip>
-
-				<MudTooltip Text="Settings">
-					<MudIconButton Icon=@Icons.Material.Outlined.Settings
-								   Color="Color.Inherit"
-								   OnClick=@OpenSettings />
-				</MudTooltip>
-			}
-			else
-			{
-				<MudTooltip Text="Information about board">
-					<MudIconButton Icon=@Icons.Material.Outlined.Info
-								   Color="Color.Inherit"
-								   OnClick=@OpenSettings />
-				</MudTooltip>
-			}
-		</MudStack>
-	</MudToolBar>
-}
+			<MudTooltip Text="Settings">
+				<MudIconButton Icon=@Icons.Material.Outlined.Settings
+							   Color="Color.Inherit"
+							   OnClick=@OpenSettings />
+			</MudTooltip>
+		}
+		else
+		{
+			<MudTooltip Text="Information about board">
+				<MudIconButton Icon=@Icons.Material.Outlined.Info
+							   Color="Color.Inherit"
+							   OnClick=@OpenSettings />
+			</MudTooltip>
+		}
+	</MudStack>
+</MudToolBar>

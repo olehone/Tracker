@@ -127,6 +127,11 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnItemMoved -= ItemsState.Apply;
         _boardRealtime.OnItemUpdated -= ItemsState.Apply;
         _boardRealtime.OnItemDeleted -= ItemsState.Apply;
+
+        _boardRealtime.OnListCreated -= ListsState.Apply;
+        _boardRealtime.OnListMoved -= ListsState.Apply;
+        _boardRealtime.OnListUpdated -= ListsState.Apply;
+        _boardRealtime.OnListDeleted -= ListsState.Apply;
         await _boardRealtime.DisconnectAsync();
     }
 }

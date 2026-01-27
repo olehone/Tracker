@@ -9,43 +9,48 @@
 			<DialogContent>
 				<MudStack>
 					<BoardItemSettingsHeader Item=@Item />
-					<MudStack Row>
-						@if (!Item.Assignees.Any())
-						{
-							<MudButton Size="Size.Small"
-									   Variant="Variant.Outlined"
-									   StartIcon=@Icons.Material.Filled.PersonAdd
-									   OnClick=@ToggleAssign>
-								Assign
-							</MudButton>
-						}
-						@if (_date is null && !_openDate)
-						{
-							<MudButton Size="Size.Small"
-									   Variant="Variant.Outlined"
-									   StartIcon=@Icons.Material.Filled.EditCalendar
-									   OnClick=@(() => _openDate = true)>
-								Set due date
-							</MudButton>
-						}
-					</MudStack>
-					@* Assignees part *@
-					@if (_openAssign)
+					@if (!Disabled)
 					{
-						<MudOverlay Visible="true"
-									AutoClose="true"
-									OnClosed="@(() => _openAssign = false)"
-									DarkBackground="false" />
-						<MudPopover Open
-									AnchorOrigin="Origin.TopRight"
-									TransformOrigin="Origin.CenterRight">
-							<BoardItemAssignees BoardState=@BoardState
-												Close=@(() => _openAssign = false)
-												Item=@Item />
-						</MudPopover>
+						<MudStack Row>
+							@if (!Item.Assignees.Any())
+							{
+								<MudButton Size="Size.Small"
+										   Variant="Variant.Outlined"
+										   StartIcon=@Icons.Material.Filled.PersonAdd
+										   OnClick=@ToggleAssign>
+									Assign
+								</MudButton>
+							}
+							@if (_date is null && !_openDate)
+							{
+								<MudButton Size="Size.Small"
+										   Variant="Variant.Outlined"
+										   StartIcon=@Icons.Material.Filled.EditCalendar
+										   OnClick=@(() => _openDate = true)>
+									Set due date
+								</MudButton>
+							}
+						</MudStack>
+
+						@if (_openAssign)
+						{
+							<MudOverlay Visible="true"
+										AutoClose="true"
+										OnClosed=@(() => _openAssign = false)
+										DarkBackground="false" />
+
+							<MudPopover Open
+										AnchorOrigin="Origin.TopRight"
+										TransformOrigin="Origin.CenterRight">
+								<BoardItemAssignees BoardState=@BoardState
+													Close=@(() => _openAssign = false)
+													Item=@Item />
+							</MudPopover>
+						}
 					}
 
 					<BoardItemAssigneesList Item=@Item
+											Disabled=@(Disabled)
 											ToggleAssign=@ToggleAssign
 											OpenAssign=@_openAssign />
 					<MudStack Row
@@ -57,11 +62,14 @@
 								<MudText Typo="Typo.body2">
 									Due date
 								</MudText>
+
 								<MudStack Row
 										  AlignItems="AlignItems.Center">
 									<MudDatePicker Date=@_date
+												   Disabled=@Disabled
 												   DateChanged=@((DateTime? date) => DateSelected(date))
 												   ShowToolbar="false" />
+
 									<MudIconButton Icon=@Icons.Material.Filled.Close
 												   OnClick=@RemoveDueDate />
 								</MudStack>
@@ -71,17 +79,20 @@
 							<MudText Typo="Typo.body2">
 								Importance
 							</MudText>
+
 							<MudSelect FullWidth
 									   Value=@_importance
 									   ValueChanged=@((BoardItemImportance importance) => ImportanceSelected(importance))>
 								@foreach (BoardItemImportance importance in Enum.GetValues(typeof(BoardItemImportance)))
 								{
-									<MudSelectItem Value=@importance>
+									<MudSelectItem Value=@importance
+												   Disabled=@Disabled>
 										<MudStack Row
 												  Justify="Justify.SpaceBetween"
 												  StretchItems="StretchItems.End">
 											<MudIcon Icon=@ImportanceHelper.GetIcon(importance)
 													 Color=@ImportanceHelper.GetColor(importance) />
+
 											<MudText>
 												@importance
 											</MudText>
@@ -94,11 +105,13 @@
 					</MudStack>
 
 					<MudTextField @bind-Value=@_description
+								  Disabled=@Disabled
 								  Label="Description"
 								  Lines="3"
 								  Variant="Variant.Outlined"
 								  @onfocus=@DescriptionFocused
 								  @onblur=@DescriptionBlurred />
+								  
 					<MudDivider />
 				</MudStack>
 			</DialogContent>

@@ -19,6 +19,10 @@ public partial class BoardItemBrief
 
     [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; } = null!;
+    [Parameter]
+    public Size Size { get; set; } = Size.Large;
+    [Parameter]
+    public bool OnlyTitle { get; set; } = false;
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
@@ -34,7 +38,9 @@ public partial class BoardItemBrief
 
     private string GetStyle()
     {
-        return Item.IsDone ? "text-decoration: line-through; width: 90%" : "width: 90%";
+        return Item.IsDone
+            ? "text-decoration: line-through; width: 90%"
+            : "width: 90%";
     }
     private Color GetColor()
     {

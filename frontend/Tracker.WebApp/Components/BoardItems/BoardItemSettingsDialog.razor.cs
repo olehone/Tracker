@@ -24,6 +24,8 @@ public partial class BoardItemSettingsDialog : IDisposable
 
     private bool IsItemExists =>
         BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
+    private bool Disabled =>
+        !BoardState.Board.Permissions.CanChangeItem;
 
     private void ToggleAssign()
     {

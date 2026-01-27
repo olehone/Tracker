@@ -5,14 +5,26 @@
 @using Tracker.WebApp.Components.Boards;
 @using Heron.MudCalendar
 
-<MudChip T="string"
-		 Label="true"
-		 Size="Size.Small"
-		 Icon=@ImportanceHelper.GetIcon(Item.Importance)
-		 Color=@GetColor()
-		 Variant=@GetVariant()
-		 OnClick=@OpenItemSettings
-		 Style=@GetStyle()>
-	@Item.Title
-</MudChip>
-
+@if (OnlyTitle)
+{
+	<MudChip T="string"
+			 Label="true"
+			 Size=@Size
+			 OnClick=@OpenItemSettings
+			 Style="width: 90%">
+		@Item.Title
+	</MudChip>
+}
+else
+{
+	<MudChip T="string"
+			 Label="true"
+			 Size=@Size
+			 Icon=@ImportanceHelper.GetIcon(Item.Importance)
+			 Color=@GetColor()
+			 Variant=@GetVariant()
+			 OnClick=@OpenItemSettings
+			 Style=@GetStyle()>
+		@Item.Title
+	</MudChip>
+}

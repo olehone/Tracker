@@ -24,6 +24,9 @@ public partial class BoardItemSettingsHeader
     private bool _isDone;
     private bool _isEditingTitle = false;
 
+    private bool Disabled =>
+        !BoardState.Board.Permissions.CanChangeItem;
+
     protected override void OnInitialized()
     {
         _title = Item.Title;
@@ -53,8 +56,8 @@ public partial class BoardItemSettingsHeader
             return;
         }
 
-        await BoardState.ItemsState.DeleteAsync(Item.Id);
         MudDialog.Close(DialogResult.Ok(true));
+        await BoardState.ItemsState.DeleteAsync(Item.Id);
     }
 
     private async Task ChangeIsDone(bool isDone)
