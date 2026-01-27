@@ -12,6 +12,6 @@ public class User : BaseEntity
     public required string FirstName { get; set; }
     public string? LastName { get; set; }
 
-    public List<UserBoard> UserBoards { get; set; } = [];
-    public List<UserWorkspace> UserWorkspaces { get; set; } = [];
+    public List<BoardUser> BoardUsers { get; set; } = [];
+    public List<WorkspaceUser> WorkspaceUsers { get; set; } = [];
 }

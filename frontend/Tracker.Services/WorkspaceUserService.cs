@@ -1,5 +1,4 @@
-﻿using Tracker.API.Requests;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -15,12 +14,12 @@ public class WorkspaceUserService(IApiErrorHandler apiErrorHandler, IWorkspaceUs
         return apiErrorHandler.ExecuteAsync(() => api.GetUsersByWorkspaceAsync(workspaceId));
     }
 
-    public Task<Result<WorkspaceUserDto>> AddUserToWorkspaceAsync(Guid workspaceId, Guid userId, UserWorkspaceRole role)
+    public Task<Result<WorkspaceUserDto>> AddUserToWorkspaceAsync(Guid workspaceId, Guid userId, WorkspaceUserRole role)
     {
         return apiErrorHandler.ExecuteAsync(() => api.AddUserToWorkspaceAsync(workspaceId, userId, role));
     }
 
-    public Task<Result> ChangeUserRoleAsync(Guid workspaceId, Guid userId, UserWorkspaceRole role)
+    public Task<Result> ChangeUserRoleAsync(Guid workspaceId, Guid userId, WorkspaceUserRole role)
     {
         return apiErrorHandler.ExecuteAsync(() => api.ChangeUserRoleAsync(workspaceId, userId, role));
     }

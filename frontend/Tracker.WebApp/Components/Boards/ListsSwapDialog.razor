@@ -1,0 +1,28 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Lists
+
+<CascadingValue Value="BoardState">
+	<MudDialog>
+		<DialogContent>
+			<MudDropContainer T=@BoardListDto
+							  Items=@Lists
+							  ItemsSelector=@((_, _) => true)
+							  ItemDropped=@SwapList
+							  Class="d-flex flex-wrap flex-grow-1">
+				<ChildContent>
+					<MudDropZone T=@BoardListDto
+								 Identifier="List drop zone"
+								 AllowReorder
+								 Class="rounded mud-background-gray pa-3 ma-0 flex-grow-1">
+					</MudDropZone>
+				</ChildContent>
+				<ItemRenderer>
+					<MudPaper Elevation="25"
+							  Class="pa-4 my-4">
+						@context.Title
+					</MudPaper>
+				</ItemRenderer>
+			</MudDropContainer>
+		</DialogContent>
+	</MudDialog>
+</CascadingValue>

@@ -1,5 +1,4 @@
 ﻿using Refit;
-using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.Workspace;

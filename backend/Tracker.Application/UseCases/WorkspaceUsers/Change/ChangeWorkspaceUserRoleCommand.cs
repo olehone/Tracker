@@ -8,5 +8,5 @@ public class ChangeWorkspaceUserRoleCommand : IRequest<Result>
 {
     public required Guid WorkspaceId { get; set; }
     public required Guid UserId { get; set; }
-    public required UserWorkspaceRole Role { get; set; }
+    public required WorkspaceUserRole Role { get; set; }
 }

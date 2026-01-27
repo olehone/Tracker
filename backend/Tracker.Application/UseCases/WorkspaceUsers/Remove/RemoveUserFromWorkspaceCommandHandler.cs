@@ -25,7 +25,7 @@ public class RemoveUserFromWorkspaceCommandHandler(
             return workspace.Error;
         }
 
-        var userWorkspace = await uow.UserWorkspaceRepository
+        var userWorkspace = await uow.WorkspaceUserRepository
             .GetAsync(request.UserId, request.WorkspaceId);
         if (userWorkspace is null)
         {
@@ -34,13 +34,13 @@ public class RemoveUserFromWorkspaceCommandHandler(
 
         var userId = userContext.GetUserId();
 
-        if (userWorkspace.Role == UserWorkspaceRole.Owner && userWorkspace.UserId == userId)
+        if (userWorkspace.Role == WorkspaceUserRole.Owner && userWorkspace.UserId == userId)
         {
             await uow.WorkspaceRepository.RemoveAsync(workspace.Value.Id);
         }
         else
         {
-            await uow.UserWorkspaceRepository.RemoveAsync(userWorkspace.Id);
+            await uow.WorkspaceUserRepository.RemoveAsync(userWorkspace.Id);
         }
 
         var sc = await uow.SaveChangesAsync(cancellationToken);

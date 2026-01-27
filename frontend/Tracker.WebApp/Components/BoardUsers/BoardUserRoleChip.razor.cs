@@ -6,5 +6,5 @@ namespace Tracker.WebApp.Components.BoardUsers;
 public partial class BoardUserRoleChip
 {
     [Parameter]
-    public UserBoardRole Role { get; set; }
+    public BoardUserRole Role { get; set; }
 }

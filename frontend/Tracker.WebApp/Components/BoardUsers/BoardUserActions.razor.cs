@@ -12,6 +12,6 @@ public partial class BoardUserActions
     private bool CanChange()
     {
         return BoardState.Board.Permissions.CanChangeBoard &&
-            BoardUser.Role != Domain.Enums.UserBoardRole.Owner;
+            BoardUser.Role != Domain.Enums.BoardUserRole.Owner;
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;

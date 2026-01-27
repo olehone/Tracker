@@ -4,5 +4,5 @@ namespace Tracker.API.Requests;
 
 public class BoardUserRoleRequest
 {
-    public required UserBoardRole Role { get; set; }
+    public required BoardUserRole Role { get; set; }
 }

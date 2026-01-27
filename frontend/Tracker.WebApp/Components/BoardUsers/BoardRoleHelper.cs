@@ -5,26 +5,26 @@ namespace Tracker.WebApp.Components.BoardUsers;
 
 internal static class BoardRoleHelper
 {
-    public static Color GetRoleColor(UserBoardRole role)
+    public static Color GetRoleColor(BoardUserRole role)
     {
         return role switch
         {
-            UserBoardRole.Owner => Color.Warning,
-            UserBoardRole.Admin => Color.Error,
-            UserBoardRole.Member => Color.Primary,
-            UserBoardRole.Observer => Color.Info,
+            BoardUserRole.Owner => Color.Warning,
+            BoardUserRole.Admin => Color.Error,
+            BoardUserRole.Member => Color.Primary,
+            BoardUserRole.Observer => Color.Info,
             _ => Color.Default
         };
     }
 
-    public static string GetRoleIcon(UserBoardRole role)
+    public static string GetRoleIcon(BoardUserRole role)
     {
         return role switch
         {
-            UserBoardRole.Owner => Icons.Material.Filled.Star,
-            UserBoardRole.Admin => Icons.Material.Filled.AdminPanelSettings,
-            UserBoardRole.Member => Icons.Material.Filled.Person,
-            UserBoardRole.Observer => Icons.Material.Filled.Visibility,
+            BoardUserRole.Owner => Icons.Material.Filled.Star,
+            BoardUserRole.Admin => Icons.Material.Filled.AdminPanelSettings,
+            BoardUserRole.Member => Icons.Material.Filled.Person,
+            BoardUserRole.Observer => Icons.Material.Filled.Visibility,
             _ => Icons.Material.Filled.PersonOff
         };
     }

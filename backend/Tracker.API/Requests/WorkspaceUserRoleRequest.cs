@@ -4,5 +4,5 @@ namespace Tracker.API.Requests;
 
 public class WorkspaceUserRoleRequest
 {
-    public required UserWorkspaceRole Role { get; set; }
+    public required WorkspaceUserRole Role { get; set; }
 }

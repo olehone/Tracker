@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
+using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
 
@@ -23,7 +23,7 @@ public partial class WorkspaceUsers
     private bool isLoading = true;
 
     private UserDto? _selectedUser;
-    private UserWorkspaceRole _selectedRole = UserWorkspaceRole.Member;
+    private WorkspaceUserRole _selectedRole = WorkspaceUserRole.Member;
     private List<UserDto> _availableUsers = new();
 
     protected override async Task OnInitializedAsync()
@@ -109,12 +109,12 @@ public partial class WorkspaceUsers
         if (result.IsSuccess)
         {
             _selectedUser = null;
-            _selectedRole = UserWorkspaceRole.Member;
+            _selectedRole = WorkspaceUserRole.Member;
             await LoadWorkspaceUsers();
         }
     }
 
-    private async Task ChangeUserRoleAsync(WorkspaceUserDto workspaceUser, UserWorkspaceRole newRole)
+    private async Task ChangeUserRoleAsync(WorkspaceUserDto workspaceUser, WorkspaceUserRole newRole)
     {
         if (workspaceUser.Role == newRole)
             return;
@@ -142,24 +142,24 @@ public partial class WorkspaceUsers
         }
     }
 
-    private static Color GetRoleColor(UserWorkspaceRole role)
+    private static Color GetRoleColor(WorkspaceUserRole role)
     {
         return role switch
         {
-            UserWorkspaceRole.Owner => Color.Warning,
-            UserWorkspaceRole.Admin => Color.Error,
-            UserWorkspaceRole.Member => Color.Primary,
+            WorkspaceUserRole.Owner => Color.Warning,
+            WorkspaceUserRole.Admin => Color.Error,
+            WorkspaceUserRole.Member => Color.Primary,
             _ => Color.Default
         };
     }
 
-    private static string GetRoleIcon(UserWorkspaceRole role)
+    private static string GetRoleIcon(WorkspaceUserRole role)
     {
         return role switch
         {
-            UserWorkspaceRole.Owner => Icons.Material.Filled.Star,
-            UserWorkspaceRole.Admin => Icons.Material.Filled.AdminPanelSettings,
-            UserWorkspaceRole.Member => Icons.Material.Filled.Person,
+            WorkspaceUserRole.Owner => Icons.Material.Filled.Star,
+            WorkspaceUserRole.Admin => Icons.Material.Filled.AdminPanelSettings,
+            WorkspaceUserRole.Member => Icons.Material.Filled.Person,
             _ => Icons.Material.Filled.PersonOff
         };
     }
@@ -167,6 +167,6 @@ public partial class WorkspaceUsers
     private bool CanChangeRole(WorkspaceUserDto workspaceUser)
     {
         return Workspace!.Permissions.CanChangeWorkspace &&
-            workspaceUser.Role != UserWorkspaceRole.Owner;
+            workspaceUser.Role != WorkspaceUserRole.Owner;
     }
 }

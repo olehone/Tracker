@@ -16,7 +16,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
         return await _dbSet
             .AsNoTracking()
-            .Where(b => b.UserBoards.Any(ub => ub.UserId == userId))
+            .Where(b => b.BoardUsers.Any(ub => ub.UserId == userId))
             .ToListAsync();
     }
 
@@ -58,7 +58,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                     .ThenInclude(bi => bi.Assignees)
                         .ThenInclude(bi => bi.BoardUser)
             .Include(b => b.PermissionRoles)
-            .Include(b => b.UserBoards)
+            .Include(b => b.BoardUsers)
                 .ThenInclude(bu => bu.User)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
@@ -89,7 +89,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
         return await _dbSet
             .AsNoTracking()
             .Where(b => b.WorkspaceId == workspaceId)
-            .Include(b => b.UserBoards.Where(ub => ub.UserId == userId))
+            .Include(b => b.BoardUsers.Where(ub => ub.UserId == userId))
             .ToListAsync();
     }
 }

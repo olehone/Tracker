@@ -37,7 +37,7 @@ public static class WorkspaceHelper
     {
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository.GetRoleAsync(userId, workspace.Id);
+        var workspaceRole = await uow.WorkspaceUserRepository.GetRoleAsync(userId, workspace.Id);
         var permissions = WorkspacePolicy
             .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
 

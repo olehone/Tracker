@@ -14,5 +14,5 @@ public class Board : BaseEntity
     public BoardVisibility Visibility { get; set; }
         = BoardVisibility.Private;
     public BoardPermissionRoles PermissionRoles { get; set; } = new();
-    public List<UserBoard> UserBoards { get; set; } = [];
+    public List<BoardUser> BoardUsers { get; set; } = [];
 }

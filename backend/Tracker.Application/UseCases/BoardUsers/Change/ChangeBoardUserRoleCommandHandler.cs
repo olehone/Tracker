@@ -33,15 +33,15 @@ public class ChangeBoardUserRoleCommandHandler(
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.UserBoardRepository
+        var boardRole = await uow.BoardUserRepository
             .GetRoleAsync(userId, board.Id);
 
         var permissions = BoardPolicy
             .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
 
-        var boardUser = new UserBoard
+        var boardUser = new BoardUser
         {
             UserId = request.UserId,
             BoardId = request.BoardId,
@@ -53,7 +53,7 @@ public class ChangeBoardUserRoleCommandHandler(
             return AuthErrors.Forbidden();
         }
 
-        if (request.Role == UserBoardRole.Owner)
+        if (request.Role == BoardUserRole.Owner)
         {
             if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeOwner))
             {
@@ -63,7 +63,7 @@ public class ChangeBoardUserRoleCommandHandler(
         }
         else
         {
-            uow.UserBoardRepository.Update(boardUser);
+            uow.BoardUserRepository.Update(boardUser);
         }
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
@@ -75,21 +75,21 @@ public class ChangeBoardUserRoleCommandHandler(
 
     private static async Task ChangeOwner(ChangeBoardUserRoleCommand request, IUnitOfWork uow)
     {
-        var oldOwner = await uow.UserBoardRepository.GetOwnerAsync(request.BoardId)!;
-        var oldOwnerAsAdmin = new UserBoard
+        var oldOwner = await uow.BoardUserRepository.GetOwnerAsync(request.BoardId)!;
+        var oldOwnerAsAdmin = new BoardUser
         {
             UserId = oldOwner!.UserId,
             BoardId = oldOwner.BoardId,
-            Role = UserBoardRole.Admin,
+            Role = BoardUserRole.Admin,
         };
 
-        var newOwner = new UserBoard
+        var newOwner = new BoardUser
         {
             UserId = request.UserId,
             BoardId = request.BoardId,
             Role = request.Role,
         };
-        uow.UserBoardRepository.Update(oldOwnerAsAdmin);
-        uow.UserBoardRepository.Update(newOwner);
+        uow.BoardUserRepository.Update(oldOwnerAsAdmin);
+        uow.BoardUserRepository.Update(newOwner);
     }
 }

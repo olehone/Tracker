@@ -1,8 +1,9 @@
 @using Tracker.Domain.Enums
 @using Tracker.WebApp.Components.BoardUsers
+
 @inherits BoardUsersSubscribeBase
 
-<MudSelect T=@UserBoardRole
+<MudSelect T=@BoardUserRole
 		   Value=@_currentRole
 		   ValueChanged=@(v => _currentRole = v)
 		   Dense
@@ -10,23 +11,23 @@
 		   Margin=@Margin.None
 		   Variant=@Variant.Text>
 
-	<MudSelectItem Value=@UserBoardRole.Observer>
+	<MudSelectItem Value=@BoardUserRole.Observer>
 		<MudStack Row>
-			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(UserBoardRole.Observer) />
+			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(BoardUserRole.Observer) />
 			Observer
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@UserBoardRole.Member>
+	<MudSelectItem Value=@BoardUserRole.Member>
 		<MudStack Row>
-			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(UserBoardRole.Member) />
+			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(BoardUserRole.Member) />
 			Member
 		</MudStack>
 	</MudSelectItem>
 
-	<MudSelectItem Value=@UserBoardRole.Admin>
+	<MudSelectItem Value=@BoardUserRole.Admin>
 		<MudStack Row>
-			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(UserBoardRole.Admin) />
+			<MudIcon Icon=@BoardRoleHelper.GetRoleIcon(BoardUserRole.Admin) />
 			Admin
 		</MudStack>
 	</MudSelectItem>

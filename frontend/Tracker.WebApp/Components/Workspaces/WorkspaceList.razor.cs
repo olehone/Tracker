@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Tracker.API.Requests;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 
 namespace Tracker.WebApp.Components.Workspaces;
 

@@ -1,6 +1,6 @@
-﻿using Tracker.API.Requests;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
+using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
@@ -95,7 +95,7 @@ public sealed class BoardUsersState(
             : [];
     }
 
-    public async Task AddAsync(Guid userId, UserBoardRole role)
+    public async Task AddAsync(Guid userId, BoardUserRole role)
     {
         var result = await boardUserService.AddAsync(Board.Id, userId, role);
         if (result.IsFailure)
@@ -108,7 +108,7 @@ public sealed class BoardUsersState(
         Notify();
     }
 
-    public async Task ChangeRoleAsync(BoardUserDto boardUser, UserBoardRole newRole)
+    public async Task ChangeRoleAsync(BoardUserDto boardUser, BoardUserRole newRole)
     {
         var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, newRole);
         if (result.IsFailure)
@@ -122,7 +122,7 @@ public sealed class BoardUsersState(
 
     public async Task RemoveAsync(BoardUserDto boardUser)
     {
-        if (boardUser.Role == UserBoardRole.Owner)
+        if (boardUser.Role == BoardUserRole.Owner)
         {
             return;
         }
@@ -144,18 +144,18 @@ public sealed class BoardUsersState(
             return;
         }
 
-        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, UserBoardRole.Owner);
+        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, BoardUserRole.Owner);
         if (result.IsFailure)
         {
             return;
         }
 
-        var previousOwner = _boardUsers.FirstOrDefault(u => u.Role == UserBoardRole.Owner);
+        var previousOwner = _boardUsers.FirstOrDefault(u => u.Role == BoardUserRole.Owner);
         if (previousOwner is not null)
         {
-            previousOwner.Role = UserBoardRole.Admin;
+            previousOwner.Role = BoardUserRole.Admin;
         }
-        boardUser.Role = UserBoardRole.Owner;
+        boardUser.Role = BoardUserRole.Owner;
         Notify();
     }
 
@@ -163,7 +163,7 @@ public sealed class BoardUsersState(
         => Board.Permissions.CanChangeBoard;
 
     public bool CanChangeMember(BoardUserDto member)
-        => CanChangeMembers() && member.Role != UserBoardRole.Owner;
+        => CanChangeMembers() && member.Role != BoardUserRole.Owner;
 
     public bool IsUserMember(UserDto user)
         => _boardUsers.Any(u => u.User.Id == user.Id);

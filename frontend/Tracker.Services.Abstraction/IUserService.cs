@@ -1,5 +1,5 @@
-﻿using Tracker.API.Requests;
-using Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 
 namespace Tracker.Services.Abstraction;

@@ -62,16 +62,16 @@
 						<MudSelect @bind-Value=@_selectedRole
 								   Dense
 								   Variant=@Variant.Text>
-							<MudSelectItem Value=@UserWorkspaceRole.Member>
+							<MudSelectItem Value=@WorkspaceUserRole.Member>
 								<MudStack Row>
-									<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Member) />
+									<MudIcon Icon=@GetRoleIcon(WorkspaceUserRole.Member) />
 									Member
 								</MudStack>
 							</MudSelectItem>
 
-							<MudSelectItem Value=@UserWorkspaceRole.Admin>
+							<MudSelectItem Value=@WorkspaceUserRole.Admin>
 								<MudStack Row>
-									<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Admin) />
+									<MudIcon Icon=@GetRoleIcon(WorkspaceUserRole.Admin) />
 									Admin
 								</MudStack>
 							</MudSelectItem>
@@ -118,23 +118,23 @@
 											  Justify="Justify.FlexStart">
 										@if (CanChangeRole(workspaceUser))
 										{
-											<MudSelect T=@UserWorkspaceRole
+											<MudSelect T=@WorkspaceUserRole
 													   Value=@workspaceUser.Role
 													   ValueChanged=@(newRole => ChangeUserRoleAsync(workspaceUser, newRole))
 													   Dense
 													   Style="min-width: 160px; width: 160px;"
 													   Margin="Margin.None"
 													   Variant="Variant.Text">
-												<MudSelectItem Value=@UserWorkspaceRole.Member>
+												<MudSelectItem Value=@WorkspaceUserRole.Member>
 													<MudStack Row>
-														<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Member) />
+														<MudIcon Icon=@GetRoleIcon(WorkspaceUserRole.Member) />
 														Member
 													</MudStack>
 												</MudSelectItem>
 
-												<MudSelectItem Value=@UserWorkspaceRole.Admin>
+												<MudSelectItem Value=@WorkspaceUserRole.Admin>
 													<MudStack Row>
-														<MudIcon Icon=@GetRoleIcon(UserWorkspaceRole.Admin) />
+														<MudIcon Icon=@GetRoleIcon(WorkspaceUserRole.Admin) />
 														Admin
 													</MudStack>
 												</MudSelectItem>
@@ -147,7 +147,7 @@
 										}
 										else
 										{
-											<MudChip T=@UserWorkspaceRole
+											<MudChip T=@WorkspaceUserRole
 													 Icon=@GetRoleIcon(workspaceUser.Role)
 													 Color=@GetRoleColor(workspaceUser.Role)
 													 Size="Size.Small">

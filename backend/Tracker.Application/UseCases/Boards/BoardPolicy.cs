@@ -7,8 +7,8 @@ namespace Tracker.Application.UseCases.Boards;
 public static class BoardPolicy
 {
     public static BoardPermissionsDto GetPermissions(BoardPermissionRoles permissionRoles,
-        UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole,
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole,
         GlobalRole globalRole = GlobalRole.None)
     {
         var role = GetEffectivePermission(globalRole, workspaceRole, boardRole);
@@ -34,12 +34,12 @@ public static class BoardPolicy
     }
 
     public static bool CanChangeOwner(GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole)
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
     {
         if (globalRole >= GlobalRole.Admin ||
-            workspaceRole >= UserWorkspaceRole.Admin ||
-            boardRole == UserBoardRole.Owner)
+            workspaceRole >= WorkspaceUserRole.Admin ||
+            boardRole == BoardUserRole.Owner)
         {
             return true;
         }
@@ -49,10 +49,10 @@ public static class BoardPolicy
 
     public static bool CanView(GlobalRole globalRole,
         BoardVisibility visibility,
-        UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole)
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
     {
-        if (globalRole >= GlobalRole.Admin || workspaceRole >= UserWorkspaceRole.Admin)
+        if (globalRole >= GlobalRole.Admin || workspaceRole >= WorkspaceUserRole.Admin)
         {
             return true;
         }
@@ -64,7 +64,7 @@ public static class BoardPolicy
 
         if (visibility >= BoardVisibility.Private)
         {
-            if (boardRole > UserBoardRole.None)
+            if (boardRole > BoardUserRole.None)
             {
                 return true;
             }
@@ -73,7 +73,7 @@ public static class BoardPolicy
 
         if (visibility <= BoardVisibility.Workspace)
         {
-            if (workspaceRole > UserWorkspaceRole.None)
+            if (workspaceRole > WorkspaceUserRole.None)
             {
                 return true;
             }
@@ -83,20 +83,20 @@ public static class BoardPolicy
     }
 
     public static bool CanChangeSettings(GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole)
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
     {
         if (globalRole >= GlobalRole.Admin)
         {
             return true;
         }
 
-        if (workspaceRole >= UserWorkspaceRole.Admin)
+        if (workspaceRole >= WorkspaceUserRole.Admin)
         {
             return true;
         }
 
-        if (boardRole >= UserBoardRole.Admin)
+        if (boardRole >= BoardUserRole.Admin)
         {
             return true;
         }
@@ -122,10 +122,10 @@ public static class BoardPolicy
     // Grand global admin or workspace admin same value as board owner
     private static BoardPermissionRole GetEffectivePermission(
         GlobalRole globalRole,
-        UserWorkspaceRole workspaceRole,
-        UserBoardRole boardRole)
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
     {
-        if (globalRole >= GlobalRole.Admin || workspaceRole >= UserWorkspaceRole.Admin)
+        if (globalRole >= GlobalRole.Admin || workspaceRole >= WorkspaceUserRole.Admin)
         {
             return BoardPermissionRole.Owner;
         }
@@ -133,15 +133,15 @@ public static class BoardPolicy
         return MapUserRoleToPermission(boardRole);
     }
     
-    private static BoardPermissionRole MapUserRoleToPermission(UserBoardRole userBoardRole,
+    private static BoardPermissionRole MapUserRoleToPermission(BoardUserRole userBoardRole,
         bool isWorkspaceMember = false)
     {
         var boardRole = userBoardRole switch
         {
-            UserBoardRole.Observer => BoardPermissionRole.Observer,
-            UserBoardRole.Member => BoardPermissionRole.Member,
-            UserBoardRole.Admin => BoardPermissionRole.Admin,
-            UserBoardRole.Owner => BoardPermissionRole.Owner,
+            BoardUserRole.Observer => BoardPermissionRole.Observer,
+            BoardUserRole.Member => BoardPermissionRole.Member,
+            BoardUserRole.Admin => BoardPermissionRole.Admin,
+            BoardUserRole.Owner => BoardPermissionRole.Owner,
             _ => BoardPermissionRole.Any
         };
         if (boardRole < BoardPermissionRole.WorkspaceMember &&

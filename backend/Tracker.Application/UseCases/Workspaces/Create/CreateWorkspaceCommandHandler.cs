@@ -30,15 +30,15 @@ public sealed class CreateWorkspaceCommandHandler(
             Title = request.Title,
         };
 
-        var userWorkspace = new UserWorkspace
+        var userWorkspace = new WorkspaceUser
         {
             UserId = userId,
             WorkspaceId = workspace.Id,
-            Role = UserWorkspaceRole.Owner
+            Role = WorkspaceUserRole.Owner
         };
 
         await uow.WorkspaceRepository.AddAsync(workspace);
-        await uow.UserWorkspaceRepository.AddAsync(userWorkspace);
+        await uow.WorkspaceUserRepository.AddAsync(userWorkspace);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 

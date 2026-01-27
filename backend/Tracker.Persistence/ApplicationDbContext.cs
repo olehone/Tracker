@@ -11,8 +11,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<BoardList> BoardLists => Set<BoardList>();
     public DbSet<BoardItem> BoardItems => Set<BoardItem>();
     public DbSet<BoardItemAssignee> BoardItemAssignees => Set<BoardItemAssignee>();
-    public DbSet<UserWorkspace> UserWorkspaces => Set<UserWorkspace>();
-    public DbSet<UserBoard> UserBoards => Set<UserBoard>();
+    public DbSet<WorkspaceUser> WorkspaceUsers => Set<WorkspaceUser>();
+    public DbSet<BoardUser> BoardUsers => Set<BoardUser>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

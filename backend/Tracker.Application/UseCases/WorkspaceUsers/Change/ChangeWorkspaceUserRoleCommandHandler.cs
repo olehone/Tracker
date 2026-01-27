@@ -30,7 +30,7 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
             return Error.NotFound("User");
         }
 
-        var workspaceUser = new UserWorkspace
+        var workspaceUser = new WorkspaceUser
         {
             UserId = request.UserId,
             WorkspaceId = request.WorkspaceId,
@@ -39,7 +39,7 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
 
         var userId = userContext.GetUserId();
         var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.UserWorkspaceRepository
+        var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, request.WorkspaceId);
 
         var permissions = WorkspacePolicy
@@ -50,7 +50,7 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
             return AuthErrors.Forbidden();
         }
 
-        if (request.Role == UserWorkspaceRole.Owner)
+        if (request.Role == WorkspaceUserRole.Owner)
         {
             if (!WorkspacePolicy.IsActionAllowed(permissions, WorkspaceAction.ChangeOwner))
             {
@@ -60,7 +60,7 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
         }
         else
         {
-            uow.UserWorkspaceRepository.Update(workspaceUser);
+            uow.WorkspaceUserRepository.Update(workspaceUser);
         }
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
@@ -72,22 +72,22 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
 
     private static async Task ChangeOwner(ChangeWorkspaceUserRoleCommand request, IUnitOfWork uow)
     {
-        var oldOwner = await uow.UserWorkspaceRepository.GetOwnerAsync(request.WorkspaceId)!;
-        var oldOwnerAsAdmin = new UserWorkspace
+        var oldOwner = await uow.WorkspaceUserRepository.GetOwnerAsync(request.WorkspaceId)!;
+        var oldOwnerAsAdmin = new WorkspaceUser
         {
             UserId = oldOwner!.UserId,
             WorkspaceId = oldOwner.WorkspaceId,
-            Role = UserWorkspaceRole.Admin,
+            Role = WorkspaceUserRole.Admin,
         };
 
-        var newOwner = new UserWorkspace
+        var newOwner = new WorkspaceUser
         {
             UserId = request.UserId,
             WorkspaceId = request.WorkspaceId,
             Role = request.Role,
         };
 
-        uow.UserWorkspaceRepository.Update(oldOwnerAsAdmin);
-        uow.UserWorkspaceRepository.Update(newOwner);
+        uow.WorkspaceUserRepository.Update(oldOwnerAsAdmin);
+        uow.WorkspaceUserRepository.Update(newOwner);
     }
 }

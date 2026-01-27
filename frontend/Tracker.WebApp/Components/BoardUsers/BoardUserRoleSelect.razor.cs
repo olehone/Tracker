@@ -6,7 +6,7 @@ namespace Tracker.WebApp.Components.BoardUsers;
 public partial class BoardUserRoleSelect
 {
     [Parameter]
-    public UserBoardRole Role { get; set; }
+    public BoardUserRole Role { get; set; }
     [Parameter]
-    public EventCallback<UserBoardRole> RoleChanged { get; set; }
+    public EventCallback<BoardUserRole> RoleChanged { get; set; }
 }
