@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemsList
+public partial class ItemsList
 {
     [Parameter,EditorRequired]
     public string Title { get; set; }

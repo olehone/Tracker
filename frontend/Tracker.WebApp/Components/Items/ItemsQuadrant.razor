@@ -1,5 +1,5 @@
 ﻿@using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.BoardItems
+@using Tracker.WebApp.Components.Items
 
 <MudPaper Elevation="3"
 		  Class="pa-3"
@@ -18,8 +18,8 @@
 		{
 			@foreach (var item in Items)
 			{
-				<BoardItem OneLine
-						   Item=@item />
+				<ItemFull OneLine
+						  Item=@item />
 			}
 		}
 		else

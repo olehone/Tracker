@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
-using Tracker.WebApp.Components.BoardItems;
+using Tracker.WebApp.Components.Items;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardCalendar : IDisposable
+public partial class Calendar : IDisposable
 {
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;

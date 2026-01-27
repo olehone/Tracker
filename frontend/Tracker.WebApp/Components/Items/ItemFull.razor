@@ -42,7 +42,7 @@
 								   IsDone=@Item.IsDone
 								   HasAttention=@IsOwn() />
 					}
-					<BoardItemImportanceIcon Importance=@Item.Importance
+					<ItemImportanceIcon Importance=@Item.Importance
 											 HasAttention=@IsOwn() />
 				</MudStack>
 			}
@@ -60,7 +60,7 @@
 						@Item.Title
 					</MudText>
 
-					<BoardItemImportanceIcon Importance=@Item.Importance
+					<ItemImportanceIcon Importance=@Item.Importance
 											 HasAttention=@IsOwn() />
 				</MudStack>
 				<MudStack Row>

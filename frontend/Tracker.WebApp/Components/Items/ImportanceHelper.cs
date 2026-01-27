@@ -1,7 +1,7 @@
 ﻿using MudBlazor;
 using Tracker.Domain.Enums;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
 internal static class ImportanceHelper
 {

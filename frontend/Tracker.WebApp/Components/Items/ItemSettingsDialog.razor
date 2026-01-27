@@ -8,7 +8,7 @@
 		<MudDialog>
 			<DialogContent>
 				<MudStack>
-					<BoardItemSettingsHeader Item=@Item />
+					<ItemSettingsHeader Item=@Item />
 					@if (!Disabled)
 					{
 						<MudStack Row>
@@ -42,14 +42,14 @@
 							<MudPopover Open
 										AnchorOrigin="Origin.TopRight"
 										TransformOrigin="Origin.CenterRight">
-								<BoardItemAssignees BoardState=@BoardState
+								<ItemAssignees BoardState=@BoardState
 													Close=@(() => _openAssign = false)
 													Item=@Item />
 							</MudPopover>
 						}
 					}
 
-					<BoardItemAssigneesList Item=@Item
+					<ItemAssigneesList Item=@Item
 											Disabled=@(Disabled)
 											ToggleAssign=@ToggleAssign
 											OpenAssign=@_openAssign />

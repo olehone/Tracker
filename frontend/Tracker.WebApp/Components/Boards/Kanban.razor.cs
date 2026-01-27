@@ -5,7 +5,7 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardKanban
+public partial class Kanban
 {
     [Inject] AppState AppState { get; set; } = null!;
 

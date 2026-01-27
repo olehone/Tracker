@@ -4,9 +4,9 @@ using Tracker.Domain.Enums;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemSettingsDialog : IDisposable
+public partial class ItemSettingsDialog : IDisposable
 {
     private bool _openAssign;
     private bool _disposed;

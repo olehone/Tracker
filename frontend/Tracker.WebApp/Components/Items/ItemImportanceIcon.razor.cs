@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Enums;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemImportanceIcon
+public partial class ItemImportanceIcon
 {
     [Parameter, EditorRequired]
     public BoardItemImportance Importance { get; set; }

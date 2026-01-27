@@ -1,11 +1,11 @@
 ﻿@page "/boards/{BoardId:guid}"
 
-@using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.BoardItems
-@using Tracker.WebApp.Components.BoardLists
-@using Tracker.WebApp.Components.Shared;
-@using Tracker.WebApp.Components.Boards;
 @using Microsoft.AspNetCore.Components.Routing
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Boards;
+@using Tracker.WebApp.Components.Items
+@using Tracker.WebApp.Components.Lists
+@using Tracker.WebApp.Components.Shared;
 
 <PageTitle>@PageTitle()</PageTitle>
 
@@ -37,14 +37,14 @@ else
 						<MudStack StretchItems="StretchItems.None"
 								  AlignItems="AlignItems.Start"
 								  Style="overflow-x: auto;">
-							<BoardKanban />
+							<Kanban />
 						</MudStack>
 						break;
 					case 1:
-						<BoardCalendar />
+						<Calendar />
 						break;
 					case 2:
-						<BoardEisenhower />
+						<Eisenhower />
 						break;
 					default:
 						<MudAlert Severity="Severity.Error">

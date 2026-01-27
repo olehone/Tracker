@@ -5,7 +5,7 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardEisenhower
+public partial class Eisenhower
 {
     [Inject] AppState AppState { get; set; } = null!;
 

@@ -5,7 +5,7 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardListsSwapDialog : IDisposable
+public partial class ListsSwapDialog : IDisposable
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;

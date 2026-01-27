@@ -3,9 +3,9 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemAssignees : IDisposable
+public partial class ItemAssignees : IDisposable
 {
     private bool _disposed;
 

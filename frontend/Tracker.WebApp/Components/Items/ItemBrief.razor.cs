@@ -3,9 +3,9 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemBrief
+public partial class ItemBrief
 {
     private static readonly DialogOptions DialogOptions = new()
     {
@@ -62,11 +62,11 @@ public partial class BoardItemBrief
     {
         var parameters = new DialogParameters
         {
-            { nameof(BoardItemSettingsDialog.BoardState), BoardState },
-            { nameof(BoardItemSettingsDialog.Item), Item }
+            { nameof(ItemSettingsDialog.BoardState), BoardState },
+            { nameof(ItemSettingsDialog.Item), Item }
         };
 
-        var dialog = await DialogService.ShowAsync<BoardItemSettingsDialog>(
+        var dialog = await DialogService.ShowAsync<ItemSettingsDialog>(
             Item.Title,
             parameters,
             DialogOptions);

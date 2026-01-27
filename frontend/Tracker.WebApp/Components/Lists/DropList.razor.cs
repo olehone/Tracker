@@ -3,9 +3,9 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardLists;
+namespace Tracker.WebApp.Components.Lists;
 
-public partial class BoardList
+public partial class DropList
 {
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
@@ -26,11 +26,11 @@ public partial class BoardList
     {
         var parameters = new DialogParameters
         {
-            { nameof(BoardListSettingsDialog.BoardState), BoardState },
-            { nameof(BoardListSettingsDialog.List), List }
+            { nameof(ListSettingsDialog.BoardState), BoardState },
+            { nameof(ListSettingsDialog.List), List }
         };
 
-        var dialog = await DialogService.ShowAsync<BoardListSettingsDialog>(
+        var dialog = await DialogService.ShowAsync<ListSettingsDialog>(
             List.Title,
             parameters
         );

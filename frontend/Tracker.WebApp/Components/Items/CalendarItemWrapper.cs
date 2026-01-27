@@ -1,7 +1,7 @@
 ﻿using Heron.MudCalendar;
 using Tracker.Domain.Dtos;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
 public class CalendarItemWrapper : CalendarItem
 {

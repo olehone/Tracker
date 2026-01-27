@@ -73,9 +73,9 @@ public partial class BoardWindowHeader
     {
         var parameters = new DialogParameters
         {
-            { nameof(BoardListsSwapDialog.BoardState), BoardState }
+            { nameof(ListsSwapDialog.BoardState), BoardState }
         };
-        var dialog = await DialogService.ShowAsync<BoardListsSwapDialog>(
+        var dialog = await DialogService.ShowAsync<ListsSwapDialog>(
             $"Move lists of {Board.Title}",
             parameters
         );

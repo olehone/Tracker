@@ -1,9 +1,9 @@
-@using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.BoardItems
-@using Tracker.WebApp.Components.BoardLists
-@using Tracker.WebApp.Components.Shared;
-@using Tracker.WebApp.Components.Boards;
 @using Heron.MudCalendar
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Boards;
+@using Tracker.WebApp.Components.Items
+@using Tracker.WebApp.Components.Lists
+@using Tracker.WebApp.Components.Shared;
 
 <MudStack Row>
 	<MudCalendar T="CalendarItemWrapper"
@@ -17,7 +17,7 @@
 				 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
 				 MonthCellMinHeight="0">
 		<CellTemplate>
-			<BoardItemBrief Item=@context.Item
+			<ItemBrief Item=@context.Item
 							Size="Size.Small" />
 		</CellTemplate>
 		<ToolbarContent>
@@ -54,6 +54,6 @@
 		</ToolbarContent>
 	</MudCalendar>
 
-	<BoardItemsList Items=@ItemsWithoutDate
+	<ItemsList Items=@ItemsWithoutDate
 					Title="Items without date" />
 </MudStack>

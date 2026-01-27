@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemsQuadrant
+public partial class ItemsQuadrant
 {
     [Parameter, EditorRequired]
     public string Title { get; set; }

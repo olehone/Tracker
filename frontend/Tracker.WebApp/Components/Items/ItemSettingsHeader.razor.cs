@@ -5,9 +5,9 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.WebApp.States;
 
-namespace Tracker.WebApp.Components.BoardItems;
+namespace Tracker.WebApp.Components.Items;
 
-public partial class BoardItemSettingsHeader
+public partial class ItemSettingsHeader
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = null!;

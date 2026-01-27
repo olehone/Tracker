@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 
-namespace Tracker.WebApp.Components.BoardLists;
+namespace Tracker.WebApp.Components.Lists;
 
-public partial class BoardListSummary
+public partial class ListSummary
 {
     [Parameter]
     public required BoardListDto List { get; set; }

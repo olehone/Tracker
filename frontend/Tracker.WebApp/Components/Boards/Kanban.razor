@@ -1,8 +1,8 @@
 @using Tracker.Domain.Dtos
-@using Tracker.WebApp.Components.BoardItems
-@using Tracker.WebApp.Components.BoardLists
-@using Tracker.WebApp.Components.Shared;
 @using Tracker.WebApp.Components.Boards;
+@using Tracker.WebApp.Components.Items
+@using Tracker.WebApp.Components.Lists
+@using Tracker.WebApp.Components.Shared;
 
 @inherits ListItemSubscribeBase
 
@@ -16,7 +16,7 @@
 	<ChildContent>
 		@foreach (var list in BoardState.ListsState.BoardLists)
 		{
-			<BoardList List=@list />
+			<DropList List=@list />
 		}
 		@if (Board.Permissions.CanCreateList)
 		{
@@ -31,6 +31,6 @@
 	</ChildContent>
 
 	<ItemRenderer>
-		<BoardItem Item=@context />
+		<ItemFull Item=@context />
 	</ItemRenderer>
 </MudDropContainer>
