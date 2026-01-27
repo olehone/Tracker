@@ -7,7 +7,7 @@
 
     CONSTRAINT FK_BoardItemAssignee_BoardUsers
         FOREIGN KEY (BoardUserId)
-        REFERENCES [dbo].[BoardUserId](Id),
+        REFERENCES [dbo].[UserBoards](Id),
 
     CONSTRAINT FK_BoardItemAssignee_BoardItems
         FOREIGN KEY (BoardItemId)
