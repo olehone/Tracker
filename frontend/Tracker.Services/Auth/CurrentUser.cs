@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Components.Authorization;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
 
 namespace Tracker.Services.Auth;
 
-public class CurrentUser(AuthenticationStateProvider authProvider)
+public class CurrentUser(IAuthService authService)
     : ICurrentUser
 {
     public bool IsMyId(Guid checkedId)
@@ -12,7 +12,7 @@ public class CurrentUser(AuthenticationStateProvider authProvider)
         return IsAuthenticated && Id == checkedId;
     }
 
-    public bool IsAuthenticated => GetUser()?.Identity?.IsAuthenticated == true;
+    public bool IsAuthenticated => authService.ClaimsPrincipal.Identity?.IsAuthenticated == true;
 
     public bool IsUnauthenticated => !IsAuthenticated;
 
@@ -20,18 +20,11 @@ public class CurrentUser(AuthenticationStateProvider authProvider)
     {
         get
         {
-            var user = GetUser();
+            var user = authService.ClaimsPrincipal;
             var claim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Guid.TryParse(claim, out var id) 
                 ? id
                 : throw new InvalidOperationException("Can't get unauthenticated user id ");
         }
-    }
-
-    private ClaimsPrincipal? GetUser()
-    {
-        var task = authProvider.GetAuthenticationStateAsync();
-        task.Wait();
-        return task.Result.User;
     }
 }

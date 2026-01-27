@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction.Auth;
@@ -17,8 +16,7 @@ public sealed class AuthService(
     : IAuthService
 {
     private readonly SemaphoreSlim _refreshLock = new(1, 1);
-    public EventCallback OnLogin { get; set; }
-    public EventCallback OnLogout { get; set; }
+    public event Action? AuthStateChanged;
 
     public async Task<Result> LoginAsync(LoginUserRequest request)
     {
@@ -31,10 +29,7 @@ public sealed class AuthService(
 
         await storage.SetAsync(result.Value);
 
-        if (OnLogin.HasDelegate)
-        {
-            await OnLogin.InvokeAsync();
-        }
+        AuthStateChanged?.Invoke();
 
         return Result.Success();
     }
@@ -49,11 +44,7 @@ public sealed class AuthService(
         }
 
         await storage.SetAsync(result.Value);
-
-        if (OnLogin.HasDelegate)
-        {
-            await OnLogin.InvokeAsync();
-        }
+        AuthStateChanged?.Invoke();
 
         return Result.Success();
     }
@@ -61,7 +52,7 @@ public sealed class AuthService(
     public async Task LogoutAsync()
     {
         await storage.ClearAsync();
-        await OnLogout.InvokeAsync();
+        AuthStateChanged?.Invoke();
     }
 
     public async Task<ClaimsPrincipal> GetPrincipalAsync()
