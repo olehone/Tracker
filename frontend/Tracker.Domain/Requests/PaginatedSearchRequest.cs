@@ -1,4 +1,4 @@
-﻿namespace Tracker.API.Requests;
+﻿namespace Tracker.Domain.Requests;
 
 public class PaginatedSearchRequest
 {
