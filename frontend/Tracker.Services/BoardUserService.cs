@@ -14,12 +14,12 @@ public class BoardUserService(IApiErrorHandler apiErrorHandler, IBoardUserApi ap
         return apiErrorHandler.ExecuteAsync(() => api.GetByBoardAsync(boardId));
     }
 
-    public Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, UserBoardRole role)
+    public Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, BoardUserRole role)
     {
         return apiErrorHandler.ExecuteAsync(() => api.AddAsync(boardId, userId, role));
     }
 
-    public Task<Result> ChangeRoleAsync(Guid boardId, Guid userId, UserBoardRole role)
+    public Task<Result> ChangeRoleAsync(Guid boardId, Guid userId, BoardUserRole role)
     {
         return apiErrorHandler.ExecuteAsync(() => api.ChangeRoleAsync(boardId, userId, role));
     }

@@ -7,7 +7,7 @@ namespace Tracker.WebApp.Components.BoardUsers;
 public partial class AddBoardUserSection
 {
     private UserDto? _selectedUser;
-    private UserBoardRole _selectedRole = UserBoardRole.Observer;
+    private BoardUserRole _selectedRole = BoardUserRole.Observer;
 
     private async Task AddUser()
     {

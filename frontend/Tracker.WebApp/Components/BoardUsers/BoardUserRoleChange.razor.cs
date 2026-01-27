@@ -9,8 +9,8 @@ public partial class BoardUserRoleChange : BoardUsersSubscribeBase
     [Parameter, EditorRequired]
     public BoardUserDto BoardUser { get; set; }
     
-    private UserBoardRole _initialRole;
-    private UserBoardRole _currentRole;
+    private BoardUserRole _initialRole;
+    private BoardUserRole _currentRole;
     private bool HasChanged => _initialRole != _currentRole;
 
     protected override void OnParametersSet()

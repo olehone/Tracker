@@ -1,12 +1,12 @@
 ﻿using Tracker.Domain.Enums;
 
-namespace Tracker.API.Requests;
+namespace Tracker.Domain.Requests.WorkspaceUser;
 
 public class WorkspaceUserRoleRequest
 {
-    public required UserWorkspaceRole Role { get; set; }
+    public required WorkspaceUserRole Role { get; set; }
 
-    public static implicit operator WorkspaceUserRoleRequest(UserWorkspaceRole role)
+    public static implicit operator WorkspaceUserRoleRequest(WorkspaceUserRole role)
     {
         return new WorkspaceUserRoleRequest { Role = role };
     }

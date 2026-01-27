@@ -1,6 +1,6 @@
 ﻿namespace Tracker.Domain.Enums;
 
-public enum UserWorkspaceRole
+public enum WorkspaceUserRole
 {
     None = 1,
     Observer = 10,
