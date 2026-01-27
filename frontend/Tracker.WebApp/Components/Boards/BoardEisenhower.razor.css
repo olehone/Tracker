@@ -1,8 +1,0 @@
-﻿.eisenhower-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: var(--mud-spacing-3);
-    min-height: 600px;
-    height: 100%;
-}

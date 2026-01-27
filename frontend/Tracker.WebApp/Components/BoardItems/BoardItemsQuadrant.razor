@@ -1,10 +1,9 @@
 ﻿@using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.BoardItems
 
-
 <MudPaper Elevation="3"
-		  Class="pa-3 d-flex flex-column"
-		  Style="height: 100%; min-height: 250px;">
+		  Class="pa-3"
+		  Style="min-width: 300px; flex: 1 1 calc(50% - 12px); height: 320px; display: flex; flex-direction: column;">
 
 	<MudText Typo="Typo.h6"
 			 Align="Align.Center"
@@ -12,18 +11,15 @@
 			 Style=@($"color: {Color}")>
 		@Title
 	</MudText>
-
-	<MudDivider Class="mb-2" />
-
-	<div class="flex-grow-1" style="overflow-y: auto;">
+	<MudStack Style="flex: 1; overflow-y: auto;"
+			  Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3"
+			  Spacing="1">
 		@if (Items.Any())
 		{
-			<MudStack Spacing="1">
-				@foreach (var item in Items)
-				{
-					<BoardItem Item=@item />
-				}
-			</MudStack>
+			@foreach (var item in Items)
+			{
+				<BoardItem Item=@item />
+			}
 		}
 		else
 		{
@@ -33,7 +29,7 @@
 				No items
 			</MudText>
 		}
-	</div>
+	</MudStack>
 
 	<MudText Typo="Typo.caption"
 			 Align="Align.Right"
