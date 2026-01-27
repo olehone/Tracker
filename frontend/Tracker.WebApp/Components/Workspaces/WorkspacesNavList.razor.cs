@@ -48,6 +48,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         if (!_isAuthenticated)
         {
             Workspaces = null;
+            return;
         }
 
         var result = await WorkspaceService.GetForCurrentUserAsync();
