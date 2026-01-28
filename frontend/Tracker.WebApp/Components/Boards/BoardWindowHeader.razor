@@ -39,7 +39,7 @@
 
 		<MudDivider Vertical FlexItem />
 
-		@if (BoardState.UsersState.RecentActiveUsers().Count > 0)
+		@if (BoardState.UsersState.RecentActiveUsers().Any())
 		{
 			<MudAvatarGroup @key=@GetUsersKey()
 							Spacing="3"

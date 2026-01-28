@@ -21,15 +21,6 @@
 									Assign
 								</MudButton>
 							}
-							@if (!Item.Assignees.Contains()
-							{
-								<MudButton Size="Size.Small"
-										   Variant="Variant.Outlined"
-										   StartIcon=@Icons.Material.Filled.PersonAdd
-										   OnClick=@ToggleAssign>
-									Assign
-								</MudButton>
-							}
 							@if (_date is null && !_openDate)
 							{
 								<MudButton Size="Size.Small"
