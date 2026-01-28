@@ -34,47 +34,27 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
             return Error.NotFound("User");
         }
 
-        var workspaceUser = new WorkspaceUser
+        var workspaceUser = await uow.WorkspaceUserRepository.GetAsync(request.UserId, request.WorkspaceId);
+        if (workspaceUser is null)
         {
-            UserId = request.UserId,
-            WorkspaceId = request.WorkspaceId,
-            Role = request.Role,
-        };
+            return WorkspaceErrors.UserNotInWorkspace;
+        }
+        workspaceUser.Role = request.Role;
 
         if (action == WorkspaceAction.ChangeOwner)
         {
-            await ChangeOwner(request, uow);
+            var oldOwner = await uow.WorkspaceUserRepository.GetOwnerAsync(workspaceUser.WorkspaceId);
+            oldOwner!.Role = WorkspaceUserRole.Admin;
+
+            uow.WorkspaceUserRepository.Update(oldOwner);
         }
-        else
-        {
-            uow.WorkspaceUserRepository.Update(workspaceUser);
-        }
+
+        uow.WorkspaceUserRepository.Update(workspaceUser);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 
         return sc.IsFailure
             ? Error.Unknown
             : Result.Success();
-    }
-
-    private static async Task ChangeOwner(ChangeWorkspaceUserRoleCommand request, IUnitOfWork uow)
-    {
-        var oldOwner = await uow.WorkspaceUserRepository.GetOwnerAsync(request.WorkspaceId)!;
-        var oldOwnerAsAdmin = new WorkspaceUser
-        {
-            UserId = oldOwner!.UserId,
-            WorkspaceId = oldOwner.WorkspaceId,
-            Role = WorkspaceUserRole.Admin,
-        };
-
-        var newOwner = new WorkspaceUser
-        {
-            UserId = request.UserId,
-            WorkspaceId = request.WorkspaceId,
-            Role = request.Role,
-        };
-
-        uow.WorkspaceUserRepository.Update(oldOwnerAsAdmin);
-        uow.WorkspaceUserRepository.Update(newOwner);
     }
 }
