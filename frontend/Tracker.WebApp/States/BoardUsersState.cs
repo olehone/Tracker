@@ -110,14 +110,14 @@ public sealed class BoardUsersState(
 
     public async Task ChangeRoleAsync(BoardUserDto boardUser, BoardUserRole newRole)
     {
+        boardUser.Role = newRole;
+        Notify();
+
         var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, newRole);
         if (result.IsFailure)
         {
-            return;
+            await boardState.ReloadAsync();
         }
-
-        boardUser.Role = newRole;
-        Notify();
     }
 
     public async Task RemoveAsync(BoardUserDto boardUser)
@@ -126,26 +126,19 @@ public sealed class BoardUsersState(
         {
             return;
         }
+        _boardUsers.Remove(boardUser);
+        Notify();
 
         var result = await boardUserService.RemoveAsync(Board.Id, boardUser.User.Id);
         if (result.IsFailure)
         {
-            return;
+            await boardState.ReloadAsync();
         }
-
-        _boardUsers.Remove(boardUser);
-        Notify();
     }
 
     public async Task TransferOwnershipAsync(BoardUserDto boardUser)
     {
         if (!Board.Permissions.CanChangeOwner)
-        {
-            return;
-        }
-
-        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, BoardUserRole.Owner);
-        if (result.IsFailure)
         {
             return;
         }
@@ -157,6 +150,12 @@ public sealed class BoardUsersState(
         }
         boardUser.Role = BoardUserRole.Owner;
         Notify();
+
+        var result = await boardUserService.ChangeRoleAsync(Board.Id, boardUser.User.Id, BoardUserRole.Owner);
+        if (result.IsFailure)
+        {
+            await boardState.ReloadAsync();
+        }
     }
 
     public bool CanChangeMembers()
