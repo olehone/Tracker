@@ -6,9 +6,6 @@ namespace Tracker.Services.ApiClients;
 
 public interface IBoardUserApi
 {
-    [Get("/api/boards/{boardId}/users")]
-    Task<IApiResponse<List<BoardUserDto>>> GetByBoardAsync(Guid boardId);
-
     [Post("/api/boards/{boardId}/users/{userId}")]
     Task<IApiResponse<BoardUserDto>> AddAsync(Guid boardId, Guid userId,
         BoardUserRoleRequest request);

@@ -36,10 +36,14 @@ public static class WorkspaceHelper
         IUserContext userContext, Workspace workspace, WorkspaceAction action)
     {
         var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            return false;
+        }
         var workspaceRole = await uow.WorkspaceUserRepository.GetRoleAsync(userId, workspace.Id);
         var permissions = WorkspacePolicy
-            .GetPermissions(workspace.PermissionRoles, workspaceRole, userRole);
+            .GetPermissions(workspace.PermissionRoles, workspaceRole, user.Role);
 
         return WorkspacePolicy.IsActionAllowed(permissions, action);
     }

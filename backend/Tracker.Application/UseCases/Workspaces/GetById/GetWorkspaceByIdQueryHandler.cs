@@ -39,7 +39,13 @@ public sealed class GetWorkspaceByIdQueryHandler(
         }
 
         var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
+        var userRole = user.Role;
         var workspaceRole = await uow.WorkspaceUserRepository
             .GetRoleAsync(userId, workspace.Id);
 

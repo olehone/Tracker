@@ -11,7 +11,7 @@ public interface IAuthService
     EventCallback OnLogout { get; set; }
     Task<Result> LoginAsync(LoginUserRequest request);
     Task<Result> RegisterAsync(RegisterUserRequest request);
-    Task<Result> LogoutAsync();
+    Task LogoutAsync();
     Task<string?> GetAccessTokenAsync();
     Task<ClaimsPrincipal> GetPrincipalAsync();
 }

@@ -20,24 +20,14 @@ public class UpdateWorkspaceCommandHandler(
         }
 
         await using var uow = unitOfWorkFactory.Create();
-        var workspace = await uow.WorkspaceRepository
-            .GetByIdAsync(request.WorkspaceId);
 
-        if (workspace is null)
+        var workspaceResult = await WorkspaceHelper.GetWorkspaceForActionAsync(uow, userContext,
+            request.WorkspaceId, WorkspaceAction.ChangeWorkspace);
+        if (workspaceResult.IsFailure)
         {
-            return Error.NotFound("Workspace");
+            return workspaceResult.Error;
         }
 
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, request.WorkspaceId);
-
-        var canChange = WorkspacePolicy.CanChangeSettings(userRole, workspaceRole);
-        if (!canChange)
-        {
-            return AuthErrors.Forbidden();
-        }
         var newWorkspace = new Workspace
         {
             Id = request.WorkspaceId,

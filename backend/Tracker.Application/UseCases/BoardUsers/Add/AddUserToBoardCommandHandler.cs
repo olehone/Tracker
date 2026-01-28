@@ -20,10 +20,11 @@ public class AddUserToBoardCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var board = await uow.BoardRepository.GetByIdAsync(request.BoardId);
-        if (board is null)
+        var board = await BoardHelper.GetBoardForActionAsync(uow, userContext,
+            request.BoardId, BoardAction.ChangeBoard);
+        if (board.IsFailure)
         {
-            return Error.NotFound("Board");
+            return board.Error;
         }
 
         var user = await uow.UserRepository.GetByIdAsync(request.UserId);
@@ -39,21 +40,6 @@ public class AddUserToBoardCommandHandler(
             return Error.AlreadyExists("User", "Board", user.Username);
         }
 
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, board.WorkspaceId);
-        var boardRole = await uow.BoardUserRepository
-            .GetRoleAsync(userId, board.Id);
-
-        var permissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, userRole);
-
-
-        if (!BoardPolicy.IsActionAllowed(permissions, BoardAction.ChangeBoard))
-        {
-            return AuthErrors.Forbidden();
-        }
         var boardUser = new BoardUser
         {
             UserId = request.UserId,

@@ -17,11 +17,15 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var workspace = await WorkspaceHelper.GetWorkspaceForActionAsync(uow, userContext,
-            request.WorkspaceId, WorkspaceAction.ChangeWorkspace);
-        if (workspace.IsFailure)
+        var action = request.Role == WorkspaceUserRole.Owner
+            ? WorkspaceAction.ChangeOwner
+            : WorkspaceAction.ChangeBoard;
+
+        var workspaceResult = await WorkspaceHelper.GetWorkspaceForActionAsync(uow, userContext,
+            request.WorkspaceId, action);
+        if (workspaceResult.IsFailure)
         {
-            return workspace.Error;
+            return workspaceResult.Error;
         }
 
         var user = await uow.UserRepository.GetByIdAsync(request.UserId);
@@ -37,25 +41,8 @@ public class ChangeWorkspaceUserRoleCommandHandler(IUserContext userContext,
             Role = request.Role,
         };
 
-        var userId = userContext.GetUserId();
-        var userRole = userContext.GetUserRole();
-        var workspaceRole = await uow.WorkspaceUserRepository
-            .GetRoleAsync(userId, request.WorkspaceId);
-
-        var permissions = WorkspacePolicy
-            .GetPermissions(workspace.Value.PermissionRoles, workspaceRole, userRole);
-
-        if (!WorkspacePolicy.IsActionAllowed(permissions, WorkspaceAction.ChangeWorkspace))
+        if (action == WorkspaceAction.ChangeOwner)
         {
-            return AuthErrors.Forbidden();
-        }
-
-        if (request.Role == WorkspaceUserRole.Owner)
-        {
-            if (!WorkspacePolicy.IsActionAllowed(permissions, WorkspaceAction.ChangeOwner))
-            {
-                return AuthErrors.Forbidden();
-            }
             await ChangeOwner(request, uow);
         }
         else
