@@ -5,8 +5,10 @@ using Tracker.WebApp;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Logging.AddFilter("Polly", LogLevel.None);
+builder.Logging.AddFilter("Polly", LogLevel.Warning);
 builder.Logging.AddFilter("Microsoft.Extensions.Http", LogLevel.Warning);
+builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning);
+
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
