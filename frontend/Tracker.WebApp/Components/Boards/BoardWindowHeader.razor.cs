@@ -29,12 +29,6 @@ public partial class BoardWindowHeader
         BoardState.OnBoardNotFound -= ToWorkspace;
     }
 
-    private string GetUsersKey()
-    {
-        return string.Join("-", BoardState.UsersState.RecentActiveUsers()
-        .Select(u => u.User.Id));
-    }
-
     private void ToWorkspace()
     {
         if (BoardState.IsLoading)

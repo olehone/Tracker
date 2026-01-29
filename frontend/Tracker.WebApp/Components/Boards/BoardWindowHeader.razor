@@ -37,25 +37,6 @@
 			<MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
 		</MudTabs>
 
-		<MudDivider Vertical FlexItem />
-
-		@if (BoardState.UsersState.RecentActiveUsers().Any())
-		{
-			<MudAvatarGroup @key=@GetUsersKey()
-							Spacing="3"
-							Max="5">
-				@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
-				{
-					var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
-					<UserAvatarWithLookup @key=@boardUser.User.Id
-										  User=@boardUser.User
-										  Color=color
-										  Size="Size.Medium" />
-				}
-			</MudAvatarGroup>
-
-			<MudDivider Vertical FlexItem />
-		}
 		@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
 		{
 			<MudTooltip Text="Move lists">

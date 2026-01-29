@@ -147,7 +147,6 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyCreated(evt.Item);
-        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemMovedEvent evt)
@@ -157,7 +156,6 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyMoved(evt.ItemId, evt.ToListId, evt.Position);
-        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemUpdatedEvent evt)
@@ -167,7 +165,6 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyUpdated(evt.ItemId, evt.ChangedFields);
-        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     public void Apply(ItemDeletedEvent evt)
@@ -177,7 +174,6 @@ public sealed class BoardItemsState(
             return;
         }
         ApplyDeleted(evt.ItemId);
-        boardState.UsersState.MarkActivity(evt.UserId);
     }
 
     private void ApplyCreated(BoardItemDto newItem)
