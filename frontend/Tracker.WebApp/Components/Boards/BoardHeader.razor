@@ -7,11 +7,12 @@
 
 @inherits BoardSubscribeBase
 
-<MudToolBar Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+<MudToolBar Dense Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+
 	<MudTooltip Text="To workspace">
-		<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
-					   Color="Color.Inherit"
-					   OnClick=@ToWorkspace />
+		<MudIconButton Href=@WorkspacePath()
+					   Icon=@Icons.Material.Filled.KeyboardArrowLeft
+					   Color="Color.Inherit" />
 	</MudTooltip>
 	<MudSpacer />
 
@@ -68,4 +69,4 @@
 			</MudTooltip>
 		}
 	</MudStack>
-</MudToolBar>
+</MudToolBar>		   

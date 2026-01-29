@@ -1,4 +1,4 @@
-﻿@page "/workspaces/{WorkspaceId:guid}/members"
+﻿@page "/workspaces/{WorkspaceId:guid}/users"
 
 @using Microsoft.AspNetCore.Authorization
 @using Tracker.Domain.Dtos
@@ -7,7 +7,7 @@
 
 @attribute [Authorize]
 
-<PageTitle>@PageTitle() - Members</PageTitle>
+<PageTitle>@PageTitle() - workspace users</PageTitle>
 
 <MudContainer MaxWidth=MaxWidth.Medium>
 	<MudPaper Elevation="5"

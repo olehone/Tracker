@@ -1,0 +1,33 @@
+@using Tracker.WebApp.Components.BoardUsers
+@using Tracker.WebApp.Components.Boards
+@using Tracker.WebApp.Components.Items
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+@using Tracker.WebApp.Shared
+
+<MudToolBar Dense
+			Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+
+	<MudText Color="Color.Inherit"
+			 Typo="Typo.h6"
+			 Class="text-ellipsis">
+		@Title
+	</MudText>
+
+	<MudSpacer />
+
+	<MudStack Row
+			  Spacing="3"
+			  AlignItems="AlignItems.Center">
+		<MudTooltip Text="To settings">
+			<MudIconButton Href=@($"/workspaces/{Id}/settings")
+						   Icon=@Icons.Material.Filled.Settings
+						   Color="Color.Inherit" />
+		</MudTooltip>
+		<MudTooltip Text="To users">
+			<MudIconButton Href=@($"/workspaces/{Id}/users")
+						   Icon=@Icons.Material.Filled.People
+						   Color="Color.Inherit" />
+		</MudTooltip>
+	</MudStack>
+</MudToolBar>

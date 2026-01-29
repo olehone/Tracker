@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Pages.Workspaces;
@@ -10,7 +9,8 @@ public partial class Overview
     [Parameter]
     public Guid WorkspaceId { get; set; }
 
-    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     private WorkspaceFullDto? Workspace { get; set; }
 
@@ -66,6 +66,16 @@ public partial class Overview
     private bool CanCreateBoard()
     {
         return Workspace?.Permissions.CanCreateBoard ?? false;
+    }
+
+    private void ToSettings()
+    {
+        Nav.NavigateTo($"workspaces/{WorkspaceId}/settings");
+    }
+
+    private void ToUsers()
+    {
+        Nav.NavigateTo($"workspaces/{WorkspaceId}/users");
     }
 
 }
