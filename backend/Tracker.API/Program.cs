@@ -33,7 +33,13 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableDetailedErrors = true;
+    }
+});
 
 var app = builder.Build();
 
@@ -47,6 +53,7 @@ app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<BoardHub>("/hubs/board");
+app.MapHub<BoardHub>("/hubs/board")
+   .RequireCors("DevCorsPolicy");
 
 await app.RunAsync();
