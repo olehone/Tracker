@@ -12,6 +12,7 @@
 				  Items=@BoardState.ItemsState.BoardItems
 				  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
 				  ItemDropped=@ItemDropped
+				  Style="overflow-x: auto; height:100%"
 				  Class="d-flex flex-row flex-nowrap">
 	<ChildContent>
 		@foreach (var list in BoardState.ListsState.BoardLists)

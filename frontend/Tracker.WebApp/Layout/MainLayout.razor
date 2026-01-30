@@ -4,10 +4,8 @@
 @inherits LayoutComponentBase
 
 <MudThemeProvider @bind-IsDarkMode=@_isDarkMode />
-
-<MudLayout>
-	<MudAppBar Elevation="1">
-
+<MudLayout Style="height: 100vh; display: flex; flex-direction: column;">
+	<MudAppBar Elevation="1" Fixed Class="d-flex">
 		<MudIconButton Icon=@Icons.Material.Filled.Menu
 					   Color="Color.Inherit"
 					   Edge="Edge.Start"
@@ -19,9 +17,7 @@
 				Tracker
 			</MudText>
 		</MudButton>
-
 		<MudSpacer />
-
 		<MudStack Row
 				  Spacing="2"
 				  AlignItems="AlignItems.Center">
@@ -29,9 +25,7 @@
 								 Icon=@Icons.Material.Outlined.WbSunny
 								 ToggledIcon=@Icons.Material.Outlined.DarkMode
 								 Color="Color.Inherit" />
-
 			<AuthorizeView>
-
 				<Authorized>
 					@if (AppState?.CurrentUser is null)
 					{
@@ -44,14 +38,12 @@
 						<UserAvatarOwnClickable User=@AppState.CurrentUser />
 					}
 				</Authorized>
-
 				<NotAuthorized>
 					<MudButton Variant="Variant.Text"
 							   Color="Color.Inherit"
 							   OnClick=@GoToLogin>
 						Login
 					</MudButton>
-
 					<MudButton Variant="Variant.Text"
 							   Color="Color.Inherit"
 							   OnClick=@GoToRegister>
@@ -60,16 +52,13 @@
 				</NotAuthorized>
 			</AuthorizeView>
 		</MudStack>
-
 	</MudAppBar>
-
 	<MudDrawer @bind-Open="_isDrawerOpen"
 			   ClipMode="DrawerClipMode.Always"
 			   Elevation="2">
 		<NavMenu />
 	</MudDrawer>
-
-	<MudMainContent Class="mud-height-full">
-		@Body
+	<MudMainContent Style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+			@Body
 	</MudMainContent>
 </MudLayout>
