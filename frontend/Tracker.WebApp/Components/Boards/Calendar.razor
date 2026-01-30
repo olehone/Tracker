@@ -5,23 +5,32 @@
 @using Tracker.WebApp.Components.Lists
 @using Tracker.WebApp.Components.Shared;
 
-<MudStack Row Style="height: 100%; overflow-y: auto;" Class="pa-4">
-	<MudCalendar T="CalendarItemWrapper"
-				 ShowMonth
-				 ShowDay="false"
-				 ShowWeek="false"
-				 ShowTodayButton
-				 ShowCurrentTime
-				 Items=@ItemsWithDate
-				 ItemChanged=@OnItemChanged
-				 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
-				 MonthCellMinHeight="0">
-		<CellTemplate>
-			<ItemBrief Item=@context.Item
-							Size="Size.Small" />
-		</CellTemplate>
-		<ToolbarContent>
-			<MudStack Row>
+	<MudGrid>
+		<MudItem md="9" sm="12">
+			<MudCalendar T="CalendarItemWrapper"
+						 ShowMonth
+						 ShowDay="false"
+						 ShowWeek="false"
+						 ShowTodayButton
+						 ShowCurrentTime
+						 Items=@ItemsWithDate
+						 ItemChanged=@OnItemChanged
+						 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
+						 MonthCellMinHeight="0">
+				<CellTemplate>
+					<ItemBrief Item=@context.Item
+							   Size="Size.Small" />
+				</CellTemplate>
+			</MudCalendar>
+		</MudItem>
+		<MudItem md="3" sm="12"
+				 Style="height:100%; display:flex;">
+
+			<MudStack Style="flex:1;
+                     display:flex;
+                     flex-direction:column;
+                     min-height:0;">
+
 				<MudToggleGroup T="bool"
 								Value=@_showNotOwn
 								ValueChanged=@OnNotOwnChanged
@@ -33,10 +42,9 @@
 					</MudToggleItem>
 
 					<MudToggleItem Value=false>
-						Assigned to me
+						Mine
 					</MudToggleItem>
 				</MudToggleGroup>
-
 				<MudToggleGroup T="bool"
 								Value=@_showNotCompleted
 								ValueChanged=@OnNotCompletedChanged
@@ -47,13 +55,11 @@
 					</MudToggleItem>
 
 					<MudToggleItem Value="false">
-						Not completed
+						Unfinished
 					</MudToggleItem>
 				</MudToggleGroup>
+				<ItemsList Items=@ItemsWithoutDate
+						   Title="Items without date" />
 			</MudStack>
-		</ToolbarContent>
-	</MudCalendar>
-
-	<ItemsList Items=@ItemsWithoutDate
-					Title="Items without date" />
-</MudStack>
+		</MudItem>
+	</MudGrid>

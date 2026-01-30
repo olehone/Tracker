@@ -1,39 +1,35 @@
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Shared
 
-<MudPaper Elevation="5"
-		  Width="400px"
-		  Class="my-3 mx-2"
-		  Style="align-self: flex-start;">
-	<MudStack Spacing="1"
-			  Justify="Justify.FlexStart"
-			  Class="pa-1">
-		<MudToolBar Dense>
-			<MudText Typo="Typo.subtitle1"
-					 Class="text-ellipsis">
-				@List.Title
-			</MudText>
-			@if (Board.Permissions.CanChangeList)
-			{
-				<MudSpacer />
-				<MudTooltip Text="Settings">
-					<MudIconButton Icon=@Icons.Material.Outlined.Settings
-								   OnClick=@OpenListSettings />
-				</MudTooltip>
-			}
-		</MudToolBar>
-
-		<MudDropZone T="BoardItemDto"
-					 Identifier=@List.Id.ToString()
-					 AllowReorder
-					 Style="min-height: 60px; max-height: 500px; overflow-y: auto;"
-					 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3" />
-
-		@if (Board.Permissions.CanCreateItem)
+<MudStack Spacing="1"
+		  Justify="Justify.FlexStart"
+		  AlignItems="AlignItems.Center"
+		  Style="width: 400px;"
+		  Class="pa-1 my-3 mx-2 mud-elevation-5">
+	<MudToolBar Dense>
+		<MudText Typo="Typo.subtitle1"
+				 Class="text-ellipsis">
+			@List.Title
+		</MudText>
+		@if (Board.Permissions.CanChangeList)
 		{
-			<OneLineCreateButton Title="Add new item"
-								 OnCreate=@CreateNewItem />
+			<MudSpacer />
+			<MudTooltip Text="Settings">
+				<MudIconButton Icon=@Icons.Material.Outlined.Settings
+							   OnClick=@OpenListSettings />
+			</MudTooltip>
 		}
-	</MudStack>
+	</MudToolBar>
 
-</MudPaper>
+	<MudDropZone T="BoardItemDto"
+				 Identifier=@List.Id.ToString()
+				 AllowReorder
+				 Style="min-height: 60px; max-height: 500px; overflow-y: auto;"
+				 Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3 mud-width-full" />
+
+	@if (Board.Permissions.CanCreateItem)
+	{
+		<OneLineCreateButton Title="Add new item"
+							 OnCreate=@CreateNewItem />
+	}
+</MudStack>

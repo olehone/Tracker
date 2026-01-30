@@ -1,7 +1,7 @@
 ﻿@using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Items
 
-<MudPaper Elevation="3"
+<MudPaper Elevation="0"
 		  Class="pa-3"
 		  Style="min-width: 300px; flex: 1 1 calc(50% - 12px); height: 320px; display: flex; flex-direction: column;">
 
@@ -12,7 +12,7 @@
 		@Title
 	</MudText>
 	<MudStack Style="flex: 1; overflow-y: auto;"
-			  Class="pa-2 ma-2 mud-background-gray rounded mud-elevation-3"
+			  Class="pa-2 mud-background-gray rounded mud-elevation-3"
 			  Spacing="1">
 		@if (Items.Any())
 		{

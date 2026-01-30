@@ -1,24 +1,19 @@
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Shared
 
-<MudPaper Elevation="5"
-		  Width="400px"
-		  Class="my-3 mx-2">
-	<MudStack Justify="Justify.Center">
-		<MudText Typo="Typo.h5"
-				 Class="ma-3">
-			@Title
-		</MudText>
-	</MudStack>
+<MudText Typo="Typo.h5"
+		 Align="Align.Center"
+		 Class="ma-3">
+	@Title
+</MudText>
 
-	<MudPaper MinHeight="60px" MaxHeight="90%"
-			  Elevation="3"
-			  Style="overflow-y: auto;"
-			  Class="pa-2 ma-2 mud-background-gray">
-		@foreach (var item in Items)
-		{
-			<ItemBrief Item=@item
-							Size="Size.Large" />
-		}
-	</MudPaper>
+<MudPaper MinHeight="60px" MaxHeight="90%"
+		  Elevation="3"
+		  Style="overflow-y: auto;"
+		  Class="pa-2 ma-2 mud-background-gray">
+	@foreach (var item in Items)
+	{
+		<ItemBrief Item=@item
+				   Size="Size.Large" />
+	}
 </MudPaper>
