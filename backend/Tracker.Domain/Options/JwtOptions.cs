@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Tracker.Domain.Options;
+﻿namespace Tracker.Domain.Options;
 
 public class JwtOptions
 {

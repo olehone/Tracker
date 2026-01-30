@@ -2,22 +2,22 @@ using Tracker.API;
 using Tracker.API.Hubs;
 using Tracker.Application;
 using Tracker.Database;
+using Tracker.Domain.Options;
 using Tracker.Infrastructure;
 using Tracker.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration["DbOptions:DefaultConnectionString"]!;
-DbMigrations.Initialize(connectionString);
+var dbOptions = builder.Configuration.GetSection("DbOptions").Get<DbOptions>()!;
+DbMigrations.Initialize(dbOptions.DefaultConnectionString);
+
+var corsOptions = builder.Configuration.GetSection("CorsOptions").Get<CorsOptions>()!;
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5158",
-            "https://localhost:5158",
-            "https://localhost:7252",
-            "http://localhost:7252")
+        policy.WithOrigins(corsOptions.AllowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
