@@ -8,45 +8,37 @@
 @if (User is not null)
 {
 	<MudContainer MaxWidth="MaxWidth.Medium">
-		<WorkWindow Elevation=0>
+		<UserInfo User=@User />
+		<MudTabs Position="Position.Top"
+				 Outlined
+				 Rounded
+				 Centered
+				 Border
+				 ApplyEffectsToContainer
+				 Class="mt-8"
+				 PanelClass="pa-0">
+			@if (IsOwnProfile)
+			{
+				<MudTabPanel Text="My workspaces">
+					<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
+								   Height="40vh" />
+				</MudTabPanel>
+			}
+			else
+			{
+				<AuthorizeView Policy="AdminOrHigher">
+					<MudTabPanel Text="All user workspaces">
+						<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
+									   Height="40vh" />
+					</MudTabPanel>
+				</AuthorizeView>
 
-			<Header>
-				<UserInfo User=@User />
-			</Header>
+				<MudTabPanel Text="Shared workspaces">
+					<WorkspaceList LoadWorkspaces=@LoadWorkspaces
+								   Height="40vh" />
+				</MudTabPanel>
+			}
 
-			<Body>
-				<MudTabs Position="Position.Top"
-						 Outlined
-						 Rounded
-						 Centered
-						 Border
-						 ApplyEffectsToContainer
-						 Class="mt-8"
-						 PanelClass="pa-0">
-					@if (IsOwnProfile)
-					{
-						<MudTabPanel Text="My workspaces">
-							<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
-										   Height="40vh" />
-						</MudTabPanel>
-					}
-					else
-					{
-						<AuthorizeView Policy="AdminOrHigher">
-							<MudTabPanel Text="All user workspaces">
-								<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
-											   Height="40vh" />
-							</MudTabPanel>
-						</AuthorizeView>
-
-						<MudTabPanel Text="Shared workspaces">
-							<WorkspaceList LoadWorkspaces=@LoadWorkspaces
-										   Height="40vh" />
-						</MudTabPanel>
-					}
-
-				</MudTabs>
-			</Body>
-		</WorkWindow>
+		</MudTabs>
 	</MudContainer>
 }

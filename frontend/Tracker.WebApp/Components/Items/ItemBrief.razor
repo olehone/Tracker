@@ -17,14 +17,18 @@
 }
 else
 {
-	<MudChip T="string"
-			 Label="true"
-			 Size=@Size
-			 Icon=@ImportanceHelper.GetIcon(Item.Importance)
-			 Color=@GetColor()
-			 Variant=@GetVariant()
-			 OnClick=@OpenItemSettings
-			 Style=@GetStyle()>
-		@Item.Title
-	</MudChip>
+	<MudButton Size=@Size
+			   Color=@GetColor()
+			   Variant=@GetVariant()
+			   OnClick=@OpenItemSettings
+			   Style=@GetStyle()
+			   Class="ma-1">
+
+		<ItemImportanceIcon Importance=@Item.Importance
+							HasAttention=@IsOwn() />
+		<MudSpacer />
+		<MudText Class="text-ellipsis">
+			@Item.Title
+		</MudText>
+	</MudButton>
 }

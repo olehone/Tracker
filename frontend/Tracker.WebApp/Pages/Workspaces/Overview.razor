@@ -2,85 +2,50 @@
 
 @using Tracker.WebApp.Components.Boards
 @using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Workspaces
 @using Tracker.WebApp.Shared
 
 <PageTitle>@PageTitle() overview</PageTitle>
-<WorkWindow>
-	<Header>
-		<MudStack Row
-				  Spacing="3"
-				  AlignItems="AlignItems.Center"
-				  Class="mud-theme-secondary px-5 py-3 rounded-t">
-			@if (Workspace is null)
-			{
-				<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
-							 Height="32px" />
-			}
-			else
-			{
-				<MudText Color="Color.Inherit"
-						 Typo="Typo.h6"
-						 Class="text-ellipsis">
-					@Workspace.Title
-				</MudText>
-				<MudSpacer/>
-				<MudTooltip Text="To settings">
-					<a href=@($"/workspaces/{Workspace.Id}/settings")>
-						<MudIcon Icon=@Icons.Material.Filled.Settings
-									   Color="Color.Inherit" />
-					</a>
-				</MudTooltip>
-				<MudTooltip Text="To members">
-					<a href=@($"/workspaces/{Workspace.Id}/members")>
-						<MudIcon Icon=@Icons.Material.Filled.People
-									   Color="Color.Inherit" />
-					</a>
-				</MudTooltip>
-			}
-		</MudStack>
-	</Header>
 
-	<Body>
-		<MudStack Class="pa-4"
-				  Style="overflow-y: auto;">
-			<MudGrid Spacing="3">
-				@if (Workspace is null)
-				{
-					<MudProgressLinear Color="Color.Primary"
-									   Indeterminate
-									   Class="my-0"/>
-					@for (var i = 0; i < UiHelper.RandomItemCount(); i++)
-					{
-						<MudItem xs="12"
-								 sm="6"
-								 lg="3">
-							<BoardSummarySkeleton />
-						</MudItem>
-					}
-				}
-				else
-				{
-					@foreach (var board in Workspace.Boards)
-					{
-						<MudItem xs="12"
-								 sm="6"
-								 lg="3">
-							<BoardSummary Board=@board />
-						</MudItem>
-					}
+@if (Workspace is null)
+{
+	<WorkspaceHeaderSkeleton />
 
-					@if (CanCreateBoard())
-					{
-						<MudItem xs="12"
-								 sm="6"
-								 lg="3">
-							<OneLineCreateButton Title="Add new board"
-												 IsWithFrame="false"
-												 OnCreate=@CreateBoard />
-						</MudItem>
-					}
-				}
-			</MudGrid>
-		</MudStack>
-	</Body>
-</WorkWindow>
+	<MudGrid Spacing="3" Class="pa-4">
+		@for (var i = 0; i < UiHelper.RandomItemCount(); i++)
+		{
+			<MudItem xs="12"
+					 sm="6"
+					 lg="3">
+				<BoardSummarySkeleton />
+			</MudItem>
+		}
+	</MudGrid>
+}
+else
+{
+	<WorkspaceHeader Title=@Workspace.Title
+					 Id=@Workspace.Id />
+
+	<MudGrid Spacing="3" Class="pa-4"
+			 Style="overflow-y: auto;">
+		@foreach (var board in Workspace.Boards)
+		{
+			<MudItem xs="12"
+					 sm="6"
+					 lg="3">
+				<BoardSummary Board=@board />
+			</MudItem>
+		}
+		@if (CanCreateBoard())
+		{
+			<MudItem xs="12"
+					 sm="6"
+					 lg="3">
+				<OneLineCreateButton Title="Add new board"
+									 IsWithFrame="false"
+									 OnCreate=@CreateBoard />
+			</MudItem>
+		}
+	</MudGrid>
+}

@@ -9,50 +9,33 @@
 
 <PageTitle>@PageTitle()</PageTitle>
 
+
 @if (BoardState.IsLoading)
 {
-	<WorkWindow>
-		<Header>
-			<BoardWindowHeaderSkeleton />
-		</Header>
-		<Body>
-			<MudProgressLinear Color="Color.Primary"
-							   Indeterminate />
-			<div />
-		</Body>
-	</WorkWindow>
+	<MudItem xs="12">
+		<BoardHeaderSkeleton />
+	</MudItem>
 }
 else
 {
 	<CascadingValue Value=@BoardState>
-
-		<WorkWindow>
-			<Header>
-				<BoardWindowHeader @bind-TabIndex=@activeIndex />
-			</Header>
-			<Body>
-				@switch (activeIndex)
-				{
-					case 0:
-						<MudStack StretchItems="StretchItems.None"
-								  AlignItems="AlignItems.Start"
-								  Style="overflow-x: auto;">
-							<Kanban />
-						</MudStack>
-						break;
-					case 1:
-						<Calendar />
-						break;
-					case 2:
-						<Eisenhower />
-						break;
-					default:
-						<MudAlert Severity="Severity.Error">
-							There no such index!
-						</MudAlert>
-						break;
-				}
-			</Body>
-		</WorkWindow>
+		<BoardHeader @bind-TabIndex=@activeIndex />
+		@switch (activeIndex)
+		{
+			case 0:
+				<Kanban />
+				break;
+			case 1:
+				<Calendar />
+				break;
+			case 2:
+				<Eisenhower />
+				break;
+			default:
+				<MudAlert Severity="Severity.Error">
+					There no such index!
+				</MudAlert>
+				break;
+		}
 	</CascadingValue>
 }

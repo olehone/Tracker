@@ -2,25 +2,23 @@
 @using Tracker.WebApp.Components.Boards
 
 <PageTitle>Home</PageTitle>
-<MudPaper Class="ma-4 pa-4"
-		  Elevation="0">
+
+<div style="height: 100%; overflow-y: auto;" class="pa-4">
 	<MudText Typo="Typo.h3"
+			 Align="Align.Center"
 			 GutterBottom="true">
 		Welcome to Tracker!
 	</MudText>
 
-	<MudText Typo="Typo.h5"
-			 GutterBottom="true">
-		Discover more!
-	</MudText>
 
 	<MudSpacer />
 	@if (Boards.Any())
 	{
-		<MudText Typo="Typo.h4">
+		<MudText Typo="Typo.h4" class="ml-5">
 			Your boards
 		</MudText>
-		<MudGrid Spacing="3">
+
+		<MudGrid Spacing="3" Class="pa-3">
 			@foreach (var board in Boards)
 			{
 				<MudItem xs="12" sm="6" lg="3" @key="board.Id">
@@ -29,5 +27,5 @@
 			}
 		</MudGrid>
 	}
-</MudPaper>
+</div>
 

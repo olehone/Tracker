@@ -7,9 +7,14 @@ public static class UiHelper
 {
     private static readonly Random Random = new();
 
-    public static int RandomItemCount()
+    public static int RandomItemCount(int min = 1, int max = 4)
     {
-        return 1 + Random.Next(0, 3);
+        return Random.Next(min, max);
+    }
+
+    public static bool RandomBool(double truePart = 0.5)
+    {
+        return Random.NextDouble() < truePart;
     }
 
     public static string RandomPercentTitleWidth()

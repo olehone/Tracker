@@ -7,11 +7,12 @@
 
 @inherits BoardSubscribeBase
 
-<MudToolBar Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+<MudToolBar Dense Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+
 	<MudTooltip Text="To workspace">
-		<MudIconButton Icon=@Icons.Material.Filled.KeyboardArrowLeft
-					   Color="Color.Inherit"
-					   OnClick=@ToWorkspace />
+		<MudIconButton Href=@WorkspacePath()
+					   Icon=@Icons.Material.Filled.KeyboardArrowLeft
+					   Color="Color.Inherit" />
 	</MudTooltip>
 	<MudSpacer />
 
@@ -37,25 +38,6 @@
 			<MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
 		</MudTabs>
 
-		<MudDivider Vertical FlexItem />
-
-		@if (BoardState.UsersState.RecentActiveUsers().Any())
-		{
-			<MudAvatarGroup @key=@GetUsersKey()
-							Spacing="3"
-							Max="5">
-				@foreach (var boardUser in BoardState.UsersState.RecentActiveUsers())
-				{
-					var color = BoardRoleHelper.GetRoleColor(boardUser.Role);
-					<UserAvatarWithLookup @key=@boardUser.User.Id
-										  User=@boardUser.User
-										  Color=color
-										  Size="Size.Medium" />
-				}
-			</MudAvatarGroup>
-
-			<MudDivider Vertical FlexItem />
-		}
 		@if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)
 		{
 			<MudTooltip Text="Move lists">
@@ -87,4 +69,4 @@
 			</MudTooltip>
 		}
 	</MudStack>
-</MudToolBar>
+</MudToolBar>		   

@@ -36,46 +36,28 @@ public class ChangeBoardUserRoleCommandHandler(
             return Error.NotFound("User");
         }
 
-        var boardUser = new BoardUser
+        var boardUser = await uow.BoardUserRepository.GetAsync(request.UserId, request.BoardId);
+        if (boardUser is null)
         {
-            UserId = request.UserId,
-            BoardId = request.BoardId,
-            Role = request.Role,
-        };
+            return BoardErrors.UserNotInBoard;
+        }
+
+        boardUser.Role = request.Role;
 
         if (action == BoardAction.ChangeOwner)
         {
-            await ChangeOwner(request, uow);
+            var oldOwner = await uow.BoardUserRepository.GetOwnerAsync(boardUser.BoardId);
+            oldOwner!.Role = BoardUserRole.Admin;
+
+            uow.BoardUserRepository.Update(oldOwner);
+
         }
-        else
-        {
-            uow.BoardUserRepository.Update(boardUser);
-        }
+        uow.BoardUserRepository.Update(boardUser);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
 
         return sc.IsFailure
             ? Error.Unknown
             : Result.Success();
-    }
-
-    private static async Task ChangeOwner(ChangeBoardUserRoleCommand request, IUnitOfWork uow)
-    {
-        var oldOwner = await uow.BoardUserRepository.GetOwnerAsync(request.BoardId)!;
-        var oldOwnerAsAdmin = new BoardUser
-        {
-            UserId = oldOwner!.UserId,
-            BoardId = oldOwner.BoardId,
-            Role = BoardUserRole.Admin,
-        };
-
-        var newOwner = new BoardUser
-        {
-            UserId = request.UserId,
-            BoardId = request.BoardId,
-            Role = request.Role,
-        };
-        uow.BoardUserRepository.Update(oldOwnerAsAdmin);
-        uow.BoardUserRepository.Update(newOwner);
     }
 }

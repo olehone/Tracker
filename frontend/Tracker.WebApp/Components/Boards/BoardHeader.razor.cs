@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Tracker.Domain.Dtos;
 using Tracker.WebApp.Components.BoardUsers;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class BoardWindowHeader
+public partial class BoardHeader
 {
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
@@ -29,25 +28,20 @@ public partial class BoardWindowHeader
         BoardState.OnBoardNotFound -= ToWorkspace;
     }
 
-    private string GetUsersKey()
-    {
-        return string.Join("-", BoardState.UsersState.RecentActiveUsers()
-        .Select(u => u.User.Id));
-    }
-
     private void ToWorkspace()
     {
-        if (BoardState.IsLoading)
+        Nav.NavigateTo(WorkspacePath());
+    }
+
+    private string WorkspacePath()
+    {
+        if (BoardState is null || BoardState.IsLoading)
         {
-            return;
+            return "/";
         }
-        if (BoardState is null)
-        {
-            Nav.NavigateTo("/");
-            return;
-        }
+
         var workspaceId = Board.WorkspaceId;
-        Nav.NavigateTo($"workspaces/{workspaceId}/overview");
+        return $"workspaces/{workspaceId}/overview";
     }
 
     private async Task OpenSettings()

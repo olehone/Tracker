@@ -5,7 +5,7 @@ namespace Tracker.WebApp.Components.Items;
 
 public class CalendarItemWrapper : CalendarItem
 {
-    public BoardItemDto Item { get; set; }
+    public BoardItemDto Item { get; set; } = null!;
 
     public CalendarItemWrapper() { }
 

@@ -1,13 +1,29 @@
+@using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Shared
 
-<MudCard Class="h-100">
-    <MudSkeleton SkeletonType="SkeletonType.Rectangle"
-                 Animation="Animation.Wave"
-                 Height="70px"/>
-    <MudCardContent>
-        <MudText Typo="Typo.h5">
-            <MudSkeleton Animation="Animation.Wave"
-                         Width=@UiHelper.RandomPercentTitleWidth()/>
-        </MudText>
-    </MudCardContent>
+<MudCard Elevation="2">
+	<MudSkeleton SkeletonType="SkeletonType.Rectangle"
+				 Animation="Animation.Wave"
+				 Height="70px" />
+
+	<MudCardContent>
+		<MudStack Row
+				  Justify="Justify.SpaceBetween"
+				  AlignItems="AlignItems.Center"
+				  Class="my-0">
+			<MudSkeleton Animation="Animation.Wave"
+						 Height="2rem"
+						 Width=@UiHelper.RandomPercentTitleWidth() />
+
+			<MudStack Row Class="my-0">
+				@for (int i = 0; i < Random.Shared.Next(1, 3); i++)
+				{
+					<MudSkeleton SkeletonType="SkeletonType.Circle"
+								 Height="24px"
+								 Width="24px"
+								 Class="ma-0" />
+				}
+			</MudStack>
+		</MudStack>
+	</MudCardContent>
 </MudCard>

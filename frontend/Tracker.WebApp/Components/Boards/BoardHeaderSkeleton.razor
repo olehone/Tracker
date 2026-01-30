@@ -1,0 +1,34 @@
+@using Tracker.WebApp.Components.Boards
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Shared
+
+<MudToolBar Dense Class=@($"mud-theme-{Color.Secondary.ToDescriptionString()}")>
+	<SmallIconSkeleton />
+	<MudSpacer />
+
+	<MudSkeleton Width=@UiHelper.RandomPixelTitleWidth()
+				 Height="32px" />
+
+	<MudSpacer />
+
+	<MudStack Row
+			  Spacing="3"
+			  AlignItems="AlignItems.Center">
+		<MudStack Row
+				  Spacing="0"
+				  AlignItems="AlignItems.Center">
+			@for (int i = 0; i < 3; i++)
+			{
+				<SmallIconSkeleton />
+			}
+		</MudStack>
+
+		@for (int i = 0; i < 3; i++)
+		{
+			<SmallIconSkeleton />
+		}
+	</MudStack>
+</MudToolBar>
+
+<MudProgressLinear Color="Color.Primary"
+				   Indeterminate />
