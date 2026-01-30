@@ -12,17 +12,21 @@
 				  Items=@BoardState.ItemsState.BoardItems
 				  ItemsSelector=@((item, list) => item.BoardListId.ToString() == list)
 				  ItemDropped=@ItemDropped
-				  Style="overflow-x: auto; height:100%; display: inline-flex;">
+				  style="overflow-x:auto">
 	<ChildContent>
-		@foreach (var list in BoardState.ListsState.BoardLists)
-		{
-			<DropList List=@list />
-		}
-		@if (Board.Permissions.CanCreateList)
-		{
-				<OneLineCreateButton Title="Add new list"
-									 OnCreate=@CreateList />
-		}
+		<MudStack Row>
+			@foreach (var list in BoardState.ListsState.BoardLists)
+			{
+				<DropList List=@list />
+			}
+			@if (Board.Permissions.CanCreateList)
+			{
+				<MudPaper MinWidth="400px" Elevation="0">
+					<OneLineCreateButton Title="Add new list"
+										 OnCreate=@CreateList />
+				</MudPaper>
+			}
+		</MudStack>
 	</ChildContent>
 
 	<ItemRenderer>

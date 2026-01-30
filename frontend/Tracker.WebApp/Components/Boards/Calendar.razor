@@ -5,61 +5,66 @@
 @using Tracker.WebApp.Components.Lists
 @using Tracker.WebApp.Components.Shared;
 
-	<MudGrid>
-		<MudItem md="9" sm="12">
-			<MudCalendar T="CalendarItemWrapper"
-						 ShowMonth
-						 ShowDay="false"
-						 ShowWeek="false"
-						 ShowTodayButton
-						 ShowCurrentTime
-						 Items=@ItemsWithDate
-						 ItemChanged=@OnItemChanged
-						 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
-						 MonthCellMinHeight="0">
-				<CellTemplate>
-					<ItemBrief Item=@context.Item
-							   Size="Size.Small" />
-				</CellTemplate>
-			</MudCalendar>
-		</MudItem>
-		<MudItem md="3" sm="12"
-				 Style="height:100%; display:flex;">
+<MudGrid>
+	<MudItem md="9" sm="12">
+		<MudCalendar T="CalendarItemWrapper"
+					 ShowMonth
+					 ShowDay="false"
+					 ShowWeek="false"
+					 ShowTodayButton
+					 ShowCurrentTime
+					 Items=@ItemsWithDate
+					 ItemChanged=@OnItemChanged
+					 EnableDragItems=@BoardState.Board.Permissions.CanChangeItem
+					 MonthCellMinHeight="0">
+			<CellTemplate>
+				<ItemBrief Item=@context.Item
+						   Size="Size.Small" />
+			</CellTemplate>
+		</MudCalendar>
+	</MudItem>
+	<MudItem md="3" sm="12">
+		<MudStack Class="pa-2">
 
-			<MudStack Style="flex:1;
-                     display:flex;
-                     flex-direction:column;
-                     min-height:0;">
+			<MudToggleGroup T="bool"
+							Value=@_showNotOwn
+							ValueChanged=@OnNotOwnChanged
+							Outlined
+							Delimiters
+							Disabled=@IsUnauthorized()>
+				<MudToggleItem Value=true>
+					All
+				</MudToggleItem>
 
-				<MudToggleGroup T="bool"
-								Value=@_showNotOwn
-								ValueChanged=@OnNotOwnChanged
-								Outlined
-								Delimiters
-								Disabled=@IsUnauthorized()>
-					<MudToggleItem Value=true>
-						All
-					</MudToggleItem>
+				<MudToggleItem Value=false>
+					Mine
+				</MudToggleItem>
+			</MudToggleGroup>
+			<MudToggleGroup T="bool"
+							Value=@_showNotCompleted
+							ValueChanged=@OnNotCompletedChanged
+							Outlined
+							Delimiters>
+				<MudToggleItem Value=true>
+					All
+				</MudToggleItem>
 
-					<MudToggleItem Value=false>
-						Mine
-					</MudToggleItem>
-				</MudToggleGroup>
-				<MudToggleGroup T="bool"
-								Value=@_showNotCompleted
-								ValueChanged=@OnNotCompletedChanged
-								Outlined
-								Delimiters>
-					<MudToggleItem Value=true>
-						All
-					</MudToggleItem>
+				<MudToggleItem Value="false">
+					Unfinished
+				</MudToggleItem>
+			</MudToggleGroup>
 
-					<MudToggleItem Value="false">
-						Unfinished
-					</MudToggleItem>
-				</MudToggleGroup>
-				<ItemsList Items=@ItemsWithoutDate
-						   Title="Items without date" />
-			</MudStack>
-		</MudItem>
-	</MudGrid>
+			<MudPaper MinHeight="60px" MaxHeight="500px"
+					  Elevation="0"
+					  Style="overflow-y: auto;"
+					  Class="ma-2">
+				@foreach (var item in ItemsWithoutDate)
+				{
+					<ItemBrief Item=@item
+							   Size="Size.Large" />
+				}
+			</MudPaper>
+
+		</MudStack>
+	</MudItem>
+</MudGrid>

@@ -19,27 +19,23 @@
 else
 {
 	<CascadingValue Value=@BoardState>
-		<MudStack Spacing="0"
-				  Style="height: 100%;">
-			<BoardHeader @bind-TabIndex=@activeIndex />
-
-			@switch (activeIndex)
-			{
-				case 0:
-					<Kanban />
-					break;
-				case 1:
-					<Calendar />
-					break;
-				case 2:
-					<Eisenhower />
-					break;
-				default:
-					<MudAlert Severity="Severity.Error">
-						There no such index!
-					</MudAlert>
-					break;
-			}
-		</MudStack>
+		<BoardHeader @bind-TabIndex=@activeIndex />
+		@switch (activeIndex)
+		{
+			case 0:
+				<Kanban />
+				break;
+			case 1:
+				<Calendar />
+				break;
+			case 2:
+				<Eisenhower />
+				break;
+			default:
+				<MudAlert Severity="Severity.Error">
+					There no such index!
+				</MudAlert>
+				break;
+		}
 	</CascadingValue>
 }
