@@ -121,7 +121,14 @@ public sealed class BoardState : IAsyncDisposable
         Notify();
     }
 
-    public bool IsMyId(Guid checkedId) => _currentUser.IsMyId(checkedId);
+    public bool IsMyId(Guid checkedId)
+    {
+        if (_appState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return checkedId == MyId;
+    }
 
     public async ValueTask DisposeAsync()
     {

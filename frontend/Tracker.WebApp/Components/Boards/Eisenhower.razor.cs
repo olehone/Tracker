@@ -29,7 +29,7 @@ public partial class Eisenhower
         }
 
         var items = BoardState.ItemsState.BoardItems
-            .Where(bi => bi.Assignees.Contains(BoardState.CurrentUserId))
+            .Where(bi => bi.Assignees.Contains(BoardState.MyId))
             .Where(bi => !bi.IsDone);
 
         UrgentImportant = items
@@ -65,9 +65,9 @@ public partial class Eisenhower
         base.StateHasChangedHandler();
     }
 
-    protected override void InsideDispose()
+    public override void Dispose()
     {
-        base.InsideDispose();
+        base.Dispose();
         BoardState.ItemsState.OnChange -= StateHasChangedHandler;
     }
 }

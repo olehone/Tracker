@@ -33,7 +33,7 @@ public partial class ItemBrief
         {
             return false;
         }
-        return Item.Assignees.Contains(BoardState.CurrentUserId);
+        return Item.Assignees.Contains(BoardState.MyId);
     }
 
     private string GetStyle()

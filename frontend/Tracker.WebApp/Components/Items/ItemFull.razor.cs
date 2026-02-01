@@ -52,7 +52,7 @@ public partial class ItemFull
         {
             return false;
         }
-        return Item.Assignees.Contains(BoardState.CurrentUserId);
+        return Item.Assignees.Contains(BoardState.MyId);
     }
 
     private string GetUsersKey()

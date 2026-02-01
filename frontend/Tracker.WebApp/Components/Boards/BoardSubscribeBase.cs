@@ -21,7 +21,7 @@ public partial class BoardSubscribeBase : ComponentBase, IDisposable
         InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         BoardState.OnChange -= StateHasChangedHandler;
     }

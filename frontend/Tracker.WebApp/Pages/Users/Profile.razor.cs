@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
-using Tracker.Services.Abstraction.Auth;
 using Tracker.WebApp.Shared;
-using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Users;
 
@@ -14,7 +12,6 @@ public partial class Profile
     public Guid UserId { get; set; }
 
     [Inject] IUserService UserService { get; set; } = null!;
-    [Inject] ICurrentUser CurrentUser { get; set; } = null!;
     [Inject] IErrorNotifier ErrorNotifier { get; set; } = null!;
 
     private UserDto? User { get; set; }
@@ -55,7 +52,7 @@ public partial class Profile
     }
 
     private async Task<Paginated<WorkspaceSummaryDto>> LoadAllWorkspaces(
-    PaginatedSearchRequest request)
+        PaginatedSearchRequest request)
     {
         var result = await UserService.GetAllWorkspacesAsync(UserId, request);
         if (ErrorNotifier.NotifyIfError(result))

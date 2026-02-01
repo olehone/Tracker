@@ -25,7 +25,7 @@ public partial class Kanban
         {
             return false;
         }
-        if (item.Assignees.Contains(BoardState.CurrentUserId))
+        if (item.Assignees.Contains(BoardState.MyId))
         {
             return false;
         }

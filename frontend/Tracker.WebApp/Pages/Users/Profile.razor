@@ -1,6 +1,7 @@
 ﻿@page "/users/{UserId:guid}"
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 @using Tracker.WebApp.Components.Workspaces
@@ -9,36 +10,39 @@
 {
 	<MudContainer MaxWidth="MaxWidth.Medium">
 		<UserInfo User=@User />
-		<MudTabs Position="Position.Top"
-				 Outlined
-				 Rounded
-				 Centered
-				 Border
-				 ApplyEffectsToContainer
-				 Class="mt-8"
-				 PanelClass="pa-0">
-			@if (IsOwnProfile)
-			{
-				<MudTabPanel Text="My workspaces">
-					<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
-								   Height="40vh" />
-				</MudTabPanel>
-			}
-			else
-			{
-				<AuthorizeView Policy="AdminOrHigher">
-					<MudTabPanel Text="All user workspaces">
+		<AuthorizeView>
+			<MudTabs Position="Position.Top"
+					 Outlined
+					 Rounded
+					 Centered
+					 Border
+					 ApplyEffectsToContainer
+					 Class="mt-8"
+					 PanelClass="pa-0">
+
+				@if (context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value == UserId.ToString())
+				{
+					<MudTabPanel Text="My workspaces">
 						<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
 									   Height="40vh" />
 					</MudTabPanel>
-				</AuthorizeView>
+				}
+				else
+				{
+					<AuthorizeView Policy="AdminOrHigher" Context="admin">
+						<MudTabPanel Text="All user workspaces">
+							<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
+										   Height="40vh" />
+						</MudTabPanel>
+					</AuthorizeView>
 
-				<MudTabPanel Text="Shared workspaces">
-					<WorkspaceList LoadWorkspaces=@LoadWorkspaces
-								   Height="40vh" />
-				</MudTabPanel>
-			}
+					<MudTabPanel Text="Shared workspaces">
+						<WorkspaceList LoadWorkspaces=@LoadWorkspaces
+									   Height="40vh" />
+					</MudTabPanel>
+				}
 
-		</MudTabs>
+			</MudTabs>
+		</AuthorizeView>
 	</MudContainer>
 }

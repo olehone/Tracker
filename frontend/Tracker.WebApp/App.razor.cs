@@ -48,4 +48,9 @@ public partial class App : IDisposable
     {
         AuthService.AuthStateChanged -= OnAuthStateChanged;
     }
+
+    public void RedirectToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
 }

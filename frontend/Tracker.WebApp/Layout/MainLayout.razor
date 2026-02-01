@@ -26,18 +26,6 @@
 								 ToggledIcon=@Icons.Material.Outlined.DarkMode
 								 Color="Color.Inherit" />
 			<AuthorizeView>
-				<Authorized>
-					@if (AppState.IsLoading)
-					{
-						<MudSkeleton Height="40px"
-									 Width="40px"
-									 SkeletonType="SkeletonType.Circle" />
-					}
-					else
-					{
-						<UserAvatarOwnClickable User=@AppState.CurrentUser />
-					}
-				</Authorized>
 				<NotAuthorized>
 					<MudButton Variant="Variant.Text"
 							   Color="Color.Inherit"
@@ -51,6 +39,19 @@
 					</MudButton>
 				</NotAuthorized>
 			</AuthorizeView>
+
+			@* Because user avatar is working based on UserDto from app state
+			it is important to check auth from app state, not from authorized view *@
+			@if (AppState.IsUnauthenticated)
+			{
+				<MudSkeleton Height="40px"
+							 Width="40px"
+							 SkeletonType="SkeletonType.Circle" />
+			}
+			else
+			{
+				<UserAvatarOwnClickable User=@AppState.CurrentUser />
+			}
 		</MudStack>
 	</MudAppBar>
 	<MudDrawer @bind-Open="_isDrawerOpen"
@@ -59,6 +60,6 @@
 		<NavMenu />
 	</MudDrawer>
 	<MudMainContent>
-			@Body
+		@Body
 	</MudMainContent>
 </MudLayout>

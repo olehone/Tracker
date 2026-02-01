@@ -1,28 +1,17 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Requests.Workspace;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Components.Workspaces;
 
-public partial class WorkspacesNavList : IAsyncDisposable
+public partial class WorkspacesNavList
 {
-    private bool _isAuthenticated;
-    private List<WorkspaceSummaryDto>? Workspaces;
-    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+    private List<WorkspaceSummaryDto>? _workspaces;
 
-    public async ValueTask DisposeAsync()
-    {
-        AuthStateProvider.AuthenticationStateChanged -= StateHasChangedHandler;
-        await Task.CompletedTask;
-    }
-
+    [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
     protected override async Task OnInitializedAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged += StateHasChangedHandler;
-        await LoadWorkspacesIfAuthenticatedAsync();
+        await LoadWorkspaces();
     }
 
     private async Task CreateWorkspace(string title)
@@ -37,32 +26,18 @@ public partial class WorkspacesNavList : IAsyncDisposable
             return;
         }
 
-        Workspaces!.Add(result.Value);
+        _workspaces!.Add(result.Value);
         StateHasChanged();
     }
 
-    private async Task LoadWorkspacesIfAuthenticatedAsync()
+    private async Task LoadWorkspaces()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        _isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-        if (!_isAuthenticated)
-        {
-            Workspaces = null;
-            return;
-        }
-
         var result = await WorkspaceService.GetForCurrentUserAsync();
         if (result.IsFailure)
         {
             return;
         }
 
-        Workspaces = result.Value;
-    }
-
-    private async void StateHasChangedHandler(Task<AuthenticationState> task)
-    {
-        await LoadWorkspacesIfAuthenticatedAsync();
-        await InvokeAsync(StateHasChanged);
+        _workspaces = result.Value;
     }
 }

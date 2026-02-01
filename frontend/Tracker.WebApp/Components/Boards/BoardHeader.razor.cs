@@ -22,9 +22,9 @@ public partial class BoardHeader
         BoardState.OnBoardNotFound += ToWorkspace;
     }
 
-    protected override void InsideDispose()
+    public override void Dispose()
     {
-        base.InsideDispose();
+        base.Dispose();
         BoardState.OnBoardNotFound -= ToWorkspace;
     }
 

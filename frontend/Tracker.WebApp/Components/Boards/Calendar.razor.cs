@@ -14,7 +14,6 @@ public partial class Calendar : IDisposable
 
     private bool _showNotOwn = true;
     private bool _showNotCompleted = true;
-
     private List<CalendarItemWrapper> ItemsWithDate = [];
     private List<BoardItemDto> ItemsWithoutDate = [];
 
@@ -79,7 +78,7 @@ public partial class Calendar : IDisposable
         {
             return false;
         }
-        return item.Assignees.Contains(BoardState.CurrentUserId);
+        return item.Assignees.Contains(BoardState.MyId);
     }
 
     private bool CompletedFilter(BoardItemDto item)
