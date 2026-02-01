@@ -20,7 +20,7 @@ public partial class BoardSubscribeBase : ComponentBase, IDisposable
 
     protected virtual void StateHasChangedHandler()
     {
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     protected virtual void InsideDispose()

@@ -67,8 +67,8 @@ public partial class ListSettingsDialog : IDisposable
         }
 
         isSubmitting = true;
-        StateHasChanged();
 
+        await InvokeAsync(StateHasChanged);
         await BoardState.ListsState.UpdateAsync(List.Id, model);
 
         isSubmitting = false;

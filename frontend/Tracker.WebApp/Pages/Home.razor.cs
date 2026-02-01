@@ -31,7 +31,9 @@ public partial class Home : IAsyncDisposable
 
         var result = await BoardService.GetForCurrentUserAsync();
         if (result.IsFailure)
+        {
             return;
+        }
 
         Boards = result.Value;
     }

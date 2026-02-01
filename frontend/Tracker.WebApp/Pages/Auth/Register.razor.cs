@@ -88,7 +88,7 @@ public partial class Register
         }
 
         _isLoading = false;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
         return false;
     }
 

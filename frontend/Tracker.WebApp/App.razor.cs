@@ -24,7 +24,7 @@ public partial class App
             }
 
             AppState.CurrentUser = result.Value;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
     }
 

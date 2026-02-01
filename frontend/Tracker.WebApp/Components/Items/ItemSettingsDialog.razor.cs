@@ -49,7 +49,7 @@ public partial class ItemSettingsDialog : IDisposable
 
         _date = Item.DueDate?.UtcDateTime;
         _importance = Item.Importance;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
     private void DescriptionFocused()
     {

@@ -27,7 +27,7 @@
 								 Color="Color.Inherit" />
 			<AuthorizeView>
 				<Authorized>
-					@if (AppState?.CurrentUser is null)
+					@if (AppState.IsLoading)
 					{
 						<MudSkeleton Height="40px"
 									 Width="40px"

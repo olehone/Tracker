@@ -38,15 +38,10 @@ public class BoardHubService(
             return;
         }
 
-        var token = await authService.GetAccessTokenAsync();
-
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(_hubUrl, options =>
             {
-                if (!string.IsNullOrEmpty(token))
-                {
-                    options.AccessTokenProvider = () => Task.FromResult(token)!;
-                }
+                options.AccessTokenProvider = authService.GetAccessTokenAsync;
             })
             .WithAutomaticReconnect()
             .Build();

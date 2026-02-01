@@ -38,7 +38,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         }
 
         Workspaces!.Add(result.Value);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadWorkspacesIfAuthenticatedAsync()

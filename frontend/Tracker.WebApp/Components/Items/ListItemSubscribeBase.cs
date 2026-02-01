@@ -22,7 +22,7 @@ public partial class ListItemSubscribeBase : ComponentBase, IDisposable
 
     protected virtual void StateHasChangedHandler()
     {
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     protected virtual void Dispose(bool disposing)

@@ -95,7 +95,7 @@ public partial class Calendar : IDisposable
     private void OnBoardStateChanged()
     {
         ReloadItems();
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     protected virtual void Dispose(bool disposing)

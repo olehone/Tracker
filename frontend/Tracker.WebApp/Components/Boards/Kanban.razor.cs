@@ -13,7 +13,7 @@ public partial class Kanban
 
     protected override void StateHasChangedHandler()
     {
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
         _container?.Refresh();
     }
 

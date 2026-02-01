@@ -69,8 +69,8 @@ public partial class BoardSettingsDialog : IDisposable
         }
 
         isSubmitting = true;
-        StateHasChanged();
 
+        await InvokeAsync(StateHasChanged);
         await BoardState.UpdateBoardAsync(model);
 
         isSubmitting = false;

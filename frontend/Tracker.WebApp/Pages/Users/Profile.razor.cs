@@ -40,7 +40,7 @@ public partial class Profile
         }
 
         User = result.Value;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task<Paginated<WorkspaceSummaryDto>> LoadWorkspaces(
