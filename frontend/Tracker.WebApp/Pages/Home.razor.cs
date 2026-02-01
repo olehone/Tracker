@@ -2,19 +2,21 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
-public partial class Home : IAsyncDisposable
+
+public partial class Home : IDisposable
 {
     private bool _isAuthenticated;
     private List<BoardSummaryDto> Boards = [];
 
-    [Inject] private IBoardService BoardService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+    [Inject] IBoardService BoardService { get; set; } = null!;
+    [Inject] AppState AppState{ get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+        AppState.OnUserChange +=  StateHasChangedHandler;
         await LoadBoardsIfAuthenticatedAsync();
     }
 
@@ -48,9 +50,14 @@ public partial class Home : IAsyncDisposable
     }
 
 
-    public ValueTask DisposeAsync()
+    private async Task StateHasChangedHandler()
     {
-        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
-        return ValueTask.CompletedTask;
+        await LoadBoardsIfAuthenticatedAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        BoardState.OnChange -= StateHasChangedHandler;
     }
 }

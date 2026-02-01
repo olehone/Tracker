@@ -25,6 +25,6 @@ public partial class UserAvatarWithLookup
         await Task.Delay(300);
 
         _open = _isHovering;
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 }

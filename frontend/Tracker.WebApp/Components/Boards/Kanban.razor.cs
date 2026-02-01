@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction.Auth;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
@@ -13,7 +11,7 @@ public partial class Kanban
 
     protected override void StateHasChangedHandler()
     {
-        InvokeAsync(StateHasChanged);
+        base.StateHasChangedHandler();
         _container?.Refresh();
     }
 

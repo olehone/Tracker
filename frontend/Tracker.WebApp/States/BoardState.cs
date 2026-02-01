@@ -1,19 +1,18 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
-using Tracker.Services.Abstraction.Auth;
 
 namespace Tracker.WebApp.States;
 
 public sealed class BoardState : IAsyncDisposable
 {
     private readonly IBoardService _boardService;
-    private readonly ICurrentUser _currentUser;
-    private BoardFullDto? _currentBoard;
+    private readonly AppState _appState;
     private readonly IBoardRealtimeService _boardRealtime;
+    private BoardFullDto? _currentBoard;
 
-    public bool IsUnauthenticated => _currentUser.IsUnauthenticated;
-    public Guid CurrentUserId => _currentUser.Id;
+    public bool IsUnauthenticated => _appState.IsUnauthenticated;
+    public Guid MyId => _appState.MyId;
 
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
@@ -27,7 +26,7 @@ public sealed class BoardState : IAsyncDisposable
     public event Action? OnBoardNotFound;
 
     public BoardState(
-        ICurrentUser currentUser,
+        AppState appState,
         IBoardService boardService,
         IBoardListService boardListService,
         IBoardItemService boardItemService,
@@ -35,8 +34,8 @@ public sealed class BoardState : IAsyncDisposable
         IUserService userService,
         IBoardRealtimeService boardRealtime)
     {
-        _currentUser = currentUser;
         _boardService = boardService;
+        _appState = appState;
 
         UsersState = new BoardUsersState(this, userService, boardUserService);
         ItemsState = new BoardItemsState(this, boardItemService);

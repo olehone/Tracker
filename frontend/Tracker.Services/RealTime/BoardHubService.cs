@@ -95,7 +95,6 @@ public class BoardHubService(
 
     public async ValueTask DisposeAsync()
     {
-        GC.SuppressFinalize(this);
         await DisconnectAsync();
     }
 

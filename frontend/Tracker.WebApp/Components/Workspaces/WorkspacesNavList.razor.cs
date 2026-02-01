@@ -15,13 +15,13 @@ public partial class WorkspacesNavList : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
+        AuthStateProvider.AuthenticationStateChanged -= StateHasChangedHandler;
         await Task.CompletedTask;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
+        AuthStateProvider.AuthenticationStateChanged += StateHasChangedHandler;
         await LoadWorkspacesIfAuthenticatedAsync();
     }
 
@@ -38,7 +38,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         }
 
         Workspaces!.Add(result.Value);
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     private async Task LoadWorkspacesIfAuthenticatedAsync()
@@ -60,7 +60,7 @@ public partial class WorkspacesNavList : IAsyncDisposable
         Workspaces = result.Value;
     }
 
-    private async void OnAuthStateChanged(Task<AuthenticationState> task)
+    private async void StateHasChangedHandler(Task<AuthenticationState> task)
     {
         await LoadWorkspacesIfAuthenticatedAsync();
         await InvokeAsync(StateHasChanged);

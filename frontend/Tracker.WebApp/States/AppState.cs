@@ -2,36 +2,40 @@
 
 namespace Tracker.WebApp.States;
 
-public class AppState(){
-
+public class AppState()
+{
     private UserDto? _currentUser;
-    
+
     public UserDto CurrentUser
     {
-        get => _currentUser ?? throw new InvalidOperationException("User accessed before authentication");
+        get => _currentUser
+            ?? throw new InvalidOperationException("User accessed when unauthenticated");
         set
         {
             _currentUser = value;
-            IsLoading = false;
             NotifyUserChanged();
         }
     }
 
-    public bool IsUnauthenticated => _currentUser?.Id is null;
+    public Guid MyId => _currentUser!.Id;
+    public bool IsUnauthenticated => _currentUser is null;
     public bool IsAuthenticated => !IsUnauthenticated;
-    public bool IsLoading { get; internal set; } = false;
-    public Guid MyId => CurrentUser.Id;
+
     public event Action? OnUserChange;
 
-    public void NotifyUserChanged()
+    public void StartLoading()
     {
-        OnUserChange?.Invoke();
+        NotifyUserChanged();
     }
 
     public void Clear()
     {
         _currentUser = null;
-        IsLoading = false;
         NotifyUserChanged();
+    }
+
+    private void NotifyUserChanged()
+    {
+        OnUserChange?.Invoke();
     }
 }

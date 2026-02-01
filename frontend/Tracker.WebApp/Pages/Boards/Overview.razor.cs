@@ -1,20 +1,17 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction;
-using Tracker.Services.Abstraction.Auth;
-using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Boards;
 
-public partial class Overview
+public partial class Overview : IDisposable
 {
     [Parameter]
     public Guid BoardId { get; set; }
     [Parameter, SupplyParameterFromQuery(Name = "item")]
     public Guid? ItemId { get; set; }
 
-
-    [Inject] ICurrentUser CurrentUser { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
     [Inject] IBoardRealtimeService BoardRealtime { get; set; } = null!;
     [Inject] IBoardService BoardService { get; set; } = null!;
     [Inject] IBoardListService BoardListService { get; set; } = null!;
@@ -28,7 +25,7 @@ public partial class Overview
     protected override async Task OnInitializedAsync()
     {
         BoardState = new BoardState(
-            CurrentUser,
+            AppState,
             BoardService,
             BoardListService,
             BoardItemService,
@@ -41,11 +38,21 @@ public partial class Overview
         {
             activeIndex = 0;
         }
-        
-        BoardState.OnChange += StateHasChanged;
+
+        BoardState.OnChange += StateHasChangedHandler;
     }
 
     private string PageTitle() => BoardState.IsLoading
         ? "Board loading"
         : BoardState.Board.Title;
+
+    private void StateHasChangedHandler()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        BoardState.OnChange -= StateHasChangedHandler;
+    }
 }

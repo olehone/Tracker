@@ -78,12 +78,12 @@ public partial class Login
             }
 
             _isLoading = false;
-            InvokeAsync(StateHasChanged);
+            StateHasChanged();
             return true;
         }
 
         _isLoading = false;
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
         return false;
     }
 
