@@ -12,8 +12,6 @@ public partial class ListItemSubscribeBase : ComponentBase, IDisposable
     protected IReadOnlyList<BoardItemDto> Items => BoardState.ItemsState.BoardItems;
     protected IReadOnlyList<BoardListDto> Lists => BoardState.ListsState.BoardLists;
 
-    private bool _disposed;
-
     protected override void OnParametersSet()
     {
         BoardState.ListsState.OnChange += StateHasChangedHandler;
@@ -22,28 +20,13 @@ public partial class ListItemSubscribeBase : ComponentBase, IDisposable
 
     protected virtual void StateHasChangedHandler()
     {
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (BoardState != null)
-        {
-            BoardState.ListsState.OnChange -= StateHasChangedHandler;
-            BoardState.ItemsState.OnChange -= StateHasChangedHandler;
-        }
-
-        _disposed = true;
-    }
 
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.ListsState.OnChange -= StateHasChangedHandler;
+        BoardState.ItemsState.OnChange -= StateHasChangedHandler;
     }
 }

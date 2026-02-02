@@ -12,16 +12,15 @@ public partial class ListsSwapDialog : IDisposable
     [Parameter, EditorRequired]
     public BoardState BoardState { get; set; } = null!;
 
-    private IReadOnlyList<BoardListDto> Lists => 
+    private IReadOnlyList<BoardListDto> Lists =>
         BoardState.ListsState.BoardLists;
-    private bool _disposed;
 
     protected override void OnInitialized()
     {
-        BoardState.ListsState.OnChange += OnStateChanged;
+        BoardState.ListsState.OnChange += StateHasChangedHandler;
     }
 
-    private void OnStateChanged()
+    private void StateHasChangedHandler()
     {
         InvokeAsync(StateHasChanged);
     }
@@ -39,21 +38,8 @@ public partial class ListsSwapDialog : IDisposable
         );
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.ListsState.OnChange -= OnStateChanged;
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.ListsState.OnChange -= StateHasChangedHandler;
     }
 }

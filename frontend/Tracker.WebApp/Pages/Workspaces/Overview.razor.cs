@@ -23,7 +23,7 @@ public partial class Overview
         }
 
         Workspace = result.Value;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -31,7 +31,7 @@ public partial class Overview
         if (Workspace == null || Workspace.Id != WorkspaceId)
         {
             Workspace = null;
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
             var result = await WorkspaceService.GetByIdAsync(WorkspaceId);
             if (result.IsFailure)
             {
@@ -55,7 +55,7 @@ public partial class Overview
         }
 
         Workspace!.Boards.Add(result.Value);
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private string PageTitle()

@@ -4,28 +4,49 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp;
 
-public partial class App
+public partial class App : IDisposable
 {
-    [Inject] private AppState AppState { get; set; } = null!;
-    [Inject] private IAuthService AuthService { get; set; } = null!;
-    [Inject] private IUserService UserService { get; set; } = null!;
-    [Inject] private NavigationManager Nav { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
+    [Inject] IAuthService AuthService { get; set; } = null!;
+    [Inject] IUserService UserService { get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
+        AuthService.AuthStateChanged += OnAuthStateChanged;
+        await LoadUserAsync();
+    }
+
+    private async void OnAuthStateChanged()
+    {
+        await InvokeAsync(LoadUserAsync);
+    }
+
+    private async Task LoadUserAsync()
+    {
+        AppState.StartLoading();
+
         var principal = await AuthService.GetPrincipalAsync();
 
-        if (principal.Identity?.IsAuthenticated == true)
+        if (principal.Identity?.IsAuthenticated is not true)
         {
-            var result = await UserService.GetCurrentAsync();
-            if (result.IsFailure)
-            {
-                return;
-            }
-
-            AppState.CurrentUser = result.Value;
-            StateHasChanged();
+            AppState.Clear();
+            return;
         }
+
+        var result = await UserService.GetCurrentAsync();
+        if (result.IsFailure)
+        {
+            AppState.Clear();
+            return;
+        }
+
+        AppState.CurrentUser = result.Value;
+    }
+
+    public void Dispose()
+    {
+        AuthService.AuthStateChanged -= OnAuthStateChanged;
     }
 
     public void RedirectToLogin()

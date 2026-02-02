@@ -133,9 +133,6 @@ public sealed class BoardUsersState(
     public bool CanChangeMembers()
         => Board.Permissions.CanChangeBoard;
 
-    public bool CanChangeMember(BoardUserDto member)
-        => CanChangeMembers() && member.Role != BoardUserRole.Owner;
-
     public bool IsUserMember(UserDto user)
         => _boardUsers.Any(u => u.User.Id == user.Id);
 

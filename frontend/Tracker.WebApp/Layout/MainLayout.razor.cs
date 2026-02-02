@@ -13,15 +13,12 @@ public partial class MainLayout : IDisposable
 
     [Inject] private NavigationManager Nav { get; set; } = null!;
 
+
     protected override void OnInitialized()
     {
-        AppState.OnUserChange += StateHasChanged;
+        AppState.OnUserChange += StateHasChangedHandler;
     }
 
-    void IDisposable.Dispose()
-    {
-        AppState.OnUserChange -= StateHasChanged;
-    }
     private void DrawerToggle()
     {
         _isDrawerOpen = !_isDrawerOpen;
@@ -42,4 +39,13 @@ public partial class MainLayout : IDisposable
         Nav.NavigateTo("/");
     }
 
+    private void StateHasChangedHandler()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AppState.OnUserChange -= StateHasChangedHandler;
+    }
 }

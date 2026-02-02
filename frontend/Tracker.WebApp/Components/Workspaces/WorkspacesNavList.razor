@@ -11,7 +11,7 @@
 			Workspaces
 		</MudText>
 
-		@if (Workspaces is null)
+		@if (_workspaces is null)
 		{
             @for (var i = 0; i < UiHelper.RandomItemCount(); i++)
 			{
@@ -20,7 +20,7 @@
 		}
 		else
 		{
-			@foreach (var workspace in Workspaces)
+			@foreach (var workspace in _workspaces)
 			{
                 <WorkspaceNavGroup Workspace=@workspace/>
 			}

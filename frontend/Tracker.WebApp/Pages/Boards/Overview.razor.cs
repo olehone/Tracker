@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Boards;
 
-public partial class Overview
+public partial class Overview : IDisposable
 {
     [Parameter]
     public Guid BoardId { get; set; }
@@ -39,11 +38,21 @@ public partial class Overview
         {
             activeIndex = 0;
         }
-        
-        BoardState.OnChange += StateHasChanged;
+
+        BoardState.OnChange += StateHasChangedHandler;
     }
 
     private string PageTitle() => BoardState.IsLoading
         ? "Board loading"
         : BoardState.Board.Title;
+
+    private void StateHasChangedHandler()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        BoardState.OnChange -= StateHasChangedHandler;
+    }
 }

@@ -20,7 +20,6 @@ public partial class BoardSettingsDialog : IDisposable
     private UpdateBoardRequest model = null!;
     private readonly UpdateBoardRequestValidator validator = new();
     private bool isSubmitting = false;
-    private bool _disposed;
 
     protected override void OnInitialized()
     {
@@ -69,8 +68,8 @@ public partial class BoardSettingsDialog : IDisposable
         }
 
         isSubmitting = true;
-        StateHasChanged();
 
+        StateHasChanged();
         await BoardState.UpdateBoardAsync(model);
 
         isSubmitting = false;
@@ -97,22 +96,9 @@ public partial class BoardSettingsDialog : IDisposable
         }
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.OnChange -= StateHasChangedHandler;
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.OnChange -= StateHasChangedHandler;
     }
 
     private void Cancel() => MudDialog.Cancel();

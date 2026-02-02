@@ -58,7 +58,7 @@ public partial class Settings
                     MinChangeBoardRole = Workspace.PermissionRoles.MinChangeBoardRole,
                 }
             };
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
         finally
         {

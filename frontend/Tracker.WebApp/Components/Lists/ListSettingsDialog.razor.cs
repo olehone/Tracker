@@ -23,11 +23,9 @@ public partial class ListSettingsDialog : IDisposable
     private UpdateBoardListRequest model = null!;
     private readonly UpdateBoardListRequestValidator validator = new();
     private bool isSubmitting = false;
-    private bool _disposed;
-
     protected override void OnInitialized()
     {
-        BoardState.OnChange += StateHasChanged;
+        BoardState.OnChange += StateHasChangedHandler;
 
         if (BoardState.Board != null)
         {
@@ -67,12 +65,17 @@ public partial class ListSettingsDialog : IDisposable
         }
 
         isSubmitting = true;
-        StateHasChanged();
 
+        StateHasChanged();
         await BoardState.ListsState.UpdateAsync(List.Id, model);
 
         isSubmitting = false;
         MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void StateHasChangedHandler()
+    {
+        InvokeAsync(StateHasChanged);
     }
 
     private void Cancel() => MudDialog.Cancel();
@@ -91,21 +94,8 @@ public partial class ListSettingsDialog : IDisposable
         }
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.OnChange -= StateHasChanged;
-            }
-            _disposed = true;
-        }
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.OnChange -= StateHasChangedHandler;
     }
 }

@@ -8,10 +8,12 @@ public sealed class BoardState : IAsyncDisposable
 {
     private readonly IBoardService _boardService;
     private readonly AppState _appState;
-    private BoardFullDto? _currentBoard;
     private readonly IBoardRealtimeService _boardRealtime;
+    private BoardFullDto? _currentBoard;
 
-    public Guid? MyId => _appState.CurrentUser?.Id;
+    public bool IsUnauthenticated => _appState.IsUnauthenticated;
+    public Guid MyId => _appState.MyId;
+
     public BoardFullDto Board => _currentBoard
         ?? throw new InvalidOperationException("BoardState accessed before board was loaded.");
 
@@ -32,8 +34,8 @@ public sealed class BoardState : IAsyncDisposable
         IUserService userService,
         IBoardRealtimeService boardRealtime)
     {
-        _appState = appState;
         _boardService = boardService;
+        _appState = appState;
 
         UsersState = new BoardUsersState(this, userService, boardUserService);
         ItemsState = new BoardItemsState(this, boardItemService);
@@ -72,7 +74,7 @@ public sealed class BoardState : IAsyncDisposable
 
     public async Task ConnectRealtimeAsync()
     {
-        if (_appState.CurrentUser is null)
+        if (IsUnauthenticated)
         {
             return;
         }
@@ -119,7 +121,14 @@ public sealed class BoardState : IAsyncDisposable
         Notify();
     }
 
-    private void Notify() => OnChange?.Invoke();
+    public bool IsMyId(Guid checkedId)
+    {
+        if (_appState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return checkedId == MyId;
+    }
 
     public async ValueTask DisposeAsync()
     {
@@ -134,4 +143,6 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnListDeleted -= ListsState.Apply;
         await _boardRealtime.DisconnectAsync();
     }
+
+    private void Notify() => OnChange?.Invoke();
 }

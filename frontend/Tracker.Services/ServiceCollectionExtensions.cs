@@ -59,8 +59,6 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-        services.AddScoped<IAuthStateNotifier>(sp =>
-            (CustomAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
 
         services.AddTransient<AuthHeaderHandler>();
         services.AddAuthorizationCore(options =>

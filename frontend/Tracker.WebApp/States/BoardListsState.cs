@@ -85,7 +85,7 @@ public sealed class BoardListsState(
 
     public void Apply(ListCreatedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -94,7 +94,7 @@ public sealed class BoardListsState(
 
     public void Apply(ListMovedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -103,7 +103,7 @@ public sealed class BoardListsState(
 
     public void Apply(ListUpdatedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -112,7 +112,7 @@ public sealed class BoardListsState(
 
     public void Apply(ListDeletedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -190,6 +190,8 @@ public sealed class BoardListsState(
 
         Notify();
     }
+
+    private bool IsMyId(Guid ckeckedId) => boardState.IsMyId(ckeckedId);
 
     private void Notify()
     {

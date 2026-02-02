@@ -12,23 +12,14 @@ public partial class Calendar : IDisposable
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
-    [Inject] AppState AppState { get; set; } = null!;
-
-    private bool _disposed;
     private bool _showNotOwn = true;
     private bool _showNotCompleted = true;
-
     private List<CalendarItemWrapper> ItemsWithDate = [];
     private List<BoardItemDto> ItemsWithoutDate = [];
 
-    private bool IsUnauthorized()
-    {
-        return AppState.CurrentUser is null;
-    }
-
     protected override void OnInitialized()
     {
-        BoardState.ItemsState.OnChange += OnBoardStateChanged;
+        BoardState.ItemsState.OnChange += StateHasChangedHandler;
         ReloadItems();
     }
 
@@ -83,11 +74,11 @@ public partial class Calendar : IDisposable
         {
             return true;
         }
-        if (AppState.CurrentUser is null)
+        if (BoardState.IsUnauthenticated)
         {
             return false;
         }
-        return item.Assignees.Contains(AppState.CurrentUser.Id);
+        return item.Assignees.Contains(BoardState.MyId);
     }
 
     private bool CompletedFilter(BoardItemDto item)
@@ -99,27 +90,14 @@ public partial class Calendar : IDisposable
         return !item.IsDone;
     }
 
-    private void OnBoardStateChanged()
+    private void StateHasChangedHandler()
     {
         ReloadItems();
-        StateHasChanged();
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                BoardState.ItemsState.OnChange -= OnBoardStateChanged;
-            }
-            _disposed = true;
-        }
+        InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.ItemsState.OnChange -= StateHasChangedHandler;
     }
 }

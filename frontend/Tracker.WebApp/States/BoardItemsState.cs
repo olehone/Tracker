@@ -142,7 +142,7 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemCreatedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -151,7 +151,7 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemMovedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -160,7 +160,7 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemUpdatedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -169,7 +169,7 @@ public sealed class BoardItemsState(
 
     public void Apply(ItemDeletedEvent evt)
     {
-        if (boardState.MyId == evt.UserId)
+        if (IsMyId(evt.UserId))
         {
             return;
         }
@@ -299,6 +299,8 @@ public sealed class BoardItemsState(
             item.Position += delta;
         }
     }
+
+    private bool IsMyId(Guid checkedId) => boardState.IsMyId(checkedId);
 
     private void Notify()
     {

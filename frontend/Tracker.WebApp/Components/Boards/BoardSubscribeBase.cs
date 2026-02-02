@@ -11,8 +11,6 @@ public partial class BoardSubscribeBase : ComponentBase, IDisposable
 
     protected BoardFullDto Board => BoardState.Board;
 
-    private bool _disposed;
-
     protected override void OnParametersSet()
     {
         BoardState.OnChange += StateHasChangedHandler;
@@ -20,32 +18,11 @@ public partial class BoardSubscribeBase : ComponentBase, IDisposable
 
     protected virtual void StateHasChangedHandler()
     {
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
-    protected virtual void InsideDispose()
+    public virtual void Dispose()
     {
         BoardState.OnChange -= StateHasChangedHandler;
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (BoardState != null)
-        {
-            InsideDispose();
-        }
-
-        _disposed = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }

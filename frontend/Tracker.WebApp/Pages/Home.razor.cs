@@ -1,54 +1,58 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
-public partial class Home : IAsyncDisposable
+
+public partial class Home : IDisposable
 {
-    private bool _isAuthenticated;
     private List<BoardSummaryDto> Boards = [];
 
-    [Inject] private IBoardService BoardService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+    [Inject] IBoardService BoardService { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        AuthStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
-        await LoadBoardsIfAuthenticatedAsync();
-    }
+        AppState.OnUserChange += HandleUserChanged;
 
-    private async Task LoadBoardsIfAuthenticatedAsync()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        _isAuthenticated = authState.User.Identity?.IsAuthenticated == true;
-
-        if (!_isAuthenticated)
+        if (AppState.IsAuthenticated)
         {
-            Boards = [];
-            return;
+            TriggerBoardsReload();
         }
-
-        var result = await BoardService.GetForCurrentUserAsync();
-        if (result.IsFailure)
-            return;
-
-        Boards = result.Value;
     }
 
-    private void OnAuthStateChanged(Task<AuthenticationState> task)
+    private void HandleUserChanged()
+    {
+        TriggerBoardsReload();
+    }
+
+    private void TriggerBoardsReload()
     {
         _ = InvokeAsync(async () =>
         {
-            await LoadBoardsIfAuthenticatedAsync();
+            await LoadBoardsAsync();
             StateHasChanged();
         });
     }
 
-
-    public ValueTask DisposeAsync()
+    private async Task LoadBoardsAsync()
     {
-        AuthStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
-        return ValueTask.CompletedTask;
+        if (!AppState.IsAuthenticated)
+        {
+            Boards.Clear();
+            return;
+        }
+
+        var result = await BoardService.GetForCurrentUserAsync();
+
+        Boards = result.IsSuccess
+            ? result.Value
+            : [];
+    }
+
+    public void Dispose()
+    {
+        AppState.OnUserChange -= HandleUserChanged;
     }
 }

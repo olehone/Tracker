@@ -7,8 +7,6 @@ namespace Tracker.WebApp.Components.Items;
 
 public partial class ItemAssignees : IDisposable
 {
-    private bool _disposed;
-
     [Parameter, EditorRequired]
     public BoardState BoardState { get; set; } = null!;
 
@@ -50,25 +48,9 @@ public partial class ItemAssignees : IDisposable
         InvokeAsync(StateHasChanged);
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            BoardState.ItemsState.OnChange -= StateHasChangedHandler;
-            BoardState.UsersState.OnChange -= StateHasChangedHandler;
-        }
-
-        _disposed = true;
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.ItemsState.OnChange -= StateHasChangedHandler;
+        BoardState.UsersState.OnChange -= StateHasChangedHandler;
     }
 }

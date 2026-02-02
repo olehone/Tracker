@@ -9,7 +9,6 @@ namespace Tracker.WebApp.Components.Items;
 public partial class ItemSettingsDialog : IDisposable
 {
     private bool _openAssign;
-    private bool _disposed;
     private string _description = string.Empty;
     private DateTime? _date;
     private BoardItemImportance _importance;
@@ -34,13 +33,13 @@ public partial class ItemSettingsDialog : IDisposable
 
     protected override void OnInitialized()
     {
-        BoardState.ItemsState.OnChange += OnChange;
+        BoardState.ItemsState.OnChange += StateHasChangedHandler;
         _description = Item.Description;
         _date = Item.DueDate?.UtcDateTime;
         _importance = Item.Importance;
     }
 
-    private void OnChange()
+    private void StateHasChangedHandler()
     {
         if (!_isEditingDescription && _description != Item.Description)
         {
@@ -49,8 +48,9 @@ public partial class ItemSettingsDialog : IDisposable
 
         _date = Item.DueDate?.UtcDateTime;
         _importance = Item.Importance;
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
+
     private void DescriptionFocused()
     {
         _isEditingDescription = true;
@@ -123,24 +123,8 @@ public partial class ItemSettingsDialog : IDisposable
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-            BoardState.ItemsState.OnChange -= OnChange;
-        }
-
-        _disposed = true;
-    }
-
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        BoardState.ItemsState.OnChange -= StateHasChangedHandler;
     }
 }
