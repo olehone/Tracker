@@ -2,6 +2,7 @@
 using Tracker.Domain.Exceptions;
 
 namespace Tracker.Database;
+
 public static class DbMigrations
 {
     public static void Initialize(string connectionString)

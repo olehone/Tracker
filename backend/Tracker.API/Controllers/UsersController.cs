@@ -16,7 +16,6 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class UserController(IMediator mediator) : ControllerBase
 {
-
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetCurrentAsync(Guid id)
     {
