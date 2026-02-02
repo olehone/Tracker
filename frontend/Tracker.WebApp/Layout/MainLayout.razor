@@ -42,13 +42,7 @@
 
 			@* Because user avatar is working based on UserDto from app state
 			it is important to check auth from app state, not from authorized view *@
-			@if (AppState.IsUnauthenticated)
-			{
-				<MudSkeleton Height="40px"
-							 Width="40px"
-							 SkeletonType="SkeletonType.Circle" />
-			}
-			else
+			@if (AppState.IsAuthenticated)
 			{
 				<UserAvatarOwnClickable User=@AppState.CurrentUser />
 			}

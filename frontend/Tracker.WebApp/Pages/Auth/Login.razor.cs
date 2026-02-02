@@ -47,6 +47,7 @@ public partial class Login
         {
             return;
         }
+        StateHasChanged();
 
         var userResult = await UserService.GetCurrentAsync();
         if (NotifyIfError(userResult))
@@ -77,13 +78,9 @@ public partial class Login
                 _errorMessages = [error.Description];
             }
 
-            _isLoading = false;
-            StateHasChanged();
             return true;
         }
 
-        _isLoading = false;
-        StateHasChanged();
         return false;
     }
 
