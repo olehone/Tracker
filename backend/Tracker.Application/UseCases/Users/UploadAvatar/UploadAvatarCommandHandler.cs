@@ -35,8 +35,12 @@ public class UploadAvatarCommandHandler(
             return AuthErrors.Forbidden();
         }
 
+        user.AvatarUpdatedAt = DateTimeOffset.UtcNow;
+        uow.UserRepository.Update(user);
+
         var url = await avatarStorageService.UploadAsync(request.File,
-            "image/png", user.Id, cancellationToken);
+            "image/png", request.UserId, cancellationToken);
+        await uow.SaveChangesAsync(cancellationToken);
 
         return url;
     }

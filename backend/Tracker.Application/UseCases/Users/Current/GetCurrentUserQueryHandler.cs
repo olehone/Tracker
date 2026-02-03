@@ -29,10 +29,12 @@ public class GetCurrentUserQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            return Error.NotFound("User");
+        }
 
-        return user is null
-            ? Error.NotFound("User")
-            : user.ToDto(avatarStorageService.GetPublicUrl(user.Id));
+        return user.ToDto(avatarStorageService.GetPublicUrl(user.Id));
     }
 }
 

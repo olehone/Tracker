@@ -15,7 +15,17 @@ public static class UserMapping
             Role = user.Role,
             FirstName = user.FirstName,
             LastName = user.LastName ?? "",
-            AvatarUrl = avatarUrl,
+            AvatarUrl = GetUrlWithVersion(user, avatarUrl)
         };
+    }
+
+    // Version help with image caching
+    private static string? GetUrlWithVersion(User user, string? avatarUrl)
+    {
+        if (user.AvatarUpdatedAt is null)
+        {
+            return null;
+        }
+        return $"{avatarUrl}?v={user.AvatarUpdatedAt.Value.Ticks}";
     }
 }

@@ -17,8 +17,6 @@ public partial class UserInfo
     [Inject] AppState AppState { get; set; } = default!;
     [Inject] ISnackbar Snackbar { get; set; } = default!;
 
-    private bool _isUploading = false;
-
     private async Task UploadAvatarAsync(IBrowserFile file)
     {
         if (file == null)
@@ -40,23 +38,18 @@ public partial class UserInfo
             return;
         }
 
-        _isUploading = true;
-        StateHasChanged();
-
         await using var stream = file.OpenReadStream(maxFileSize);
         var result = await UserService.UploadAvatarAsync(User.Id, stream, file.Name);
 
         if (result.IsSuccess)
         {
-            Snackbar.Add("Avatar uploaded successfully", Severity.Success);
-            var newUrl = result.Value + "?new=true";
-            User.AvatarUrl = newUrl;
+            User.AvatarUrl = result.Value;
             if (AppState.IsAuthenticated && AppState.MyId == User.Id)
             {
-                AppState.CurrentUser.AvatarUrl = newUrl;
+                AppState.CurrentUser.AvatarUrl = result.Value;
             }
         }
-        _isUploading = false;
+
         StateHasChanged();
     }
 }
