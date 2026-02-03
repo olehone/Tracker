@@ -4,4 +4,6 @@ public class BlobOptions
 {
     public const string SectionName = "BlobOptions";
     public required string DefaultConnectionString { get; init; }
+
+    public required string AvatarContainerName { get; init; }
 }
