@@ -23,7 +23,6 @@ public sealed class GetUserByIdQueryHandler(
         {
             return Error.NotFound("User");
         }
-        var avatarUrl = avatarStorageService.GetPublicUrl(user.Id);
-        return user.ToDto(avatarUrl);
+        return user.ToDto(avatarStorageService.GetPublicUrl(user.Id));
     }
 }

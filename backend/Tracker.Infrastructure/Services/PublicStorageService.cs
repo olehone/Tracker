@@ -12,15 +12,9 @@ internal class PublicStorageService
         _containerClient = blobServiceClient.GetBlobContainerClient(containerName);
     }
 
-    public async Task<string?> GetPublicUrlAsync(Guid resourceId, CancellationToken cancellationToken = default)
+    public string GetPublicUrl(Guid resourceId)
     {
         var blobClient = _containerClient.GetBlobClient(resourceId.ToString());
-
-        if (!await blobClient.ExistsAsync(cancellationToken))
-        {
-            return null;
-        }
-
         return blobClient.Uri.ToString();
     }
 
@@ -37,7 +31,7 @@ internal class PublicStorageService
             new BlobHttpHeaders { ContentType = contentType },
             cancellationToken: cancellationToken);
 
-        return await GetPublicUrlAsync(resourceId, cancellationToken);
+        return GetPublicUrl(resourceId);
     }
 
     public async Task DeleteAsync(Guid resourceId, CancellationToken cancellationToken = default)

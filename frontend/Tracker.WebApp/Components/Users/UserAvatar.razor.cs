@@ -16,6 +16,15 @@ public partial class UserAvatar
     [Parameter]
     public EventCallback<bool> HandleHovering { get; set; }
 
+    private bool _avatarFailed;
+
+    private void HandleImageError()
+    {
+        Console.WriteLine("Error on loading image");
+        _avatarFailed = true;
+        StateHasChanged();
+    }
+
     private string CustomColor
     {
         get

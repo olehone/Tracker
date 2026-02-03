@@ -1,0 +1,10 @@
+﻿@inherits MudComponentBase
+
+<img @attributes="UserAttributes" 
+    src="@_srcState.Value" 
+    alt="@Alt" 
+    class="@Classname" 
+    style="@Style" 
+    width="@Width" 
+    height="@Height" 
+    @onerror=@(() => Console.WriteLine("Error"))>
