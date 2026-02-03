@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
@@ -24,4 +23,11 @@ public interface IUserApi
     [Get("/api/users/{id}/workspaces")]
     Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync([FromRoute] Guid id,
         [FromQuery] PaginatedSearchRequest request);
+
+    [Multipart]
+    [Post("/api/users/{id}/avatar")]
+    Task<IApiResponse<string>> UploadAvatarAsync(Guid Id, [AliasAs("File")] StreamPart file);
+
+    [Delete("/api/users/{id}/avatar")]
+    Task<IApiResponse> DeleteAvatarAsync(Guid id);
 }

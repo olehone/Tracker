@@ -1,17 +1,16 @@
-@if (User.AvatarUrl is null)
-{
-	<MudAvatar Style=@CustomColor
-			   Variant="Variant.Outlined"
-			   Size=@Size
-			   @onmouseenter=@(() => HandleHovering.InvokeAsync(true))
-			   @onmouseleave=@(() => HandleHovering.InvokeAsync(false))>
-		@FirstLetter()
-	</MudAvatar>
-}
-else
-{
-	<MudAvatar Color=@Color
-			   Variant="Variant.Outlined">
-		<MudImage Src=@User.AvatarUrl></MudImage>
-	</MudAvatar>
-}
+@using Tracker.WebApp.Components.Shared
+
+<MudAvatar Style=@ImageStyle
+           Variant="Variant.Outlined"
+           Size=@Size
+           @onmouseenter=@(() => HandleHovering.InvokeAsync(true))
+           @onmouseleave=@(() => HandleHovering.InvokeAsync(false))>
+    @if (!string.IsNullOrEmpty(User.AvatarUrl) && !_avatarFailed)
+    {
+        <CustomImage Src=@User.AvatarUrl ObjectFit="ObjectFit.Cover" HandleError=@HandleImageError/>
+    }
+    else
+    {
+        @FirstLetter()
+    }
+</MudAvatar>

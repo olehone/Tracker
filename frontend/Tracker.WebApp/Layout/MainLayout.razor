@@ -5,61 +5,69 @@
 
 <MudThemeProvider @bind-IsDarkMode=@_isDarkMode />
 <MudLayout Style="height: 100vh; display: flex; flex-direction: column;">
-	<MudAppBar Elevation="1" Fixed Class="d-flex">
-		<MudIconButton Icon=@Icons.Material.Filled.Menu
-					   Color="Color.Inherit"
-					   Edge="Edge.Start"
-					   OnClick=@DrawerToggle />
-		<MudButton OnClick=@GoToHome
-				   Color="Color.Inherit"
-				   Style="background-color: inherit; box-shadow: none;">
-			<MudText Typo=Typo.h6 Color="Color.Inherit">
-				Tracker
-			</MudText>
-		</MudButton>
-		<MudSpacer />
-		<MudStack Row
-				  Spacing="2"
-				  AlignItems="AlignItems.Center">
-			<MudToggleIconButton @bind-Toggled=@_isDarkMode
-								 Icon=@Icons.Material.Outlined.WbSunny
-								 ToggledIcon=@Icons.Material.Outlined.DarkMode
-								 Color="Color.Inherit" />
-			<AuthorizeView>
-				<NotAuthorized>
-					<MudButton Variant="Variant.Text"
-							   Color="Color.Inherit"
-							   OnClick=@GoToLogin>
-						Login
-					</MudButton>
-					<MudButton Variant="Variant.Text"
-							   Color="Color.Inherit"
-							   OnClick=@GoToRegister>
-						Register
-					</MudButton>
-				</NotAuthorized>
-			</AuthorizeView>
+    <MudAppBar Elevation="1" Fixed Class="d-flex">
+        <MudIconButton Icon=@Icons.Material.Filled.Menu
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick=@DrawerToggle />
+        <MudButton OnClick=@GoToHome
+                   Color="Color.Inherit"
+                   Style="background-color: inherit; box-shadow: none;">
+            <MudText Typo=Typo.h6 Color="Color.Inherit">
+                Tracker
+            </MudText>
+        </MudButton>
 
-			@* Because user avatar is working based on UserDto from app state
+        <MudSpacer />
+
+        <MudStack Row
+                  Spacing="2"
+                  AlignItems="AlignItems.Center">
+            <MudToggleIconButton @bind-Toggled=@_isDarkMode
+                                 Icon=@Icons.Material.Outlined.WbSunny
+                                 ToggledIcon=@Icons.Material.Outlined.DarkMode
+                                 Color="Color.Inherit" />
+            <AuthorizeView>
+                <NotAuthorized>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Inherit"
+                               OnClick=@GoToLogin>
+                        Login
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Inherit"
+                               OnClick=@GoToRegister>
+                        Register
+                    </MudButton>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            @* Because user avatar is working based on UserDto from app state
 			it is important to check auth from app state, not from authorized view *@
-			@if (AppState.IsUnauthenticated)
-			{
-				<MudSkeleton Height="40px"
-							 Width="40px"
-							 SkeletonType="SkeletonType.Circle" />
-			}
-			else
-			{
-				<UserAvatarOwnClickable User=@AppState.CurrentUser />
-			}
-		</MudStack>
-	</MudAppBar>
-	<MudDrawer @bind-Open="_isDrawerOpen"
-			   ClipMode="DrawerClipMode.Always"
-			   Elevation="2">
-		<NavMenu />
-	</MudDrawer>
-	<MudMainContent>
-		@Body
-	</MudMainContent>
+            @if (AppState.IsAuthenticated)
+            {
+                <UserAvatarWithLookup User=@AppState.CurrentUser
+                                      Size="Size.Medium">
+                    <AdditionalActions>
+                        <MudButton OnClick=@Logout
+                                   IconColor="Color.Error">
+                            <MudIcon Icon=@Icons.Material.Filled.Logout />
+                            Logout
+                        </MudButton>
+                    </AdditionalActions>
+                </UserAvatarWithLookup>
+            }
+        </MudStack>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_isDrawerOpen"
+               ClipMode="DrawerClipMode.Always"
+               Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+        @Body
+    </MudMainContent>
 </MudLayout>

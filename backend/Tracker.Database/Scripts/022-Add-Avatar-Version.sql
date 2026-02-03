@@ -1,0 +1,2 @@
+﻿ALTER TABLE [dbo].[Users] 
+ADD AvatarUpdatedAt DATETIMEOFFSET(0) NULL;

@@ -83,11 +83,10 @@ public partial class Register
             {
                 _errorMessages = [error.Description];
             }
-
+            StateHasChanged();
             return true;
         }
 
-        _isLoading = false;
         StateHasChanged();
         return false;
     }

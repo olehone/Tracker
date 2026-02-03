@@ -9,8 +9,6 @@ public partial class UserAvatarWithLookup
     [Parameter, EditorRequired]
     public UserDto User { get; set; } 
     [Parameter]
-    public Color Color { get; set; } = Color.Default;
-    [Parameter]
     public Size Size { get; set; } = Size.Medium;
     [Parameter]
     public RenderFragment? AdditionalActions { get; set; }

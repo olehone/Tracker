@@ -2,24 +2,49 @@
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 
-<MudGrid>
-	<MudItem xs=12
-			 sm="4">
-		<UserAvatarBig User=@User />
-	</MudItem>
+<MudGrid Class="pa-3">
+    <MudItem xs=12
+             sm="4">
+        <UserAvatar User=@User
+                    Style=@($"width:160px;height:160px;font-size:72px;") />
+    </MudItem>
 
-	<MudItem xs="12"
-			 sm="8">
-		<MudStack>
-			<MudStack Row Justify="Justify.SpaceBetween">
-				<MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
+    <MudItem xs="12"
+             sm="8">
+        <MudStack>
+            <MudStack Row Justify="Justify.SpaceBetween">
+                <MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
 
-				<UserGlobalRoleChip Role=@User.Role />
-			</MudStack>
-			<MudText Typo="Typo.h5">@User.Username</MudText>
+                <UserGlobalRoleChip Role=@User.Role />
+            </MudStack>
 
-			<MudText>@User.Email</MudText>
-		</MudStack>
-	</MudItem>
+            <MudText Typo="Typo.h5">@User.Username</MudText>
+
+            <MudText>@User.Email</MudText>
+
+            <MudFileUpload T="IBrowserFile"
+                           Accept=".png,.jpg,.jpeg"
+                           FilesChanged=@UploadAvatarAsync
+                           MaximumFileCount="1">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon=@Icons.Material.Filled.CloudUpload>
+                        Update avatar
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
+
+            @if (User.AvatarUrl is not null)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon=@Icons.Material.Filled.CloudUpload
+                           OnClick=@DeleteAvatarAsync>
+                    Delete avatar
+                </MudButton>
+            }
+        </MudStack>
+    </MudItem>
 </MudGrid>
 

@@ -28,6 +28,7 @@
     <EmbeddedResource Include="Scripts\019-Descriptions-Not-Null.sql" />
     <EmbeddedResource Include="Scripts\020-Rename-UserBoards-To-BoardUsers.sql" />
     <EmbeddedResource Include="Scripts\021-Rename-UserWorkspaces-To-WorkspaceUsers.sql" />
+    <EmbeddedResource Include="Scripts\022-Add-Avatar-Version.sql" />
   </ItemGroup>
 
   <ItemGroup>

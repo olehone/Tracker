@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
@@ -7,7 +8,8 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Users.GetById;
 
 public sealed class GetUserByIdQueryHandler(
-    IUnitOfWorkFactory unitOfWorkFactory)
+    IUnitOfWorkFactory unitOfWorkFactory,
+    IAvatarStorageService avatarStorageService)
     : IRequestHandler<GetUserByIdQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(
@@ -17,9 +19,11 @@ public sealed class GetUserByIdQueryHandler(
         await using var uow = unitOfWorkFactory.Create();
 
         var user = await uow.UserRepository.GetByIdAsync(request.Id);
+        if (user is null)
+        {
+            return Error.NotFound("User");
+        }
 
-        return user is null
-            ? Error.NotFound("User")
-            : user.ToDto();
+        return user.ToDto(avatarStorageService.GetPublicUrl(user.Id));
     }
 }
