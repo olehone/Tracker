@@ -30,7 +30,7 @@ public class UploadAvatarCommandHandler(
             return AuthErrors.Unauthenticated;
         }
 
-        if (user.Id != request.UserId || user.Role < GlobalRole.Admin)
+        if (user.Id != request.UserId && user.Role < GlobalRole.Admin)
         {
             return AuthErrors.Forbidden();
         }

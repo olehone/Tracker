@@ -24,4 +24,8 @@ public interface IUserApi
     [Get("/api/users/{id}/workspaces")]
     Task<IApiResponse<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync([FromRoute] Guid id,
         [FromQuery] PaginatedSearchRequest request);
+
+    [Multipart]
+    [Post("/api/users/{id}/avatar")]
+    Task<IApiResponse<string>> UploadAvatarAsync(Guid Id, [AliasAs("File")] StreamPart file);
 }

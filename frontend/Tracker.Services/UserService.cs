@@ -1,4 +1,5 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Refit;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -37,5 +38,11 @@ public class UserService(
         Guid id, PaginatedSearchRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.GetMutualWorkspacesAsync(id, request));
+    }
+
+    public async Task<Result<string>> UploadAvatarAsync(Guid userId, Stream fileStream, string fileName)
+    {
+        var streamPart = new StreamPart(fileStream, fileName);
+        return await apiErrorHandler.ExecuteAsync(() => api.UploadAvatarAsync(userId, streamPart));
     }
 }
