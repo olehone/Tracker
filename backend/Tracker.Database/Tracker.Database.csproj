@@ -22,13 +22,13 @@
     <EmbeddedResource Include="Scripts\013-Add-Status-To-Task.sql" />
     <EmbeddedResource Include="Scripts\014-Make-Status-Not-Null-Set-Default.sql" />
     <EmbeddedResource Include="Scripts\015-Add-BoardItemAssignee.sql" />
-    <EmbeddedResource Include="Scripts\022-Add-Avatar-Version.sql" />
     <EmbeddedResource Include="Scripts\016-Add-Item-Due-Date.sql" />
     <EmbeddedResource Include="Scripts\017-Add-Item-Importance.sql" />
     <EmbeddedResource Include="Scripts\018-Item-Importance-Not-Null.sql" />
     <EmbeddedResource Include="Scripts\019-Descriptions-Not-Null.sql" />
     <EmbeddedResource Include="Scripts\020-Rename-UserBoards-To-BoardUsers.sql" />
     <EmbeddedResource Include="Scripts\021-Rename-UserWorkspaces-To-WorkspaceUsers.sql" />
+    <EmbeddedResource Include="Scripts\022-Add-Avatar-Version.sql" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,7 +17,9 @@
                 Tracker
             </MudText>
         </MudButton>
+
         <MudSpacer />
+
         <MudStack Row
                   Spacing="2"
                   AlignItems="AlignItems.Center">
@@ -32,6 +34,7 @@
                                OnClick=@GoToLogin>
                         Login
                     </MudButton>
+
                     <MudButton Variant="Variant.Text"
                                Color="Color.Inherit"
                                OnClick=@GoToRegister>
@@ -57,11 +60,13 @@
             }
         </MudStack>
     </MudAppBar>
+
     <MudDrawer @bind-Open="_isDrawerOpen"
                ClipMode="DrawerClipMode.Always"
                Elevation="2">
         <NavMenu />
     </MudDrawer>
+
     <MudMainContent>
         @Body
     </MudMainContent>

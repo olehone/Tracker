@@ -34,14 +34,15 @@
                     </MudButton>
                 </ActivatorContent>
             </MudFileUpload>
+
             @if (User.AvatarUrl is not null)
             {
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon=@Icons.Material.Filled.CloudUpload
-                       OnClick=@DeleteAvatarAsync>
-                Delete avatar
-            </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon=@Icons.Material.Filled.CloudUpload
+                           OnClick=@DeleteAvatarAsync>
+                    Delete avatar
+                </MudButton>
             }
         </MudStack>
     </MudItem>

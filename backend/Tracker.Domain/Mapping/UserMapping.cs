@@ -19,7 +19,6 @@ public static class UserMapping
         };
     }
 
-    // Version help with image caching
     public static string? GetAvatar(this User user, string? avatarUrl)
     {
         if (user.AvatarUpdatedAt is null)
