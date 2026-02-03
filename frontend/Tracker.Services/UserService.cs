@@ -40,9 +40,9 @@ public class UserService(
         return apiErrorHandler.ExecuteAsync(() => api.GetMutualWorkspacesAsync(id, request));
     }
 
-    public async Task<Result<string>> UploadAvatarAsync(Guid userId, Stream fileStream, string fileName)
+    public async Task<Result<string>> UploadAvatarAsync(Guid userId, Stream fileStream, string contentType, string fileName)
     {
-        var streamPart = new StreamPart(fileStream, fileName);
+        var streamPart = new StreamPart(fileStream, fileName, contentType);
         return await apiErrorHandler.ExecuteAsync(() => api.UploadAvatarAsync(userId, streamPart));
     }
 }

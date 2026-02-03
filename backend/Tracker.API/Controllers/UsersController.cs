@@ -3,14 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.Common.Services;
 using Tracker.Application.UseCases.Users.Current;
 using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.GetById;
 using Tracker.Application.UseCases.Users.UploadAvatar;
 using Tracker.Application.UseCases.Workspaces.GetAllForUser;
 using Tracker.Application.UseCases.Workspaces.GetMutual;
-using Tracker.Domain.Results;
 
 namespace Tracker.API.Controllers;
 
@@ -79,15 +77,16 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost("{id:guid}/avatar")]
-    public async Task<IActionResult> UploadPleaseAsync(Guid id,
+    public async Task<IActionResult> UploadAvatarAsync(Guid id,
         [FromForm] FileUploadRequest request)
     {
-
         await using Stream stream = request.File.OpenReadStream();
         var mediatorRequest = new UploadAvatarCommand
         {
             UserId = id,
-            File = stream,
+            Content = stream,
+            ContentType = request.File.ContentType,
+            ContentLength = request.File.Length
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

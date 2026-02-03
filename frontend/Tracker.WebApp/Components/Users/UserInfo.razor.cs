@@ -39,7 +39,7 @@ public partial class UserInfo
         }
 
         await using var stream = file.OpenReadStream(maxFileSize);
-        var result = await UserService.UploadAvatarAsync(User.Id, stream, file.Name);
+        var result = await UserService.UploadAvatarAsync(User.Id, stream, file.ContentType, file.Name);
 
         if (result.IsSuccess)
         {
@@ -47,6 +47,13 @@ public partial class UserInfo
             if (AppState.IsAuthenticated && AppState.MyId == User.Id)
             {
                 AppState.CurrentUser.AvatarUrl = result.Value;
+            }
+        }
+        else
+        {
+            foreach (var detail in result.Error.Details!)
+            {
+                Snackbar.Add(detail, Severity.Warning);
             }
         }
 

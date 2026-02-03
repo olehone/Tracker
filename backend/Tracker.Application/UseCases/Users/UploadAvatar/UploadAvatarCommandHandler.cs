@@ -38,8 +38,7 @@ public class UploadAvatarCommandHandler(
         user.AvatarUpdatedAt = DateTimeOffset.UtcNow;
         uow.UserRepository.Update(user);
 
-        var url = await avatarStorageService.UploadAsync(request.File,
-            "image/png", request.UserId, cancellationToken);
+        var url = await avatarStorageService.UploadAsync(request.Content, request.ContentType, request.UserId, cancellationToken);
         await uow.SaveChangesAsync(cancellationToken);
 
         return url;
