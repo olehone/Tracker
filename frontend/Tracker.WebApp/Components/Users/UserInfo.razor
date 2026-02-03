@@ -29,11 +29,20 @@
                 <ActivatorContent>
                     <MudButton Variant="Variant.Filled"
                                Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                               StartIcon=@Icons.Material.Filled.CloudUpload>
                         Update avatar
                     </MudButton>
                 </ActivatorContent>
             </MudFileUpload>
+            @if (User.AvatarUrl is not null)
+            {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon=@Icons.Material.Filled.CloudUpload
+                       OnClick=@DeleteAvatarAsync>
+                Delete avatar
+            </MudButton>
+            }
         </MudStack>
     </MudItem>
 </MudGrid>

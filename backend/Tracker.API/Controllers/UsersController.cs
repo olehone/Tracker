@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.Users.Current;
+using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.GetById;
 using Tracker.Application.UseCases.Users.UploadAvatar;
@@ -87,6 +88,17 @@ public class UserController(IMediator mediator) : ControllerBase
             Content = stream,
             ContentType = request.File.ContentType,
             ContentLength = request.File.Length
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpDelete("{id:guid}/avatar")]
+    public async Task<IActionResult> DeleteAvatarAsync(Guid id)
+    {
+        var mediatorRequest = new DeleteAvatarCommand
+        {
+            UserId = id,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();

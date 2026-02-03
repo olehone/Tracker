@@ -17,6 +17,15 @@ public partial class UserInfo
     [Inject] AppState AppState { get; set; } = default!;
     [Inject] ISnackbar Snackbar { get; set; } = default!;
 
+    //TODO: add proper user permission check
+
+    private async Task DeleteAvatarAsync()
+    {
+        await UserService.DeleteAvatarAsync(User.Id);
+        User.AvatarUrl = null;
+        StateHasChanged();
+    }
+
     private async Task UploadAvatarAsync(IBrowserFile file)
     {
         if (file == null)
@@ -24,21 +33,7 @@ public partial class UserInfo
             return;
         }
 
-        var allowedTypes = new[] { "image/png", "image/jpeg", "image/jpg" };
-        if (!allowedTypes.Contains(file.ContentType))
-        {
-            Snackbar.Add("Please upload a PNG or JPEG image", Severity.Warning);
-            return;
-        }
-
-        const long maxFileSize = 5 * 1024 * 1024;
-        if (file.Size > maxFileSize)
-        {
-            Snackbar.Add("File size must be less than 5MB", Severity.Warning);
-            return;
-        }
-
-        await using var stream = file.OpenReadStream(maxFileSize);
+        await using var stream = file.OpenReadStream();
         var result = await UserService.UploadAvatarAsync(User.Id, stream, file.ContentType, file.Name);
 
         if (result.IsSuccess)

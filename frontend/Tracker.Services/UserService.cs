@@ -45,4 +45,9 @@ public class UserService(
         var streamPart = new StreamPart(fileStream, fileName, contentType);
         return await apiErrorHandler.ExecuteAsync(() => api.UploadAvatarAsync(userId, streamPart));
     }
+
+    public Task<Result> DeleteAvatarAsync(Guid userId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAvatarAsync(userId));
+    }
 }

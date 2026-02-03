@@ -2,30 +2,25 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Domain.Enums;
-using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Users.UploadAvatar;
+namespace Tracker.Application.UseCases.Users.GetById;
 
-public class UploadAvatarCommandHandler(
+public sealed class DeleteAvatarCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext,
     IAvatarStorageService avatarStorageService)
-    : IRequestHandler<UploadAvatarCommand, Result<string>>
+    : IRequestHandler<DeleteAvatarCommand, Result>
 {
-    public async Task<Result<string>> Handle(
-        UploadAvatarCommand request,
+    public async Task<Result> Handle(
+        DeleteAvatarCommand request,
         CancellationToken cancellationToken)
     {
-        if (userContext.IsUnauthenticated())
-        {
-            return AuthErrors.Unauthenticated;
-        }
-
         await using var uow = unitOfWorkFactory.Create();
-        var userId = userContext.GetUserId();
 
+        var userId = userContext.GetUserId();
         var currentUser = await uow.UserRepository.GetByIdAsync(userId);
         if (currentUser is null)
         {
@@ -42,19 +37,10 @@ public class UploadAvatarCommandHandler(
             return AuthErrors.Forbidden();
         }
 
-        updatedUser.AvatarUpdatedAt = DateTimeOffset.UtcNow;
-        
-        var url = await avatarStorageService.UploadAsync(request.Content, request.ContentType, request.UserId, cancellationToken);
-        
-        uow.UserRepository.Update(updatedUser);
-        await uow.SaveChangesAsync(cancellationToken);
+        await avatarStorageService.DeleteAsync(updatedUser.Id, cancellationToken);
 
-        var avatarUrl = updatedUser.GetAvatar(url);
-        if (avatarUrl is null)
-        {
-            return Error.Unknown;
-        }
+        updatedUser.AvatarUpdatedAt = null;
 
-        return avatarUrl;
+        return await uow.SaveChangesAsync(cancellationToken);
     }
 }
