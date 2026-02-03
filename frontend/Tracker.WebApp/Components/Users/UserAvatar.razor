@@ -1,12 +1,13 @@
 @using Tracker.WebApp.Components.Shared
-<MudAvatar Style=@CustomColor
+
+<MudAvatar Style=@ImageStyle
            Variant="Variant.Outlined"
            Size=@Size
            @onmouseenter=@(() => HandleHovering.InvokeAsync(true))
            @onmouseleave=@(() => HandleHovering.InvokeAsync(false))>
     @if (!string.IsNullOrEmpty(User.AvatarUrl) && !_avatarFailed)
     {
-        <CustomImage Src=@User.AvatarUrl ObjectFit="ObjectFit.Cover" @onerror=@(() => HandleImageError())/>
+        <CustomImage Src=@User.AvatarUrl ObjectFit="ObjectFit.Cover" HandleError=@HandleImageError/>
     }
     else
     {

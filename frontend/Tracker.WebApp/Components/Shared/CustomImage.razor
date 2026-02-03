@@ -1,10 +1,13 @@
 ﻿@inherits MudComponentBase
 
-<img @attributes="UserAttributes" 
-    src="@_srcState.Value" 
-    alt="@Alt" 
-    class="@Classname" 
-    style="@Style" 
-    width="@Width" 
-    height="@Height" 
-    @onerror=@(() => Console.WriteLine("Error"))>
+@* This component is identical to MudImage
+But with custom error handler *@
+
+<img @attributes="UserAttributes"
+     src=@_srcState.Value
+     alt=@Alt
+     class=@Classname
+     style=@Style
+     width=@Width
+     height=@Height
+     @onerror=@HandleError>

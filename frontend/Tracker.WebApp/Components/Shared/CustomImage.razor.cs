@@ -51,4 +51,7 @@ public partial class CustomImage
 
     [Parameter]
     public ObjectPosition ObjectPosition { set; get; } = ObjectPosition.Center;
+
+    [Parameter]
+    public EventCallback HandleError { get; set; }
 }

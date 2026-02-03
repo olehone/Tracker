@@ -12,29 +12,27 @@ public partial class UserAvatar
     [Parameter]
     public Size Size { get; set; } = Size.Medium;
     [Parameter]
-    public Color Color { get; set; } = Color.Default;
+    public string Style { get; set; } = string.Empty;
     [Parameter]
     public EventCallback<bool> HandleHovering { get; set; }
 
-    private bool _avatarFailed;
+    private bool _avatarFailed = false;
+    private string? _customColor;
 
     private void HandleImageError()
     {
-        Console.WriteLine("Error on loading image");
         _avatarFailed = true;
         StateHasChanged();
     }
 
-    private string CustomColor
+    private string ImageStyle
     {
         get
         {
             _customColor ??= UiHelper.GetColorById(User.Id);
-            return _customColor;
+            return _customColor + Style;
         }
     }
-
-    private string? _customColor;
 
     public string GetUserColor()
     {

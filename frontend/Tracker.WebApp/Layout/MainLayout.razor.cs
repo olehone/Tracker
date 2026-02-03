@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Tracker.Services;
+using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Layout;
@@ -11,8 +13,15 @@ public partial class MainLayout : IDisposable
     [CascadingParameter]
     private AppState AppState { get; set; } = null!;
 
+    [Inject] IAuthService AuthService { get; set; } = null!;
     [Inject] private NavigationManager Nav { get; set; } = null!;
 
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        AppState.Clear();
+        Nav.NavigateTo("/");
+    }
 
     protected override void OnInitialized()
     {
