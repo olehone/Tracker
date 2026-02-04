@@ -23,7 +23,6 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(() => api.LoginAsync(request));
         if (result.IsFailure)
         {
-            await LogoutAsync();
             return result.Error;
         }
 
@@ -39,7 +38,6 @@ public sealed class AuthService(
         var result = await apiErrorHandler.ExecuteAsync(() => api.RegisterAsync(request));
         if (result.IsFailure)
         {
-            await LogoutAsync();
             return result.Error;
         }
 
@@ -48,7 +46,7 @@ public sealed class AuthService(
 
         return Result.Success();
     }
-
+    
     public async Task LogoutAsync()
     {
         await storage.ClearAsync();

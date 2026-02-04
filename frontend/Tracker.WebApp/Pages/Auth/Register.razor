@@ -10,7 +10,7 @@
               Style="width: 100%; max-width: 400px;">
 
         <MudForm @ref=@_form
-                 @bind-IsValid=@_isSuccess
+                 @bind-IsValid=@_isValid
                  Model=@_registerModel>
             <MudStack Spacing="3">
                 <MudTextField T="string"
@@ -71,7 +71,7 @@
                 }
 
                 <MudButton OnClick=@HandleRegister
-                           Disabled=@(_isLoading || !_isSuccess)
+                           Disabled=@(_isLoading || !_isValid)
                            FullWidth
                            Variant=Variant.Filled
                            Color=Color.Primary>

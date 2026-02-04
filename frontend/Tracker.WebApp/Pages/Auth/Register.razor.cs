@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -15,7 +15,7 @@ public partial class Register
     private IReadOnlyList<string>? _errorMessages;
     private MudForm _form = null!;
     private bool _isLoading;
-    private bool _isSuccess;
+    private bool _isValid;
     private string? _secondPassword;
 
     [CascadingParameter]
@@ -47,6 +47,7 @@ public partial class Register
         }
 
         _isLoading = true;
+        _errorMessages = null;
 
         var result = await Auth.RegisterAsync(ToRequest(_registerModel));
         _isLoading = false;
@@ -75,19 +76,12 @@ public partial class Register
         {
             var error = result.Error!;
 
-            if (error.Type == ErrorType.Validation)
-            {
-                _errorMessages = error.Details;
-            }
-            else
-            {
-                _errorMessages = [error.Description];
-            }
-            StateHasChanged();
+            _errorMessages = error.Type == ErrorType.Validation
+                ? error.Details
+                : [error.Description];
             return true;
         }
 
-        StateHasChanged();
         return false;
     }
 

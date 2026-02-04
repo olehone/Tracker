@@ -1,8 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Services;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
@@ -13,45 +12,49 @@ public partial class UserInfo
     [Parameter]
     public required UserDto User { get; set; }
 
-    [Inject] IUserService UserService { get; set; } = default!;
-    [Inject] AppState AppState { get; set; } = default!;
-    [Inject] ISnackbar Snackbar { get; set; } = default!;
+    [Parameter]
+    public EventCallback<UserDto> UserChanged { get; set; }
 
-    //TODO: add proper user permission check
+    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
-    private async Task DeleteAvatarAsync()
+    private bool IsMe => AppState.IsAuthenticated && AppState.MyId == User.Id;
+
+    private async Task OpenSettingsAsync()
     {
-        await UserService.DeleteAvatarAsync(User.Id);
-        User.AvatarUrl = null;
-        StateHasChanged();
+        var parameters = new DialogParameters
+        {
+            { nameof(UserSettingsDialog.User), User },
+            { nameof(UserSettingsDialog.UserChanged), EventCallback.Factory.Create<UserDto>(this, OnUserUpdated) }
+        };
+
+        var dialog = await DialogService.ShowAsync<UserSettingsDialog>(
+            User.Username,
+            parameters,
+            new DialogOptions { NoHeader = true });
+
+        await dialog.Result;
     }
 
-    private async Task UploadAvatarAsync(IBrowserFile file)
+    private async Task OnUserUpdated(UserDto updatedUser)
     {
-        if (file == null)
+        User = updatedUser;
+        await UpdateUserStateAsync();
+    }
+
+    private async Task UpdateUserStateAsync()
+    {
+        if (IsMe)
         {
-            return;
+            var user = AppState.CurrentUser;
+            user.AvatarUrl = User.AvatarUrl;
+            user.Username = User.Username;
+            user.FirstName = User.FirstName;
+            user.LastName = User.LastName;
+            AppState.CurrentUser = user;
         }
 
-        await using var stream = file.OpenReadStream();
-        var result = await UserService.UploadAvatarAsync(User.Id, stream, file.ContentType, file.Name);
-
-        if (result.IsSuccess)
-        {
-            User.AvatarUrl = result.Value;
-            if (AppState.IsAuthenticated && AppState.MyId == User.Id)
-            {
-                AppState.CurrentUser.AvatarUrl = result.Value;
-            }
-        }
-        else
-        {
-            foreach (var detail in result.Error.Details!)
-            {
-                Snackbar.Add(detail, Severity.Warning);
-            }
-        }
-
+        await UserChanged.InvokeAsync(User);
         StateHasChanged();
     }
 }
