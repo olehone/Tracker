@@ -7,6 +7,7 @@ using Tracker.Application.UseCases.Users.Current;
 using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.GetById;
+using Tracker.Application.UseCases.Users.Update;
 using Tracker.Application.UseCases.Users.UploadAvatar;
 using Tracker.Application.UseCases.Workspaces.GetAllForUser;
 using Tracker.Application.UseCases.Workspaces.GetMutual;
@@ -19,9 +20,23 @@ namespace Tracker.API.Controllers;
 public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetCurrentAsync(Guid id)
+    public async Task<IActionResult> GetAsync(Guid id)
     {
         var mediatorRequest = new GetUserByIdQuery { Id = id };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateAsync(Guid id, UpdateUserRequest request)
+    {
+        var mediatorRequest = new UpdateUserCommand
+        {
+            UserId = id,
+            Username = request.Username,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+        };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
