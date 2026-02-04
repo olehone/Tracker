@@ -5,8 +5,10 @@
 <MudGrid Class="pa-3">
     <MudItem xs=12
              sm="4">
-        <UserAvatar User=@User
-                    Style=@($"width:160px;height:160px;font-size:72px;") />
+        <MudButton>
+            <UserAvatar User=@User
+                        Style="width:160px;height:160px;font-size:72px;" />
+        </MudButton>
     </MudItem>
 
     <MudItem xs="12"
@@ -21,6 +23,7 @@
             <MudText Typo="Typo.h5">@User.Username</MudText>
 
             <MudText>@User.Email</MudText>
+
 
             <MudFileUpload T="IBrowserFile"
                            Accept=".png,.jpg,.jpeg"

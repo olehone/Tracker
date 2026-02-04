@@ -15,7 +15,7 @@ public partial class Register
     private IReadOnlyList<string>? _errorMessages;
     private MudForm _form = null!;
     private bool _isLoading;
-    private bool _isSuccess;
+    private bool _isValid;
     private string? _secondPassword;
 
     [CascadingParameter]
@@ -47,6 +47,7 @@ public partial class Register
         }
 
         _isLoading = true;
+        _errorMessages = null;
 
         var result = await Auth.RegisterAsync(ToRequest(_registerModel));
         _isLoading = false;
@@ -87,7 +88,6 @@ public partial class Register
             return true;
         }
 
-        StateHasChanged();
         return false;
     }
 
