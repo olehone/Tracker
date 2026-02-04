@@ -40,7 +40,8 @@ public sealed class DeleteAvatarCommandHandler(
         await avatarStorageService.DeleteAsync(updatedUser.Id, cancellationToken);
 
         updatedUser.AvatarUpdatedAt = null;
-
+        uow.UserRepository.Update(updatedUser);
+        
         return await uow.SaveChangesAsync(cancellationToken);
     }
 }
