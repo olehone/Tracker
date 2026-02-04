@@ -20,7 +20,7 @@
 					 Class="mt-8"
 					 PanelClass="pa-0">
 
-				@if (context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value == UserId.ToString())
+				@if (AppState.MyId == User.Id)
 				{
 					<MudTabPanel Text="My workspaces">
 						<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
@@ -30,7 +30,7 @@
 				else
 				{
 					<AuthorizeView Policy="AdminOrHigher" Context="admin">
-						<MudTabPanel Text="All user workspaces">
+						<MudTabPanel Text="All workspaces">
 							<WorkspaceList LoadWorkspaces=@LoadAllWorkspaces
 										   Height="40vh" />
 						</MudTabPanel>

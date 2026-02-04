@@ -4,32 +4,41 @@
 
 <MudGrid Class="pa-3">
     <MudItem xs="12" sm="4">
-        <UserAvatar User="@User"
+        <UserAvatar User=@User
                     Style="width:160px;height:160px;font-size:72px;" />
     </MudItem>
 
     <MudItem xs="12" sm="8">
         <MudStack>
-            <MudStack Row Justify="Justify.SpaceBetween">
+            <MudStack Row
+                      Justify="Justify.SpaceBetween">
                 <MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
+
                 <UserGlobalRoleChip Role="@User.Role" />
             </MudStack>
 
             <MudText Typo="Typo.h5">@User.Username</MudText>
 
             <MudText>@User.Email</MudText>
+
             @if (AppState.IsAuthenticated && AppState.MyId == User.Id)
             {
                 <MudButton FullWidth
+                           Color="Color.Primary"
                            Variant="Variant.Filled"
-                           OnClick=@OpenSettingsAsync>Change</MudButton>
+                           OnClick=@OpenSettingsAsync>
+                    Change
+                </MudButton>
             }
             else
             {
                 <AuthorizeView Policy="AdminOrHigher">
                     <MudButton FullWidth
+                               Color="Color.Primary"
                                Variant="Variant.Filled"
-                               OnClick=@OpenSettingsAsync>Change</MudButton>
+                               OnClick=@OpenSettingsAsync>
+                        Change
+                    </MudButton>
                 </AuthorizeView>
             }
         </MudStack>

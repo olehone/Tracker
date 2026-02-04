@@ -83,9 +83,10 @@ public partial class UserSettingsDialog
 
         var confirmed = await DialogService.ShowMessageBox(
             title: "Warning",
-            message: "You are deleting your avatar",
+            message: "You are going to delete avatar",
             yesText: "Delete",
-            cancelText: "Cancel");
+            cancelText: "Cancel",
+            options: new DialogOptions { FullWidth = false});
 
         if (confirmed != true)
         {
