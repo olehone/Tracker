@@ -2,16 +2,20 @@
 using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
+using Tracker.Domain.Requests.Users;
 
 namespace Tracker.Services.ApiClients;
 
 public interface IUserApi
 {
-    [Get("/api/users/me")]
-    Task<IApiResponse<UserDto>> GetCurrentAsync();
-
     [Get("/api/users/{id}")]
     Task<IApiResponse<UserDto>> GetByIdAsync(Guid id);
+
+    [Put("/api/users/{id}")]
+    Task<IApiResponse> UpdateAsync(Guid id, UpdateUserRequest request);
+
+    [Get("/api/users/me")]
+    Task<IApiResponse<UserDto>> GetCurrentAsync();
 
     [Get("/api/users/all")]
     Task<IApiResponse<Paginated<UserDto>>> GetAsync([Query] PaginatedSearchRequest request);

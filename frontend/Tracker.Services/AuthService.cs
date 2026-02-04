@@ -46,7 +46,7 @@ public sealed class AuthService(
 
         return Result.Success();
     }
-
+    
     public async Task LogoutAsync()
     {
         await storage.ClearAsync();

@@ -1,0 +1,90 @@
+@using Tracker.Domain.Requests.Users
+
+<UserAvatar User="@User"
+            Style="width:160px;height:160px;font-size:72px; align-content:center" />
+
+<MudStack Row>
+    <MudFileUpload T="IBrowserFile"
+                   Accept=".png,.jpg,.jpeg"
+                   FilesChanged=@UploadAvatarAsync
+                   MaximumFileCount="1">
+        <ActivatorContent>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon=@Icons.Material.Filled.CloudUpload>
+                Update avatar
+            </MudButton>
+        </ActivatorContent>
+    </MudFileUpload>
+
+    @if (User.AvatarUrl is not null)
+    {
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon=@Icons.Material.Filled.CloudUpload
+                   OnClick=@DeleteAvatarAsync>
+            Delete avatar
+        </MudButton>
+    }
+</MudStack>
+
+<MudForm @ref="@_form"
+         @bind-IsValid="@_isValid"
+         Model="@_model"
+         Validation="@(_validator)">
+    <MudStack Spacing="3">
+        <MudTextField T="string"
+                      @bind-Value="@_model.FirstName"
+                      Label="First Name"
+                      For="@(() => _model.FirstName)"
+                      Required
+                      Immediate />
+
+        <MudTextField T="string"
+                      @bind-Value="@_model.LastName"
+                      Label="Last Name"
+                      For="@(() => _model.LastName)" />
+
+        <MudTextField T="string"
+                      @bind-Value="@_model.Username"
+                      Label="Username"
+                      For="@(() => _model.Username)"
+                      Required
+                      Immediate />
+
+        @if (_errorMessages is not null && _errorMessages.Count > 0)
+        {
+            @foreach (var error in _errorMessages)
+            {
+                <MudAlert Severity="Severity.Error" Dense>
+                    @error
+                </MudAlert>
+            }
+        }
+
+        <MudStack Row Spacing="2">
+            <MudButton OnClick="@HandleSubmitAsync"
+                       Disabled="@(_isLoading || !_isValid)"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth>
+                @if (_isLoading)
+                {
+                    <MudProgressCircular Size="Size.Small" Class="mx-3" />
+                    <MudText>Saving...</MudText>
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+
+            <MudButton OnClick="@Cancel"
+                       Disabled="@_isLoading"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default">
+                Cancel
+            </MudButton>
+        </MudStack>
+    </MudStack>
+</MudForm>

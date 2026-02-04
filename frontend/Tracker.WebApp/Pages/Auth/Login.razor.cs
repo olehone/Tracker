@@ -69,14 +69,9 @@ public partial class Login
         {
             var error = result.Error!;
 
-            if (error.Type == ErrorType.Validation)
-            {
-                _errorMessages = error.Details;
-            }
-            else
-            {
-                _errorMessages = [error.Description];
-            }
+            _errorMessages = error.Type == ErrorType.Validation
+                ? error.Details
+                : [error.Description];
 
             return true;
         }

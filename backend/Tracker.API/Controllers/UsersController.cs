@@ -20,7 +20,7 @@ namespace Tracker.API.Controllers;
 public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetAsync(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
         var mediatorRequest = new GetUserByIdQuery { Id = id };
         var response = await mediator.Send(mediatorRequest);
@@ -36,6 +36,27 @@ public class UserController(IMediator mediator) : ControllerBase
             Username = request.Username,
             FirstName = request.FirstName,
             LastName = request.LastName,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentAsync()
+    {
+        var response = await mediator.Send(new GetCurrentUserQuery());
+        return response.ToActionResult();
+    }
+
+    [Authorize(Roles = "Admin,Owner")]
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAsync([FromQuery] PaginatedSearchRequest request)
+    {
+        var mediatorRequest = new GetUsersQuery
+        {
+            SearchQuery = request.SearchQuery,
+            Page = request.Page,
+            AmountInPage = request.AmountInPage
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
@@ -69,26 +90,6 @@ public class UserController(IMediator mediator) : ControllerBase
             AmountInPage = request.AmountInPage
         };
         var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-    [HttpGet("all")]
-    public async Task<IActionResult> GetAsync([FromQuery] PaginatedSearchRequest request)
-    {
-        var mediatorRequest = new GetUsersQuery
-        {
-            SearchQuery = request.SearchQuery,
-            Page = request.Page,
-            AmountInPage = request.AmountInPage
-        };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-    [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentAsync()
-    {
-        var response = await mediator.Send(new GetCurrentUserQuery());
         return response.ToActionResult();
     }
 

@@ -38,7 +38,8 @@ public class UpdateUserCommandHandler(
             return AuthErrors.Forbidden();
         }
 
-        if (await uow.UserRepository.UsernameExistsAsync(request.Username))
+        if (updatedUser.Username != request.Username &&
+            await uow.UserRepository.UsernameExistsAsync(request.Username))
         {
             return AuthErrors.UsernameExists;
         }

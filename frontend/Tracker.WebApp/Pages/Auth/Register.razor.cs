@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -76,15 +76,9 @@ public partial class Register
         {
             var error = result.Error!;
 
-            if (error.Type == ErrorType.Validation)
-            {
-                _errorMessages = error.Details;
-            }
-            else
-            {
-                _errorMessages = [error.Description];
-            }
-            StateHasChanged();
+            _errorMessages = error.Type == ErrorType.Validation
+                ? error.Details
+                : [error.Description];
             return true;
         }
 
