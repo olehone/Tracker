@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
             return new BlobServiceClient(blobOptions.DefaultConnectionString);
         });
         services.AddScoped<IAvatarStorageService, AzureBlobAvatarStorageService>();
+        services.AddScoped<IAttachmentStorageService, AzureBlobAttachmentStorageService>();
 
         return services;
     }

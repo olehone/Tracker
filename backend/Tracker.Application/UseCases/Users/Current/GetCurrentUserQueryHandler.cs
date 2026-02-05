@@ -34,7 +34,7 @@ public class GetCurrentUserQueryHandler(
             return Error.NotFound("User");
         }
 
-        return user.ToDto(avatarStorageService.GetPublicUrl(user.Id));
+        return user.ToDto(avatarStorageService.GetUrl(user.Id));
     }
 }
 

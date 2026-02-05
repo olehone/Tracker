@@ -6,12 +6,17 @@ using Tracker.Domain.Results;
 namespace Tracker.Infrastructure.Services;
 
 // Separate container/folder name in case that same entity would have different containers
-internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration) : IAzurePrivateBlobStorageService
+internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration)
 {
-    public async Task<string> GetUrl(string folderName, string fileName, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> GetUrlAsync(string folderName, string fileName, CancellationToken cancellationToken = default)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);
         var blob = container.GetBlobClient(fileName);
+        var isExist = await blob.ExistsAsync(cancellationToken);
+        if (!isExist)
+        {
+            return Error.NotFound("File");
+        }
 
         var sasBuilder = new BlobSasBuilder
         {
@@ -24,6 +29,21 @@ internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClien
 
         var sasUri = blob.GenerateSasUri(sasBuilder);
         return sasUri.ToString();
+    }
+
+    public async Task<Result<Stream>> GetStreamAsync(string folderName, 
+        string fileName, CancellationToken cancellationToken = default)
+    {
+        var container = blobServiceClient.GetBlobContainerClient(folderName);
+        var blob = container.GetBlobClient(fileName);
+        var isExist = await blob.ExistsAsync(cancellationToken);
+        if (!isExist)
+        {
+            return Error.NotFound("File");
+        }
+
+        var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+        return stream;
     }
 
     public async Task<string> UploadAsync(
