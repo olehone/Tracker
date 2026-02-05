@@ -38,15 +38,20 @@ internal static class ServiceCollectionExtensions
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];
+                        if (string.IsNullOrEmpty(accessToken))
+                        {
+                            return Task.CompletedTask;
+                        }
+
                         var path = context.HttpContext.Request.Path;
 
-                        if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/hubs") ||
-                                (path.StartsWithSegments("/api/board") && path.Value.Contains("/attachments/"))))
+                        var isTokenInQuery = jwtOptions.Value.TokenInQueryEndpoints.Any(endpoint =>
+                            path.StartsWithSegments(endpoint));
+                        
+                        if (isTokenInQuery)
                         {
                             context.Token = accessToken;
                         }
-
                         return Task.CompletedTask;
                     }
                 };

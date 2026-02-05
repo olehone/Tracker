@@ -12,6 +12,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
+
     public async Task<IReadOnlyList<Board>> GetByUserAsync(Guid userId)
     {
         return await _dbSet
@@ -45,6 +46,17 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .FirstOrDefaultAsync(b =>
                 b.BoardLists.Any(l =>
                     l.BoardItems.Any(bi => bi.Id == itemId)));
+    }
+
+    public Task<Board?> GetWithWorkspaceByItemAttachmentAsync(Guid attachmentId)
+    {
+        return _dbSet
+            .AsNoTracking()
+            .Include(b => b.Workspace)
+            .FirstOrDefaultAsync(b =>
+                b.BoardLists.Any(l =>
+                    l.BoardItems.Any(bi =>
+                        bi.Attachments.Any(a => a.Id == attachmentId))));
     }
 
     public Task<Board?> GetByIdWithListsItemsUsersAsync(Guid id)

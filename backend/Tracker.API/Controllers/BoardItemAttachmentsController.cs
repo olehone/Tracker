@@ -15,6 +15,22 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
+    [HttpGet("/attachments/{attachmentId:guid}", Name = "DownloadAsync")]
+    public async Task<IActionResult> DownloadAsync(Guid attachmentId,
+        [FromQuery] bool isDirect = false)
+    {
+        var mediatorRequest = new DownloadAttachmentCommand
+        {
+            AttachmentId = attachmentId,
+            ForceDirect = isDirect,
+        };
+        var result = await mediator.Send(mediatorRequest);
+
+        return result.IsSuccess
+            ? Redirect(result.Value)
+            : result.ToActionResult();
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(Guid boardId, Guid itemId)
     {
@@ -28,43 +44,10 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         {
             foreach (var attachment in result.Value)
             {
-                attachment.Url = GetUrl(boardId, itemId, attachment.Id);
+                attachment.Url = GetUrl(attachment.Id);
             }
         }
         return result.ToActionResult();
-    }
-
-    // This is for resolving URLs inside texts
-    // Remove bandwidth for big files, download directly from storage
-    // Stream inline files directly, browser will resolve inline content
-    [HttpGet("{attachmentId:guid}", Name = "DownloadAsync")]
-    [AllowAnonymous]
-    public async Task<IActionResult> DownloadAsync(Guid boardId, Guid itemId, Guid attachmentId,
-        [FromQuery] bool isDirect = false)
-    {
-        var mediatorRequest = new DownloadAttachmentCommand
-        {
-            BoardId = boardId,
-            BoardItemId = itemId,
-            AttachmentId = attachmentId,
-            ForceDirect = isDirect,
-        };
-        var result = await mediator.Send(mediatorRequest);
-
-        if (result.IsFailure)
-        {
-            return result.ToActionResult();
-        }
-
-        return Redirect(result.Value.RedirectUrl!);
-        if (isDirect)
-        {
-            return File(result.Value.Stream!, result.Value.ContentType, result.Value.FileName, true);
-        }
-        else
-        {
-            return Redirect(result.Value.RedirectUrl!);
-        }
     }
 
     [HttpPost]
@@ -85,7 +68,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         var response = await mediator.Send(mediatorRequest);
         if (response.IsSuccess)
         {
-            response.Value.Url = GetUrl(boardId, itemId, response.Value.Id);
+            response.Value.Url = GetUrl(response.Value.Id);
         }
 
         return response.ToActionResult();
@@ -104,10 +87,10 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    private string GetUrl(Guid boardId, Guid itemId, Guid attachmentId)
+    private string GetUrl(Guid attachmentId)
     {
-        return Url.Link( 
+        return Url.Link(
             nameof(DownloadAsync),
-            new { boardId, itemId, attachmentId })!;
+            new { attachmentId })!;
     }
 }
