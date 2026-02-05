@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
             var blobOptions = serviceProvider.GetRequiredService<IOptions<BlobOptions>>().Value;
             return new BlobServiceClient(blobOptions.DefaultConnectionString);
         });
-        services.AddScoped<IAvatarStorageService, AvatarStorageService>();
+        services.AddScoped<IAvatarStorageService, AzureBlobAvatarStorageService>();
 
         return services;
     }
