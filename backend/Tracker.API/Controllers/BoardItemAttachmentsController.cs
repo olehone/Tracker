@@ -37,8 +37,9 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
     // This is for resolving URLs inside texts
     // Remove bandwidth for big files, download directly from storage
     // Stream inline files directly, browser will resolve inline content
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetAsync(Guid boardId, Guid itemId, Guid attachmentId,
+    [HttpGet("{attachmentId:guid}", Name = "DownloadAsync")]
+    [AllowAnonymous]
+    public async Task<IActionResult> DownloadAsync(Guid boardId, Guid itemId, Guid attachmentId,
         [FromQuery] bool isDirect = false)
     {
         var mediatorRequest = new DownloadAttachmentCommand
@@ -55,6 +56,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             return result.ToActionResult();
         }
 
+        return Redirect(result.Value.RedirectUrl!);
         if (isDirect)
         {
             return File(result.Value.Stream!, result.Value.ContentType, result.Value.FileName, true);
@@ -89,7 +91,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("{attachmentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid boardId, Guid itemId, Guid attachmentId)
     {
         var mediatorRequest = new DeleteAttachmentCommand
@@ -104,10 +106,8 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 
     private string GetUrl(Guid boardId, Guid itemId, Guid attachmentId)
     {
-        return Url.Action(
-            nameof(GetAsync),
-            null,
-            new { boardId, itemId, attachmentId },
-            Request.Scheme)!;
+        return Url.Link( 
+            nameof(DownloadAsync),
+            new { boardId, itemId, attachmentId })!;
     }
 }

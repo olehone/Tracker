@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Net.Http.Headers;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Tracker.Domain.Results;
@@ -8,7 +9,8 @@ namespace Tracker.Infrastructure.Services;
 // Separate container/folder name in case that same entity would have different containers
 internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration)
 {
-    public async Task<Result<string>> GetUrlAsync(string folderName, string fileName, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> GetUrlAsync(string folderName, string fileName, string originalName,
+        bool isInline, CancellationToken cancellationToken = default)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);
         var blob = container.GetBlobClient(fileName);
@@ -18,12 +20,18 @@ internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClien
             return Error.NotFound("File");
         }
 
+        var dispositionType = isInline ? "inline" : "attachment";
+
+        var encodedFileName = Uri.EscapeDataString(originalName);
+        var contentDisposition = $"{dispositionType}; filename*=UTF-8''{encodedFileName}";
+
         var sasBuilder = new BlobSasBuilder
         {
             BlobContainerName = folderName,
             BlobName = fileName,
             Resource = "b",
             ExpiresOn = DateTimeOffset.UtcNow.Add(expiration),
+            ContentDisposition = contentDisposition.ToString()
         };
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
@@ -31,7 +39,7 @@ internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClien
         return sasUri.ToString();
     }
 
-    public async Task<Result<Stream>> GetStreamAsync(string folderName, 
+    public async Task<Result<Stream>> GetStreamAsync(string folderName,
         string fileName, CancellationToken cancellationToken = default)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);

@@ -57,6 +57,7 @@ public class UploadAttachmentCommandHandler(
         await uow.BoardItemAttachmentRepository.AddAsync(newAttachment);
         var result = await uow.SaveChangesAsync(cancellationToken);
 
+        newAttachment.UploadedBy = currentUser;
         return result.IsSuccess
             ? newAttachment.ToDto()
             : Error.Unknown;

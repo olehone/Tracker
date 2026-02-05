@@ -7,7 +7,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItemAttachments.Download;
 
-public class DownloadCommandHandler(
+public class DownloadAttachmentCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory,
     IAttachmentStorageService attachments)
@@ -25,7 +25,7 @@ public class DownloadCommandHandler(
             return itemResult.Error;
         }
 
-        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(request.BoardItemId);
+        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(request.AttachmentId);
         if (attachment is null)
         {
             return Error.NotFound("Attachment");
@@ -34,16 +34,19 @@ public class DownloadCommandHandler(
         {
             return Error.Gone("Attachment");
         }
+        if (attachment.BoardItemId != request.BoardItemId)
+        {
+            return Error.Validation("Item does not have this attachment");
+        }
 
-        bool shouldStream = IsImage(attachment.ContentType) && !request.ForceDirect;
         var response = new AttachmentResponse
         {
             ContentType = attachment.ContentType,
-            FileName = attachment.OriginalFileName
+            FileName = attachment.OriginalFileName,
         };
         bool isFailure;
 
-        if (shouldStream)
+        if (request.ForceDirect)
         {
             var stream = await attachments.GetStreamAsync(attachment.StorageFolder,
                 attachment.StorageFileName, cancellationToken);
@@ -53,7 +56,7 @@ public class DownloadCommandHandler(
         else
         {
             var url = await attachments.GetUrlAsync(attachment.StorageFolder,
-                attachment.StorageFileName, cancellationToken);
+                attachment.StorageFileName, attachment.OriginalFileName, request.ForceDirect, cancellationToken);
             isFailure = url.IsFailure;
             response.RedirectUrl = url.Value;
         }
@@ -68,7 +71,4 @@ public class DownloadCommandHandler(
 
         return response;
     }
-
-    private static bool IsImage(string contentType) =>
-        contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
 }

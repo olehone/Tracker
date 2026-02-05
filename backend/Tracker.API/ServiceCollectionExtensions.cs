@@ -41,7 +41,8 @@ internal static class ServiceCollectionExtensions
                         var path = context.HttpContext.Request.Path;
 
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            path.StartsWithSegments("/hubs"))
+                            (path.StartsWithSegments("/hubs") ||
+                                (path.StartsWithSegments("/api/board") && path.Value.Contains("/attachments/"))))
                         {
                             context.Token = accessToken;
                         }

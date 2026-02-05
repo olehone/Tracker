@@ -16,6 +16,7 @@ public class BoardItemAttachmentRepository : Repository<BoardItemAttachment, Gui
         return await _dbSet
             .AsNoTracking()
             .Where(a => a.BoardItemId == itemId)
+            .Include(a => a.UploadedBy)
             .ToListAsync();
     }
 }
