@@ -18,6 +18,7 @@ internal class UnitOfWork : IUnitOfWork
     private IBoardListRepository _boardListRepository = null!;
     private IBoardItemRepository _boardItemRepository = null!;
     private IBoardItemAssigneeRepository _boardItemAssigneeRepository = null!;
+    private IBoardItemAttachmentRepository _boardItemAttachmentRepository = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
 
     public IUserRepository UserRepository
@@ -31,11 +32,13 @@ internal class UnitOfWork : IUnitOfWork
     public IBoardUserRepository BoardUserRepository
         => _userBoardRepository ??= new BoardUserRepository(_dbContext);
     public IBoardListRepository BoardListRepository
-    => _boardListRepository ??= new BoardListRepository(_dbContext);
+        => _boardListRepository ??= new BoardListRepository(_dbContext);
     public IBoardItemRepository BoardItemRepository
-    => _boardItemRepository ??= new BoardItemRepository(_dbContext);
+        => _boardItemRepository ??= new BoardItemRepository(_dbContext);
     public IBoardItemAssigneeRepository BoardItemAssigneeRepository
-    => _boardItemAssigneeRepository ??= new BoardItemAssigneeRepository(_dbContext);
+        => _boardItemAssigneeRepository ??= new BoardItemAssigneeRepository(_dbContext);
+    public IBoardItemAttachmentRepository BoardItemAttachmentRepository
+        => _boardItemAttachmentRepository ??= new BoardItemAttachmentRepository(_dbContext);
     public IRefreshTokenRepository RefreshTokenRepository
         => _refreshTokenRepository ??= new RefreshTokenRepository(_dbContext);
 

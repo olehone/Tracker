@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Requests.BoardItem;
+using Tracker.Services;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Items;
@@ -14,6 +15,7 @@ public partial class ItemSettingsDialog : IDisposable
     private BoardItemImportance _importance;
     private bool _isEditingDescription = false;
     private bool _openDate = false;
+    private List<FileDto> _attachments = null;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
@@ -21,6 +23,13 @@ public partial class ItemSettingsDialog : IDisposable
     [Parameter, EditorRequired]
     public BoardItemDto Item { get; set; } = null!;
 
+    [Inject] AppState AppState { get; set; } = null!;
+    [Inject] IItemAttachmentService Attachments { get; set; } = null!;
+
+    private bool IsMeBoardUser => AppState.IsAuthenticated
+        && BoardState.UsersState.IsUserMember(AppState.CurrentUser);
+    private bool IsMeAssigned => IsMeBoardUser
+        && Item.Assignees.Any(a=> a == AppState.MyId);
     private bool IsItemExists =>
         BoardState.ItemsState.BoardItems.Any(i => i.Id == Item.Id);
     private bool Disabled =>
@@ -37,6 +46,17 @@ public partial class ItemSettingsDialog : IDisposable
         _description = Item.Description;
         _date = Item.DueDate?.UtcDateTime;
         _importance = Item.Importance;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        var attachments = await Attachments.GetAllAsync(BoardState.Board.Id, Item.Id);
+        if (attachments.IsSuccess)
+        {
+            _attachments = attachments.Value;
+            StateHasChanged();
+        }
     }
 
     private void StateHasChangedHandler()

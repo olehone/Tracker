@@ -3,16 +3,16 @@ using Azure.Storage.Blobs.Models;
 
 namespace Tracker.Infrastructure.Services;
 
-internal class PublicStorageService
+internal class AzurePublicBlobStorageService
 {
     private readonly BlobContainerClient _containerClient;
 
-    public PublicStorageService(BlobServiceClient blobServiceClient, string containerName)
+    public AzurePublicBlobStorageService(BlobServiceClient blobServiceClient, string containerName)
     {
         _containerClient = blobServiceClient.GetBlobContainerClient(containerName);
     }
 
-    public string GetPublicUrl(Guid resourceId)
+    public string GetUrl(Guid resourceId)
     {
         var blobClient = _containerClient.GetBlobClient(resourceId.ToString());
         return blobClient.Uri.ToString();
@@ -31,7 +31,7 @@ internal class PublicStorageService
             new BlobHttpHeaders { ContentType = contentType },
             cancellationToken: cancellationToken);
 
-        return GetPublicUrl(resourceId);
+        return GetUrl(resourceId);
     }
 
     public async Task DeleteAsync(Guid resourceId, CancellationToken cancellationToken = default)

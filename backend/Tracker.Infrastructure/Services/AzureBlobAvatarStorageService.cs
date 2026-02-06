@@ -5,9 +5,9 @@ using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Services;
 
-internal class AvatarStorageService : PublicStorageService, IAvatarStorageService
+internal class AzureBlobAvatarStorageService : AzurePublicBlobStorageService, IAvatarStorageService
 {
-    public AvatarStorageService(BlobServiceClient blobServiceClient, IOptions<BlobOptions> options)
+    public AzureBlobAvatarStorageService(BlobServiceClient blobServiceClient, IOptions<BlobOptions> options)
         : base(blobServiceClient, options.Value.AvatarContainerName)
     {
     }

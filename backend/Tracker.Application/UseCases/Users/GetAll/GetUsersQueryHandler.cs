@@ -31,7 +31,7 @@ public sealed class GetUsersQueryHandler(
             .GetAsync(request.SearchQuery, skip, request.AmountInPage);
 
         var userDtos = users.Select(user => user
-            .ToDto(avatarStorageService.GetPublicUrl(user.Id)))
+            .ToDto(avatarStorageService.GetUrl(user.Id)))
             .ToList();
 
         return new Paginated<UserDto>

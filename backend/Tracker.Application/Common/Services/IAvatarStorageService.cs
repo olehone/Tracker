@@ -3,7 +3,7 @@
 // Public storage with public URL for file access
 public interface IAvatarStorageService
 {
-    string GetPublicUrl(Guid resourceId);
+    string GetUrl(Guid resourceId);
     Task<string> UploadAsync(Stream stream, string contentType, Guid resourceId, CancellationToken cancellationToken);
     Task DeleteAsync(Guid resourceId, CancellationToken cancellationToken = default);
 }

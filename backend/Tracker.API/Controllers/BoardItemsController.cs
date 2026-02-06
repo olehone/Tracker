@@ -13,7 +13,6 @@ using Tracker.Application.UseCases.BoardItems.Create;
 using Tracker.Application.UseCases.BoardItems.Delete;
 using Tracker.Application.UseCases.BoardItems.Move;
 using Tracker.Application.UseCases.BoardItems.Update;
-using Tracker.Domain.Enums;
 
 namespace Tracker.API.Controllers;
 [Route("api/board/{boardId:guid}/items")]

@@ -11,7 +11,7 @@ namespace Tracker.Application.UseCases.Users.UploadAvatar;
 public class UploadAvatarCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext,
-    IAvatarStorageService avatarStorageService)
+    IAvatarStorageService avatars)
     : IRequestHandler<UploadAvatarCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(
@@ -44,7 +44,7 @@ public class UploadAvatarCommandHandler(
 
         updatedUser.AvatarUpdatedAt = DateTimeOffset.UtcNow;
         
-        var url = await avatarStorageService.UploadAsync(request.Content, request.ContentType, request.UserId, cancellationToken);
+        var url = await avatars.UploadAsync(request.Content, request.ContentType, request.UserId, cancellationToken);
         
         uow.UserRepository.Update(updatedUser);
         await uow.SaveChangesAsync(cancellationToken);

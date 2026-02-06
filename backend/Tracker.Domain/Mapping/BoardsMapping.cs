@@ -72,4 +72,18 @@ public static class BoardsMapping
             Assignees = boardItem.Assignees.Select(a => a.BoardUser.UserId).ToHashSet()
         };
     }
+
+    public static BoardItemAttachmentDto ToDto(this BoardItemAttachment attachment)
+    {
+        return new BoardItemAttachmentDto
+        {
+            Id = attachment.Id,
+            UploadedAt = attachment.UploadedAt,
+            UploadedByName = attachment.UploadedBy.Username,
+            FileName = attachment.OriginalFileName,
+            ContentType = attachment.ContentType,
+            SizeBytes = attachment.SizeBytes,
+            IsDeleted = attachment.IsDeleted,
+        };
+    }
 }

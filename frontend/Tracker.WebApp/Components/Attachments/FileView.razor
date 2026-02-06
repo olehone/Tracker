@@ -1,0 +1,23 @@
+﻿@if (IsImage(File))
+{
+    <MudImage Src=@_imageUrl Alt=@File.FileName />
+}
+else
+{
+    <MudStack Row
+              AlignItems="AlignItems.Center"
+              Justify="Justify.SpaceBetween"
+              Class=@(File.IsDeleted
+                        ? $"pa-2 ma-2 mud-theme-{Color.Error.ToDescriptionString()}"
+                        : "pa-2 ma-2")
+          Style="@($"color:{Colors.LightGreen.Accent3}; background:{Colors.BlueGray.Darken4};")">
+
+        <MudText Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
+            @File.FileName
+        </MudText>
+
+        <MudIconButton Disabled=@File.IsDeleted
+                       Icon=@Icons.Material.Filled.ArrowDownward
+                       OnClick=@Download />
+    </MudStack>
+}

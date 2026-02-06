@@ -5,6 +5,7 @@ public enum ErrorType
     None,
     Validation,
     NotFound,
+    Gone,
     Conflict,
     Unauthenticated,
     Forbidden,

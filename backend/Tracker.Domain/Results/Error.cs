@@ -24,4 +24,8 @@ public sealed record Error(
         ErrorType.Conflict,
         $"{memberName} is already a member of this {containerType}");
 
+    public static Error Gone(string entityName) => new(
+        $"{entityName}.Gone",
+        ErrorType.Gone,
+        $"{entityName} is no longer exists");
 }

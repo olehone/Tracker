@@ -14,4 +14,5 @@ public class BoardItem : BaseEntity
     public BoardItemImportance Importance { get; set; } = BoardItemImportance.Low;
     public BoardList? BoardList { get; set; }
     public HashSet<BoardItemAssignee> Assignees { get; set; } = [];
+    public HashSet<BoardItemAttachment> Attachments { get; set; } = [];
 }
