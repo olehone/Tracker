@@ -8,7 +8,7 @@ namespace Tracker.Services;
 
 public class ItemAttachmentService(IApiErrorHandler apiErrorHandler, IItemAttachmentApi api) : IItemAttachmentService
 {
-    public Task<Result> DownloadAsync(Guid attachmentId, bool isDirect = false, bool isRedirect = false)
+    public Task<Result<string>> DownloadAsync(Guid attachmentId, bool isDirect = false, bool isRedirect = false)
     {
         return apiErrorHandler.ExecuteAsync(() => api.DownloadAsync(attachmentId, isDirect, isRedirect));
     }

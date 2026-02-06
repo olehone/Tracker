@@ -1,12 +1,23 @@
-﻿<MudButton OnClick=@Download
-    Class=@($"ma-2 pa-2 mud-theme-{Colors.Gray.Lighten3.ToString()}")>
-    <h3>@File.FileName</h3>
-    <h3>@File.UploadedByName</h3>
-</MudButton>
+﻿@if (IsImage(File))
+{
+    <MudImage Src=@_imageUrl Alt=@File.FileName />
+}
+else
+{
+    <MudStack Row
+              AlignItems="AlignItems.Center"
+              Justify="Justify.SpaceBetween"
+              Class=@(File.IsDeleted
+                        ? $"pa-2 ma-2 mud-theme-{Color.Error.ToDescriptionString()}"
+                        : "pa-2 ma-2")
+          Style="@($"color:{Colors.LightGreen.Accent3}; background:{Colors.BlueGray.Darken4};")">
 
-<MudImage Src=@_downloadUrl ></MudImage>
+        <MudText Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
+            @File.FileName
+        </MudText>
 
-<a href=@_downloadUrl target="_blank">
-    Download @File.FileName
-</a>
-
+        <MudIconButton Disabled=@File.IsDeleted
+                       Icon=@Icons.Material.Filled.ArrowDownward
+                       OnClick=@Download />
+    </MudStack>
+}

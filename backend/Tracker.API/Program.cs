@@ -59,10 +59,4 @@ app.MapControllers();
 app.MapHub<BoardHub>("/hubs/board")
    .RequireCors("DevCorsPolicy");
 
-app.Use(async (ctx, next) =>
-{
-    Console.WriteLine($"HIT: {ctx.Request.Method} {ctx.Request.Path}");
-    await next();
-});
-
 await app.RunAsync();

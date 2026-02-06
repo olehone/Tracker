@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
+using Microsoft.JSInterop;
+using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Options;
 using Tracker.Services;
-using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Components.Attachments;
 
@@ -11,29 +10,41 @@ public partial class FileView
 {
     [Parameter, EditorRequired]
     public FileDto File { get; set; }
-    [Inject] IItemAttachmentService Attachments { get; set; }
-    [Inject] IConfiguration Configuration { get; set; }
-    [Inject] IAuthService AuthService { get; set; }
-    private string _downloadUrl = null!;
 
-    [Inject] IOptions<ApiOptions> apiOptions { get; set; }
+    [Inject] IItemAttachmentService Attachments { get; set; }
+    [Inject] IJSRuntime JS { get; set; }
+
+    private string? _imageUrl;
 
     protected override async Task OnParametersSetAsync()
     {
-        _downloadUrl = await GetDownloadUrl();
+        if (IsImage(File))
+        {
+            await LoadImageUrl();
+        }
     }
-    
+    private async Task LoadImageUrl()
+    {
+        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        if (result.IsSuccess)
+        {
+            _imageUrl = result.Value;
+        }
+    }
+
     private async Task Download()
     {
-        await Attachments.DownloadAsync(File.Id, false, false);
-
+        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        if (result.IsSuccess)
+        {
+            await JS.InvokeVoidAsync("open", result.Value, "_blank");
+        }
     }
 
-    private async Task<string> GetDownloadUrl()
+    private static bool IsImage(FileDto file)
     {
-        var token = await AuthService.GetAccessTokenAsync();
-        var apiBaseUrl = apiOptions.Value.ApiBaseUrl;
-        return $"{apiBaseUrl}/attachments/{File.Id}?access_token={token}";
+        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg" };
+        return imageExtensions.Any(ext =>
+            file.FileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
     }
-
 }
