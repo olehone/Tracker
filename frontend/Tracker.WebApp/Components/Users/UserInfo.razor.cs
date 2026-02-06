@@ -47,7 +47,6 @@ public partial class UserInfo
         if (IsMe)
         {
             var user = AppState.CurrentUser;
-            user.AvatarUrl = User.AvatarUrl;
             user.Username = User.Username;
             user.FirstName = User.FirstName;
             user.LastName = User.LastName;

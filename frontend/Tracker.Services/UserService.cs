@@ -44,13 +44,17 @@ public class UserService(IApiErrorHandler apiErrorHandler, IUserApi api)
         return apiErrorHandler.ExecuteAsync(() => api.GetMutualWorkspacesAsync(id, request));
     }
 
+    public Task<Result<string>> GetAvatarUrlAsync(Guid userId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.GetAvatarUrlAsync(userId));
+    }
+
     public async Task<Result<string>> UploadAvatarAsync(Guid userId, 
         Stream fileStream, string contentType, string fileName)
     {
         var streamPart = new StreamPart(fileStream, fileName, contentType);
         return await apiErrorHandler.ExecuteAsync(() => api.UploadAvatarAsync(userId, streamPart));
     }
-
     public Task<Result> DeleteAvatarAsync(Guid userId)
     {
         return apiErrorHandler.ExecuteAsync(() => api.DeleteAvatarAsync(userId));

@@ -1,9 +1,7 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
-using Tracker.Domain.Entities;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -11,8 +9,7 @@ namespace Tracker.Application.UseCases.Users.Current;
 
 public class GetCurrentUserQueryHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
-    IUserContext userContext,
-    IAvatarStorageService avatarStorageService)
+    IUserContext userContext)
     : IRequestHandler<GetCurrentUserQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(
@@ -34,7 +31,7 @@ public class GetCurrentUserQueryHandler(
             return Error.NotFound("User");
         }
 
-        return user.ToDto(avatarStorageService.GetUrl(user.Id));
+        return user.ToDto();
     }
 }
 

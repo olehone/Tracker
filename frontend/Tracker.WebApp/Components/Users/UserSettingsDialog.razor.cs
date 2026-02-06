@@ -85,7 +85,7 @@ public partial class UserSettingsDialog
             message: "You are going to delete avatar",
             yesText: "Delete",
             cancelText: "Cancel",
-            options: new DialogOptions { FullWidth = false});
+            options: new DialogOptions { FullWidth = false });
 
         if (confirmed != true)
         {
@@ -95,7 +95,7 @@ public partial class UserSettingsDialog
         var result = await UserService.DeleteAvatarAsync(User.Id);
         if (result.IsSuccess)
         {
-            User.AvatarUrl = null;
+            User.AvatarUpdatedAt = null;
             await UserChanged.InvokeAsync(User);
             MudDialog.Close(DialogResult.Ok(true));
         }
@@ -113,7 +113,7 @@ public partial class UserSettingsDialog
 
         if (result.IsSuccess)
         {
-            User.AvatarUrl = result.Value;
+            User.AvatarUpdatedAt = DateTimeOffset.UtcNow;
             await UserChanged.InvokeAsync(User);
             MudDialog.Close(DialogResult.Ok(true));
         }

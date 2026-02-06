@@ -3,6 +3,7 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Users.DeleteAvatar;
+using Tracker.Application.UseCases.Users.GetAvatarUrl;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 

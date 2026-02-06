@@ -6,6 +6,7 @@ using Tracker.API.Services;
 using Tracker.Application.UseCases.Users.Current;
 using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Application.UseCases.Users.GetAll;
+using Tracker.Application.UseCases.Users.GetAvatarUrl;
 using Tracker.Application.UseCases.Users.GetById;
 using Tracker.Application.UseCases.Users.Update;
 using Tracker.Application.UseCases.Users.UploadAvatar;
@@ -88,6 +89,17 @@ public class UserController(IMediator mediator) : ControllerBase
             SearchQuery = request.SearchQuery,
             Page = request.Page,
             AmountInPage = request.AmountInPage
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpGet("{id:guid}/avatar")]
+    public async Task<IActionResult> GetAvatarUrlAsync(Guid id)
+    {
+        var mediatorRequest = new GetAvatarUrlCommand
+        {
+            UserId = id,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
