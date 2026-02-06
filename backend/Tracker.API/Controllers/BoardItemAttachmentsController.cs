@@ -17,7 +17,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("/attachments/{attachmentId:guid}", Name = "DownloadAsync")]
     public async Task<IActionResult> DownloadAsync(Guid attachmentId,
-        [FromQuery] bool isDirect = false)
+        [FromQuery] bool isDirect = false, [FromQuery] bool isRedirect = true)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
@@ -25,8 +25,11 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             ForceDirect = isDirect,
         };
         var result = await mediator.Send(mediatorRequest);
-
-        return result.IsSuccess
+        if (result.IsFailure)
+        {
+            return result.ToActionResult();
+        }
+        return isRedirect
             ? Redirect(result.Value)
             : result.ToActionResult();
     }
@@ -75,12 +78,10 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{attachmentId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid boardId, Guid itemId, Guid attachmentId)
+    public async Task<IActionResult> DeleteAsync(Guid attachmentId)
     {
         var mediatorRequest = new DeleteAttachmentCommand
         {
-            BoardId = boardId,
-            BoardItemId = itemId,
             AttachmentId = attachmentId,
         };
         var response = await mediator.Send(mediatorRequest);

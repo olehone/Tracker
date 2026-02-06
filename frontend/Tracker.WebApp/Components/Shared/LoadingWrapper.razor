@@ -1,0 +1,28 @@
+﻿@if (LoadingCondition)
+{
+    @if (IsLinear)
+    {
+        <MudStack Justify="Justify.Center">
+            <MudProgressCircular Indeterminate
+                                 Color="Color.Primary" />
+        </MudStack>
+    }
+    else
+    {
+        <MudProgressLinear Color="Color.Primary"
+                           Indeterminate />
+    }
+}
+else
+{
+    @Content
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public bool LoadingCondition { get; set; }
+    [Parameter, EditorRequired]
+    public RenderFragment Content { get; set; }
+    [Parameter]
+    public bool IsLinear { get; set; } = false;
+}

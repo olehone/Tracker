@@ -1,4 +1,5 @@
-﻿using Tracker.Application.Common.Auth;
+﻿using MediatR;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
@@ -102,6 +103,52 @@ public static class BoardHelper
 
         return boardItem;
     }
+    
+    public static async Task<Result<BoardItemAttachment>> GetItemAttachmentForActionAsync(IUnitOfWork uow, 
+        IUserContext userContext, Guid attachmentId)
+    {
+        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(attachmentId);
+        if (attachment is null)
+        {
+            return Error.NotFound("Attachment");
+        }
+        if (attachment.IsDeleted)
+        {
+            return Error.Gone("Attachment");
+        }
+
+        BoardAction action = BoardAction.ChangeItem;
+
+        if (userContext.IsUnauthenticated())
+        {
+            return AuthErrors.Unauthenticated;
+        }
+
+        var board = await uow.BoardRepository.GetWithWorkspaceByItemAttachmentAsync(attachmentId);
+        if (board is null)
+        {
+            return Error.NotFound("Board", "attachment");
+        }
+
+        var boardItem = await uow.BoardItemRepository.GetByIdAsync(attachment.BoardItemId);
+        if (boardItem is null)
+        {
+            return Error.NotFound("Board item", "attachment");
+        }
+
+        var isAllowed = await IsActionAllowed(uow, userContext, board, action);
+        var assigned = boardItem.Assignees
+            .Any(bia => bia.BoardUser.UserId == userContext.GetUserId());
+
+        if (!isAllowed && !assigned)
+        {
+            return AuthErrors.Forbidden();
+        }
+
+        return attachment;
+    }
+
+
 
     // User must be authenticated before call
     // for proper separation of unauthenticated and forbidden error

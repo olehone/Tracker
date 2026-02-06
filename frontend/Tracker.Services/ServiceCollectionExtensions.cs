@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IBoardUserApi>();
         services.AddApiClientWithAuth<IBoardListApi>();
         services.AddApiClientWithAuth<IBoardItemApi>();
+        services.AddApiClientWithAuth<IItemAttachmentApi>();
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWorkspaceService, WorkspaceService>();
@@ -47,6 +48,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBoardUserService, BoardUserService>();
         services.AddScoped<IBoardListService, BoardListService>();
         services.AddScoped<IBoardItemService, BoardItemService>();
+        services.AddScoped<IItemAttachmentService, ItemAttachmentService>();
 
         services.AddScoped<IBoardRealtimeService, BoardHubService>();
         return services;

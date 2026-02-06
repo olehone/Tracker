@@ -1,0 +1,12 @@
+﻿<MudButton OnClick=@Download
+    Class=@($"ma-2 pa-2 mud-theme-{Colors.Gray.Lighten3.ToString()}")>
+    <h3>@File.FileName</h3>
+    <h3>@File.UploadedByName</h3>
+</MudButton>
+
+<MudImage Src=@_downloadUrl ></MudImage>
+
+<a href=@_downloadUrl target="_blank">
+    Download @File.FileName
+</a>
+

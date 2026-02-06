@@ -7,8 +7,8 @@ namespace Tracker.Services.ApiClients;
 
 public interface IBoardItemApi
 {
-    [Post("/api/board/{boardId}/items/{boardListId}")]
-    Task<IApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, CreateWithTitleRequest request);
+    [Post("/api/board/{boardId}/items/{itemId}")]
+    Task<IApiResponse<BoardItemDto>> CreateAsync(Guid boardId, Guid itemId, CreateWithTitleRequest request);
 
     [Post("/api/board/{boardId}/items/move/{itemId}")]
     Task<IApiResponse> MoveAsync(Guid boardId, Guid itemId, MoveBoardItemRequest request);

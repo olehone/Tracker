@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Options;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
@@ -19,22 +18,12 @@ public class DeleteAttachmentCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
-            request.BoardItemId, request.BoardId);
-        if (itemResult.IsFailure)
+        var attachmentResult = await BoardHelper.GetItemAttachmentForActionAsync(uow, userContext, request.AttachmentId);
+        if (attachmentResult.IsFailure)
         {
-            return itemResult.Error;
+            return attachmentResult.Error;
         }
-
-        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(request.BoardItemId);
-        if (attachment is null)
-        {
-            return Error.NotFound("Attachment");
-        }
-        if (attachment.IsDeleted)
-        {
-            return Error.Gone("Attachment");
-        }
+        var attachment = attachmentResult.Value;
 
         await attachments.DeleteAsync(attachment.StorageFolder,
             attachment.StorageFileName, cancellationToken);
