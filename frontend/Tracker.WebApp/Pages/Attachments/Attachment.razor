@@ -1,0 +1,47 @@
+﻿@* @page "/attachments/{AttachmentId:guid}"
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+@using Tracker.WebApp.Components.Workspaces
+
+<LoadingWrapper LoadingCondition=@(_attachments is null)>
+    <Content>
+        <MudTooltip>
+            <ChildContent>
+                <MudStack Row
+                          AlignItems="AlignItems.Center"
+                          Justify="Justify.SpaceBetween"
+                          Class=@(File.IsDeleted
+                                                    ? $"pa-2 ma-2 border-solid rounded mud-theme-{Color.Error.ToDescriptionString()}"
+                                                    : "pa-2 ma-2 border-solid rounded")
+                          Style="@($"background:{Colors.Gray.Lighten3};")">
+
+                    <MudText Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
+                        @File.FileName
+                    </MudText>
+                    <MudText>
+                        @UiHelper.FileSize(File.SizeBytes)
+                    </MudText>
+
+                    <MudIconButton Disabled=@File.IsDeleted
+                                   Icon=@Icons.Material.Filled.ArrowDownward
+                                   OnClick=@Download />
+                </MudStack>
+            </ChildContent>
+            <TooltipContent>
+                <MudStack Row
+                          AlignItems="AlignItems.Center"
+                          Justify="Justify.SpaceBetween">
+                    <MudText>
+                        Uploaded at: @File.UploadedAt.ToLocalTime().DateTime
+                    </MudText>
+                    <MudText>
+                        By: @File.UploadedByName
+                    </MudText>
+                </MudStack>
+            </TooltipContent>
+        </MudTooltip>
+    </Content>
+</LoadingWrapper> *@

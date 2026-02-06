@@ -1,23 +1,45 @@
-﻿@if (IsImage(File))
-{
-    <MudImage Src=@_imageUrl Alt=@File.FileName />
-}
-else
-{
-    <MudStack Row
-              AlignItems="AlignItems.Center"
-              Justify="Justify.SpaceBetween"
-              Class=@(File.IsDeleted
-                        ? $"pa-2 ma-2 mud-theme-{Color.Error.ToDescriptionString()}"
-                        : "pa-2 ma-2")
-          Style="@($"color:{Colors.LightGreen.Accent3}; background:{Colors.BlueGray.Darken4};")">
+﻿@using Tracker.WebApp.Shared
 
-        <MudText Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
-            @File.FileName
-        </MudText>
+<div class="pa-2 mud-width-full">
+    <MudTooltip>
+        <ChildContent>
+            <MudStack Row
+                      AlignItems="AlignItems.Center"
+                      Justify="Justify.SpaceBetween"
+                      Class=@GetClass()
+                      Style="@($"background:{Colors.Gray.Lighten3};")">
 
-        <MudIconButton Disabled=@File.IsDeleted
-                       Icon=@Icons.Material.Filled.ArrowDownward
-                       OnClick=@Download />
-    </MudStack>
-}
+                <MudText Class="mx-2"
+                         Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
+                    @File.FileName
+                </MudText>
+                <MudStack Row
+                          AlignItems="AlignItems.Center"
+                          Justify="Justify.SpaceBetween">
+                    <MudText Class="text-ellipsis">
+                        @UiHelper.FileSize(File.SizeBytes)
+                    </MudText>
+                    @if (!Disabled && !File.IsDeleted)
+                    {
+                        <MudIconButton Icon=@Icons.Material.Filled.ArrowDownward
+                                       OnClick=@Download />
+                        <MudIconButton Icon=@Icons.Material.Filled.Delete
+                                       OnClick=@Delete />
+                    }
+                </MudStack>
+            </MudStack>
+        </ChildContent>
+        <TooltipContent>
+            <MudStack Row
+                      AlignItems="AlignItems.Center"
+                      Justify="Justify.SpaceBetween">
+                <MudText>
+                    Uploaded at: @File.UploadedAt.ToLocalTime().DateTime
+                </MudText>
+                <MudText>
+                    By: @File.UploadedByName
+                </MudText>
+            </MudStack>
+        </TooltipContent>
+    </MudTooltip>
+</div>

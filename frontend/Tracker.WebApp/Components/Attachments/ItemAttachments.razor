@@ -1,0 +1,44 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Shared
+
+<MudStack Row
+          Justify="Justify.SpaceBetween"
+          AlignItems="AlignItems.Center">
+    <MudListSubheader>Attachments</MudListSubheader>
+
+    <MudFileUpload T="IBrowserFile"
+                   Disabled=@Disabled
+                   FilesChanged=@UploadAsync
+                   MaximumFileCount="1">
+        <ActivatorContent>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon=@Icons.Material.Filled.CloudUpload>
+                Upload attachment
+            </MudButton>
+        </ActivatorContent>
+    </MudFileUpload>
+</MudStack>
+<LoadingWrapper LoadingCondition=@(Attachments is null)>
+    <Content>
+        <MudPaper Outlined
+                  MaxHeight="400px"
+                  MinHeight="30px"
+                  Style="overflow-y:auto">
+            @foreach (var attachment in Attachments!)
+            {
+                <FileView File=@attachment
+                          Disabled=@Disabled></FileView>
+            }
+        </MudPaper>
+    </Content>
+</LoadingWrapper>
+
+@code {
+    [Parameter, EditorRequired]
+    public EventCallback<IBrowserFile?> UploadAsync { get; set; }
+    [Parameter, EditorRequired]
+    public List<FileDto> Attachments { get; set; }
+    [Parameter, EditorRequired]
+    public bool Disabled { get; set; }
+}

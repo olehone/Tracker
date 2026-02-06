@@ -34,7 +34,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             : result.ToActionResult();
     }
 
-    [HttpDelete("{attachmentId:guid}")]
+    [HttpDelete("/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid attachmentId)
     {
         var mediatorRequest = new DeleteAttachmentCommand

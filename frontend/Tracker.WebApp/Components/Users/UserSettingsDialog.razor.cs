@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
@@ -6,6 +5,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Users;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Users;
@@ -25,10 +25,9 @@ public partial class UserSettingsDialog
     [Parameter]
     public EventCallback<UserDto> UserChanged { get; set; }
 
-    [Inject] private IUserService UserService { get; set; } = null!;
-    [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private IAuthorizationService AuthorizationService { get; set; } = null!;
-    [Inject] private ISnackbar Snackbar { get; set; } = null!;
+    [Inject] IUserService UserService { get; set; } = null!;
+    [Inject] IDialogService DialogService { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     private UpdateUserRequest _model = null!;
     private readonly UpdateUserModelValidator _validator = new();
@@ -154,8 +153,8 @@ public partial class UserSettingsDialog
 
         if (file.Size > MaxAvatarSizeBytes)
         {
-            var maxSizeMb = MaxAvatarSizeBytes / (1024 * 1024);
-            Snackbar.Add($"Avatar must be less than or equal to {maxSizeMb} MB", Severity.Warning);
+            var size = UiHelper.FileSize(MaxAvatarSizeBytes);
+            Snackbar.Add($"Avatar must be less than or equal to {size}", Severity.Warning);
             return false;
         }
         return true;
