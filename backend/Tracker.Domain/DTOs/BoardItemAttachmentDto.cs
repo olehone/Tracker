@@ -9,5 +9,4 @@ public class BoardItemAttachmentDto
     public required string ContentType { get; set; }
     public required long SizeBytes { get; set; }
     public required bool IsDeleted { get; set; }
-    public string? Url { get; set; }
 }

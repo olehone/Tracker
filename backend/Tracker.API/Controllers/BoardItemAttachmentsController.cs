@@ -34,6 +34,17 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             : result.ToActionResult();
     }
 
+    [HttpDelete("{attachmentId:guid}")]
+    public async Task<IActionResult> DeleteAsync(Guid attachmentId)
+    {
+        var mediatorRequest = new DeleteAttachmentCommand
+        {
+            AttachmentId = attachmentId,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllAsync(Guid boardId, Guid itemId)
     {
@@ -43,13 +54,6 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             BoardItemId = itemId
         };
         var result = await mediator.Send(mediatorRequest);
-        if (result.IsSuccess)
-        {
-            foreach (var attachment in result.Value)
-            {
-                attachment.Url = GetUrl(attachment.Id);
-            }
-        }
         return result.ToActionResult();
     }
 
@@ -69,29 +73,6 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         };
 
         var response = await mediator.Send(mediatorRequest);
-        if (response.IsSuccess)
-        {
-            response.Value.Url = GetUrl(response.Value.Id);
-        }
-
         return response.ToActionResult();
-    }
-
-    [HttpDelete("{attachmentId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid attachmentId)
-    {
-        var mediatorRequest = new DeleteAttachmentCommand
-        {
-            AttachmentId = attachmentId,
-        };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-    private string GetUrl(Guid attachmentId)
-    {
-        return Url.Link(
-            nameof(DownloadAsync),
-            new { attachmentId })!;
     }
 }
