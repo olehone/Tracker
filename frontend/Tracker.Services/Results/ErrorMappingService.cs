@@ -18,6 +18,7 @@ public static class ErrorMappingService
             HttpStatusCode.Unauthorized => MapResponseContent(content, ErrorType.Unauthenticated),
             HttpStatusCode.Forbidden => MapResponseContent(content, ErrorType.Forbidden),
             HttpStatusCode.NotFound => MapResponseContent(content, ErrorType.NotFound),
+            HttpStatusCode.Gone => MapResponseContent(content, ErrorType.Gone),
             HttpStatusCode.Conflict => MapResponseContent(content, ErrorType.Conflict),
             _ when (int)statusCode >= 500 => MapResponseContent(content, ErrorType.Server),
             _ => new Error(statusCode.ToString(), ErrorType.Unknown, "Unknown error")
@@ -124,6 +125,7 @@ public static class ErrorMappingService
         {
             ErrorType.Validation => "Validation failed",
             ErrorType.NotFound => "Resource not found",
+            ErrorType.Gone => "Resource is deleted",
             ErrorType.Conflict => "A conflict occurred",
             ErrorType.Unauthenticated => "You are not logged in",
             ErrorType.Forbidden => "You do not have permission to perform this action",
