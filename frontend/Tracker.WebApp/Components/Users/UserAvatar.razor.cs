@@ -8,7 +8,7 @@ namespace Tracker.WebApp.Components.Users;
 
 public partial class UserAvatar
 {
-    private string _avatarUrl;
+    private string? _avatarUrl;
 
     [Parameter, EditorRequired]
     public UserDto User { get; set; }
@@ -21,27 +21,16 @@ public partial class UserAvatar
 
     [Inject] IUserService UserService { get; set; } = null!;
 
-    protected override Task OnParametersSetAsync()
-    {
-        return LoadAvatarAsync();
-    }
-
-    private async Task LoadAvatarAsync()
-    {
-        if (User.AvatarUpdatedAt is null)
-        {
-            return;
-        }
-        var avatarUrl = await UserService.GetAvatarUrlAsync(User.Id);
-        _avatarFailed = avatarUrl.IsFailure;
-        if (avatarUrl.IsSuccess)
-        {
-            _avatarUrl = avatarUrl.Value;
-        }
-    }
-
     private bool _avatarFailed = false;
     private string? _customColor;
+
+    protected override void OnParametersSet()
+    {
+        if (User.AvatarUpdatedAt is not null)
+        {
+            _avatarUrl = UserService.GetAvatarUrl(User.Id, User.AvatarUpdatedAt);
+        }
+    }
 
     private void HandleImageError()
     {

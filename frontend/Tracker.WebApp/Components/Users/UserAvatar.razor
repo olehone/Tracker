@@ -5,9 +5,12 @@
            Size=@Size
            @onmouseenter=@(() => HandleHovering.InvokeAsync(true))
            @onmouseleave=@(() => HandleHovering.InvokeAsync(false))>
-    @if (!string.IsNullOrEmpty(_avatarUrl) && !_avatarFailed)
+    @if (!string.IsNullOrWhiteSpace(_avatarUrl))
     {
-        <CustomImage Src=@_avatarUrl ObjectFit="ObjectFit.Cover" HandleError=@HandleImageError />
+        <CustomImage Src=@_avatarUrl
+                     ObjectFit="ObjectFit.Cover"
+                     HandleError=@HandleImageError />
+        <MudLink Href=@_avatarUrl />
     }
     else
     {

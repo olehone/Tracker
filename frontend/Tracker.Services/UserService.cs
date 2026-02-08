@@ -49,7 +49,15 @@ public class UserService(IApiErrorHandler apiErrorHandler, IUserApi api)
         return apiErrorHandler.ExecuteAsync(() => api.GetAvatarUrlAsync(userId));
     }
 
-    public async Task<Result<string>> UploadAvatarAsync(Guid userId, 
+    public string GetAvatarUrl(Guid userId, DateTimeOffset? changedAt)
+    {
+        var url = $"api/users/{userId}/avatar";
+        return changedAt is null
+            ? url
+            : $"{url}?v={changedAt?.Ticks}";
+    }
+
+    public async Task<Result<string>> UploadAvatarAsync(Guid userId,
         Stream fileStream, string contentType, string fileName)
     {
         var streamPart = new StreamPart(fileStream, fileName, contentType);

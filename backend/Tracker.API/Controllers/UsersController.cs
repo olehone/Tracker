@@ -95,14 +95,20 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:guid}/avatar")]
-    public async Task<IActionResult> GetAvatarUrlAsync(Guid id)
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAvatarUrlAsync(Guid id, [FromQuery] long version)
     {
         var mediatorRequest = new GetAvatarUrlCommand
         {
             UserId = id,
+            Version = version
         };
         var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
+        if (response.IsFailure)
+        {
+            return response.ToActionResult();
+        }
+        return Redirect(response.Value);
     }
 
     [HttpPost("{id:guid}/avatar")]
