@@ -19,8 +19,7 @@ public partial class FileView
 
     private string? _imageUrl;
 
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         if (File.IsDeleted)
         {
@@ -29,13 +28,13 @@ public partial class FileView
 
         if (IsImage(File))
         {
-            await LoadImageUrl();
+            await LoadImageUrlAsync();
         }
     }
 
-    private async Task LoadImageUrl()
+    private async Task LoadImageUrlAsync()
     {
-        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        var result = await Attachments.GetUrlAsync(File.Id);
         if (result.IsSuccess)
         {
             _imageUrl = result.Value;
@@ -44,7 +43,7 @@ public partial class FileView
 
     private async Task Download()
     {
-        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        var result = await Attachments.GetUrlAsync(File.Id, isRedirect: false);
         if (result.IsSuccess)
         {
             await JS.InvokeVoidAsync("open", result.Value, "_blank");

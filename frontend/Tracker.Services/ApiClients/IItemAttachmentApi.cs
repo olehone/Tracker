@@ -6,7 +6,10 @@ namespace Tracker.Services.ApiClients;
 public interface IItemAttachmentApi
 {
     [Get("/api/attachments/{attachmentId}")]
-    Task<IApiResponse<string>> DownloadAsync(Guid attachmentId, [Query] bool isDirect, [Query] bool isRedirect);
+    Task<IApiResponse<Stream>> DownloadAsync(Guid attachmentId);
+    
+    [Get("/api/attachments/{attachmentId}/url")]
+    Task<IApiResponse<string>> GetUrlAsync(Guid attachmentId, [Query] bool isRedirect);
 
     [Get("/api/board/{boardId}/items/{itemId}/attachments")]
     Task<IApiResponse<List<FileDto>>> GetAllAsync(Guid boardId, Guid itemId);
