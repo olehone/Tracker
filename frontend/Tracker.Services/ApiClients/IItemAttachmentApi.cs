@@ -5,7 +5,7 @@ namespace Tracker.Services.ApiClients;
 
 public interface IItemAttachmentApi
 {
-    [Get("/attachments/{attachmentId}")]
+    [Get("/api/attachments/{attachmentId}")]
     Task<IApiResponse<string>> DownloadAsync(Guid attachmentId, [Query] bool isDirect, [Query] bool isRedirect);
 
     [Get("/api/board/{boardId}/items/{itemId}/attachments")]
@@ -15,6 +15,6 @@ public interface IItemAttachmentApi
     [Post("/api/board/{boardId}/items/{itemId}/attachments")]
     Task<IApiResponse<FileDto>> UploadAsync(Guid boardId, Guid itemId, [AliasAs("File")] StreamPart file);
 
-    [Delete("/attachments/{attachmentId}")]
+    [Delete("/api/attachments/{attachmentId}")]
     Task<IApiResponse> DeleteAsync(Guid attachmentId);
 }

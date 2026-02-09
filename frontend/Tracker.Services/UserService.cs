@@ -9,7 +9,9 @@ using Tracker.Services.ApiClients;
 
 namespace Tracker.Services;
 
-public class UserService(IApiErrorHandler apiErrorHandler, IUserApi api)
+public class UserService(IApiErrorHandler apiErrorHandler, 
+    IUserApi api,
+    IApiUrlService apiUrl)
     : IUserService
 {
     public Task<Result<UserDto>> GetByIdAsync(Guid id)
@@ -51,7 +53,8 @@ public class UserService(IApiErrorHandler apiErrorHandler, IUserApi api)
 
     public string GetAvatarUrl(Guid userId, DateTimeOffset? changedAt)
     {
-        var url = $"api/users/{userId}/avatar";
+        var baseUrl = apiUrl.GetApiUrl();
+        var url = $"{baseUrl}/api/users/{userId}/avatar";
         return changedAt is null
             ? url
             : $"{url}?v={changedAt?.Ticks}";
