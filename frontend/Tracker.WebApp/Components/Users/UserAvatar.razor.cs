@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Services.Abstraction;
 using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Users;
 
 public partial class UserAvatar
 {
+    private string? _avatarUrl;
+
     [Parameter, EditorRequired]
     public UserDto User { get; set; }
     [Parameter]
@@ -16,8 +19,18 @@ public partial class UserAvatar
     [Parameter]
     public EventCallback<bool> HandleHovering { get; set; }
 
+    [Inject] IUserService UserService { get; set; } = null!;
+
     private bool _avatarFailed = false;
     private string? _customColor;
+
+    protected override void OnParametersSet()
+    {
+        if (User.AvatarUpdatedAt is not null)
+        {
+            _avatarUrl = UserService.GetAvatarUrl(User.Id, User.AvatarUpdatedAt);
+        }
+    }
 
     private void HandleImageError()
     {

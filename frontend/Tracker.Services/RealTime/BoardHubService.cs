@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Options;
 using Tracker.Domain.Events;
-using Tracker.Domain.Options;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.Services.RealTime;
 
 public class BoardHubService(
-    IOptions<ApiOptions> apiOptions,
+    IApiUrlService apiUrl,
     IAuthService authService) : IBoardRealtimeService
 {
-    private readonly string _hubUrl = $"{apiOptions.Value.ApiBaseUrl}/hubs/board";
+
+    private readonly string _hubUrl = $"{apiUrl.GetApiUrl()}/hubs/board";
     private HubConnection? _hubConnection;
     private Guid? _currentBoardId;
 

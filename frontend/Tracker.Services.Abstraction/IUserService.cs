@@ -15,6 +15,8 @@ public interface IUserService
         Guid id, PaginatedSearchRequest request);
     Task<Result<Paginated<WorkspaceSummaryDto>>> GetMutualWorkspacesAsync(
         Guid id, PaginatedSearchRequest request);
+    Task<Result<string>> GetAvatarUrlAsync(Guid userId);
+    string GetAvatarUrl(Guid userId, DateTimeOffset? changedAt);
     Task<Result<string>> UploadAvatarAsync(Guid userId, Stream fileStream, string contentType, string fileName);
     Task<Result> DeleteAvatarAsync(Guid userId);
 }
