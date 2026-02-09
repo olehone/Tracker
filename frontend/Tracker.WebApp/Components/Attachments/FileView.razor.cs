@@ -22,6 +22,11 @@ public partial class FileView
 
     protected override async Task OnParametersSetAsync()
     {
+        if (File.IsDeleted)
+        {
+            return;
+        }
+
         if (IsImage(File))
         {
             await LoadImageUrl();
@@ -76,7 +81,7 @@ public partial class FileView
 
     private string GetClass()
     {
-        var baseClass = "border-solid rounded mud-width-full pa-2";
+        var baseClass = "border-solid rounded mud-width-full pa-0";
         if (File.IsDeleted)
         {
             baseClass += $" mud-theme-{Color.Error.ToDescriptionString()}";

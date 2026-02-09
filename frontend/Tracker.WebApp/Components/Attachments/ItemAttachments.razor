@@ -6,31 +6,37 @@
           AlignItems="AlignItems.Center">
     <MudListSubheader>Attachments</MudListSubheader>
 
-    <MudFileUpload T="IBrowserFile"
-                   Disabled=@Disabled
-                   FilesChanged=@UploadAsync
-                   MaximumFileCount="1">
-        <ActivatorContent>
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon=@Icons.Material.Filled.CloudUpload>
-                Upload attachment
-            </MudButton>
-        </ActivatorContent>
-    </MudFileUpload>
+    @if (!Disabled)
+    {
+        <MudFileUpload T="IBrowserFile"
+                       Disabled=@Disabled
+                       FilesChanged=@UploadAsync
+                       MaximumFileCount="1">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon=@Icons.Material.Filled.CloudUpload>
+                    Upload attachment
+                </MudButton>
+            </ActivatorContent>
+        </MudFileUpload>
+    }
 </MudStack>
 <LoadingWrapper LoadingCondition=@(Attachments is null)>
     <Content>
-        <MudPaper Outlined
-                  MaxHeight="400px"
-                  MinHeight="30px"
-                  Style="overflow-y:auto">
-            @foreach (var attachment in Attachments!)
-            {
-                <FileView File=@attachment
-                          Disabled=@Disabled></FileView>
-            }
-        </MudPaper>
+        @if (Attachments!.Any())
+        {
+            <MudPaper Outlined
+                      MaxHeight="400px"
+                      MinHeight="30px"
+                      Style="overflow-y:auto">
+                @foreach (var attachment in Attachments!.OrderBy(a => a.IsDeleted))
+                {
+                    <FileView File=@attachment
+                              Disabled=@Disabled></FileView>
+                }
+            </MudPaper>
+        }
     </Content>
 </LoadingWrapper>
 
