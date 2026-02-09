@@ -15,6 +15,6 @@ public interface IItemAttachmentApi
     [Post("/api/board/{boardId}/items/{itemId}/attachments")]
     Task<IApiResponse<FileDto>> UploadAsync(Guid boardId, Guid itemId, [AliasAs("File")] StreamPart file);
 
-    [Delete("/api/board/{boardId}/items/{itemId}/attachments/{attachmentId}")]
+    [Delete("/api/attachments/{attachmentId}")]
     Task<IApiResponse> DeleteAsync(Guid attachmentId);
 }

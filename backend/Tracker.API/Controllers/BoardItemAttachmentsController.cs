@@ -15,7 +15,7 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("/attachments/{attachmentId:guid}"]
+    [HttpGet("/api/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> DownloadAsync(Guid attachmentId,
         [FromQuery] bool isDirect = false, [FromQuery] bool isRedirect = true)
     {
@@ -34,7 +34,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             : result.ToActionResult();
     }
 
-    [HttpDelete("{attachmentId:guid}")]
+    [HttpDelete("/api/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid attachmentId)
     {
         var mediatorRequest = new DeleteAttachmentCommand
