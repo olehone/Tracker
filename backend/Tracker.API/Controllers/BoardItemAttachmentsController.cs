@@ -17,7 +17,7 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
     [HttpGet("/api/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> DownloadAsync(Guid attachmentId,
-        [FromQuery] bool isDirect = false, [FromQuery] bool isRedirect = true)
+        [FromQuery] bool isDirect = true)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
@@ -29,9 +29,10 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         {
             return result.ToActionResult();
         }
-        return isRedirect
-            ? Redirect(result.Value)
-            : result.ToActionResult();
+
+        return isDirect
+            ? File(result.Value.Stream!, result.Value.ContentType, result.Value.FileName, true)
+            : Redirect(result.Value.RedirectUrl!);
     }
 
     [HttpDelete("/api/attachments/{attachmentId:guid}")]
