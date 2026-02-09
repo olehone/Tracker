@@ -24,6 +24,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+var blobOptions = builder.Configuration.GetSection("BlobOptions").Get<BlobOptions>()!;
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = blobOptions.ItemAttachmentMaxSize;
+});
+
 builder.Services.AddControllers();
 builder.Services.AddJwtBearerAndAuth();
 
