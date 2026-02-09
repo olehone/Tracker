@@ -2,11 +2,10 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Users.GetById;
+namespace Tracker.Application.UseCases.Users.DeleteAvatar;
 
 public sealed class DeleteAvatarCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,

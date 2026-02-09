@@ -15,7 +15,7 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("/attachments/{attachmentId:guid}", Name = "DownloadAsync")]
+    [HttpGet("/attachments/{attachmentId:guid}"]
     public async Task<IActionResult> DownloadAsync(Guid attachmentId,
         [FromQuery] bool isDirect = false, [FromQuery] bool isRedirect = true)
     {

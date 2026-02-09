@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Tracker.Domain.Results;
@@ -7,7 +6,7 @@ using Tracker.Domain.Results;
 namespace Tracker.Infrastructure.Services;
 
 // Separate container/folder name in case that same entity would have different containers
-internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration)
+internal class AzureBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration)
 {
     public async Task<Result<string>> GetUrlAsync(string folderName, string fileName, string originalName,
         bool isInline, CancellationToken cancellationToken = default)
@@ -58,12 +57,13 @@ internal class AzurePrivateBlobStorageService(BlobServiceClient blobServiceClien
         Stream stream,
         string folderName,
         string contentType,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? fileName = null)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);
         await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
-        var blobName = Guid.NewGuid().ToString();
+        var blobName = fileName ?? Guid.NewGuid().ToString();
         var blob = container.GetBlobClient(blobName);
 
         await blob.UploadAsync(

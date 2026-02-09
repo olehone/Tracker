@@ -3,7 +3,6 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Enums;
-using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Users.UploadAvatar;
@@ -49,12 +48,6 @@ public class UploadAvatarCommandHandler(
         uow.UserRepository.Update(updatedUser);
         await uow.SaveChangesAsync(cancellationToken);
 
-        var avatarUrl = updatedUser.GetAvatar(url);
-        if (avatarUrl is null)
-        {
-            return Error.Unknown;
-        }
-
-        return avatarUrl;
+        return url;
     }
 }
