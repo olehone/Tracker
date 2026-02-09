@@ -70,4 +70,25 @@ public static class UiHelper
         var hue = bytes[0] % 360;
         return $"background:hsl({hue}, 60%, 55%);";
     }
+
+    public static string FileSize(long bytes)
+    {
+        string[] units = { "B", "KB", "MB", "GB", "TB" };
+
+        double size = bytes;
+        int unit = 0;
+
+        while (size >= 1024 && unit < units.Length - 1)
+        {
+            size /= 1024;
+            unit++;
+        }
+
+        if (unit == 0)
+        {
+            return $"{bytes} B";
+        }
+
+        return $"{size:0.##} {units[unit]}";
+    }
 }

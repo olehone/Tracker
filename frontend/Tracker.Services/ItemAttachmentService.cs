@@ -1,6 +1,7 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Results;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
@@ -16,7 +17,7 @@ public class ItemAttachmentService(IApiErrorHandler apiErrorHandler, IItemAttach
     {
         return apiErrorHandler.ExecuteAsync(() => api.GetAllAsync(boardId, itemId));
     }
-    public Task<Result<string>> UploadAsync(Guid boardId, Guid itemId,
+    public Task<Result<FileDto>> UploadAsync(Guid boardId, Guid itemId,
         Stream fileStream, string contentType, string fileName)
     {
         var streamPart = new StreamPart(fileStream, fileName, contentType);

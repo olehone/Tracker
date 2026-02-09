@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IBoardItemApi>();
         services.AddApiClientWithAuth<IItemAttachmentApi>();
 
+        services.AddScoped<IApiUrlService, ApiUrlService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWorkspaceService, WorkspaceService>();
         services.AddScoped<IWorkspaceUserService, WorkspaceUserService>();

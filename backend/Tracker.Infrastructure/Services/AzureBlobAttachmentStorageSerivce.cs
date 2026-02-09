@@ -5,10 +5,10 @@ using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Services;
 
-internal class AzureBlobAttachmentStorageService : AzurePrivateBlobStorageService, IAttachmentStorageService
+internal class AzureBlobAttachmentStorageService : AzureBlobStorageService, IAttachmentStorageService
 {
     public AzureBlobAttachmentStorageService(BlobServiceClient blobServiceClient, IOptions<BlobOptions> options)
-        : base(blobServiceClient, options.Value.ItemAttachmentExpiration)
+        : base(blobServiceClient, options.Value.ItemAttachmentSasExpiration)
     {
     }
 }

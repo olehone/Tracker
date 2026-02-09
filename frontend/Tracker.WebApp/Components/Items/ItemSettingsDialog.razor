@@ -62,7 +62,7 @@
                     }
 
                     <ItemAssigneesList Item=@Item
-                                       Disabled=@(Disabled)
+                                       Disabled=@Disabled
                                        ToggleAssign=@ToggleAssign
                                        OpenAssign=@_openAssign />
                     <MudStack Row
@@ -123,21 +123,9 @@
                                   Variant="Variant.Outlined"
                                   @onfocus=@DescriptionFocused
                                   @onblur=@DescriptionBlurred />
-
-                    <MudListSubheader>Attachments</MudListSubheader>
-                    <LoadingWrapper LoadingCondition=@(_attachments is null)>
-                        <Content>
-                            <MudPaper Outlined
-                                      MaxHeight="200px"
-                                      MinHeight="30px"
-                                      Style="overflow-y:auto">
-                                @foreach (var attachment in _attachments)
-                                {
-                                    <FileView File=@attachment></FileView>
-                                }
-                            </MudPaper>
-                        </Content>
-                    </LoadingWrapper>
+                    <ItemAttachments UploadAsync=@UploadAttachmentAsync
+                                     Attachments=@_attachments
+                                     Disabled=@Disabled />
                 </MudStack>
             </DialogContent>
         </MudDialog>
