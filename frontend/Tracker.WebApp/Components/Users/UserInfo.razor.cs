@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Users;

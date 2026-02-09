@@ -73,8 +73,6 @@ public partial class UserSettingsDialog
         User.FirstName = _model.FirstName;
         User.LastName = _model.LastName;
         await UserChanged.InvokeAsync(User);
-
-        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private async Task DeleteAvatarAsync()
