@@ -1,17 +1,87 @@
-﻿<div class="col-md-12">
-    <MarkdownEditor Value="@markdownValue"
-                    ValueChanged="@OnMarkdownValueChanged"
-                    Preview />
+﻿@using PSC.Blazor.Components.MarkdownEditor.Enums
 
-    <hr />
-</div>
+<MarkdownEditor Value="@markdownValue"
+                ValueChanged="@OnMarkdownValueChanged"
+                ValueHTMLChanged="@OnMarkdownValueHTMLChanged">
+    @* HideIcons and ShowIcons don't work, have to rewrite default icons manually *@
+    <Toolbar>
+        <MarkdownToolbarButton Action="MarkdownAction.Bold"
+                               Icon="fa fa-bold"
+                               Title="Bold" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Italic"
+                               Icon="fa fa-italic"
+                               Title="Italic" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Heading"
+                               Icon="fa fa-header"
+                               Title="Heading" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Code"
+                               Icon="fa fa-code"
+                               Title="Code Block"
+                               Separator />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Quote"
+                               Icon="fa fa-quote-left"
+                               Title="Quote" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.UnorderedList"
+                               Icon="fa fa-list-ul"
+                               Title="Unordered List" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.OrderedList"
+                               Icon="fa fa-list-ol"
+                               Title="Ordered List" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Link"
+                               Icon="fa fa-link"
+                               Title="Insert Link"
+                               Separator />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Image"
+                               Icon="fa fa-picture-o"
+                               Title="Insert Image" />
+
+        <MarkdownToolbarButton Action="MarkdownAction.Table"
+                               Icon="fa fa-table"
+                               Title="Insert Table" />
+
+
+        @* <MarkdownToolbarButton Action="MarkdownAction.Preview"
+                                   Icon="fa fa-eye no-disable"
+                                   Title="Preview" /> *@
+
+        <MarkdownToolbarButton Action="MarkdownAction.Fullscreen"
+                               Name="mde-tb-fullscreen"
+                               Icon="fa fa-arrows-alt no-disable no-mobile"
+                               Title="Fullscreen"
+                               Separator />
+
+
+    </Toolbar>
+</MarkdownEditor>
+@((MarkupString)markdownHtml)
+@(markdownHtml)
 
 @code {
-    string markdownValue = "#Markdown Editor\nThis is a test";
+    string markdownValue = "# Markdown Editor\nThis is a test";
+    string markdownHtml;
+
+    protected override void OnInitialized()
+    {
+        markdownHtml = Markdig.Markdown.ToHtml(markdownValue ?? string.Empty);
+        base.OnInitialized();
+    }
 
     Task OnMarkdownValueChanged(string value)
     {
         return Task.CompletedTask;
     }
 
+    Task OnMarkdownValueHTMLChanged(string value)
+    {
+        markdownHtml = value;
+        return Task.CompletedTask;
+    }
 }
