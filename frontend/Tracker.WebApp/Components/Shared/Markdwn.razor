@@ -1,8 +1,14 @@
-﻿@using PSC.Blazor.Components.MarkdownEditor.Enums
+﻿@using Markdig
+@using Markdig.Syntax
+@using Markdig.Syntax.Inlines
+@using PSC.Blazor.Components.MarkdownEditor.Enums
+@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Attachments
 
-<MarkdownEditor Value="@markdownValue"
+<MarkdownEditor Value="@Value"
                 ValueChanged="@OnMarkdownValueChanged"
-                ValueHTMLChanged="@OnMarkdownValueHTMLChanged">
+                ValueHTMLChanged="@OnMarkdownValueHTMLChanged"
+                ValueHTML=@markdownHtml>
     @* HideIcons and ShowIcons don't work, have to rewrite default icons manually *@
     <Toolbar>
         <MarkdownToolbarButton Action="MarkdownAction.Bold"
@@ -61,16 +67,39 @@
 
     </Toolbar>
 </MarkdownEditor>
+<MudText Typo="Typo.h1"> MarkupString </MudText>
 @((MarkupString)markdownHtml)
+<MudText Typo="Typo.h1"> Purehtml </MudText>
 @(markdownHtml)
+<MudText Typo="Typo.h1"> RenderMarkdonw </MudText>
+@RenderMarkdown(Value)
+
 
 @code {
+    [Parameter, EditorRequired]
+    public EventCallback<IBrowserFile?> UploadAsync { get; set; }
+    [Parameter, EditorRequired]
+    public List<FileDto> Attachments { get; set; }
+    [Parameter, EditorRequired]
+    public bool Disabled { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<string> ValueChanged { get; set; }
+    [Parameter, EditorRequired]
+    [Category(CategoryTypes.FormComponent.Data)]
+    public string Value
+    {
+        get => markdownValue;
+        set => markdownValue = value ?? string.Empty;
+    }
+
     string markdownValue = "# Markdown Editor\nThis is a test";
     string markdownHtml;
-
+    const string attachment = "[attachment](api/attachments/83109ff0-d5d1-49e5-b36d-deacfc47ba75)";
     protected override void OnInitialized()
     {
         markdownHtml = Markdig.Markdown.ToHtml(markdownValue ?? string.Empty);
+        markdownHtml += "<a> It is custom html here! </a>";
         base.OnInitialized();
     }
 
@@ -82,6 +111,58 @@
     Task OnMarkdownValueHTMLChanged(string value)
     {
         markdownHtml = value;
+        markdownHtml += "<a> It is custom html here! </a>";
+        markdownHtml = markdownHtml.Replace("is", "was");
         return Task.CompletedTask;
     }
+
+    private RenderFragment RenderMarkdown(string markdown) => builder =>
+{
+    var pipeline = new MarkdownPipelineBuilder().Build();
+    var document = Markdown.Parse(markdown ?? string.Empty, pipeline);
+
+    int seq = 0;
+
+    foreach (var block in document)
+    {
+        if (block is ParagraphBlock paragraph)
+        {
+            builder.OpenElement(seq++, "p");
+
+            var inline = paragraph.Inline?.FirstChild;
+
+            while (inline != null)
+            {
+                if (inline is LinkInline link &&
+                    link.Url != null &&
+                    link.Url.StartsWith("api/attachments/"))
+                {
+                    var id = link.Url.Split('/').Last();
+                    if (!Guid.TryParse(id, out Guid idGuid))
+                    {
+                        return;
+                    }
+                    var file = Attachments.FirstOrDefault(a => a.Id == idGuid);
+                    if (file is null)
+                    {
+                        return;
+                    }
+                    builder.OpenComponent<FileView>(seq++);
+                    builder.AddAttribute(seq++, "File", file);
+                    builder.AddAttribute(seq++, "Disabled", Disabled);
+                    builder.CloseComponent();
+                }
+                else
+                {
+                    builder.AddContent(seq++, inline.ToString());
+                }
+
+                inline = inline.NextSibling;
+            }
+
+            builder.CloseElement();
+        }
+    }
+};
+
 }
