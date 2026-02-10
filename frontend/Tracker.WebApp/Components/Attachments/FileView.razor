@@ -31,9 +31,11 @@
                             @if (!Disabled && !File.IsDeleted)
                             {
                                 <MudIconButton Icon=@Icons.Material.Filled.ArrowDownward
-                                               OnClick=@Download />
+                                               OnClick=@DownloadAsync />
+                                <MudIconButton Icon=@Icons.Material.Filled.Link
+                                               OnClick=@CopyLinkToClipboardAsync />
                                 <MudIconButton Icon=@Icons.Material.Filled.Delete
-                                               OnClick=@Delete />
+                                               OnClick=@DeleteAsync />
                             }
                         </MudStack>
                     </MudStack>

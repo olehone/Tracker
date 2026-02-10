@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.20" PrivateAssets="all" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
         <PackageReference Include="MudBlazor" Version="8.15.0" />
+        <PackageReference Include="PSC.Blazor.Components.MarkdownEditor" Version="8.0.8" />
     </ItemGroup>
 
     <ItemGroup>

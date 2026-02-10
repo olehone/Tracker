@@ -15,6 +15,7 @@ public partial class FileView
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] IItemAttachmentService Attachments { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
     private string? _imageUrl;
@@ -41,7 +42,7 @@ public partial class FileView
         }
     }
 
-    private async Task Download()
+    private async Task DownloadAsync()
     {
         var result = await Attachments.GetUrlAsync(File.Id, isRedirect: false);
         if (result.IsSuccess)
@@ -50,7 +51,22 @@ public partial class FileView
         }
     }
 
-    private async Task Delete()
+    private async Task CopyLinkToClipboardAsync()
+    {
+        try
+        {
+            var link = $"api/attachments/{File.Id}";
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", link);
+            Snackbar.Add("Copied link to clipboard", Severity.Normal);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Cannot write to clipboard: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteAsync()
     {
         var confirmed = await DialogService.ShowMessageBox(
             title: "Warning",

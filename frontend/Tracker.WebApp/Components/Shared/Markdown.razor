@@ -1,0 +1,17 @@
+﻿<div class="col-md-12">
+    <MarkdownEditor Value="@markdownValue"
+                    ValueChanged="@OnMarkdownValueChanged"
+                    Preview />
+
+    <hr />
+</div>
+
+@code {
+    string markdownValue = "#Markdown Editor\nThis is a test";
+
+    Task OnMarkdownValueChanged(string value)
+    {
+        return Task.CompletedTask;
+    }
+
+}

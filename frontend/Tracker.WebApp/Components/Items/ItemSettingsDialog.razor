@@ -123,6 +123,9 @@
                                   Variant="Variant.Outlined"
                                   @onfocus=@DescriptionFocused
                                   @onblur=@DescriptionBlurred />
+
+                    <Markdown />
+
                     <ItemAttachments UploadAsync=@UploadAttachmentAsync
                                      Attachments=@_attachments
                                      Disabled=@Disabled />
