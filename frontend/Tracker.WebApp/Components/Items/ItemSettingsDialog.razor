@@ -124,10 +124,10 @@
                                   @onfocus=@DescriptionFocused
                                   @onblur=@DescriptionBlurred />
 
-                    <Markdwn @bind-Value=@_description
-                             Attachments=@_attachments
-                             Disabled=@Disabled
-                             UploadAsync=@UploadAttachmentAsync />
+                    <MarkdownTextFieldWithAttachments @bind-Value=@_description
+                                                      Attachments=@_attachments
+                                                      Disabled=@Disabled
+                                                      UploadAsync=@UploadAttachmentAsync />
 
                     <ItemAttachments UploadAsync=@UploadAttachmentAsync
                                      Attachments=@_attachments

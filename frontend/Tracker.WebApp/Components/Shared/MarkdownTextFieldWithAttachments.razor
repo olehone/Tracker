@@ -1,12 +1,12 @@
 ﻿@using Markdig
 @using Markdig.Syntax
 @using Markdig.Syntax.Inlines
+@using Microsoft.AspNetCore.Components.Rendering
 @using PSC.Blazor.Components.MarkdownEditor.Enums
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Attachments
 
-<MarkdownEditor Value="@Value"
-                ValueChanged="@OnMarkdownValueChanged"
+<MarkdownEditor @bind-Value="@Value"
                 ValueHTMLChanged="@OnMarkdownValueHTMLChanged"
                 ValueHTML=@markdownHtml>
     @* HideIcons and ShowIcons don't work, have to rewrite default icons manually *@
@@ -67,13 +67,8 @@
 
     </Toolbar>
 </MarkdownEditor>
-<MudText Typo="Typo.h1"> MarkupString </MudText>
-@((MarkupString)markdownHtml)
-<MudText Typo="Typo.h1"> Purehtml </MudText>
-@(markdownHtml)
-<MudText Typo="Typo.h1"> RenderMarkdonw </MudText>
-@RenderMarkdown(Value)
 
+@RenderMarkdownWithAttachments(Value)
 
 @code {
     [Parameter, EditorRequired]
@@ -82,87 +77,83 @@
     public List<FileDto> Attachments { get; set; }
     [Parameter, EditorRequired]
     public bool Disabled { get; set; }
-
     [Parameter, EditorRequired]
     public EventCallback<string> ValueChanged { get; set; }
     [Parameter, EditorRequired]
-    [Category(CategoryTypes.FormComponent.Data)]
-    public string Value
-    {
-        get => markdownValue;
-        set => markdownValue = value ?? string.Empty;
-    }
+    public string Value { get; set; } = string.Empty;
 
-    string markdownValue = "# Markdown Editor\nThis is a test";
     string markdownHtml;
-    const string attachment = "[attachment](api/attachments/83109ff0-d5d1-49e5-b36d-deacfc47ba75)";
+
     protected override void OnInitialized()
     {
-        markdownHtml = Markdig.Markdown.ToHtml(markdownValue ?? string.Empty);
-        markdownHtml += "<a> It is custom html here! </a>";
+        markdownHtml = Markdig.Markdown.ToHtml(Value ?? string.Empty);
         base.OnInitialized();
-    }
-
-    Task OnMarkdownValueChanged(string value)
-    {
-        return Task.CompletedTask;
     }
 
     Task OnMarkdownValueHTMLChanged(string value)
     {
         markdownHtml = value;
-        markdownHtml += "<a> It is custom html here! </a>";
-        markdownHtml = markdownHtml.Replace("is", "was");
         return Task.CompletedTask;
     }
 
-    private RenderFragment RenderMarkdown(string markdown) => builder =>
-{
-    var pipeline = new MarkdownPipelineBuilder().Build();
-    var document = Markdown.Parse(markdown ?? string.Empty, pipeline);
-
-    int seq = 0;
-
-    foreach (var block in document)
+    private RenderFragment RenderMarkdownWithAttachments(string markdown) => builder =>
     {
-        if (block is ParagraphBlock paragraph)
+        if (string.IsNullOrEmpty(markdown)) return;
+
+        var html = Markdown.ToHtml(markdown);
+        var document = Markdown.Parse(markdown);
+        var attachmentLinks = document.Descendants<LinkInline>()
+            .Where(link => link.Url?.StartsWith("api/attachments/") == true)
+            .ToList();
+
+        if (!attachmentLinks.Any())
         {
-            builder.OpenElement(seq++, "p");
+            builder.AddMarkupContent(0, html);
+            return;
+        }
 
-            var inline = paragraph.Inline?.FirstChild;
+        int seq = 0;
+        var remainingHtml = html;
 
-            while (inline != null)
+        foreach (var link in attachmentLinks)
+        {
+            var id = link.Url.Split('/').Last();
+            if (!Guid.TryParse(id, out var idGuid)) continue;
+
+            var file = Attachments?.FirstOrDefault(a => a.Id == idGuid);
+            if (file == null) continue;
+
+            // Find the HTML representation of this link
+            var linkHtml = $"<a href=\"api/attachments/{idGuid}\">";
+            var linkEndHtml = "</a>";
+
+            var linkStart = remainingHtml.IndexOf(linkHtml);
+            if (linkStart == -1) continue;
+
+            var linkEnd = remainingHtml.IndexOf(linkEndHtml, linkStart);
+            if (linkEnd == -1) continue;
+
+            // Add HTML before the link
+            var beforeLink = remainingHtml.Substring(0, linkStart);
+            if (!string.IsNullOrEmpty(beforeLink))
             {
-                if (inline is LinkInline link &&
-                    link.Url != null &&
-                    link.Url.StartsWith("api/attachments/"))
-                {
-                    var id = link.Url.Split('/').Last();
-                    if (!Guid.TryParse(id, out Guid idGuid))
-                    {
-                        return;
-                    }
-                    var file = Attachments.FirstOrDefault(a => a.Id == idGuid);
-                    if (file is null)
-                    {
-                        return;
-                    }
-                    builder.OpenComponent<FileView>(seq++);
-                    builder.AddAttribute(seq++, "File", file);
-                    builder.AddAttribute(seq++, "Disabled", Disabled);
-                    builder.CloseComponent();
-                }
-                else
-                {
-                    builder.AddContent(seq++, inline.ToString());
-                }
-
-                inline = inline.NextSibling;
+                builder.AddMarkupContent(seq++, beforeLink);
             }
 
-            builder.CloseElement();
-        }
-    }
-};
+            // Add FileView component instead of link
+            builder.OpenComponent<FileView>(seq++);
+            builder.AddAttribute(seq++, "File", file);
+            builder.AddAttribute(seq++, "Disabled", Disabled);
+            builder.CloseComponent();
 
+            // Continue with remaining HTML
+            remainingHtml = remainingHtml.Substring(linkEnd + linkEndHtml.Length);
+        }
+
+        // Add any remaining HTML
+        if (!string.IsNullOrEmpty(remainingHtml))
+        {
+            builder.AddMarkupContent(seq++, remainingHtml);
+        }
+    };
 }
