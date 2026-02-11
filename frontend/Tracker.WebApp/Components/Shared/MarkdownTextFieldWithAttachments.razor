@@ -6,95 +6,108 @@
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Attachments
 
-<MarkdownEditor @bind-Value="@Value"
-                ValueHTMLChanged="@OnMarkdownValueHTMLChanged"
-                ValueHTML=@markdownHtml>
-    @* HideIcons and ShowIcons don't work, have to rewrite default icons manually *@
-    <Toolbar>
-        <MarkdownToolbarButton Action="MarkdownAction.Bold"
-                               Icon="fa fa-bold"
-                               Title="Bold" />
+@if (_isPreview)
+{
+    <MudPaper Outlined MaxHeight="400px" Class="pa-2">
+        <MudStack Row
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween">
+            <MudListSubheader Gutters="false">
+                Description
+            </MudListSubheader>
 
-        <MarkdownToolbarButton Action="MarkdownAction.Italic"
-                               Icon="fa fa-italic"
-                               Title="Italic" />
+            <MudIconButton Color="Color.Primary"
+                           Icon=@Icons.Material.Filled.RemoveRedEye
+                           Disabled=@Disabled
+                           OnClick=@TogglePreview />
+        </MudStack>
+        @RenderMarkdownWithAttachments(Value)
+    </MudPaper>
+}
+else
+{
+    <MarkdownEditor @bind-Value=@Value
+                    AllowResize="false"
+                    AutoSaveEnabled="true"
+                    Theme=@($"mud-theme-{Color.Surface.ToDescriptionString()}")
+                    CustomButtonClicked=@OnCustomButtonClicked>
+        @* HideIcons and ShowIcons don't work, have to rewrite default icons manually *@
+        <Toolbar>
+            <MarkdownToolbarButton Action="MarkdownAction.Bold"
+                                   Icon="fa fa-bold"
+                                   Title="Bold" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Heading"
-                               Icon="fa fa-header"
-                               Title="Heading" />
+            <MarkdownToolbarButton Action="MarkdownAction.Italic"
+                                   Icon="fa fa-italic"
+                                   Title="Italic" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Code"
-                               Icon="fa fa-code"
-                               Title="Code Block"
-                               Separator />
+            <MarkdownToolbarButton Action="MarkdownAction.Heading"
+                                   Icon="fa fa-header"
+                                   Title="Heading" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Quote"
-                               Icon="fa fa-quote-left"
-                               Title="Quote" />
+            <MarkdownToolbarButton Action="MarkdownAction.Code"
+                                   Icon="fa fa-code"
+                                   Title="Code Block"
+                                   Separator />
 
-        <MarkdownToolbarButton Action="MarkdownAction.UnorderedList"
-                               Icon="fa fa-list-ul"
-                               Title="Unordered List" />
+            <MarkdownToolbarButton Action="MarkdownAction.Quote"
+                                   Icon="fa fa-quote-left"
+                                   Title="Quote" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.OrderedList"
-                               Icon="fa fa-list-ol"
-                               Title="Ordered List" />
+            <MarkdownToolbarButton Action="MarkdownAction.UnorderedList"
+                                   Icon="fa fa-list-ul"
+                                   Title="Unordered List" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Link"
-                               Icon="fa fa-link"
-                               Title="Insert Link"
-                               Separator />
+            <MarkdownToolbarButton Action="MarkdownAction.OrderedList"
+                                   Icon="fa fa-list-ol"
+                                   Title="Ordered List" />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Image"
-                               Icon="fa fa-picture-o"
-                               Title="Insert Image" />
+            <MarkdownToolbarButton Action="MarkdownAction.Link"
+                                   Icon="fa fa-link"
+                                   Title="Insert Link"
+                                   Separator />
 
-        <MarkdownToolbarButton Action="MarkdownAction.Table"
-                               Icon="fa fa-table"
-                               Title="Insert Table" />
+            <MarkdownToolbarButton Action="MarkdownAction.Image"
+                                   Icon="fa fa-picture-o"
+                                   Title="Insert Image" />
 
-
-        @* <MarkdownToolbarButton Action="MarkdownAction.Preview"
-                                   Icon="fa fa-eye no-disable"
-                                   Title="Preview" /> *@
-
-        <MarkdownToolbarButton Action="MarkdownAction.Fullscreen"
-                               Name="mde-tb-fullscreen"
-                               Icon="fa fa-arrows-alt no-disable no-mobile"
-                               Title="Fullscreen"
-                               Separator />
+            <MarkdownToolbarButton Action="MarkdownAction.Table"
+                                   Icon="fa fa-table"
+                                   Title="Insert Table" />
 
 
-    </Toolbar>
-</MarkdownEditor>
 
-@RenderMarkdownWithAttachments(Value)
+            <MarkdownToolbarButton Action="MarkdownAction.Fullscreen"
+                                   Name="mde-tb-fullscreen"
+                                   Icon="fa fa-arrows-alt no-disable no-mobile"
+                                   Title="Fullscreen"
+                                   Separator />
+
+            <MarkdownToolbarButton Icon="fa fa-eye no-disable"
+                                   Name=@_togglePreviewName
+                                   Title="Preview"/>
+
+        </Toolbar>
+    </MarkdownEditor>
+}
+
 
 @code {
+    private const string _togglePreviewName = "toggle-preview";
+
+    private bool _isPreview = true;
+
     [Parameter, EditorRequired]
-    public EventCallback<IBrowserFile?> UploadAsync { get; set; }
+    public string Value { get; set; } = string.Empty;
+    [Parameter, EditorRequired]
+    public EventCallback<string> ValueChanged { get; set; }
+
     [Parameter, EditorRequired]
     public List<FileDto> Attachments { get; set; }
     [Parameter, EditorRequired]
+    public EventCallback<IBrowserFile?> UploadAsync { get; set; }
+    [Parameter, EditorRequired]
     public bool Disabled { get; set; }
-    [Parameter, EditorRequired]
-    public EventCallback<string> ValueChanged { get; set; }
-    [Parameter, EditorRequired]
-    public string Value { get; set; } = string.Empty;
-
-    string markdownHtml;
-
-    protected override void OnInitialized()
-    {
-        markdownHtml = Markdig.Markdown.ToHtml(Value ?? string.Empty);
-        base.OnInitialized();
-    }
-
-    Task OnMarkdownValueHTMLChanged(string value)
-    {
-        markdownHtml = value;
-        return Task.CompletedTask;
-    }
 
     private RenderFragment RenderMarkdownWithAttachments(string markdown) => builder =>
     {
@@ -156,4 +169,18 @@
             builder.AddMarkupContent(seq++, remainingHtml);
         }
     };
+
+    private Task OnCustomButtonClicked(MarkdownButtonEventArgs eventArgs)
+    {
+        if (eventArgs.Name == _togglePreviewName)
+        {
+            TogglePreview();
+        }
+        return Task.CompletedTask;
+    }
+
+    private void TogglePreview()
+    {
+        _isPreview = !_isPreview;
+    }
 }

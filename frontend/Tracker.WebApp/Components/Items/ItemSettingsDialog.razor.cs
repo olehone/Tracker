@@ -95,12 +95,12 @@ public partial class ItemSettingsDialog : IDisposable
         }
     }
 
-    private void DescriptionFocused()
+    private void StartEditingDescription()
     {
         _isEditingDescription = true;
     }
 
-    private async Task DescriptionBlurred()
+    private async Task FinishEditingDescription()
     {
         _isEditingDescription = false;
 

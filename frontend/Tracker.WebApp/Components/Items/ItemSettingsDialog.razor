@@ -116,14 +116,6 @@
 
                     </MudStack>
 
-                    <MudTextField @bind-Value=@_description
-                                  Disabled=@Disabled
-                                  Label="Description"
-                                  Lines="3"
-                                  Variant="Variant.Outlined"
-                                  @onfocus=@DescriptionFocused
-                                  @onblur=@DescriptionBlurred />
-
                     <MarkdownTextFieldWithAttachments @bind-Value=@_description
                                                       Attachments=@_attachments
                                                       Disabled=@Disabled
