@@ -14,8 +14,8 @@ public partial class OneLineCreateButton
     public Typo Typo { get; set; } = Typo.inherit;
     [Parameter]
     public bool IsWithFrame { get; set; } = true;
-    [Parameter]
-    public required EventCallback<string> OnCreate { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<string> OnCreate { get; set; }
 
     private void AddItemPressed()
     {

@@ -2,6 +2,7 @@
 @using Tracker.Domain.Enums
 @using Tracker.WebApp.Components.Attachments
 @using Tracker.WebApp.Components.BoardUsers
+@using Tracker.WebApp.Components.ItemComments
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 
@@ -129,14 +130,8 @@
                                           @onfocus=@DescriptionFocused
                                           @onblur=@DescriptionBlurred />
                         </MudStack>
-                        <MudPaper Style="overflow-y:auto"
-                                  Class="pa-2 mud-width-full mud-background-gray">
-                            @for (int i = 0; i < 100; i++)
-                            {
-                                int b = i;
-                                <MudText> Hello @i and @b</MudText>
-                            }
-                        </MudPaper>
+
+                        <ItemCommentsSection ItemId=@Item.Id/>
                     </MudStack>
                 </MudStack>
             </DialogContent>

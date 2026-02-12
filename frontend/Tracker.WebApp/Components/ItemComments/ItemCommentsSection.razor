@@ -1,0 +1,36 @@
+﻿@using Tracker.Domain.Requests.ItemComment
+@using Tracker.Services
+@using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.Shared
+
+<MudPaper Style="overflow-y:auto"
+          Class="pa-2 mud-width-full mud-background-gray">
+    @foreach (var comment in _comments)
+    {
+        <MudText>@comment</MudText>
+    }
+    <OneLineCreateButton OnCreate=@CreateComment />
+</MudPaper>
+
+@code {
+    private List<string> _comments = ["1", "2"];
+
+    [Parameter, EditorRequired]
+    public Guid ItemId { get; set; }
+
+    [Inject] IItemCommentService commentService { get; set; } = null!;
+
+    private async Task CreateComment(string content)
+    {
+        var request = new CreateCommentRequest
+        {
+            Content = content,
+        };
+        var result = await commentService.CreateAsync(ItemId, request);
+        if (result.IsFailure)
+        {
+            return;
+        }
+        _comments.Add(result.Value.Content);
+    }
+}
