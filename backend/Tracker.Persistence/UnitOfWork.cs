@@ -24,7 +24,7 @@ internal class UnitOfWork : IUnitOfWork
 
     public IUserRepository UserRepository
         => _userRepository ??= new UserRepository(_dbContext);
-    public IWorkspaceRepository WorkspaceRepository 
+    public IWorkspaceRepository WorkspaceRepository
         => _workspaceRepository ??= new WorkspaceRepository(_dbContext);
     public IWorkspaceUserRepository WorkspaceUserRepository
     => _userWorkspaceRepository ??= new WorkspaceUserRepository(_dbContext);

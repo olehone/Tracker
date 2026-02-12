@@ -1,6 +1,4 @@
-﻿using Tracker.Domain.Enums;
-
-namespace Tracker.Domain.Dtos;
+﻿namespace Tracker.Domain.Dtos;
 
 public class ItemCommentDto
 {

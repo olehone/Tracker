@@ -4,6 +4,7 @@ using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.ItemComments.Create;
