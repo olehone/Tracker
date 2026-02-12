@@ -35,7 +35,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
                 var publicBoards = await uow.BoardRepository.GetPublicByWorkspaceAsync(request.Id);
                 return workspace.ToFullDto(WorkspacePermissionsDto.None, publicBoards);
             }
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("Workspace is private");
         }
 
         var userId = userContext.GetUserId();
@@ -51,7 +51,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
 
         if (!WorkspacePolicy.CanView(userRole, workspace.Visibility, workspaceRole))
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("This workspace is private");
         }
 
         var boards = await uow.BoardRepository

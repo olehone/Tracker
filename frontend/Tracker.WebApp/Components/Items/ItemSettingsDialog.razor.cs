@@ -113,6 +113,24 @@ public partial class ItemSettingsDialog : IDisposable
         await BoardState.ItemsState.UpdateAsync(Item.Id, request);
     }
 
+    private void StartEditingDescription()
+    {
+        _isEditingDescription = true;
+    }
+
+    private async Task FinishEditingDescription()
+    {
+        _isEditingDescription = false;
+
+        if (_description == Item.Description)
+        {
+            return;
+        }
+
+        var request = new UpdateBoardItemRequest { Description = _description };
+        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
+    }
+
     private async Task RemoveDueDate()
     {
         var request = new UpdateBoardItemRequest

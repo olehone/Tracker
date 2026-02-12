@@ -30,7 +30,7 @@ public class GetBoardByIdQueryHandler(
             {
                 return board.ToFullDto(BoardPermissionsDto.None);
             }
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("Board is private");
         }
 
         var userId = userContext.GetUserId();
@@ -51,7 +51,7 @@ public class GetBoardByIdQueryHandler(
 
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("Board is private");
         }
 
         return board.ToFullDto(permissions);

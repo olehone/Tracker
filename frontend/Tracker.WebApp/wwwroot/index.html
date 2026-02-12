@@ -1,45 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0"/>
+          content="width=device-width, initial-scale=1.0" />
     <title>Tracker.WebApp</title>
-    <base href="/"/>
+    <base href="/" />
     <link rel="icon"
           type="image/png"
-          href="favicon.png"/>
+          href="favicon.png" />
     <link href="manifest.webmanifest"
-          rel="manifest"/>
+          rel="manifest" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-          rel="stylesheet"/>
+          rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css"
-          rel="stylesheet"/>
+          rel="stylesheet" />
     <link href="site.css"
-          rel="stylesheet"/>
+          rel="stylesheet" />
     <link rel="apple-touch-icon"
           sizes="512x512"
-          href="icon-512.png"/>
+          href="icon-512.png" />
     <link rel="apple-touch-icon"
           sizes="192x192"
-          href="icon-192.png"/>
+          href="icon-192.png" />
+    <link href="/_content/PSC.Blazor.Components.MarkdownEditor/css/markdowneditor.css"
+          rel="stylesheet" />
+    <link href="/_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css"
+          rel="stylesheet" />
 </head>
 <body>
-<div id="app">
+    <div id="app">
         Loading...
-</div>
+    </div>
 
-<div id="blazor-error-ui"
-     style="background: red; bottom: 0; box-shadow: 0 -1px 2px rgba(0,0,0,0.2); display: none; left: 0; padding: 0.6rem 1.25rem; position: fixed; width: 100%; z-index: 1000; color: #000;">
-    An unhandled error has occurred.
-    <a href=""
-       class="reload"
-       style="color: #000; margin-left: 0.5rem; font-weight:bold;">Reload</a>
-    <a class="dismiss"
-       style="color: #000; margin-left: 0.5rem; font-weight:bold;">Close</a>
-</div>
-<script src="_framework/blazor.webassembly.js"></script>
-<script src="_content/MudBlazor/MudBlazor.min.js"></script>
-<script>navigator.serviceWorker.register('service-worker.js');</script>
+    <div id="blazor-error-ui"
+         style="background: red; bottom: 0; box-shadow: 0 -1px 2px rgba(0,0,0,0.2); display: none; left: 0; padding: 0.6rem 1.25rem; position: fixed; width: 100%; z-index: 1000; color: #000;">
+        An unhandled error has occurred.
+        <a href=""
+           class="reload"
+           style="color: #000; margin-left: 0.5rem; font-weight:bold;">Reload</a>
+        <a class="dismiss"
+           style="color: #000; margin-left: 0.5rem; font-weight:bold;">Close</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="site.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="/_content/PSC.Blazor.Components.MarkdownEditor/js/markdownEditor.js"></script>
+    <script src="/_content/PSC.Blazor.Components.MarkdownEditor/js/easymde.min.js"></script>
 </body>
 </html>

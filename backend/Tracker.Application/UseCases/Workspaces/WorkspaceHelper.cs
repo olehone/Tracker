@@ -25,7 +25,7 @@ public static class WorkspaceHelper
         var isAllowed = await IsActionAllowed(uow, userContext, workspace, action);
         if (!isAllowed)
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("You are not allowed to change workspace");
         }
         return workspace;
     }

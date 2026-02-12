@@ -9,16 +9,22 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    networks:
+      - main
+
 
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     restart: unless-stopped
-    command: "azurite --blobHost 0.0.0.0 --location /data --debug /data/debug.log --skipApiVersionCheck"
+    command: "azurite --blobHost 0.0.0.0 --location /data --debug /data/debug.log --skipApiVersionCheck --loose"
     ports:
       - "10000:10000"
     volumes:
       - azurite_data:/data
+    networks:
+      - main
+
 
   nginx:
     image: nginx:alpine
@@ -28,7 +34,13 @@ services:
       - "8080:8080"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - main
 
 volumes:
   sqlserver_data:
   azurite_data:
+
+networks: 
+  main:
+    driver: bridge

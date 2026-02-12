@@ -33,7 +33,7 @@ public sealed class DeleteAvatarCommandHandler(
 
         if (currentUser.Id != request.UserId && currentUser.Role < GlobalRole.Admin)
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("You cannot delete avatar of another user");
         }
 
         await avatarStorageService.DeleteAsync(updatedUser.Id, cancellationToken);

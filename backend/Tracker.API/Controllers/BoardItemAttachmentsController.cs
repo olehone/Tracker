@@ -7,6 +7,7 @@ using Tracker.Application.UseCases.BoardItemAttachments.Delete;
 using Tracker.Application.UseCases.BoardItemAttachments.Download;
 using Tracker.Application.UseCases.BoardItemAttachments.GetAll;
 using Tracker.Application.UseCases.BoardItemAttachments.Upload;
+using Tracker.Domain.Results;
 
 namespace Tracker.API.Controllers;
 
@@ -15,26 +16,42 @@ namespace Tracker.API.Controllers;
 [Authorize]
 public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("/attachments/{attachmentId:guid}"]
-    public async Task<IActionResult> DownloadAsync(Guid attachmentId,
-        [FromQuery] bool isDirect = false, [FromQuery] bool isRedirect = true)
+    [HttpGet("/api/attachments/{attachmentId:guid}")]
+    public async Task<IActionResult> DownloadAsync(Guid attachmentId)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
             AttachmentId = attachmentId,
-            ForceDirect = isDirect,
+            ForceDirect = true,
         };
         var result = await mediator.Send(mediatorRequest);
         if (result.IsFailure)
         {
             return result.ToActionResult();
         }
-        return isRedirect
-            ? Redirect(result.Value)
-            : result.ToActionResult();
+        return File(result.Value.Stream!, result.Value.ContentType, result.Value.FileName, true);
     }
 
-    [HttpDelete("{attachmentId:guid}")]
+    [HttpGet("/api/attachments/{attachmentId:guid}/url")]
+    public async Task<IActionResult> GetUrlAsync(Guid attachmentId, [FromQuery] bool isRedirect = true)
+    {
+        var mediatorRequest = new DownloadAttachmentCommand
+        {
+            AttachmentId = attachmentId,
+            ForceDirect = false,
+        };
+        var result = await mediator.Send(mediatorRequest);
+        if (result.IsFailure)
+        {
+            return result.ToActionResult();
+        }
+        var url = result.Value.RedirectUrl!;
+        return isRedirect
+            ? Redirect(url)
+            : Result.SuccessOf(url).ToActionResult();
+    }
+
+    [HttpDelete("/api/attachments/{attachmentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid attachmentId)
     {
         var mediatorRequest = new DeleteAttachmentCommand

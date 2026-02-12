@@ -1,0 +1,26 @@
+﻿@using Tracker.Domain.Requests.ItemComment
+@using Tracker.Services
+@using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.Shared
+
+<MudPaper Outlined
+          Style="overflow-y:auto; max-height:500px"
+          Class="pa-2 mud-width-full mud-background-gray">
+    <OneLineCreateButton OnCreate=@CreateComment />
+    @foreach (var comment in _comments)
+    {
+        <ItemComment Comment=@comment />
+    }
+
+    @if (_hasMore)
+    {
+        <div @ref="_trigger" style="height:1px"></div>
+    }
+    @if (_isLoading)
+    {
+        <MudStack Justify="Justify.Center">
+            <MudProgressCircular Indeterminate
+                                 Color="Color.Primary" />
+        </MudStack>
+    }
+</MudPaper>

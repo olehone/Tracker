@@ -1,33 +1,46 @@
 ﻿@using Tracker.WebApp.Shared
 
 <div class="pa-2 mud-width-full">
-    <MudTooltip>
-        <ChildContent>
-            <MudStack Row
-                      AlignItems="AlignItems.Center"
-                      Justify="Justify.SpaceBetween"
-                      Class=@GetClass()
-                      Style="@($"background:{Colors.Gray.Lighten3};")">
 
-                <MudText Class="mx-2"
-                         Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
-                    @File.FileName
-                </MudText>
-                <MudStack Row
-                          AlignItems="AlignItems.Center"
-                          Justify="Justify.SpaceBetween">
-                    <MudText Class="text-ellipsis">
-                        @UiHelper.FileSize(File.SizeBytes)
-                    </MudText>
-                    @if (!Disabled && !File.IsDeleted)
-                    {
-                        <MudIconButton Icon=@Icons.Material.Filled.ArrowDownward
-                                       OnClick=@Download />
-                        <MudIconButton Icon=@Icons.Material.Filled.Delete
-                                       OnClick=@Delete />
-                    }
-                </MudStack>
-            </MudStack>
+    <MudTooltip Delay="500">
+        <ChildContent>
+            <MudCard Class="mud-width-full">
+                @if (!File.IsDeleted && _imageUrl is not null)
+                {
+                    <MudCardMedia Image=@_imageUrl
+                                  Height="200" />
+                }
+                <MudCardContent Class="pa-0">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center"
+                              Justify="Justify.SpaceBetween"
+                              Class=@GetClass()
+                              Style="@($"background:{Colors.Gray.Lighten3};")">
+
+                        <MudText Class="mx-2"
+                                 Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
+                            @File.FileName
+                        </MudText>
+                        <MudStack Class="mx-2"
+                                  Row
+                                  AlignItems="AlignItems.Center"
+                                  Justify="Justify.SpaceBetween">
+                            <MudText Class="text-ellipsis">
+                                @UiHelper.FileSize(File.SizeBytes)
+                            </MudText>
+                            @if (!Disabled && !File.IsDeleted)
+                            {
+                                <MudIconButton Icon=@Icons.Material.Filled.ArrowDownward
+                                               OnClick=@DownloadAsync />
+                                <MudIconButton Icon=@Icons.Material.Filled.Link
+                                               OnClick=@CopyLinkToClipboardAsync />
+                                <MudIconButton Icon=@Icons.Material.Filled.Delete
+                                               OnClick=@DeleteAsync />
+                            }
+                        </MudStack>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
         </ChildContent>
         <TooltipContent>
             <MudStack Row

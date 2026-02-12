@@ -12,6 +12,7 @@ public interface IUnitOfWork : IAsyncDisposable
     IBoardUserRepository BoardUserRepository { get; }
     IBoardListRepository BoardListRepository{ get; }
     IBoardItemRepository BoardItemRepository{ get; }
+    IItemCommentRepository ItemCommentRepository{ get; }
     IBoardItemAssigneeRepository BoardItemAssigneeRepository{ get; }
     IBoardItemAttachmentRepository BoardItemAttachmentRepository{ get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }

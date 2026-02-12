@@ -15,38 +15,58 @@ public partial class FileView
 
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] IItemAttachmentService Attachments { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
     private string? _imageUrl;
 
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
+        if (File.IsDeleted)
+        {
+            return;
+        }
+
         if (IsImage(File))
         {
-            await LoadImageUrl();
+            await LoadImageUrlAsync();
         }
     }
 
-    private async Task LoadImageUrl()
+    private async Task LoadImageUrlAsync()
     {
-        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        var result = await Attachments.GetUrlAsync(File.Id);
         if (result.IsSuccess)
         {
             _imageUrl = result.Value;
         }
     }
 
-    private async Task Download()
+    private async Task DownloadAsync()
     {
-        var result = await Attachments.DownloadAsync(File.Id, isDirect: false, isRedirect: false);
+        var result = await Attachments.GetUrlAsync(File.Id, isRedirect: false);
         if (result.IsSuccess)
         {
             await JS.InvokeVoidAsync("open", result.Value, "_blank");
         }
     }
 
-    private async Task Delete()
+    private async Task CopyLinkToClipboardAsync()
+    {
+        try
+        {
+            var link = $"api/attachments/{File.Id}";
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", link);
+            Snackbar.Add("Copied link to clipboard", Severity.Normal);
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Cannot write to clipboard: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteAsync()
     {
         var confirmed = await DialogService.ShowMessageBox(
             title: "Warning",
@@ -76,7 +96,7 @@ public partial class FileView
 
     private string GetClass()
     {
-        var baseClass = "border-solid rounded mud-width-full pa-2";
+        var baseClass = "border-solid rounded mud-width-full pa-0";
         if (File.IsDeleted)
         {
             baseClass += $" mud-theme-{Color.Error.ToDescriptionString()}";
