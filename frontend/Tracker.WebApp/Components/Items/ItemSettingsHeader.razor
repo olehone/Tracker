@@ -3,37 +3,37 @@
 @using Tracker.WebApp.Components.Users
 
 <MudStack Row
-		  Justify="Justify.SpaceBetween"
-		  StretchItems="StretchItems.Start"
-		  AlignItems="AlignItems.Center">
-	<MudStack Row
-			  AlignItems="AlignItems.Center"
-			  StretchItems="StretchItems.End">
-		<MudCheckBox Value="@_isDone"
-					 Disabled=@Disabled
-					 ValueChanged=@((bool isDone) => ChangeIsDone(isDone))
-					 Size="Size.Large" />
+          Justify="Justify.SpaceBetween"
+          StretchItems="StretchItems.Start"
+          AlignItems="AlignItems.Center">
+    <MudStack Row
+              AlignItems="AlignItems.Center"
+              StretchItems="StretchItems.End">
+        <MudCheckBox Value="@_isDone"
+                     Disabled=@Disabled
+                     ValueChanged=@((bool isDone) => ChangeIsDone(isDone))
+                     Size="Size.Large" />
 
-		<MudTextField @bind-Value=@_title
-					  Disabled=@Disabled
-					  Typo="Typo.h5"
-					  FullWidth
-					  Required
-					  Underline="false"
-					  Variant="Variant.Text"
-					  Style=@GetTitleStyle()
-					  @onblur=@TitleBlurred
-					  @onfocus=@TitleFocused />
-	</MudStack>
-	<MudStack Row
-			  AlignItems="AlignItems.Center">
-		<MudMenu Icon=@Icons.Material.Filled.MoreVert
-				 AriaLabel="Open item menu">
-			<MudMenuItem Label="Delete"
-						 Disabled=@Disabled
-						 OnClick=@Delete />
-		</MudMenu>
-		<MudIconButton Icon=@Icons.Material.Filled.Close
-					   OnClick=@Cancel />
-	</MudStack>
+        <MudTextField @bind-Value=@_title
+                      Disabled=@Disabled
+                      Typo="Typo.h5"
+                      FullWidth
+                      Required
+                      Underline="false"
+                      Variant="Variant.Text"
+                      Style=@GetTitleStyle()
+                      @onblur=@TitleBlurred
+                      @onfocus=@TitleFocused />
+    </MudStack>
+    <MudStack Row
+              AlignItems="AlignItems.Center">
+        <MudMenu Icon=@Icons.Material.Filled.MoreVert
+                 AriaLabel="Open item menu">
+            <MudMenuItem Label="Delete"
+                         Disabled=@Disabled
+                         OnClick=@Delete />
+        </MudMenu>
+        <MudIconButton Icon=@Icons.Material.Filled.Close
+                       OnClick=@Cancel />
+    </MudStack>
 </MudStack>

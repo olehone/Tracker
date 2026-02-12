@@ -3,6 +3,7 @@
 @using Markdig.Syntax.Inlines
 @using Microsoft.AspNetCore.Components.Rendering
 @using PSC.Blazor.Components.MarkdownEditor.Enums
+@using PSC.Blazor.Components.MarkdownEditor.Models
 @using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Attachments
 
@@ -12,9 +13,12 @@
         <MudStack Row
                   AlignItems="AlignItems.Center"
                   Justify="Justify.SpaceBetween">
-            <MudListSubheader Gutters="false">
-                Description
-            </MudListSubheader>
+            @if (Header is not null)
+            {
+                <MudListSubheader Gutters="false">
+                    @Header
+                </MudListSubheader>
+            }
 
             <MudIconButton Color="Color.Primary"
                            Icon=@Icons.Material.Filled.RemoveRedEye
@@ -85,10 +89,23 @@ else
 
             <MarkdownToolbarButton Icon="fa fa-eye no-disable"
                                    Name=@_togglePreviewName
-                                   Title="Preview"/>
+                                   Title="Preview" />
 
         </Toolbar>
     </MarkdownEditor>
+
+    <MudFileUpload T="IBrowserFile"
+                   Disabled=@Disabled
+                   FilesChanged=@UploadAndAddAsync
+                   MaximumFileCount="1">
+        <ActivatorContent>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon=@Icons.Material.Filled.AttachFile>
+                Attach
+            </MudButton>
+        </ActivatorContent>
+    </MudFileUpload>
 }
 
 
@@ -98,10 +115,12 @@ else
     private bool _isPreview = true;
 
     [Parameter, EditorRequired]
-    public string Value { get; set; } = string.Empty;
+    public string Value { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<string> ValueChanged { get; set; }
 
+    [Parameter]
+    public string Header { get; set; }
     [Parameter, EditorRequired]
     public List<FileDto> Attachments { get; set; }
     [Parameter, EditorRequired]
@@ -169,6 +188,12 @@ else
             builder.AddMarkupContent(seq++, remainingHtml);
         }
     };
+
+    private async Task UploadAndAddAsync(IBrowserFile file)
+    {
+        await UploadAsync.InvokeAsync(file);
+
+    }
 
     private Task OnCustomButtonClicked(MarkdownButtonEventArgs eventArgs)
     {

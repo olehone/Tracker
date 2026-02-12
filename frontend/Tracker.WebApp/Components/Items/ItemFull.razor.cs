@@ -13,7 +13,7 @@ public partial class ItemFull
     {
         CloseButton = false,
         NoHeader = true,
-        MaxWidth = MaxWidth.Small
+        MaxWidth = MaxWidth.Medium
     };
 
     [CascadingParameter]
