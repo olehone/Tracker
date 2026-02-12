@@ -21,6 +21,7 @@ public class ItemCommentRepository : Repository<ItemComment, Guid>, IItemComment
             .OrderByDescending(c => c.UploadedAt)
             .Take(take)
             .Include(a => a.UploadedBy)
+            .Include(a => a.Attachments)
             .ToListAsync();
     }
 }

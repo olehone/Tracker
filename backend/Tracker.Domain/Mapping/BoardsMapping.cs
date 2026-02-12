@@ -80,6 +80,8 @@ public static class BoardsMapping
             Id = comment.Id,
             Content = comment.Content,
             UploadedAt = comment.UploadedAt,
+            Attachments = comment.Attachments
+                .Select(a => a.ToDto()).ToList()
         };
     }
 
