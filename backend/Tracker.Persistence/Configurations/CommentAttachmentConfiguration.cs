@@ -14,7 +14,7 @@ public class CommentAttachmentConfiguration : IEntityTypeConfiguration<CommentAt
 
         builder.HasOne(attachment => attachment.Comment)
             .WithMany(comment => comment.Attachments)
-            .HasForeignKey(attachment => attachment.BoardCommentId);
+            .HasForeignKey(attachment => attachment.ItemCommentId);
 
         builder.Property(attachment => attachment.OriginalFileName)
             .IsRequired();

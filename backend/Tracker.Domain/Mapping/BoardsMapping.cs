@@ -96,4 +96,18 @@ public static class BoardsMapping
             IsDeleted = attachment.IsDeleted,
         };
     }
+
+    public static CommentAttachmentDto ToDto(this CommentAttachment attachment)
+    {
+        return new CommentAttachmentDto
+        {
+            Id = attachment.Id,
+            UploadedAt = attachment.UploadedAt,
+            UploadedByName = attachment.UploadedBy.Username,
+            FileName = attachment.OriginalFileName,
+            ContentType = attachment.ContentType,
+            SizeBytes = attachment.SizeBytes,
+            IsDeleted = attachment.IsDeleted,
+        };
+    }
 }

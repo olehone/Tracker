@@ -24,11 +24,11 @@ public class UploadCommentAttachmentCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext,
-            request.BoardItemId, request.BoardId);
-        if (itemResult.IsFailure)
+        var commentResult = await BoardHelper.GetItemCommentForActionAsync(uow, userContext,
+            request.CommentId);
+        if (commentResult.IsFailure)
         {
-            return itemResult.Error;
+            return commentResult.Error;
         }
 
         var userId = userContext.GetUserId();
@@ -42,10 +42,9 @@ public class UploadCommentAttachmentCommandHandler(
         var storageFileName = await attachments.UploadAsync(request.Content,
             storageFolder, request.ContentType, cancellationToken);
 
-
-        var newAttachment = new BoardItemAttachment
+        var newAttachment = new CommentAttachment
         {
-            BoardItemId = request.BoardItemId,
+            ItemCommentId = request.CommentId,
             UserId = userId,
             OriginalFileName = request.FileName,
             ContentType = request.ContentType,
@@ -54,7 +53,7 @@ public class UploadCommentAttachmentCommandHandler(
             StorageFolder = storageFolder,
         };
 
-        await uow.BoardItemAttachmentRepository.AddAsync(newAttachment);
+        await uow.CommentAttachmentRepository.AddAsync(newAttachment);
         var result = await uow.SaveChangesAsync(cancellationToken);
 
         newAttachment.UploadedBy = currentUser;
