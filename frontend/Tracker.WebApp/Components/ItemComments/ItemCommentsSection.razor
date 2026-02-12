@@ -3,34 +3,24 @@
 @using Tracker.Services.Abstraction
 @using Tracker.WebApp.Components.Shared
 
-<MudPaper Style="overflow-y:auto"
+<MudPaper Outlined
+          Style="overflow-y:auto; max-height:500px"
           Class="pa-2 mud-width-full mud-background-gray">
+    <OneLineCreateButton OnCreate=@CreateComment />
     @foreach (var comment in _comments)
     {
-        <MudText>@comment</MudText>
+        <ItemComment Comment=@comment />
     }
-    <OneLineCreateButton OnCreate=@CreateComment />
-</MudPaper>
 
-@code {
-    private List<string> _comments = ["1", "2"];
-
-    [Parameter, EditorRequired]
-    public Guid ItemId { get; set; }
-
-    [Inject] IItemCommentService commentService { get; set; } = null!;
-
-    private async Task CreateComment(string content)
+    @if (_hasMore)
     {
-        var request = new CreateCommentRequest
-        {
-            Content = content,
-        };
-        var result = await commentService.CreateAsync(ItemId, request);
-        if (result.IsFailure)
-        {
-            return;
-        }
-        _comments.Add(result.Value.Content);
+        <div @ref="_trigger" style="height:1px"></div>
     }
-}
+    @if (_isLoading)
+    {
+        <MudStack Justify="Justify.Center">
+            <MudProgressCircular Indeterminate
+                                 Color="Color.Primary" />
+        </MudStack>
+    }
+</MudPaper>

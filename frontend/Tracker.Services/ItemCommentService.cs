@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -11,6 +12,11 @@ public class ItemCommentService(IApiErrorHandler apiErrorHandler,
     IItemCommentApi api) : IItemCommentService
 
 {
+    public Task<Result<CursorPage<ItemCommentDto>>> GetAsync(Guid itemId, CursorTimeRequest request)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.GetAsync(itemId, request));
+    }
+
     public Task<Result<ItemCommentDto>> CreateAsync(Guid itemId, CreateCommentRequest request)
     {
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(itemId, request));

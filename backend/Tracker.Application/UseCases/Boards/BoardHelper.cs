@@ -137,8 +137,6 @@ public static class BoardHelper
         }
         var workspaceRole = await uow.WorkspaceUserRepository.GetRoleAsync(userId, board.WorkspaceId);
         var boardRole = await uow.BoardUserRepository.GetRoleAsync(userId, board.Id);
-        var permissions = BoardPolicy
-            .GetPermissions(board.PermissionRoles, workspaceRole, boardRole, user.Role);
 
         return BoardPolicy.CanView(user.Role, board.Visibility, workspaceRole, boardRole)
             ? item

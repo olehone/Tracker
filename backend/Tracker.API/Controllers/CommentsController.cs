@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.ItemComments.Create;
+using Tracker.Application.UseCases.ItemComments.Get;
 
 namespace Tracker.API.Controllers;
 
@@ -14,9 +15,17 @@ public class CommentsController(IMediator mediator) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
-    public async Task<IActionResult> GetAsync([FromQuery] PaginatedSearchRequest request)
+    public async Task<IActionResult> GetAsync(Guid itemId,
+        [FromQuery] CursorTimeRequest request)
     {
-        return BadRequest();
+        var mediatorRequest = new LoadCommentsQuery
+        {
+            ItemId = itemId,
+            Before = request.Before,
+            Take = request.Amount
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
     }
 
     [HttpPost]

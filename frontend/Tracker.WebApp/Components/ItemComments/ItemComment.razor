@@ -1,0 +1,11 @@
+﻿@using Tracker.Domain.Dtos
+
+<MudPaper Class="ma-2 pa-2">
+    <MudText>@Comment.Id</MudText>
+    <MudText>@Comment.Content</MudText>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public required ItemCommentDto Comment { get; set; }
+}
