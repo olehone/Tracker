@@ -33,7 +33,7 @@ public sealed class GetWorkspacesQueryHandler(
         var userRole = user.Role;
         if (userRole < GlobalRole.Admin)
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("You must to be admin to perform this action");
         }
 
         int skip = (request.Page - 1) * request.AmountInPage;

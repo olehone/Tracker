@@ -34,7 +34,7 @@ public class CheckBoardRealtimeAccessQueryHandler(
 
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("Board is private");
         }
 
         return Result.Success();

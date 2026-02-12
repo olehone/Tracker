@@ -38,7 +38,7 @@ public class UploadAvatarCommandHandler(
 
         if (currentUser.Id != request.UserId && currentUser.Role < GlobalRole.Admin)
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("You can't upload avatar for another user");
         }
 
         updatedUser.AvatarUpdatedAt = DateTimeOffset.UtcNow;

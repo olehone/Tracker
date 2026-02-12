@@ -35,7 +35,7 @@ public class UpdateUserCommandHandler(
 
         if (currentUser.Id != request.UserId && currentUser.Role < GlobalRole.Admin)
         {
-            return AuthErrors.Forbidden();
+            return AuthErrors.Forbidden("You cannot update another user");
         }
 
         if (updatedUser.Username != request.Username &&
