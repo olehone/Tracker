@@ -1,6 +1,4 @@
-﻿using System;
-using MediatR;
-using Tracker.Application.Common.Auth;
+﻿using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
@@ -156,36 +154,37 @@ public static class BoardHelper
             return Error.Gone("Attachment");
         }
 
-        BoardAction action = BoardAction.ChangeItem;
-
-        if (userContext.IsUnauthenticated())
+        var item = await GetBoardItemForActionAsync(uow, userContext, attachment.BoardItemId);
+        if (item.IsFailure)
         {
-            return AuthErrors.Unauthenticated;
-        }
-
-        var board = await uow.BoardRepository.GetWithWorkspaceByItemAttachmentAsync(attachmentId);
-        if (board is null)
-        {
-            return Error.NotFound("Board", "attachment");
-        }
-
-        var boardItem = await uow.BoardItemRepository.GetByIdAsync(attachment.BoardItemId);
-        if (boardItem is null)
-        {
-            return Error.NotFound("Board item", "attachment");
-        }
-
-        var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
-        var assigned = boardItem.Assignees
-            .Any(bia => bia.BoardUser.UserId == userContext.GetUserId());
-
-        if (!isAllowed && !assigned)
-        {
-            return AuthErrors.Forbidden("You cannot change this item");
+            return item.Error;
         }
 
         return attachment;
     }
+
+    public static async Task<Result<ItemComment>> GetItemCommentForActionAsync(IUnitOfWork uow,
+        IUserContext userContext, Guid commentId)
+    {
+        var comment = await uow.ItemCommentRepository.GetByIdAsync(commentId);
+        if (comment is null)
+        {
+            return Error.NotFound("Comment");
+        }
+        if (comment.IsDeleted)
+        {
+            return Error.Gone("Comment");
+        }
+
+        var item = await GetBoardItemForActionAsync(uow, userContext, comment.BoardItemId);
+        if (item.IsFailure)
+        {
+            return item.Error;
+        }
+
+        return comment;
+    }
+
 
     // User must be authenticated before call
     // for proper separation of unauthenticated and forbidden error

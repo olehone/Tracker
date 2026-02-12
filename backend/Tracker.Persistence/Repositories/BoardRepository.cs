@@ -59,6 +59,17 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
                         bi.Attachments.Any(a => a.Id == attachmentId))));
     }
 
+    public Task<Board?> GetWithWorkspaceByCommentAttachmentAsync(Guid commentId)
+    {
+        return _dbSet
+            .AsNoTracking()
+            .Include(b => b.Workspace)
+            .FirstOrDefaultAsync(b =>
+                b.BoardLists.Any(l =>
+                    l.BoardItems.Any(bi =>
+                        bi.Comments.Any(a => a.Id == commentId))));
+    }
+
     public Task<Board?> GetByIdWithListsItemsUsersAsync(Guid id)
     {
         return _dbSet
