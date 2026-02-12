@@ -20,6 +20,7 @@ internal class UnitOfWork : IUnitOfWork
     private IItemCommentRepository _itemCommentRepository = null!;
     private IBoardItemAssigneeRepository _boardItemAssigneeRepository = null!;
     private IBoardItemAttachmentRepository _boardItemAttachmentRepository = null!;
+    private ICommentAttachmentRepository _commentAttachmentRepository = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
 
     public IUserRepository UserRepository
@@ -42,9 +43,10 @@ internal class UnitOfWork : IUnitOfWork
         => _boardItemAssigneeRepository ??= new BoardItemAssigneeRepository(_dbContext);
     public IBoardItemAttachmentRepository BoardItemAttachmentRepository
         => _boardItemAttachmentRepository ??= new BoardItemAttachmentRepository(_dbContext);
+    public ICommentAttachmentRepository CommentAttachmentRepository
+        => _commentAttachmentRepository ??= new CommentAttachmentRepository(_dbContext);
     public IRefreshTokenRepository RefreshTokenRepository
         => _refreshTokenRepository ??= new RefreshTokenRepository(_dbContext);
-
 
     public UnitOfWork(ApplicationDbContext applicationDbContext)
     {

@@ -6,15 +6,16 @@ namespace Tracker.Application.Common.UnitOfWork;
 public interface IUnitOfWork : IAsyncDisposable
 {
     IUserRepository UserRepository { get; }
-    IWorkspaceRepository WorkspaceRepository{ get; }
+    IWorkspaceRepository WorkspaceRepository { get; }
     IWorkspaceUserRepository WorkspaceUserRepository { get; }
-    IBoardRepository BoardRepository{ get; }
+    IBoardRepository BoardRepository { get; }
     IBoardUserRepository BoardUserRepository { get; }
-    IBoardListRepository BoardListRepository{ get; }
-    IBoardItemRepository BoardItemRepository{ get; }
-    IItemCommentRepository ItemCommentRepository{ get; }
-    IBoardItemAssigneeRepository BoardItemAssigneeRepository{ get; }
-    IBoardItemAttachmentRepository BoardItemAttachmentRepository{ get; }
+    IBoardListRepository BoardListRepository { get; }
+    IBoardItemRepository BoardItemRepository { get; }
+    IItemCommentRepository ItemCommentRepository { get; }
+    IBoardItemAssigneeRepository BoardItemAssigneeRepository { get; }
+    IBoardItemAttachmentRepository BoardItemAttachmentRepository { get; }
+    ICommentAttachmentRepository CommentAttachmentRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
     Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
