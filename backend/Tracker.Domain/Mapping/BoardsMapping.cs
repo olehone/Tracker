@@ -73,6 +73,15 @@ public static class BoardsMapping
         };
     }
 
+    public static ItemCommentDto ToDto(this ItemComment comment)
+    {
+        return new ItemCommentDto()
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+        };
+    }
+
     public static BoardItemAttachmentDto ToDto(this BoardItemAttachment attachment)
     {
         return new BoardItemAttachmentDto

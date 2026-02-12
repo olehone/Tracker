@@ -66,7 +66,7 @@ public static class BoardHelper
     }
     
     public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow, 
-        IUserContext userContext, Guid boardItemId, Guid boardId)
+        IUserContext userContext, Guid boardItemId, Guid? boardId = null)
     {
         BoardAction action = BoardAction.ChangeItem;
 
@@ -81,7 +81,7 @@ public static class BoardHelper
             return Error.NotFound("Board");
         }
 
-        if (board.Id != boardId)
+        if (boardId is not null && board.Id != boardId)
         {
             return Error.Validation("Board does not have this item");
         }

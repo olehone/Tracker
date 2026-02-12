@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
+using Tracker.API.Services;
+using Tracker.Application.UseCases.ItemComments.Create;
 
 namespace Tracker.API.Controllers;
 
-[Route("api/board/{boardId:guid}/items/{itemId:guid}/comments")]
+[Route("api/items/{itemId:guid}/comments")]
 [ApiController]
 [Authorize]
 public class CommentsController(IMediator mediator) : ControllerBase
@@ -18,9 +20,16 @@ public class CommentsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync()
+    public async Task<IActionResult> CreateAsync(Guid itemId,
+        CreateCommentRequest request)
     {
-        return BadRequest();
+        var mediatorRequest = new CreateItemCommentCommand
+        {
+            BoardItemId = itemId,
+            Content = request.Content
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
     }
 
     [HttpPut("/api/attachments/{commentId:guid}")]

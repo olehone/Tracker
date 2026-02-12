@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Entities.Common;
+using Tracker.Domain.Results;
 
 namespace Tracker.Domain.Entities;
 
@@ -11,5 +12,10 @@ public class ItemComment : BaseEntity
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
     public bool IsDeleted { get; set; } = false;
     public User UploadedBy { get; set; } = null!;
+
+    public Error ToDto()
+    {
+        throw new NotImplementedException();
+    }
     //public ICollection<BoardItemAttachment> Attachments { get; set; } = [];
 }
