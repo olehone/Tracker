@@ -17,7 +17,6 @@ using Tracker.Application.UseCases.BoardItems.Update;
 namespace Tracker.API.Controllers;
 [Route("api/board/{boardId:guid}/items")]
 [ApiController]
-
 [Authorize]
 public class BoardItemsController(IMediator mediator,
     IHubContext<BoardHub, IClientBoardHub> hubContext,
