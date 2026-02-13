@@ -55,7 +55,7 @@ public class AttachmentsController(IMediator mediator) : ControllerBase
             : Result.SuccessOf(url).ToActionResult();
     }
 
-    [HttpPost]
+    [HttpPost("/api/attachments/{parentId:guid}")]
     public async Task<IActionResult> UploadAsync(Guid parentId,
         [FromForm] FileUploadRequest request, [FromQuery] AttachmentType type)
     {

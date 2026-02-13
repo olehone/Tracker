@@ -25,7 +25,6 @@ public class UploadAttachmentCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-
         var result = await uow.SaveChangesAsync(cancellationToken);
         var attachment = request.Type switch
         {
