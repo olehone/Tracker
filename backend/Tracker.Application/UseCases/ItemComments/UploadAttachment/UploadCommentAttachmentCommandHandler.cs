@@ -17,9 +17,9 @@ public class UploadCommentAttachmentCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IAttachmentStorageService attachments,
     IOptions<BlobOptions> options)
-    : IRequestHandler<UploadCommentAttachmentCommand, Result<CommentAttachmentDto>>
+    : IRequestHandler<UploadCommentAttachmentCommand, Result<FileDto>>
 {
-    public async Task<Result<CommentAttachmentDto>> Handle(UploadCommentAttachmentCommand request,
+    public async Task<Result<FileDto>> Handle(UploadCommentAttachmentCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();

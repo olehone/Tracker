@@ -1,11 +1,18 @@
 ﻿@using Tracker.Domain.Dtos
+@using Tracker.WebApp.Components.Attachments
 
 <MudPaper Class="ma-2 pa-2">
-    <MudText>@Comment.Id</MudText>
     <MudText>@Comment.Content</MudText>
+    @foreach (var attachment in Comment.Attachments)
+    {
+        <FileView File=@attachment
+                  Disabled=@Disabled />
+    }
 </MudPaper>
 
 @code {
-    [Parameter]
-    public required ItemCommentDto Comment { get; set; }
+    [Parameter, EditorRequired]
+    public ItemCommentDto Comment { get; set; }
+    [Parameter, EditorRequired]
+    public bool Disabled { get; set; }
 }

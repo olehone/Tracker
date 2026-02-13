@@ -95,24 +95,6 @@ public partial class ItemSettingsDialog : IDisposable
         }
     }
 
-    private void DescriptionFocused()
-    {
-        _isEditingDescription = true;
-    }
-
-    private async Task DescriptionBlurred()
-    {
-        _isEditingDescription = false;
-
-        if (_description == Item.Description)
-        {
-            return;
-        }
-
-        var request = new UpdateBoardItemRequest { Description = _description };
-        await BoardState.ItemsState.UpdateAsync(Item.Id, request);
-    }
-
     private void StartEditingDescription()
     {
         _isEditingDescription = true;

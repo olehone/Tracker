@@ -4,7 +4,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.ItemComments.UploadAttachment;
 
-public class UploadCommentAttachmentCommand : IRequest<Result<CommentAttachmentDto>>
+public class UploadCommentAttachmentCommand : IRequest<Result<FileDto>>
 {
     public required Guid CommentId { get; set; }
     public required Stream Content { get; set; }

@@ -85,9 +85,9 @@ public static class BoardsMapping
         };
     }
 
-    public static BoardItemAttachmentDto ToDto(this BoardItemAttachment attachment)
+    public static FileDto ToDto(this BoardItemAttachment attachment)
     {
-        return new BoardItemAttachmentDto
+        return new FileDto
         {
             Id = attachment.Id,
             UploadedAt = attachment.UploadedAt,
@@ -99,9 +99,9 @@ public static class BoardsMapping
         };
     }
 
-    public static CommentAttachmentDto ToDto(this CommentAttachment attachment)
+    public static FileDto ToDto(this CommentAttachment attachment)
     {
-        return new CommentAttachmentDto
+        return new FileDto
         {
             Id = attachment.Id,
             UploadedAt = attachment.UploadedAt,

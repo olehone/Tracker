@@ -6,8 +6,6 @@ using Tracker.API.Services;
 using Tracker.Application.UseCases.ItemComments.Create;
 using Tracker.Application.UseCases.ItemComments.Get;
 using Tracker.Application.UseCases.ItemComments.UploadAttachment;
-using Tracker.Domain.Dtos;
-using Tracker.Domain.Results;
 
 namespace Tracker.API.Controllers;
 
@@ -35,48 +33,36 @@ public class CommentsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> CreateAsync(Guid itemId,
         CreateCommentRequest request)
     {
-        var createCommentRequest = new CreateItemCommentCommand
+        var mediatorRequest = new CreateItemCommentCommand
         {
             BoardItemId = itemId,
             Content = request.Content,
         };
-        var commentResponse = await mediator.Send(createCommentRequest);
-        if (commentResponse.IsFailure)
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpPost("/api/comments/{commentId:guid}")]
+    public async Task<IActionResult> UploadAttachmentAsync(Guid commentId,
+        [FromForm] FileUploadRequest request)
+    {
+        await using Stream stream = request.File.OpenReadStream();
+        var mediatorRequest = new UploadCommentAttachmentCommand
         {
-            return commentResponse.ToActionResult();
-        }
+            CommentId = commentId,
+            Content = stream,
+            ContentType = request.File.ContentType,
+            FileName = request.File.FileName,
+            ContentLength = request.File.Length,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
 
-        // There may be better way to handle uploading several files
-        // to fresh created entity, i choose this approach to not let 
-        // IFormFile, and http concept, to be in application layer
-        // and not to create all streams at once
-
-        UploadCommentAttachmentCommand fileRequest;
-        Result<CommentAttachmentDto> fileResponse;
-        foreach (var file in request.Files)
-        {
-            await using Stream stream = file.OpenReadStream();
-            fileRequest = new UploadCommentAttachmentCommand
-            {
-                CommentId = commentResponse.Value.Id,
-                Content = stream,
-                ContentType = file.ContentType,
-                FileName = file.FileName,
-                ContentLength = file.Length,
-            };
-            fileResponse = await mediator.Send(fileRequest);
-
-            // Also i could add some kind of fallback for failed files
-            // now user will just see comment with not all files, unlikely, but
-            // not informative. Could wrap list of results, but require a lot of 
-            // work on result chain 
-            if (!fileResponse.IsFailure)
-            {
-                commentResponse.Value.Attachments.Add(fileResponse.Value);
-            }
-        }
-
-        return commentResponse.ToActionResult();
+    [HttpDelete("/api/comments/{commentId:guid}/attachments/{attachmentId:guid}")]
+    public async Task<IActionResult> DeleteAttachmentAsync(Guid attachmentId)
+    {
+        return BadRequest();
     }
 
     [HttpPut("/api/attachments/{commentId:guid}")]
@@ -86,7 +72,7 @@ public class CommentsController(IMediator mediator) : ControllerBase
         return BadRequest();
     }
 
-    [HttpDelete("/api/attachments/{commentId:guid}")]
+    [HttpDelete("/api/comments/{commentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid commentId)
     {
         return BadRequest();

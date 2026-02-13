@@ -17,9 +17,9 @@ public class UploadAttachmentCommandHandler(
     IUnitOfWorkFactory unitOfWorkFactory,
     IAttachmentStorageService attachments,
     IOptions<BlobOptions> options)
-    : IRequestHandler<UploadAttachmentCommand, Result<BoardItemAttachmentDto>>
+    : IRequestHandler<UploadAttachmentCommand, Result<FileDto>>
 {
-    public async Task<Result<BoardItemAttachmentDto>> Handle(UploadAttachmentCommand request,
+    public async Task<Result<FileDto>> Handle(UploadAttachmentCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();

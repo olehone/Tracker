@@ -11,9 +11,9 @@ namespace Tracker.Application.UseCases.BoardItemAttachments.GetAll;
 public class GetItemAttachmentsCommandHandler(
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
-    : IRequestHandler<GetItemAttachmentsCommand, Result<IReadOnlyList<BoardItemAttachmentDto>>>
+    : IRequestHandler<GetItemAttachmentsCommand, Result<IReadOnlyList<FileDto>>>
 {
-    public async Task<Result<IReadOnlyList<BoardItemAttachmentDto>>> Handle(
+    public async Task<Result<IReadOnlyList<FileDto>>> Handle(
         GetItemAttachmentsCommand request,
         CancellationToken cancellationToken)
     {

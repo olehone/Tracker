@@ -4,7 +4,7 @@ using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.BoardItemAttachments.Upload;
 
-public class UploadAttachmentCommand: IRequest<Result<BoardItemAttachmentDto>>
+public class UploadAttachmentCommand: IRequest<Result<FileDto>>
 {
     public required Guid BoardId { get; set; }
     public required Guid BoardItemId { get; set; }

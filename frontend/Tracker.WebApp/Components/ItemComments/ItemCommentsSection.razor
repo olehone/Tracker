@@ -1,20 +1,51 @@
 ﻿@using Tracker.Domain.Requests.ItemComment
 @using Tracker.Services
 @using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.Attachments
 @using Tracker.WebApp.Components.Shared
 
 <MudPaper Outlined
-          Style="overflow-y:auto; max-height:500px"
+          Style="overflow-y:auto;"
           Class="pa-2 mud-width-full mud-background-gray">
-    <OneLineCreateButton OnCreate=@CreateComment />
+    @if (!Disabled)
+    {
+        @foreach (var error in _errors)
+        {
+            <MudText Color="Color.Error">@error</MudText>
+        }
+        <OneLineCreateButton OnCreate=@CreateComment />
+        @foreach (var attachment in _attachments)
+        {
+            <BrowserFilePreview File=@attachment />
+        }
+        <MudFileUpload T="IBrowserFile"
+                       Disabled=@Disabled
+                       FilesChanged=@AddAttachmentAsync
+                       MaximumFileCount="1">
+            <ActivatorContent>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon=@Icons.Material.Filled.CloudUpload>
+                    Upload attachments
+                </MudButton>
+            </ActivatorContent>
+        </MudFileUpload>
+    }
     @foreach (var comment in _comments)
     {
-        <ItemComment Comment=@comment />
+        <ItemComment Comment=@comment
+                     Disabled=@Disabled />
     }
 
     @if (_hasMore)
     {
         <div @ref="_trigger" style="height:1px"></div>
+    }
+    else
+    {
+        <MudText Align="Align.Center">
+            No more comments
+        </MudText>
     }
     @if (_isLoading)
     {

@@ -1,6 +1,6 @@
 ﻿namespace Tracker.Domain.Dtos;
 
-public class BoardItemAttachmentDto
+public class FileDto
 {
     public required Guid Id { get; set; }
     public required DateTimeOffset UploadedAt { get; set; }
