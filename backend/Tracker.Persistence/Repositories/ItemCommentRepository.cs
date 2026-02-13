@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 using Tracker.Application.Common.Repositories;
 using Tracker.Domain.Entities;
 
@@ -9,6 +10,14 @@ public class ItemCommentRepository : Repository<ItemComment, Guid>, IItemComment
     public ItemCommentRepository(ApplicationDbContext applicationDbContext)
         : base(applicationDbContext)
     {
+    }
+
+    public new async Task<ItemComment?> GetByIdAsync(Guid commentId)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Include(c => c.UploadedBy)
+            .FirstOrDefaultAsync(c => c.Id == commentId);
     }
 
     public async Task<IReadOnlyCollection<ItemComment>> LoadAsync(Guid itemId,

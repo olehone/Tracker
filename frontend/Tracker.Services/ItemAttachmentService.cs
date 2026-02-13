@@ -9,7 +9,7 @@ using Tracker.Services.ApiClients;
 namespace Tracker.Services;
 
 public class AttachmentService(IApiErrorHandler apiErrorHandler,
-    IItemAttachmentApi api) : IAttachmentService
+    IAttachmentApi api) : IAttachmentService
 {
     public Task<Result<Stream>> DownloadAsync(Guid attachmentId, AttachmentType type)
     {

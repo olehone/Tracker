@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IBoardListApi>();
         services.AddApiClientWithAuth<IBoardItemApi>();
         services.AddApiClientWithAuth<IItemCommentApi>();
-        services.AddApiClientWithAuth<IItemAttachmentApi>();
+        services.AddApiClientWithAuth<IAttachmentApi>();
 
         services.AddScoped<IApiUrlService, ApiUrlService>();
         services.AddScoped<IUserService, UserService>();
