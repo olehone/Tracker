@@ -141,26 +141,35 @@ public static class BoardHelper
             : AuthErrors.Forbidden("Board is private");
     }
 
-    public static async Task<Result<BoardItemAttachment>> GetItemAttachmentForActionAsync(IUnitOfWork uow,
-        IUserContext userContext, Guid attachmentId)
+    public static async Task<Result> CanViewBoardAsync(Board board, IUnitOfWork uow, IUserContext userContext,
+        CancellationToken cancellationToken)
     {
-        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(attachmentId);
-        if (attachment is null)
+        if (userContext.IsUnauthenticated())
         {
-            return Error.NotFound("Attachment");
-        }
-        if (attachment.IsDeleted)
-        {
-            return Error.Gone("Attachment");
+            if (BoardPolicy.CanAnonView(board.Visibility))
+            {
+                return AuthErrors.Forbidden("Board is private");
+            }
         }
 
-        var item = await GetBoardItemForActionAsync(uow, userContext, attachment.BoardItemId);
-        if (item.IsFailure)
+        var userId = userContext.GetUserId();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
         {
-            return item.Error;
+            return AuthErrors.Unauthenticated;
         }
+        var userRole = user.Role;
 
-        return attachment;
+        var workspaceRole = await uow.WorkspaceUserRepository
+            .GetRoleAsync(userId, board.WorkspaceId);
+        var boardRole = await uow.BoardUserRepository
+            .GetRoleAsync(userId, board.Id);
+
+        if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
+        {
+            return AuthErrors.Forbidden("Board is private");
+        }
+        return Result.Success();
     }
 
     public static async Task<Result<ItemComment>> GetItemCommentForActionAsync(IUnitOfWork uow,
@@ -175,14 +184,22 @@ public static class BoardHelper
         {
             return Error.Gone("Comment");
         }
+        var userId = userContext.GetUserId();
+        var ownComment = comment.UploadedBy.Id == userId;
 
         var item = await GetBoardItemForActionAsync(uow, userContext, comment.BoardItemId);
-        if (item.IsFailure)
+
+        if (!item.IsFailure)
         {
-            return item.Error;
+            return comment;
         }
 
-        return comment;
+        if (item.Error.Type == ErrorType.Forbidden && ownComment)
+        {
+            return comment;
+        }
+
+        return item.Error;
     }
 
 

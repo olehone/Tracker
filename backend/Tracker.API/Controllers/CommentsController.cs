@@ -5,7 +5,6 @@ using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.ItemComments.Create;
 using Tracker.Application.UseCases.ItemComments.Get;
-using Tracker.Application.UseCases.ItemComments.UploadAttachment;
 
 namespace Tracker.API.Controllers;
 
@@ -42,28 +41,22 @@ public class CommentsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpPost("/api/comments/{commentId:guid}")]
-    public async Task<IActionResult> UploadAttachmentAsync(Guid commentId,
-        [FromForm] FileUploadRequest request)
-    {
-        await using Stream stream = request.File.OpenReadStream();
-        var mediatorRequest = new UploadCommentAttachmentCommand
-        {
-            CommentId = commentId,
-            Content = stream,
-            ContentType = request.File.ContentType,
-            FileName = request.File.FileName,
-            ContentLength = request.File.Length,
-        };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-    [HttpDelete("/api/comments/{commentId:guid}/attachments/{attachmentId:guid}")]
-    public async Task<IActionResult> DeleteAttachmentAsync(Guid attachmentId)
-    {
-        return BadRequest();
-    }
+    //[HttpPost("/api/comments/{commentId:guid}")]
+    //public async Task<IActionResult> UploadAttachmentAsync(Guid commentId,
+    //    [FromForm] FileUploadRequest request)
+    //{
+    //    await using Stream stream = request.File.OpenReadStream();
+    //    var mediatorRequest = new UploadCommentAttachmentCommand
+    //    {
+    //        CommentId = commentId,
+    //        Content = stream,
+    //        ContentType = request.File.ContentType,
+    //        FileName = request.File.FileName,
+    //        ContentLength = request.File.Length,
+    //    };
+    //    var response = await mediator.Send(mediatorRequest);
+    //    return response.ToActionResult();
+    //}
 
     [HttpPut("/api/attachments/{commentId:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid commentId,

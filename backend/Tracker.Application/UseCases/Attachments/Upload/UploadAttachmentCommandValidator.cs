@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Options;
-using Tracker.Application.UseCases.ItemComments.UploadAttachment;
 using Tracker.Domain.Options;
 
-namespace Tracker.Application.UseCases.BoardItemAttachments.Upload;
+namespace Tracker.Application.UseCases.Attachments.Upload;
 
-public class UploadCommentAttachmentCommandValidator : AbstractValidator<UploadCommentAttachmentCommand>
+public class UploadAttachmentCommandValidator : AbstractValidator<UploadAttachmentCommand>
 {
-    public UploadCommentAttachmentCommandValidator(IOptions<BlobOptions> options)
+    public UploadAttachmentCommandValidator(IOptions<BlobOptions> options)
     {
         RuleFor(x => x.Content)
             .NotNull();

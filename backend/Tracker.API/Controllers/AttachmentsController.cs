@@ -3,25 +3,27 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.BoardItemAttachments.Delete;
-using Tracker.Application.UseCases.BoardItemAttachments.Download;
-using Tracker.Application.UseCases.BoardItemAttachments.GetAll;
-using Tracker.Application.UseCases.BoardItemAttachments.Upload;
+using Tracker.Application.UseCases.Attachments.Delete;
+using Tracker.Application.UseCases.Attachments.Download;
+using Tracker.Application.UseCases.Attachments.Upload;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.API.Controllers;
 
-[Route("api/board/{boardId:guid}/items/{itemId:guid}/attachments")]
+[Route("/api/attachments/{attachmentId:guid}")]
 [ApiController]
 [Authorize]
-public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
+public class AttachmentsController(IMediator mediator) : ControllerBase
 {
-    [HttpGet("/api/attachments/{attachmentId:guid}")]
-    public async Task<IActionResult> DownloadAsync(Guid attachmentId)
+    [HttpGet]
+    public async Task<IActionResult> DownloadAsync(Guid attachmentId,
+        [FromQuery] AttachmentType type)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
             AttachmentId = attachmentId,
+            Type = type,
             ForceDirect = true,
         };
         var result = await mediator.Send(mediatorRequest);
@@ -32,12 +34,14 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
         return File(result.Value.Stream!, result.Value.ContentType, result.Value.FileName, true);
     }
 
-    [HttpGet("/api/attachments/{attachmentId:guid}/url")]
-    public async Task<IActionResult> GetUrlAsync(Guid attachmentId, [FromQuery] bool isRedirect = true)
+    [HttpGet("url")]
+    public async Task<IActionResult> GetUrlAsync(Guid attachmentId,
+        [FromQuery] bool isRedirect = true, [FromQuery] AttachmentType type = AttachmentType.Item)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
             AttachmentId = attachmentId,
+            Type = type,
             ForceDirect = false,
         };
         var result = await mediator.Send(mediatorRequest);
@@ -51,38 +55,30 @@ public class BoardItemAttachmentsController(IMediator mediator) : ControllerBase
             : Result.SuccessOf(url).ToActionResult();
     }
 
-    [HttpDelete("/api/attachments/{attachmentId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid attachmentId)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAsync(Guid attachmentId,
+        [FromQuery] AttachmentType type)
     {
         var mediatorRequest = new DeleteAttachmentCommand
         {
             AttachmentId = attachmentId,
+            Type = type
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync(Guid boardId, Guid itemId)
-    {
-        var mediatorRequest = new GetItemAttachmentsCommand
-        {
-            BoardId = boardId,
-            BoardItemId = itemId
-        };
-        var result = await mediator.Send(mediatorRequest);
-        return result.ToActionResult();
-    }
 
     [HttpPost]
-    public async Task<IActionResult> UploadAsync(Guid boardId, Guid itemId,
-        [FromForm] FileUploadRequest request)
+    public async Task<IActionResult> UploadAsync(Guid boardId, Guid parentId,
+        [FromForm] FileUploadRequest request, [FromQuery] AttachmentType type)
     {
         await using Stream stream = request.File.OpenReadStream();
         var mediatorRequest = new UploadAttachmentCommand
         {
             BoardId = boardId,
-            BoardItemId = itemId,
+            ParentId = parentId,
+            Type = type,
             Content = stream,
             ContentType = request.File.ContentType,
             FileName = request.File.FileName,
