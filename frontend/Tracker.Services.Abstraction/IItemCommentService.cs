@@ -9,6 +9,4 @@ public interface IItemCommentService
 {
     Task<Result<CursorPage<ItemCommentDto>>> GetAsync(Guid itemId, CursorTimeRequest request);
     Task<Result<ItemCommentDto>> CreateAsync(Guid itemId, CreateCommentRequest request);
-    Task<Result<FileDto>> UploadAttachmentAsync(Guid commentId,
-        Stream fileStream, string contentType, string fileName);
 }

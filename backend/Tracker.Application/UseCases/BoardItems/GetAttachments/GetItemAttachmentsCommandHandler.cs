@@ -3,6 +3,7 @@ using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Application.UseCases.Boards;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Mapping;
 using Tracker.Domain.Results;
 
@@ -29,6 +30,6 @@ public class GetItemAttachmentsCommandHandler(
 
         var attachments = await uow.BoardItemAttachmentRepository
             .GetByItemAsync(request.BoardItemId);
-        return attachments.Select(a => a.ToDto()).ToList();
+        return attachments.Select(a => a.ToDto(AttachmentType.Item)).ToList();
     }
 }

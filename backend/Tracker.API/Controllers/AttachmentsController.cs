@@ -36,7 +36,7 @@ public class AttachmentsController(IMediator mediator) : ControllerBase
 
     [HttpGet("url")]
     public async Task<IActionResult> GetUrlAsync(Guid attachmentId,
-        [FromQuery] bool isRedirect = true, [FromQuery] AttachmentType type = AttachmentType.Item)
+        [FromQuery] AttachmentType type, [FromQuery] bool isRedirect = true)
     {
         var mediatorRequest = new DownloadAttachmentCommand
         {
@@ -55,6 +55,25 @@ public class AttachmentsController(IMediator mediator) : ControllerBase
             : Result.SuccessOf(url).ToActionResult();
     }
 
+    [HttpPost]
+    public async Task<IActionResult> UploadAsync(Guid parentId,
+        [FromForm] FileUploadRequest request, [FromQuery] AttachmentType type)
+    {
+        await using Stream stream = request.File.OpenReadStream();
+        var mediatorRequest = new UploadAttachmentCommand
+        {
+            ParentId = parentId,
+            Type = type,
+            Content = stream,
+            ContentType = request.File.ContentType,
+            FileName = request.File.FileName,
+            ContentLength = request.File.Length
+        };
+
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
     [HttpDelete]
     public async Task<IActionResult> DeleteAsync(Guid attachmentId,
         [FromQuery] AttachmentType type)
@@ -64,27 +83,6 @@ public class AttachmentsController(IMediator mediator) : ControllerBase
             AttachmentId = attachmentId,
             Type = type
         };
-        var response = await mediator.Send(mediatorRequest);
-        return response.ToActionResult();
-    }
-
-
-    [HttpPost]
-    public async Task<IActionResult> UploadAsync(Guid boardId, Guid parentId,
-        [FromForm] FileUploadRequest request, [FromQuery] AttachmentType type)
-    {
-        await using Stream stream = request.File.OpenReadStream();
-        var mediatorRequest = new UploadAttachmentCommand
-        {
-            BoardId = boardId,
-            ParentId = parentId,
-            Type = type,
-            Content = stream,
-            ContentType = request.File.ContentType,
-            FileName = request.File.FileName,
-            ContentLength = request.File.Length
-        };
-
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }

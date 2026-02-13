@@ -30,7 +30,8 @@ public partial class ItemSettingsDialog : IDisposable
     public BoardItemDto Item { get; set; } = null!;
 
     [Inject] AppState AppState { get; set; } = null!;
-    [Inject] IItemAttachmentService Attachments { get; set; } = null!;
+    [Inject] IAttachmentService Attachments { get; set; } = null!;
+    [Inject] IBoardItemService ItemService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     private bool CanChange => IsMeAssigned
@@ -56,10 +57,9 @@ public partial class ItemSettingsDialog : IDisposable
         _importance = Item.Importance;
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        await base.OnParametersSetAsync();
-        var attachments = await Attachments.GetAllAsync(BoardState.Board.Id, Item.Id);
+        var attachments = await ItemService.GetAttachmentsAsync(BoardState.Board.Id, Item.Id);
         if (attachments.IsSuccess)
         {
             _attachments = attachments.Value;
@@ -86,8 +86,8 @@ public partial class ItemSettingsDialog : IDisposable
             return;
         }
         await using var stream = file.OpenReadStream(MaxAttachmentSizeBytes);
-        var result = await Attachments.UploadAsync(BoardState.Board.Id, Item.Id,
-            stream, file.ContentType, file.Name);
+        var result = await Attachments.UploadAsync(Item.Id,
+            stream, file.ContentType, file.Name, AttachmentType.Item);
 
         if (result.IsSuccess)
         {

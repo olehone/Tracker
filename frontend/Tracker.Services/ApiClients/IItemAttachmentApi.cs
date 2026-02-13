@@ -1,23 +1,21 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Services.ApiClients;
 
 public interface IItemAttachmentApi
 {
     [Get("/api/attachments/{attachmentId}")]
-    Task<IApiResponse<Stream>> DownloadAsync(Guid attachmentId);
-    
-    [Get("/api/attachments/{attachmentId}/url")]
-    Task<IApiResponse<string>> GetUrlAsync(Guid attachmentId, [Query] bool isRedirect);
+    Task<IApiResponse<Stream>> DownloadAsync(Guid attachmentId, [Query] AttachmentType type);
 
-    [Get("/api/board/{boardId}/items/{itemId}/attachments")]
-    Task<IApiResponse<List<FileDto>>> GetAllAsync(Guid boardId, Guid itemId);
+    [Get("/api/attachments/{attachmentId}/url")]
+    Task<IApiResponse<string>> GetUrlAsync(Guid attachmentId, [Query] AttachmentType type, [Query] bool isRedirect);
 
     [Multipart]
-    [Post("/api/board/{boardId}/items/{itemId}/attachments")]
-    Task<IApiResponse<FileDto>> UploadAsync(Guid boardId, Guid itemId, [AliasAs("File")] StreamPart file);
+    [Post("/api/attachments/{attachmentId}")]
+    Task<IApiResponse<FileDto>> UploadAsync(Guid parentId, [AliasAs("File")] StreamPart file, [Query] AttachmentType type);
 
     [Delete("/api/attachments/{attachmentId}")]
-    Task<IApiResponse> DeleteAsync(Guid attachmentId);
+    Task<IApiResponse> DeleteAsync(Guid attachmentId, [Query] AttachmentType type);
 }

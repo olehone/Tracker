@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
@@ -31,6 +32,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     public bool Disabled { get; set; } = true;
 
     [Inject] IItemCommentService CommentService { get; set; } = null!;
+    [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
@@ -100,8 +102,8 @@ public partial class ItemCommentsSection : IAsyncDisposable
         foreach (var attachment in _attachments)
         {
             await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
-            var result = await CommentService.UploadAttachmentAsync(comment.Id,
-                stream, attachment.ContentType, attachment.Name);
+            var result = await AttachmentService.UploadAsync(comment.Id,
+                stream, attachment.ContentType, attachment.Name, AttachmentType.Comment);
 
             if (result.IsSuccess)
             {

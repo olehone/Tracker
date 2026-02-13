@@ -16,6 +16,7 @@ using Tracker.Application.UseCases.BoardItems.Move;
 using Tracker.Application.UseCases.BoardItems.Update;
 
 namespace Tracker.API.Controllers;
+
 [Route("api/board/{boardId:guid}/items")]
 [ApiController]
 [Authorize]
@@ -26,7 +27,7 @@ public class BoardItemsController(IMediator mediator,
 {
     [HttpGet("{itemId:guid}/attachments")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAttachmentsAsync(Guid boardId, 
+    public async Task<IActionResult> GetAttachmentsAsync(Guid boardId,
         Guid itemId)
     {
         var mediatorRequest = new GetItemAttachmentsCommand

@@ -1,5 +1,6 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Domain.Mapping;
 
@@ -84,12 +85,12 @@ public static class BoardsMapping
                 .Select(a =>
                 {
                     a.UploadedBy = comment.UploadedBy;
-                    return a.ToDto();
+                    return a.ToDto(AttachmentType.Comment);
                 }).ToList()
         };
     }
 
-    public static FileDto ToDto(this FileUpload file)
+    public static FileDto ToDto(this FileUpload file, AttachmentType type)
     {
         return new FileDto
         {
@@ -100,6 +101,7 @@ public static class BoardsMapping
             ContentType = file.ContentType,
             SizeBytes = file.SizeBytes,
             IsDeleted = file.IsDeleted,
+            Type = type
         };
     }
 }

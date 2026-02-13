@@ -38,14 +38,14 @@ public class UploadAttachmentCommandHandler(
             return attachment.Error;
         }
         return result.IsSuccess
-            ? attachment.Value.ToDto()
+            ? attachment.Value.ToDto(request.Type)
             : Error.Unknown;
     }
 
     private async Task<Result<FileUpload>> UploadItemAttachmentAsync(IUnitOfWork uow,
         UploadAttachmentCommand request, string storageFolder, CancellationToken cancellationToken)
     {
-        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.ParentId, request.BoardId);
+        var itemResult = await BoardHelper.GetBoardItemForActionAsync(uow, userContext, request.ParentId);
         if (itemResult.IsFailure)
         {
             return itemResult.Error;

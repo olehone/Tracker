@@ -1,4 +1,6 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
+
+namespace Tracker.Domain.Dtos;
 
 public class FileDto
 {
@@ -9,5 +11,5 @@ public class FileDto
     public required string ContentType { get; set; }
     public required long SizeBytes { get; set; }
     public required bool IsDeleted { get; set; }
-    public string? Url { get; set; }
+    public required AttachmentType Type { get; set; }
 }

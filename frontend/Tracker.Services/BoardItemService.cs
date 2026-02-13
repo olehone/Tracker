@@ -13,7 +13,7 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
 {
     public Task<Result<BoardItemDto>> CreateAsync(Guid boardId, Guid boardListId, string title)
     {
-        var request = new CreateWithTitleRequest{ Title = title };
+        var request = new CreateWithTitleRequest { Title = title };
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(boardId, boardListId, request));
     }
 
@@ -40,5 +40,10 @@ public class BoardItemService(IApiErrorHandler apiErrorHandler, IBoardItemApi ap
     Task<Result<HashSet<Guid>>> IBoardItemService.UnassignAsync(Guid boardId, Guid itemId, Guid userId)
     {
         return apiErrorHandler.ExecuteAsync(() => api.UnassingAsync(boardId, itemId, userId));
+    }
+
+    public Task<Result<List<FileDto>>> GetAttachmentsAsync(Guid boardId, Guid itemId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.GetAttachmentsAsync(boardId, itemId));
     }
 }

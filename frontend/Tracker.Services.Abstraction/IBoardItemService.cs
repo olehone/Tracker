@@ -12,5 +12,5 @@ public interface IBoardItemService
     Task<Result> DeleteAsync(Guid boardId, Guid itemId);
     Task<Result<HashSet<Guid>>> AssignAsync(Guid boardId, Guid itemId, Guid userId);
     Task<Result<HashSet<Guid>>> UnassignAsync(Guid boardId, Guid itemId, Guid userId);
-
+    Task<Result<List<FileDto>>> GetAttachmentsAsync(Guid boardId, Guid itemId);
 }

@@ -7,7 +7,6 @@ namespace Tracker.Application.UseCases.Attachments.Upload;
 
 public class UploadAttachmentCommand: IRequest<Result<FileDto>>
 {
-    public required Guid BoardId { get; set; }
     public required Guid ParentId { get; set; }
     public required AttachmentType Type { get; set; }
     public required Stream Content { get; set; }
