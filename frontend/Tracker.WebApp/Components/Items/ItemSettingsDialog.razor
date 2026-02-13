@@ -14,7 +14,7 @@
                 <MudStack>
                     <ItemSettingsHeader Item=@Item />
                     <MudStack Row
-                              Style="max-height:500px">
+                              Style="max-height:700px">
                         <MudStack Justify="Justify.FlexEnd"
                                   Class="mud-width-full">
                             @if (!Disabled)
@@ -126,12 +126,19 @@
                                           Label="Description"
                                           Variant="Variant.Outlined"
                                           AutoGrow
-                                          MaxLines="15"
-                                          @onfocus=@DescriptionFocused
-                                          @onblur=@DescriptionBlurred />
+                                          MaxLines="10"
+                                          @onfocus=@StartEditingDescription
+                                          @onblur=@FinishEditingDescription />
+
+                            <ItemAttachments Attachments=@_attachments
+                                             Disabled=@Disabled
+                                             UploadAsync=@UploadAttachmentAsync />
                         </MudStack>
 
-                        <ItemCommentsSection ItemId=@Item.Id/>
+                        <ItemCommentsSection ItemId=@Item.Id
+                                             IsFileValid=@IsFileValid 
+                                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                                             Disabled=@Disabled/>
                     </MudStack>
                 </MudStack>
             </DialogContent>

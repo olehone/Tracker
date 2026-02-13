@@ -1,5 +1,6 @@
 ﻿using Refit;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Results;
@@ -7,33 +8,28 @@ using Tracker.Services.ApiClients;
 
 namespace Tracker.Services;
 
-public class ItemAttachmentService(IApiErrorHandler apiErrorHandler,
-    IItemAttachmentApi api) : IItemAttachmentService
+public class AttachmentService(IApiErrorHandler apiErrorHandler,
+    IAttachmentApi api) : IAttachmentService
 {
-    public Task<Result<Stream>> DownloadAsync(Guid attachmentId)
+    public Task<Result<Stream>> DownloadAsync(Guid attachmentId, AttachmentType type)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DownloadAsync(attachmentId));
+        return apiErrorHandler.ExecuteAsync(() => api.DownloadAsync(attachmentId, type));
     }
 
-    public Task<Result<string>> GetUrlAsync(Guid attachmentId, bool isRedirect = false)
+    public Task<Result<string>> GetUrlAsync(Guid attachmentId, AttachmentType type, bool isRedirect = false)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.GetUrlAsync(attachmentId, isRedirect));
+        return apiErrorHandler.ExecuteAsync(() => api.GetUrlAsync(attachmentId, type, isRedirect));
     }
 
-    public Task<Result<List<FileDto>>> GetAllAsync(Guid boardId, Guid itemId)
-    {
-        return apiErrorHandler.ExecuteAsync(() => api.GetAllAsync(boardId, itemId));
-    }
-
-    public Task<Result<FileDto>> UploadAsync(Guid boardId, Guid itemId,
-        Stream fileStream, string contentType, string fileName)
+    public Task<Result<FileDto>> UploadAsync(Guid parentId,
+        Stream fileStream, string contentType, string fileName, AttachmentType type)
     {
         var streamPart = new StreamPart(fileStream, fileName, contentType);
-        return apiErrorHandler.ExecuteAsync(() => api.UploadAsync(boardId, itemId, streamPart));
+        return apiErrorHandler.ExecuteAsync(() => api.UploadAsync(parentId, streamPart, type));
     }
 
-    public Task<Result> DeleteAsync(Guid attachmentId)
+    public Task<Result> DeleteAsync(Guid attachmentId, AttachmentType type)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(attachmentId));
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(attachmentId, type));
     }
 }

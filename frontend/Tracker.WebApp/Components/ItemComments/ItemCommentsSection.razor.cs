@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
+using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
+using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.Components.ItemComments;
@@ -10,20 +14,28 @@ namespace Tracker.WebApp.Components.ItemComments;
 public partial class ItemCommentsSection : IAsyncDisposable
 {
     private List<ItemCommentDto> _comments = [];
+    private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
     private DateTimeOffset? _lastLoadedAt = null;
-
+    private ICollection<IBrowserFile> _attachments = [];
     private ElementReference _trigger;
     private DotNetObjectReference<ItemCommentsSection>? _ref;
 
     [Parameter, EditorRequired]
     public Guid ItemId { get; set; }
+    [Parameter, EditorRequired]
+    public Func<IBrowserFile, bool> IsFileValid { get; set; }
+    [Parameter, EditorRequired]
+    public int MaxAttachmentSizeBytes { get; set; }
+    [Parameter]
+    public bool Disabled { get; set; } = true;
 
     [Inject] IItemCommentService CommentService { get; set; } = null!;
+    [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         _comments.Clear();
         _lastLoadedAt = null;
@@ -74,11 +86,54 @@ public partial class ItemCommentsSection : IAsyncDisposable
     private async Task CreateComment(string content)
     {
         var request = new CreateCommentRequest { Content = content };
-        var result = await CommentService.CreateAsync(ItemId, request);
-        if (result.IsSuccess)
+        var createCommentResult = await CommentService.CreateAsync(ItemId, request);
+        if (createCommentResult.IsFailure)
         {
-            _comments.Insert(0, result.Value);
+            if (createCommentResult.Error.Type == ErrorType.Validation)
+            {
+                _errors = createCommentResult.Error.Details
+                    ?? [createCommentResult.Error.Description];
+                StateHasChanged();
+            }
+            return;
         }
+        var comment = createCommentResult.Value;
+
+        foreach (var attachment in _attachments)
+        {
+            await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
+            var result = await AttachmentService.UploadAsync(comment.Id,
+                stream, attachment.ContentType, attachment.Name, AttachmentType.Comment);
+
+            if (result.IsSuccess)
+            {
+                comment.Attachments.Add(result.Value);
+            }
+        }
+        _comments.Insert(0, comment);
+    }
+
+    private async Task AddAttachmentsAsync(List<IBrowserFile> files)
+    {
+        foreach (var file in files)
+        {
+            if (!IsFileValid(file))
+            {
+                return;
+            }
+            _attachments.Add(file);
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddAttachmentAsync(IBrowserFile file)
+    {
+        if (!IsFileValid(file))
+        {
+            return;
+        }
+        _attachments.Add(file);
+        StateHasChanged();
     }
 
     public async ValueTask DisposeAsync()

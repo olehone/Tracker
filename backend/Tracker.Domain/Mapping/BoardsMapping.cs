@@ -1,5 +1,6 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Domain.Mapping;
 
@@ -80,20 +81,27 @@ public static class BoardsMapping
             Id = comment.Id,
             Content = comment.Content,
             UploadedAt = comment.UploadedAt,
+            Attachments = comment.Attachments
+                .Select(a =>
+                {
+                    a.UploadedBy = comment.UploadedBy;
+                    return a.ToDto(AttachmentType.Comment);
+                }).ToList()
         };
     }
 
-    public static BoardItemAttachmentDto ToDto(this BoardItemAttachment attachment)
+    public static FileDto ToDto(this FileUpload file, AttachmentType type)
     {
-        return new BoardItemAttachmentDto
+        return new FileDto
         {
-            Id = attachment.Id,
-            UploadedAt = attachment.UploadedAt,
-            UploadedByName = attachment.UploadedBy.Username,
-            FileName = attachment.OriginalFileName,
-            ContentType = attachment.ContentType,
-            SizeBytes = attachment.SizeBytes,
-            IsDeleted = attachment.IsDeleted,
+            Id = file.Id,
+            UploadedAt = file.UploadedAt,
+            UploadedByName = file.UploadedBy.Username,
+            FileName = file.OriginalFileName,
+            ContentType = file.ContentType,
+            SizeBytes = file.SizeBytes,
+            IsDeleted = file.IsDeleted,
+            Type = type
         };
     }
 }

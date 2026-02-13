@@ -35,7 +35,7 @@ public class CommentsController(IMediator mediator) : ControllerBase
         var mediatorRequest = new CreateItemCommentCommand
         {
             BoardItemId = itemId,
-            Content = request.Content
+            Content = request.Content,
         };
         var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
@@ -48,7 +48,7 @@ public class CommentsController(IMediator mediator) : ControllerBase
         return BadRequest();
     }
 
-    [HttpDelete("/api/attachments/{commentId:guid}")]
+    [HttpDelete("/api/comments/{commentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid commentId)
     {
         return BadRequest();

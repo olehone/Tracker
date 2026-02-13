@@ -24,4 +24,7 @@ public interface IBoardItemApi
 
     [Delete("/api/board/{boardId}/items/{itemId}/assign/{userId}")]
     Task<IApiResponse<HashSet<Guid>>> UnassingAsync(Guid boardId, Guid itemId, Guid userId);
+
+    [Get("/api/board/{boardId}/items/{itemId}/attachments")]
+    Task<IApiResponse<List<FileDto>>> GetAttachmentsAsync(Guid boardId, Guid itemId);
 }

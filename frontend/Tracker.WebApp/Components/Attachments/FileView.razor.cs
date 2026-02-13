@@ -14,7 +14,7 @@ public partial class FileView
     public bool Disabled { get; set; }
 
     [Inject] IDialogService DialogService { get; set; } = null!;
-    [Inject] IItemAttachmentService Attachments { get; set; } = null!;
+    [Inject] IAttachmentService Attachments { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
@@ -35,7 +35,7 @@ public partial class FileView
 
     private async Task LoadImageUrlAsync()
     {
-        var result = await Attachments.GetUrlAsync(File.Id);
+        var result = await Attachments.GetUrlAsync(File.Id, File.Type);
         if (result.IsSuccess)
         {
             _imageUrl = result.Value;
@@ -44,7 +44,7 @@ public partial class FileView
 
     private async Task DownloadAsync()
     {
-        var result = await Attachments.GetUrlAsync(File.Id, isRedirect: false);
+        var result = await Attachments.GetUrlAsync(File.Id, File.Type, isRedirect: false);
         if (result.IsSuccess)
         {
             await JS.InvokeVoidAsync("open", result.Value, "_blank");
@@ -80,7 +80,7 @@ public partial class FileView
             return;
         }
 
-        var result = await Attachments.DeleteAsync(File.Id);
+        var result = await Attachments.DeleteAsync(File.Id, File.Type);
         if (result.IsSuccess)
         {
             File.IsDeleted = true;

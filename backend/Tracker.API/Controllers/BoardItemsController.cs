@@ -11,10 +11,12 @@ using Tracker.Application.UseCases.BoardItemAssignees.Add;
 using Tracker.Application.UseCases.BoardItemAssignees.Remove;
 using Tracker.Application.UseCases.BoardItems.Create;
 using Tracker.Application.UseCases.BoardItems.Delete;
+using Tracker.Application.UseCases.BoardItems.GetAttachments;
 using Tracker.Application.UseCases.BoardItems.Move;
 using Tracker.Application.UseCases.BoardItems.Update;
 
 namespace Tracker.API.Controllers;
+
 [Route("api/board/{boardId:guid}/items")]
 [ApiController]
 [Authorize]
@@ -23,6 +25,19 @@ public class BoardItemsController(IMediator mediator,
      IUserContext userContext)
     : ControllerBase
 {
+    [HttpGet("{itemId:guid}/attachments")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAttachmentsAsync(Guid boardId,
+        Guid itemId)
+    {
+        var mediatorRequest = new GetItemAttachmentsCommand
+        {
+            BoardId = boardId,
+            BoardItemId = itemId
+        };
+        var result = await mediator.Send(mediatorRequest);
+        return result.ToActionResult();
+    }
 
     [HttpPost("{boardListId:guid}")]
     public async Task<IActionResult> CreateAsync(Guid boardId, Guid boardListId,

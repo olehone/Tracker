@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Options;
-using Tracker.Application.UseCases.Users.UploadAvatar;
 using Tracker.Domain.Options;
 
-namespace Tracker.Application.UseCases.BoardItemAttachments.Upload;
+namespace Tracker.Application.UseCases.Attachments.Upload;
 
 public class UploadAttachmentCommandValidator : AbstractValidator<UploadAttachmentCommand>
 {

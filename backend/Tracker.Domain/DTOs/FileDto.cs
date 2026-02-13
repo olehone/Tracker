@@ -1,6 +1,8 @@
-﻿namespace Tracker.Domain.Dtos;
+﻿using Tracker.Domain.Enums;
 
-public class BoardItemAttachmentDto
+namespace Tracker.Domain.Dtos;
+
+public class FileDto
 {
     public required Guid Id { get; set; }
     public required DateTimeOffset UploadedAt { get; set; }
@@ -9,4 +11,5 @@ public class BoardItemAttachmentDto
     public required string ContentType { get; set; }
     public required long SizeBytes { get; set; }
     public required bool IsDeleted { get; set; }
+    public required AttachmentType Type { get; set; }
 }

@@ -4,17 +4,17 @@ using Tracker.Domain.Entities;
 
 namespace Tracker.Persistence.Configurations;
 
-public class BoardItemAttachmentConfiguration : IEntityTypeConfiguration<BoardItemAttachment>
+public class CommentAttachmentConfiguration : IEntityTypeConfiguration<CommentAttachment>
 {
-    public void Configure(EntityTypeBuilder<BoardItemAttachment> builder)
+    public void Configure(EntityTypeBuilder<CommentAttachment> builder)
     {
-        builder.ToTable("BoardItemAttachments");
+        builder.ToTable("CommentAttachments");
 
         builder.HasKey(attachment => attachment.Id);
 
-        builder.HasOne(attachment => attachment.Item)
-            .WithMany(item => item.Attachments)
-            .HasForeignKey(attachment => attachment.BoardItemId);
+        builder.HasOne(attachment => attachment.Comment)
+            .WithMany(comment => comment.Attachments)
+            .HasForeignKey(attachment => attachment.ItemCommentId);
 
         builder.Property(attachment => attachment.OriginalFileName)
             .IsRequired();

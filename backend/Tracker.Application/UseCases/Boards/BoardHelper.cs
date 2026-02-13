@@ -1,6 +1,4 @@
-﻿using System;
-using MediatR;
-using Tracker.Application.Common.Auth;
+﻿using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
@@ -143,49 +141,67 @@ public static class BoardHelper
             : AuthErrors.Forbidden("Board is private");
     }
 
-    public static async Task<Result<BoardItemAttachment>> GetItemAttachmentForActionAsync(IUnitOfWork uow,
-        IUserContext userContext, Guid attachmentId)
+    public static async Task<Result> CanViewBoardAsync(Board board, IUnitOfWork uow, IUserContext userContext,
+        CancellationToken cancellationToken)
     {
-        var attachment = await uow.BoardItemAttachmentRepository.GetByIdAsync(attachmentId);
-        if (attachment is null)
-        {
-            return Error.NotFound("Attachment");
-        }
-        if (attachment.IsDeleted)
-        {
-            return Error.Gone("Attachment");
-        }
-
-        BoardAction action = BoardAction.ChangeItem;
-
         if (userContext.IsUnauthenticated())
+        {
+            if (BoardPolicy.CanAnonView(board.Visibility))
+            {
+                return AuthErrors.Forbidden("Board is private");
+            }
+        }
+
+        var userId = userContext.GetUserId();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
         {
             return AuthErrors.Unauthenticated;
         }
+        var userRole = user.Role;
 
-        var board = await uow.BoardRepository.GetWithWorkspaceByItemAttachmentAsync(attachmentId);
-        if (board is null)
+        var workspaceRole = await uow.WorkspaceUserRepository
+            .GetRoleAsync(userId, board.WorkspaceId);
+        var boardRole = await uow.BoardUserRepository
+            .GetRoleAsync(userId, board.Id);
+
+        if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
-            return Error.NotFound("Board", "attachment");
+            return AuthErrors.Forbidden("Board is private");
         }
-
-        var boardItem = await uow.BoardItemRepository.GetByIdAsync(attachment.BoardItemId);
-        if (boardItem is null)
-        {
-            return Error.NotFound("Board item", "attachment");
-        }
-
-        var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
-        var assigned = boardItem.Assignees
-            .Any(bia => bia.BoardUser.UserId == userContext.GetUserId());
-
-        if (!isAllowed && !assigned)
-        {
-            return AuthErrors.Forbidden("You cannot change this item");
-        }
-
-        return attachment;
+        return Result.Success();
     }
+
+    public static async Task<Result<ItemComment>> GetItemCommentForActionAsync(IUnitOfWork uow,
+        IUserContext userContext, Guid commentId)
+    {
+        var comment = await uow.ItemCommentRepository.GetByIdAsync(commentId);
+        if (comment is null)
+        {
+            return Error.NotFound("Comment");
+        }
+        if (comment.IsDeleted)
+        {
+            return Error.Gone("Comment");
+        }
+        var userId = userContext.GetUserId();
+        var ownComment = comment.UploadedBy.Id == userId;
+
+        var item = await GetBoardItemForActionAsync(uow, userContext, comment.BoardItemId);
+
+        if (!item.IsFailure)
+        {
+            return comment;
+        }
+
+        if (item.Error.Type == ErrorType.Forbidden && ownComment)
+        {
+            return comment;
+        }
+
+        return item.Error;
+    }
+
 
     // User must be authenticated before call
     // for proper separation of unauthenticated and forbidden error

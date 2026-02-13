@@ -1,4 +1,4 @@
-﻿namespace Tracker.Application.UseCases.BoardItemAttachments;
+﻿namespace Tracker.Application.UseCases.Attachments;
 
 public class AttachmentResponse
 {
