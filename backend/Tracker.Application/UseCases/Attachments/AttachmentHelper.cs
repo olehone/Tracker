@@ -46,7 +46,7 @@ internal static class AttachmentHelper
             return error;
         }
 
-        var board = await GetBoardAsync(attachmentId, type, uow);
+        var board = await GetBoardByAttachmentAsync(attachmentId, type, uow);
         if (board == null)
         {
             return Error.NotFound("Board");
@@ -87,7 +87,7 @@ internal static class AttachmentHelper
         };
     }
 
-    private static async Task<Board?> GetBoardAsync(Guid attachmentId, AttachmentType Type, IUnitOfWork uow)
+    private static async Task<Board?> GetBoardByAttachmentAsync(Guid attachmentId, AttachmentType Type, IUnitOfWork uow)
     {
         return Type switch
         {
