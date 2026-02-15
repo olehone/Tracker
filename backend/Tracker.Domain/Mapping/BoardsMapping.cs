@@ -81,6 +81,8 @@ public static class BoardsMapping
             Id = comment.Id,
             Content = comment.Content,
             UploadedAt = comment.UploadedAt,
+            UpdatedAt = comment.UpdatedAt,
+            UploadedBy = comment.UploadedBy.ToDto(),
             Attachments = comment.Attachments
                 .Select(a =>
                 {

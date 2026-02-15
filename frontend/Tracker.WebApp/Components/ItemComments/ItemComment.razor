@@ -1,14 +1,21 @@
 ﻿@using Tracker.Domain.Dtos
 @using Tracker.WebApp.Components.Attachments
+@using Tracker.WebApp.Components.Users
 
-<MudPaper Class="ma-2 pa-2">
-    <MudText>@Comment.Content</MudText>
-    @foreach (var attachment in Comment.Attachments)
-    {
-        <FileView File=@attachment
-                  Disabled=@Disabled />
-    }
-</MudPaper>
+<MudStack Row
+          AlignItems="AlignItems.Start"
+          Class="ma-2 mud-full-width">
+    <UserAvatarWithLookup User=@Comment.UploadedBy />
+
+    <div class="border-solid">
+        <MudText>@Comment.Content</MudText>
+        @foreach (var attachment in Comment.Attachments)
+        {
+            <FileView File=@attachment
+                      Disabled="true" />
+        }
+    </div>
+</MudStack>
 
 @code {
     [Parameter, EditorRequired]

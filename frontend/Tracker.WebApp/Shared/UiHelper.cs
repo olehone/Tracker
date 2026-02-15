@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using System.Security.Cryptography;
+using MudBlazor;
 using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Shared;

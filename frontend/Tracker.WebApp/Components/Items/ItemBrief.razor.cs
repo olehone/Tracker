@@ -12,7 +12,7 @@ public partial class ItemBrief
     {
         CloseButton = false,
         NoHeader = true,
-        MaxWidth = MaxWidth.Small
+        MaxWidth = MaxWidth.Large
     };
 
     [CascadingParameter]

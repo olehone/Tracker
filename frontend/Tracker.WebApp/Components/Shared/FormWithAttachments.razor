@@ -1,75 +1,56 @@
 ﻿@using FluentValidation
 @using Severity = MudBlazor.Severity
-@inject ISnackbar Snackbar
+@using Tracker.WebApp.Shared
 
-<MudCard>
-    <MudForm Model="@Model" @ref="@form" Validation="@(ValidationRules.ValidateValue)" ValidationDelay="0">
-        <MudCardContent>
-            <MudStack>
-                <MudTextField @bind-Value="Model.Text"
-                              For="@(() => Model.Text)"
-                              Lines="3"
-                              Counter=@MaxTextLength
-                              MaxLength=@MaxTextLength />
+<MudForm Model=@Model
+         @ref=@form
+         Validation=@ValidationRules
+         ValidationDelay="0">
+    <MudTextField @bind-Value=@Model.Text
+                  Label="Write a comment"
+                  AutoGrow
+                  Variant="Variant.Outlined"
+                  Immediate="true"
+                  Counter=@MaxTextLength
+                  MaxLength=@MaxTextLength />
+    @if (IsEditing)
+    {
+        @foreach (var file in Model.Attachments)
+        {
+            <BrowserFilePreview File=@file
+                                OnDelete=@(() => RemoveFile(file)) />
+        }
 
-                <MudGrid Justify="@Justify.FlexEnd" Spacing="1">
-                    <MudItem>
-                        <MudFileUpload @ref="@_fileUpload"
-                                       T="IReadOnlyList<IBrowserFile>"
-                                       For=@(() => Model.Attachments)
-                                       @bind-Files="Model.Attachments"
-                                       OnFilesChanged="HandleFilesChanged"
-                                       Accept="@AcceptedExtensions"
-                                       AppendMultipleFiles
-                                       SuppressOnChangeWhenInvalid="true">
-                            <ActivatorContent>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.Filled.CloudUpload">
-                                    Upload Files
-                                </MudButton>
-                            </ActivatorContent>
-                        </MudFileUpload>
-                    </MudItem>
-                    <MudItem>
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Clear"
-                                   OnClick="@ClearAsync">
-                            Clear Files
-                        </MudButton>
-                    </MudItem>
-                </MudGrid>
+        <MudStack Row
+                  Justify="Justify.SpaceBetween">
+            <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                           @bind-Files=@Model.Attachments
+                           OnFilesChanged=@HandleFilesChanged
+                           Accept=@AcceptedExtensions
+                           AppendMultipleFiles
+                           SuppressOnChangeWhenInvalid="true">
+                <ActivatorContent>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                        Upload Files
+                    </MudButton>
+                </ActivatorContent>
+            </MudFileUpload>
 
-                @if (Model.Attachments?.Any() == true)
-                {
-                    <MudPaper Class="pa-4" Elevation="1">
-                        <MudText Typo="Typo.subtitle2" Class="mb-2">Selected Files (@Model.Attachments.Count)</MudText>
-                        @foreach (var file in Model.Attachments)
-                        {
-                            <MudText>
-                                <strong>@file.Name</strong> - @FormatFileSize(file.Size)
-                            </MudText>
-                        }
-                    </MudPaper>
-                }
-            </MudStack>
-        </MudCardContent>
-        <MudCardActions>
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
-                       Class="ml-auto"
-                       OnClick="@Submit"
-                       Disabled="@IsSubmitting">
-                @if (IsSubmitting)
+                       OnClick=@Submit
+                       Disabled=@_isSubmitting>
+                @if (_isSubmitting)
                 {
-                    <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                    <MudProgressCircular Indeterminate />
                 }
                 Submit
             </MudButton>
-        </MudCardActions>
-    </MudForm>
-</MudCard>
+        </MudStack>
+    }
+</MudForm>
 
 @code {
     [Parameter]
@@ -80,6 +61,7 @@
     public int MaxFileCount { get; set; } = 5;
     [Parameter]
     public string AcceptedExtensions { get; set; } = "*";
+
     [Parameter, EditorRequired]
     public EventCallback<TextWithAttachmentsModel> OnSubmit { get; set; }
     [Parameter, EditorRequired]
@@ -89,29 +71,16 @@
 
     private MudForm form;
     private TextWithAttachmentsModelValidator ValidationRules;
-    private MudFileUpload<IReadOnlyList<IBrowserFile>> _fileUpload;
-    private bool IsSubmitting;
+    private bool _isSubmitting;
 
-    protected override void OnInitialized()
-    {
-        ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount);
-    }
-
+    private bool IsEditing => !string.IsNullOrWhiteSpace(Model.Text);
     protected override void OnParametersSet()
     {
-        // Reinitialize validator if parameters change
         ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount);
     }
 
     private async Task HandleFilesChanged(InputFileChangeEventArgs e)
     {
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-
-        if (Model.Attachments?.Any() == true)
-        {
-            Snackbar.Add($"Selected {Model.Attachments.Count} file(s)", Severity.Info);
-        }
-
         await ModelChanged.InvokeAsync(Model);
     }
 
@@ -119,35 +88,22 @@
     {
         await form.Validate();
 
-        if (form.IsValid)
+        if (!form.IsValid)
         {
-            IsSubmitting = true;
-            StateHasChanged();
+            return;
+        }
 
-            await OnSubmit.InvokeAsync(Model);
-            IsSubmitting = false;
-            StateHasChanged();
-        }
-        else
-        {
-            Snackbar.Add("Please fix validation errors", Severity.Warning);
-        }
+        _isSubmitting = true;
+        StateHasChanged();
+
+        await OnSubmit.InvokeAsync(Model);
+        _isSubmitting = false;
+        StateHasChanged();
     }
 
-    private Task ClearAsync()
-        => _fileUpload?.ClearAsync() ?? Task.CompletedTask;
-
-    private string FormatFileSize(long bytes)
+    private void RemoveFile(IBrowserFile file)
     {
-        string[] sizes = { "B", "KB", "MB", "GB" };
-        double len = bytes;
-        int order = 0;
-        while (len >= 1024 && order < sizes.Length - 1)
-        {
-            order++;
-            len = len / 1024;
-        }
-        return $"{len:0.##} {sizes[order]}";
+        Model.Attachments = Model.Attachments.Where(f => !f.Equals(file)).ToList();
     }
 
     public class TextWithAttachmentsModelValidator : AbstractValidator<TextWithAttachmentsModel>
@@ -168,32 +124,8 @@
             {
                 RuleFor(x => x.Attachments)
                     .Must(files => files.All(f => f.Size <= maxFileSizeBytes))
-                    .WithMessage($"Each file must be less than {FormatBytes(maxFileSizeBytes)}");
+                    .WithMessage($"Each file must be less than {UiHelper.FileSize(maxFileSizeBytes)}");
             });
         }
-
-        private static string FormatBytes(long bytes)
-        {
-            string[] sizes = { "B", "KB", "MB", "GB" };
-            double len = bytes;
-            int order = 0;
-            while (len >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                len = len / 1024;
-            }
-            return $"{len:0.##} {sizes[order]}";
-        }
-
-        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
-        {
-            var result = await ValidateAsync(ValidationContext<TextWithAttachmentsModel>
-                .CreateWithOptions((TextWithAttachmentsModel)model, x => x.IncludeProperties(propertyName)));
-
-            if (result.IsValid)
-                return Array.Empty<string>();
-
-            return result.Errors.Select(e => e.ErrorMessage);
-        };
     }
 }

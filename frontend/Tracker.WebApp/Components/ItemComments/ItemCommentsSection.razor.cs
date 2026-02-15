@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Tracker.Domain.Dtos;
@@ -9,6 +10,7 @@ using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.Components.Shared;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.ItemComments;
 
@@ -20,10 +22,10 @@ public partial class ItemCommentsSection : IAsyncDisposable
     private bool _hasMore = true;
     private bool _isLoading = true;
     private DateTimeOffset? _lastLoadedAt = null;
-    private ICollection<IBrowserFile> _attachments = [];
-    private List<FileDto> _newAttachments = [];
     private ElementReference _trigger;
     private DotNetObjectReference<ItemCommentsSection>? _ref;
+    private ItemCommentDto? _selectedComment;
+    private MudMenu? _contextMenu;
 
     [Parameter, EditorRequired]
     public Guid ItemId { get; set; }
@@ -37,9 +39,16 @@ public partial class ItemCommentsSection : IAsyncDisposable
     [Inject] IItemCommentService CommentService { get; set; } = null!;
     [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
 
-    public string NewComment { get; set; } = string.Empty;
-
+    private bool IsMine(Guid id)
+    {
+        if (AppState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return id == AppState.MyId;
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -80,7 +89,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         StateHasChanged();
     }
 
-    private async Task CreateComment()
+    private async Task CreateCommentAsync()
     {
         var request = new CreateCommentRequest { Content = model.Text };
         var createCommentResult = await CommentService.CreateAsync(ItemId, request);
@@ -108,29 +117,30 @@ public partial class ItemCommentsSection : IAsyncDisposable
             }
         }
         _comments.Insert(0, comment);
+        model = new();
     }
 
-    private async Task AddAttachmentsAsync(List<IBrowserFile> files)
+    private void EditComment()
     {
-        foreach (var file in files)
+        if (_selectedComment is not null)
         {
-            if (!IsFileValid(file))
-            {
-                return;
-            }
-            _attachments.Add(file);
-            StateHasChanged();
         }
     }
 
-    private async Task AddAttachmentAsync(IBrowserFile file)
+    private void DeleteComment()
     {
-        if (!IsFileValid(file))
+        if (_selectedComment is not null)
         {
-            return;
         }
-        _attachments.Add(file);
-        StateHasChanged();
+    }
+
+    private async Task RightClickComment(MouseEventArgs args, ItemCommentDto comment)
+    {
+        _selectedComment = comment;
+        if (_contextMenu != null)
+        {
+            await _contextMenu.OpenMenuAsync(args);
+        }
     }
 
     public async ValueTask DisposeAsync()

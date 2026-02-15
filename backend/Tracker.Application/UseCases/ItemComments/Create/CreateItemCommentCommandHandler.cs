@@ -15,7 +15,7 @@ public class CreateItemCommentCommandHandler(
     : IRequestHandler<CreateItemCommentCommand, Result<ItemCommentDto>>
 {
     public async Task<Result<ItemCommentDto>> Handle(
-        CreateItemCommentCommand request, 
+        CreateItemCommentCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -28,6 +28,11 @@ public class CreateItemCommentCommandHandler(
         }
         var item = itemResult.Value;
         var userId = userContext.GetUserId();
+        var user = await uow.UserRepository.GetByIdAsync(userId);
+        if (user is null)
+        {
+            return AuthErrors.Unauthenticated;
+        }
 
         var itemComment = new ItemComment
         {
@@ -35,10 +40,10 @@ public class CreateItemCommentCommandHandler(
             BoardItemId = request.BoardItemId,
             Content = request.Content,
         };
+
         await uow.ItemCommentRepository.AddAsync(itemComment);
-
         var sc = await uow.SaveChangesAsync(cancellationToken);
-
+        itemComment.UploadedBy = user;
         return sc.IsFailure
             ? Error.Unknown
             : itemComment.ToDto();

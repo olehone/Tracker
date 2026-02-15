@@ -4,6 +4,6 @@ namespace Tracker.WebApp.Components.Shared;
 
 public class TextWithAttachmentsModel
 {
-    public string Text { get; set; }
-    public IReadOnlyList<IBrowserFile> Attachments { get; set; }
+    public string Text { get; set; } = string.Empty;
+    public IReadOnlyList<IBrowserFile> Attachments { get; set; } = new List<IBrowserFile>();
 }
