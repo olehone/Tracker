@@ -19,6 +19,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     private bool _isLoading = true;
     private DateTimeOffset? _lastLoadedAt = null;
     private ICollection<IBrowserFile> _attachments = [];
+    private List<FileDto> _newAttachments = [];
     private ElementReference _trigger;
     private DotNetObjectReference<ItemCommentsSection>? _ref;
 
@@ -35,13 +36,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _comments.Clear();
-        _lastLoadedAt = null;
-        _hasMore = true;
-        await LoadCommentsAsync();
-    }
+    public string NewComment { get; set; } = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -67,7 +62,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         _isLoading = true;
         var request = new CursorTimeRequest
         {
-            Amount = 5,
+            Amount = 20,
             Before = _lastLoadedAt
         };
         var result = await CommentService.GetAsync(ItemId, request);

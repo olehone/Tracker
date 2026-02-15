@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Shared;
 
 namespace Tracker.WebApp.Components.Attachments;
 
@@ -27,7 +28,7 @@ public partial class FileView
             return;
         }
 
-        if (IsImage(File))
+        if (UiHelper.IsImage(File))
         {
             await LoadImageUrlAsync();
         }
@@ -85,13 +86,6 @@ public partial class FileView
         {
             File.IsDeleted = true;
         }
-    }
-
-    private static bool IsImage(FileDto file)
-    {
-        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg" };
-        return imageExtensions.Any(ext =>
-            file.FileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
     }
 
     private string GetClass()

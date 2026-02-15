@@ -17,7 +17,7 @@
                               Class=@GetClass()
                               Style="@($"background:{Colors.Gray.Lighten3};")">
 
-                        <MudText Class="mx-2"
+                        <MudText Class="mx-2 text-ellipsis"
                                  Style=@(File.IsDeleted ? "text-decoration: line-through;" : "")>
                             @File.FileName
                         </MudText>
@@ -43,6 +43,10 @@
             </MudCard>
         </ChildContent>
         <TooltipContent>
+            <MudStack >
+                <MudText>
+                    @File.FileName
+                </MudText>
             <MudStack Row
                       AlignItems="AlignItems.Center"
                       Justify="Justify.SpaceBetween">
@@ -52,6 +56,7 @@
                 <MudText>
                     By: @File.UploadedByName
                 </MudText>
+            </MudStack>
             </MudStack>
         </TooltipContent>
     </MudTooltip>

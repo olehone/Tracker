@@ -102,8 +102,8 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<ApiOptions>>().Value;
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
             })
-            .AddHttpMessageHandler<AuthHeaderHandler>()
-            .AddStandardResilienceHandler();
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+            //.AddStandardResilienceHandler();
 
         return services;
     }
