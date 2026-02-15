@@ -25,7 +25,6 @@ public class UploadAttachmentCommandHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var result = await uow.SaveChangesAsync(cancellationToken);
         var attachment = request.Type switch
         {
             AttachmentType.Item => await UploadItemAttachmentAsync(uow, request, options.Value.ItemAttachmentContainerName, cancellationToken),
@@ -36,6 +35,7 @@ public class UploadAttachmentCommandHandler(
         {
             return attachment.Error;
         }
+        var result = await uow.SaveChangesAsync(cancellationToken);
         return result.IsSuccess
             ? attachment.Value.ToDto(request.Type)
             : Error.Unknown;
@@ -65,7 +65,6 @@ public class UploadAttachmentCommandHandler(
         {
             BoardItemId = request.ParentId,
             UserId = userId,
-            UploadedBy = currentUser,
             OriginalFileName = request.FileName,
             ContentType = request.ContentType,
             SizeBytes = request.ContentLength,
@@ -74,6 +73,7 @@ public class UploadAttachmentCommandHandler(
         };
 
         await uow.BoardItemAttachmentRepository.AddAsync(attachment);
+        attachment.UploadedBy = currentUser;
         return attachment;
     }
 
@@ -100,15 +100,14 @@ public class UploadAttachmentCommandHandler(
         {
             ItemCommentId = request.ParentId,
             UserId = userId,
-            UploadedBy = currentUser,
             OriginalFileName = request.FileName,
             ContentType = request.ContentType,
             SizeBytes = request.ContentLength,
             StorageFileName = storageFileName,
             StorageFolder = storageFolder,
         };
-
         await uow.CommentAttachmentRepository.AddAsync(attachment);
+        attachment.UploadedBy = currentUser;
         return attachment;
     }
 }

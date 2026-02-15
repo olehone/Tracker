@@ -64,13 +64,13 @@ internal class UnitOfWork : IUnitOfWork
         {
             return await _dbContext.SaveChangesAsync(cancellationToken);
         }
-        catch (SqlException ex)
+        catch (Exception ex)
         {
             return ExceptionToError(ex);
         }
     }
 
-    private static Error ExceptionToError(SqlException ex)
+    private static Error ExceptionToError(Exception ex)
     {
         return ex switch
         {
