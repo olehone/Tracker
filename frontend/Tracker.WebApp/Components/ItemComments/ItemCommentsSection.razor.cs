@@ -8,11 +8,13 @@ using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Components.Shared;
 
 namespace Tracker.WebApp.Components.ItemComments;
 
 public partial class ItemCommentsSection : IAsyncDisposable
 {
+    private TextWithAttachmentsModel model = new();
     private List<ItemCommentDto> _comments = [];
     private string[] _errors = [];
     private bool _hasMore = true;
@@ -78,9 +80,9 @@ public partial class ItemCommentsSection : IAsyncDisposable
         StateHasChanged();
     }
 
-    private async Task CreateComment(string content)
+    private async Task CreateComment()
     {
-        var request = new CreateCommentRequest { Content = content };
+        var request = new CreateCommentRequest { Content = model.Text };
         var createCommentResult = await CommentService.CreateAsync(ItemId, request);
         if (createCommentResult.IsFailure)
         {
@@ -94,7 +96,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         }
         var comment = createCommentResult.Value;
 
-        foreach (var attachment in _attachments)
+        foreach (var attachment in model.Attachments)
         {
             await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
             var result = await AttachmentService.UploadAsync(comment.Id,

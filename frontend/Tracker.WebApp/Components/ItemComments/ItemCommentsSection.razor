@@ -13,24 +13,8 @@
         {
             <MudText Color="Color.Error">@error</MudText>
         }
-
-        <OneLineCreateButton OnCreate=@CreateComment />
-        @foreach (var attachment in _attachments)
-        {
-            <BrowserFilePreview File=@attachment />
-        }
-        <MudFileUpload T="IBrowserFile"
-                       Disabled=@Disabled
-                       FilesChanged=@AddAttachmentAsync
-                       MaximumFileCount="1">
-            <ActivatorContent>
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon=@Icons.Material.Filled.CloudUpload>
-                    Upload attachments
-                </MudButton>
-            </ActivatorContent>
-        </MudFileUpload>
+        <FormWithAttachments @bind-Model=@model
+                             OnSubmit=@CreateComment />
     }
     @foreach (var comment in _comments)
     {
