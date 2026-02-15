@@ -5,6 +5,7 @@ using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.ItemComments.Create;
 using Tracker.Application.UseCases.ItemComments.Get;
+using Tracker.Application.UseCases.ItemComments.Update;
 
 namespace Tracker.API.Controllers;
 
@@ -43,9 +44,15 @@ public class CommentsController(IMediator mediator) : ControllerBase
 
     [HttpPut("/api/attachments/{commentId:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid commentId,
-        [FromBody] UpdateBoardItemRequest request)
+        [FromBody] UpdateItemCommentRequest request)
     {
-        return BadRequest();
+        var mediatorRequest = new UpdateItemCommentCommand
+        {
+            CommentId = commentId,
+            Content = request.Content,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
     }
 
     [HttpDelete("/api/comments/{commentId:guid}")]
