@@ -15,21 +15,29 @@
     }
 }
 
-@foreach (var commentGroup in _newCommentGroups)
-{
-    <CommentGroup Group=commentGroup
-                  IsMine=@((commentId) => IsMine(commentId))
-                  MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
-                  ApplyCommentDeleted=@ApplyCommentDeleted />
+@{
+    foreach (var commentGroup in _commentGroups)
+    {
+        var user = commentGroup.First().UploadedBy;
+        var isMine = IsMine(user.Id);
+        var position = isMine
+            ? ChatBubblePosition.End
+            : ChatBubblePosition.Start;
 
-}
-@foreach (var commentGroup in _oldCommentGroups)
-{
-    <CommentGroup Group=commentGroup
-                  IsMine=@((commentId) => IsMine(commentId))
-                  MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
-                  ApplyCommentDeleted=@ApplyCommentDeleted />
+        <MudChat ChatPosition=@position
+                 ArrowPosition="ChatArrowPosition.None">
+            <UserAvatarWithLookup User=@user />
 
+            <MudChatHeader Name=@(isMine ? null : user.Username)
+                           Time=@commentGroup.First().UploadedAt.ToLocalTime().DateTime.ToString("D") />
+            @foreach (var comment in commentGroup)
+            {
+                <ItemComment Comment=@comment
+                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                             OnDelete=@(() => ApplyCommentDeleted(comment.Id)) />
+            }
+        </MudChat>
+    }
 }
 
 @if (_hasMore)

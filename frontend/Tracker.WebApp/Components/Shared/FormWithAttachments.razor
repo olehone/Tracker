@@ -37,6 +37,7 @@
                       AdornmentIcon=@Icons.Material.Filled.AttachFile
                       Clearable
                       OnClearButtonClick=Clear
+                      ClearIcon=@Icons.Material.Filled.Clear
                       OnAdornmentClick=TriggerFileUpload />
         @if (IsEditing)
         {
@@ -81,8 +82,7 @@
     [Parameter, EditorRequired]
     public EventCallback<TextWithAttachmentsModel> ModelChanged { get; set; }
 
-
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
         ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount, ExistingAttachmentsCount);
         Model.Attachments = [];

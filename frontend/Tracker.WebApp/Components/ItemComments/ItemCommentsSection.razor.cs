@@ -1,4 +1,3 @@
-using System.ComponentModel.Design;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -16,8 +15,7 @@ namespace Tracker.WebApp.Components.ItemComments;
 public partial class ItemCommentsSection : IAsyncDisposable
 {
     private TextWithAttachmentsModel model = new();
-    private List<List<ItemCommentDto>> _oldCommentGroups = [];
-    private List<List<ItemCommentDto>> _newCommentGroups = [];
+    private List<List<ItemCommentDto>> _commentGroups = [];
     private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
@@ -89,26 +87,26 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     private void AddComments(IReadOnlyList<ItemCommentDto> comments)
     {
-        Guid? lastUserId = _oldCommentGroups.Count == 0
+        Guid? lastUserId = _commentGroups.Count == 0
             ? null
-            : _oldCommentGroups.Last().Last().UploadedBy.Id;
+            : _commentGroups.Last().Last().UploadedBy.Id;
         foreach (var comment in comments)
         {
             if (lastUserId is null
-                || _oldCommentGroups.Count == 0)
+                || _commentGroups.Count == 0)
             {
-                _oldCommentGroups.Add([comment]);
+                _commentGroups.Add([comment]);
                 lastUserId = comment.UploadedBy.Id;
                 continue;
             }
 
             if (comment.UploadedBy.Id == lastUserId)
             {
-                _oldCommentGroups.Last().Add(comment);
+                _commentGroups.Last().Add(comment);
             }
             else
             {
-                _oldCommentGroups.Add([comment]);
+                _commentGroups.Add([comment]);
             }
 
             lastUserId = comment.UploadedBy.Id;
@@ -117,87 +115,52 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     public void ApplyCommentCreated(ItemCommentDto comment)
     {
-        if (_newCommentGroups.Count > 1)
+        if (_commentGroups.Count == 0
+            || comment.UploadedBy.Id == _commentGroups.First().First().UploadedBy.Id)
         {
-            if (comment.UploadedBy.Id == _newCommentGroups.First().First().UploadedBy.Id)
-            {
-                _newCommentGroups.First().Insert(0, comment);
-            }
-            else
-            {
-                _newCommentGroups.Insert(0, [comment]);
-            }
+            _commentGroups.First().Insert(0, comment);
         }
         else
         {
-            if (comment.UploadedBy.Id == _oldCommentGroups.First().First().UploadedBy.Id)
-            {
-                _oldCommentGroups.First().Insert(0, comment);
-            }
-            else
-            {
-                _newCommentGroups.Insert(0, [comment]);
-            }
+            _commentGroups.Insert(0, [comment]);
         }
+
         StateHasChanged();
     }
 
     public void ApplyCommentUpdated(ItemCommentDto updatedComment)
     {
-        var oldComment = _oldCommentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
-        if (oldComment is not null)
+        var comment = _commentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
+        if (comment is null)
         {
-            //_oldCommentGroups = _oldCommentGroups
-            //    .Select(g => g
-            //        .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
-            //        .ToList())
-            //    .ToList();
-            oldComment = updatedComment;
-            StateHasChanged();
             return;
         }
-
-        var newComment = _newCommentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
-        if (newComment is not null)
-        {
-            //_oldCommentGroups = _oldCommentGroups
-            //    .Select(g => g
-            //        .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
-            //        .ToList())
-            //    .ToList();
-            newComment = updatedComment;
-            StateHasChanged();
-            return;
-        }
-    }
-
-    public void DeleteCommentInGroup(List<List<ItemCommentDto>> groups, List<ItemCommentDto> group, Guid commentId)
-    {
-        var comment = group.First(c => c.Id == commentId);
-        group.Remove(comment);
-        if (group.Count == 0)
-        {
-            groups.Remove(group);
-        }
+        comment = updatedComment;
+        _commentGroups = _commentGroups
+            .Select(g => g
+                .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
+                .ToList())
+            .ToList();
         StateHasChanged();
     }
 
     public void ApplyCommentDeleted(Guid commentId)
     {
-        var group = _oldCommentGroups
+        var group = _commentGroups
             .FirstOrDefault(g => g.Any(c => c.Id == commentId));
-        if (group is not null)
+
+        if (group is null)
         {
-            DeleteCommentInGroup(_oldCommentGroups, group, commentId);
             return;
         }
-        group = _newCommentGroups
-            .FirstOrDefault(g => g.Any(c => c.Id == commentId));
-        if (group is not null)
+
+        var comment = group.First(c => c.Id == commentId);
+        group.Remove(comment);
+        if (group.Count == 0)
         {
-            DeleteCommentInGroup(_newCommentGroups, group, commentId);
-            return;
+            _commentGroups.Remove(group);
         }
+        StateHasChanged();
     }
 
     private async Task CreateCommentAsync()
@@ -227,6 +190,8 @@ public partial class ItemCommentsSection : IAsyncDisposable
                 comment.Attachments.Add(result.Value);
             }
         }
+        StateHasChanged();
+
 
         ApplyCommentCreated(comment);
         model = new();
