@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Requests;
@@ -24,8 +22,6 @@ public partial class ItemCommentsSection : IAsyncDisposable
     private DateTimeOffset? _lastLoadedAt = null;
     private ElementReference _trigger;
     private DotNetObjectReference<ItemCommentsSection>? _ref;
-    private ItemCommentDto? _selectedComment;
-    private MudMenu? _contextMenu;
 
     [Parameter, EditorRequired]
     public Guid ItemId { get; set; }
@@ -40,7 +36,6 @@ public partial class ItemCommentsSection : IAsyncDisposable
     [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
-    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     private bool IsMine(Guid id)
     {
@@ -74,7 +69,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         _isLoading = true;
         var request = new CursorTimeRequest
         {
-            Amount = 2,
+            Amount = 5,
             Before = _lastLoadedAt
         };
         var result = await CommentService.GetAsync(ItemId, request);
@@ -155,32 +150,6 @@ public partial class ItemCommentsSection : IAsyncDisposable
             _commentGroups.Insert(0, [comment]);
         }
         model = new();
-    }
-
-    private void EditComment()
-    {
-        if (_selectedComment is not null)
-        {
-            Snackbar.Add("Edited");
-        }
-    }
-
-    private void DeleteComment()
-    {
-        if (_selectedComment is not null)
-        {
-            Snackbar.Add("Deleted");
-        }
-    }
-
-    private async Task RightClickComment(MouseEventArgs args, ItemCommentDto comment)
-    {
-        _selectedComment = comment;
-        if (_contextMenu != null)
-        {
-            Snackbar.Add("Right click");
-            await _contextMenu.OpenMenuAsync(args);
-        }
     }
 
     public async ValueTask DisposeAsync()

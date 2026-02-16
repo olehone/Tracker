@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tracker.API.Requests;
 using Tracker.API.Services;
 using Tracker.Application.UseCases.ItemComments.Create;
+using Tracker.Application.UseCases.ItemComments.Delete;
 using Tracker.Application.UseCases.ItemComments.Get;
 using Tracker.Application.UseCases.ItemComments.Update;
 
@@ -42,7 +43,7 @@ public class CommentsController(IMediator mediator) : ControllerBase
         return response.ToActionResult();
     }
 
-    [HttpPut("/api/attachments/{commentId:guid}")]
+    [HttpPut("/api/comments/{commentId:guid}")]
     public async Task<IActionResult> UpdateAsync(Guid commentId,
         [FromBody] UpdateItemCommentRequest request)
     {
@@ -58,6 +59,11 @@ public class CommentsController(IMediator mediator) : ControllerBase
     [HttpDelete("/api/comments/{commentId:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid commentId)
     {
-        return BadRequest();
+        var mediatorRequest = new DeleteItemCommentCommand
+        {
+            CommentId = commentId
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
     }
 }

@@ -8,8 +8,8 @@
          ValidationDelay="0">
     <MudFileUpload T="IReadOnlyList<IBrowserFile>"
                    @ref=@_mudFileUpload
-                   Files=@Model.Attachments
-                   OnFilesChanged=@HandleFilesChanged
+                   @bind-Files=@Model.Attachments
+                   For=@(() => Model.Attachments)
                    Accept=@AcceptedExtensions
                    AppendMultipleFiles
                    SuppressOnChangeWhenInvalid
@@ -68,6 +68,8 @@
     [Parameter]
     public string AcceptedExtensions { get; set; } = "*";
 
+    [Parameter]
+    public Func<int> ExistingAttachmentsCount { get; set; } = (() => 0);
     [Parameter, EditorRequired]
     public EventCallback<TextWithAttachmentsModel> OnSubmit { get; set; }
     [Parameter, EditorRequired]
@@ -78,12 +80,8 @@
 
     protected override void OnParametersSet()
     {
-        ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount);
-    }
-
-    private async Task HandleFilesChanged(InputFileChangeEventArgs e)
-    {
-        await ModelChanged.InvokeAsync(Model);
+        ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount, ExistingAttachmentsCount);
+        Model.Attachments = [];
     }
 
     private async Task Submit()
@@ -128,7 +126,7 @@
 
     public class TextWithAttachmentsModelValidator : AbstractValidator<TextWithAttachmentsModel>
     {
-        public TextWithAttachmentsModelValidator(int maxTextLength, long maxFileSizeBytes, int maxFileCount)
+        public TextWithAttachmentsModelValidator(int maxTextLength, long maxFileSizeBytes, int maxFileCount, Func<int> existingFiles)
         {
             RuleFor(x => x.Text)
                 .NotEmpty()
@@ -137,7 +135,7 @@
                 .WithMessage($"Text cannot exceed {maxTextLength} characters");
 
             RuleFor(x => x.Attachments)
-                .Must(files => files == null || files.Count <= maxFileCount)
+                .Must(files => files == null || (files.Count + existingFiles()) <= maxFileCount)
                 .WithMessage($"Maximum {maxFileCount} files allowed");
 
             When(x => x.Attachments != null && x.Attachments.Any(), () =>

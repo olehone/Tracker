@@ -21,24 +21,19 @@
         var user = commentGroup.First().UploadedBy;
         var isMine = IsMine(user.Id);
         var position = isMine
-        ? ChatBubblePosition.End
-        : ChatBubblePosition.Start;
+            ? ChatBubblePosition.End
+            : ChatBubblePosition.Start;
 
-        <MudChat ChatPosition="@position">
+        <MudChat ChatPosition=@position>
             <UserAvatarWithLookup User=@user />
 
             <MudChatHeader Name=@(isMine ? null : user.Username)
                            Time=@commentGroup.First().UploadedAt.ToLocalTime().DateTime.ToString() />
             @foreach (var comment in commentGroup)
             {
-                <MudChatBubble OnContextClick=@((MouseEventArgs args) => RightClickComment(args, comment))>
-                    @comment.Content
-                    @foreach (var attachment in comment.Attachments)
-                    {
-                        <FileView File=@attachment
-                                  Disabled="true" />
-                    }
-                </MudChatBubble>
+
+                <ItemComment Comment=@comment
+                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes />
             }
         </MudChat>
     }
@@ -63,15 +58,3 @@ else
                              Color="Color.Primary" />
     </MudStack>
 }
-
-<MudMenu PositionAtCursor="true"
-         @ref="_contextMenu"
-         id="_contextMenu">
-    <MudMenuItem Icon=@Icons.Material.Filled.Delete OnClick=@DeleteComment>
-        Delete
-    </MudMenuItem>
-
-    <MudMenuItem Icon=@Icons.Material.Filled.Edit OnClick=@EditComment>
-        Edit
-    </MudMenuItem>
-</MudMenu>

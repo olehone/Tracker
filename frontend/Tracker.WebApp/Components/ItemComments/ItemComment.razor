@@ -1,0 +1,111 @@
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.Domain.Requests
+@using Tracker.Domain.Requests.ItemComment
+@using Tracker.Services
+@using Tracker.Services.Abstraction
+@using Tracker.WebApp.Components.Attachments
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+@using Tracker.WebApp.States
+
+@if (!_isDeleted)
+{
+    @if (_isEditing)
+    {
+        <FormWithAttachments @bind-Model=@model
+                             OnSubmit=@UpdateCommentAsync
+                             ExistingAttachmentsCount=@(() => Comment.Attachments.Count) />
+        @foreach (var attachment in Comment.Attachments)
+        {
+            <FileView File=@attachment
+                      Disabled="false" />
+        }
+    }
+    else
+    {
+        <MudChatBubble>
+
+            @Comment.Content
+            @foreach (var attachment in Comment.Attachments)
+            {
+                <FileView File=@attachment
+                          Disabled="true" />
+            }
+
+            @if (CanChange())
+            {
+                <MudChatFooter>
+                    <MudLink OnClick=@StartEditing> Edit </MudLink>
+                    <MudLink OnClick=@DeleteCommentAsync> Delete </MudLink>
+                </MudChatFooter>
+            }
+        </MudChatBubble>
+    }
+}
+
+@code {
+    private bool _isEditing = false;
+    private bool _isDeleted = false;
+    private TextWithAttachmentsModel model = new();
+
+    [Parameter, EditorRequired]
+    public ItemCommentDto Comment { get; set; }
+    [Parameter, EditorRequired]
+    public int MaxAttachmentSizeBytes { get; set; }
+
+    [Inject] AppState AppState { get; set; } = null!;
+    [Inject] IItemCommentService CommentService { get; set; } = null!;
+    [Inject] IAttachmentService AttachmentService { get; set; } = null!;
+
+    private async Task UpdateCommentAsync()
+    {
+        var request = new UpdateItemCommentRequest
+        {
+            Content = model.Text
+        };
+        var commentResult = await CommentService.UpdateAsync(Comment.Id, request);
+        if (commentResult.IsSuccess)
+        {
+            Comment.Content = model.Text;
+        }
+        foreach (var attachment in model.Attachments)
+        {
+            await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
+            var result = await AttachmentService.UploadAsync(Comment.Id,
+                stream, attachment.ContentType, attachment.Name, AttachmentType.Comment);
+
+            if (result.IsSuccess)
+            {
+                Comment.Attachments.Add(result.Value);
+            }
+        }
+        model = new();
+        _isEditing = false;
+    }
+
+    private async Task DeleteCommentAsync()
+    {
+        var result = await CommentService.DeleteAsync(Comment.Id);
+        if (result.IsSuccess)
+        {
+            _isDeleted = true;
+        }
+        _isEditing = false;
+    }
+
+    private void StartEditing()
+    {
+        model.Text = Comment.Content;
+        _isEditing = true;
+    }
+
+    private bool CanChange()
+    {
+        if (AppState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return Comment.UploadedBy.Id == AppState.MyId;
+    }
+}
