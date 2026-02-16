@@ -16,12 +16,7 @@
 }
 
 @{
-    var orderedGroups = _comments
-    .OrderByDescending(c => c.UploadedAt)
-    .GroupBy(c => c.UploadedBy.Id)
-    .ToList();
-
-    foreach (var commentGroup in orderedGroups)
+    foreach (var commentGroup in _commentGroups)
     {
         var user = commentGroup.First().UploadedBy;
         var isMine = IsMine(user.Id);

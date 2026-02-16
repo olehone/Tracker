@@ -17,7 +17,7 @@ namespace Tracker.WebApp.Components.ItemComments;
 public partial class ItemCommentsSection : IAsyncDisposable
 {
     private TextWithAttachmentsModel model = new();
-    private List<ItemCommentDto> _comments = [];
+    private List<List<ItemCommentDto>> _commentGroups = [];
     private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
@@ -74,7 +74,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         _isLoading = true;
         var request = new CursorTimeRequest
         {
-            Amount = 20,
+            Amount = 2,
             Before = _lastLoadedAt
         };
         var result = await CommentService.GetAsync(ItemId, request);
@@ -86,8 +86,36 @@ public partial class ItemCommentsSection : IAsyncDisposable
         }
         _hasMore = result.Value.HasMore;
         _lastLoadedAt = result.Value.LastLoadedAt;
-        _comments.AddRange(result.Value.Items);
+        AddComments(result.Value.Items);
         StateHasChanged();
+    }
+
+    private void AddComments(IReadOnlyList<ItemCommentDto> comments)
+    {
+        Guid? lastUserId = _commentGroups.Count == 0
+            ? null
+            : _commentGroups.Last().Last().UploadedBy.Id;
+        foreach (var comment in comments)
+        {
+            if (lastUserId is null
+                || _commentGroups.Count == 0)
+            {
+                _commentGroups.Add([comment]);
+                lastUserId = comment.UploadedBy.Id;
+                continue;
+            }
+
+            if (comment.UploadedBy.Id == lastUserId)
+            {
+                _commentGroups.Last().Add(comment);
+            }
+            else
+            {
+                _commentGroups.Add([comment]);
+            }
+
+            lastUserId = comment.UploadedBy.Id;
+        }
     }
 
     private async Task CreateCommentAsync()
@@ -117,7 +145,15 @@ public partial class ItemCommentsSection : IAsyncDisposable
                 comment.Attachments.Add(result.Value);
             }
         }
-        _comments.Insert(0, comment);
+
+        if (comment.UploadedBy.Id == _commentGroups.First().First().UploadedBy.Id)
+        {
+            _commentGroups.First().Insert(0, comment);
+        }
+        else
+        {
+            _commentGroups.Insert(0, [comment]);
+        }
         model = new();
     }
 
