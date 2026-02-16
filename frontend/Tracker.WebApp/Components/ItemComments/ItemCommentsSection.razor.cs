@@ -40,6 +40,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     private bool IsMine(Guid id)
     {
@@ -124,6 +125,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     {
         if (_selectedComment is not null)
         {
+            Snackbar.Add("Edited");
         }
     }
 
@@ -131,6 +133,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
     {
         if (_selectedComment is not null)
         {
+            Snackbar.Add("Deleted");
         }
     }
 
@@ -139,6 +142,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         _selectedComment = comment;
         if (_contextMenu != null)
         {
+            Snackbar.Add("Right click");
             await _contextMenu.OpenMenuAsync(args);
         }
     }

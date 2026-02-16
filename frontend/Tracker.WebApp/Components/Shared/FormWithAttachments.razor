@@ -6,38 +6,38 @@
          @ref=@form
          Validation=@ValidationRules
          ValidationDelay="0">
-    <MudTextField @bind-Value=@Model.Text
-                  Label="Write a comment"
-                  AutoGrow
-                  Variant="Variant.Outlined"
-                  Immediate="true"
-                  Counter=@MaxTextLength
-                  MaxLength=@MaxTextLength />
-    @if (IsEditing)
-    {
-        @foreach (var file in Model.Attachments)
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                   @ref=@_mudFileUpload
+                   Files=@Model.Attachments
+                   OnFilesChanged=@HandleFilesChanged
+                   Accept=@AcceptedExtensions
+                   AppendMultipleFiles
+                   SuppressOnChangeWhenInvalid
+                   @onkeydown=@HandleKeys>
+        <SelectedTemplate>
+            @foreach (var file in context)
+            {
+                <BrowserFilePreview File=@file
+                                    OnDelete=@(() => RemoveFile(file)) />
+            }
+        </SelectedTemplate>
+    </MudFileUpload>
+
+    <MudStack Row
+              Justify="Justify.FlexStart"
+              AlignItems="AlignItems.Center">
+        <MudTextField @bind-Value=@Model.Text
+                      Label="Write a comment"
+                      AutoGrow
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      Counter=@MaxTextLength
+                      MaxLength=@MaxTextLength
+                      Adornment="Adornment.Start"
+                      AdornmentIcon=@Icons.Material.Filled.AttachFile
+                      OnAdornmentClick=TriggerFileUpload />
+        @if (IsEditing)
         {
-            <BrowserFilePreview File=@file
-                                OnDelete=@(() => RemoveFile(file)) />
-        }
-
-        <MudStack Row
-                  Justify="Justify.SpaceBetween">
-            <MudFileUpload T="IReadOnlyList<IBrowserFile>"
-                           @bind-Files=@Model.Attachments
-                           OnFilesChanged=@HandleFilesChanged
-                           Accept=@AcceptedExtensions
-                           AppendMultipleFiles
-                           SuppressOnChangeWhenInvalid="true">
-                <ActivatorContent>
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.CloudUpload">
-                        Upload Files
-                    </MudButton>
-                </ActivatorContent>
-            </MudFileUpload>
-
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        OnClick=@Submit
@@ -48,11 +48,17 @@
                 }
                 Submit
             </MudButton>
-        </MudStack>
-    }
+        }
+    </MudStack>
 </MudForm>
 
 @code {
+    private MudFileUpload<IReadOnlyList<IBrowserFile>> _mudFileUpload;
+    private MudForm form;
+    private TextWithAttachmentsModelValidator ValidationRules;
+    private bool _isSubmitting;
+    private bool IsEditing => !string.IsNullOrWhiteSpace(Model.Text);
+
     [Parameter]
     public int MaxTextLength { get; set; } = 500;
     [Parameter]
@@ -69,11 +75,7 @@
     [Parameter, EditorRequired]
     public EventCallback<TextWithAttachmentsModel> ModelChanged { get; set; }
 
-    private MudForm form;
-    private TextWithAttachmentsModelValidator ValidationRules;
-    private bool _isSubmitting;
 
-    private bool IsEditing => !string.IsNullOrWhiteSpace(Model.Text);
     protected override void OnParametersSet()
     {
         ValidationRules = new TextWithAttachmentsModelValidator(MaxTextLength, MaxFileSizeBytes, MaxFileCount);
@@ -104,6 +106,24 @@
     private void RemoveFile(IBrowserFile file)
     {
         Model.Attachments = Model.Attachments.Where(f => !f.Equals(file)).ToList();
+    }
+
+    private async Task TriggerFileUpload()
+    {
+        await _mudFileUpload.OpenFilePickerAsync();
+    }
+
+    private void Clear()
+    {
+        Model = new();
+    }
+
+    private async Task HandleKeys(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && e.CtrlKey)
+        {
+            await Submit();
+        }
     }
 
     public class TextWithAttachmentsModelValidator : AbstractValidator<TextWithAttachmentsModel>

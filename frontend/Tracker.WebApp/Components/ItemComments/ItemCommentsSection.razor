@@ -5,78 +5,71 @@
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
 
-<MudPaper Outlined
-          Style="overflow-y:auto;"
-          Class="pa-2 mb-2 mud-width-full mud-background-gray">
-    @if (!Disabled)
+@if (!Disabled)
+{
+    <FormWithAttachments @bind-Model=@model
+                         OnSubmit=@CreateCommentAsync />
+    @foreach (var error in _errors)
     {
-        <FormWithAttachments @bind-Model=@model
-                             OnSubmit=@CreateCommentAsync />
-        @foreach (var error in _errors)
-        {
-            <MudText Color="Color.Error">@error</MudText>
-        }
+        <MudText Color="Color.Error">@error</MudText>
     }
+}
 
-    @{
-        var orderedGroups = _comments
-        .OrderByDescending(c => c.UploadedAt)
-        .GroupBy(c => c.UploadedBy.Id)
-        .ToList();
+@{
+    var orderedGroups = _comments
+    .OrderByDescending(c => c.UploadedAt)
+    .GroupBy(c => c.UploadedBy.Id)
+    .ToList();
 
-        foreach (var commentGroup in orderedGroups)
-        {
-            var user = commentGroup.First().UploadedBy;
-            var position = IsMine(user.Id)
-            ? ChatBubblePosition.End
-            : ChatBubblePosition.Start;
-
-            <MudChat ChatPosition="@position">
-                <UserAvatarWithLookup User=@user />
-
-                <MudChatHeader Name=@user.Username
-                               Time=@commentGroup.First().UploadedAt.ToLocalTime().ToString() />
-                @foreach (var comment in commentGroup.OrderByDescending(m => m.UploadedAt))
-                {
-                    <MudChatBubble OnContextClick=@((MouseEventArgs args) => RightClickComment(args, comment))>
-                        @comment.Content
-                        @foreach (var attachment in comment.Attachments)
-                        {
-                            <FileView File=@attachment
-                                      Disabled="true" />
-                        }
-                    </MudChatBubble>
-                }
-            </MudChat>
-        }
-    }
-
-    @foreach (var comment in _comments)
+    foreach (var commentGroup in orderedGroups)
     {
-        <ItemComment Comment=@comment
-                     Disabled=@Disabled />
-    }
+        var user = commentGroup.First().UploadedBy;
+        var isMine = IsMine(user.Id);
+        var position = isMine
+        ? ChatBubblePosition.End
+        : ChatBubblePosition.Start;
 
-    @if (_hasMore)
-    {
-        <div @ref="_trigger" style="height:1px"></div>
-    }
-    else
-    {
-        <MudText Align="Align.Center">
-            No more comments
-        </MudText>
-    }
-    @if (_isLoading)
-    {
-        <MudStack Justify="Justify.Center">
-            <MudProgressCircular Indeterminate
-                                 Color="Color.Primary" />
-        </MudStack>
-    }
-</MudPaper>
+        <MudChat ChatPosition="@position">
+            <UserAvatarWithLookup User=@user />
 
-<MudMenu PositionAtCursor
+            <MudChatHeader Name=@(isMine ? null : user.Username)
+                           Time=@commentGroup.First().UploadedAt.ToLocalTime().DateTime.ToString() />
+            @foreach (var comment in commentGroup)
+            {
+                <MudChatBubble OnContextClick=@((MouseEventArgs args) => RightClickComment(args, comment))>
+                    @comment.Content
+                    @foreach (var attachment in comment.Attachments)
+                    {
+                        <FileView File=@attachment
+                                  Disabled="true" />
+                    }
+                </MudChatBubble>
+            }
+        </MudChat>
+    }
+}
+
+@if (_hasMore)
+{
+    <div @ref="_trigger" style="height:1px"></div>
+}
+else
+{
+    <MudText Typo="Typo.h6"
+             Align="Align.Center"
+             Class="ma-8">
+        No more comments
+    </MudText>
+}
+@if (_isLoading)
+{
+    <MudStack Justify="Justify.Center">
+        <MudProgressCircular Indeterminate
+                             Color="Color.Primary" />
+    </MudStack>
+}
+
+<MudMenu PositionAtCursor="true"
          @ref="_contextMenu"
          id="_contextMenu">
     <MudMenuItem Icon=@Icons.Material.Filled.Delete OnClick=@DeleteComment>
