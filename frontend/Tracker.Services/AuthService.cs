@@ -105,7 +105,6 @@ public sealed class AuthService(
 
             if (result == null || result.IsFailure)
             {
-                await LogoutAsync();
                 return null;
             }
 
@@ -115,7 +114,6 @@ public sealed class AuthService(
         }
         catch (Exception)
         {
-            await LogoutAsync();
             return null;
         }
         finally

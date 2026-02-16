@@ -29,8 +29,7 @@ public static class ServiceCollectionExtensions
             {
                 var options = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
-            })
-            .AddStandardResilienceHandler();
+            });
 
         services.AddApiClientWithAuth<IUserApi>();
         services.AddApiClientWithAuth<IWorkspaceApi>();
