@@ -18,19 +18,19 @@
 @{
     foreach (var commentGroup in _commentGroups)
     {
-        var user = commentGroup.First().UploadedBy;
-        var isMine = IsMine(user.Id);
+        var isMine = IsMine(commentGroup.UserId);
         var position = isMine
             ? ChatBubblePosition.End
             : ChatBubblePosition.Start;
 
         <MudChat ChatPosition=@position
-                 ArrowPosition="ChatArrowPosition.None">
-            <UserAvatarWithLookup User=@user />
+                 ArrowPosition="ChatArrowPosition.None"
+                 @key=@commentGroup.Key>
+            <UserAvatarWithLookup User=@commentGroup.User />
 
-            <MudChatHeader Name=@(isMine ? null : user.Username)
-                           Time=@commentGroup.First().UploadedAt.ToLocalTime().DateTime.ToString("D") />
-            @foreach (var comment in commentGroup)
+            <MudChatHeader Name=@(isMine ? null : commentGroup.User.Username)
+                           Time=@commentGroup.Comments.First().UploadedAt.ToLocalTime().DateTime.ToString("D") />
+            @foreach (var comment in commentGroup.Comments)
             {
                 <ItemComment Comment=@comment
                              MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes

@@ -15,7 +15,7 @@ namespace Tracker.WebApp.Components.ItemComments;
 public partial class ItemCommentsSection : IAsyncDisposable
 {
     private TextWithAttachmentsModel model = new();
-    private List<List<ItemCommentDto>> _commentGroups = [];
+    private List<CommentGroup> _commentGroups = [];
     private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
@@ -89,24 +89,23 @@ public partial class ItemCommentsSection : IAsyncDisposable
     {
         Guid? lastUserId = _commentGroups.Count == 0
             ? null
-            : _commentGroups.Last().Last().UploadedBy.Id;
+            : _commentGroups.Last().UserId;
         foreach (var comment in comments)
         {
-            if (lastUserId is null
-                || _commentGroups.Count == 0)
+            if (lastUserId is null || _commentGroups.Count == 0)
             {
-                _commentGroups.Add([comment]);
+                _commentGroups.Add(new(comment));
                 lastUserId = comment.UploadedBy.Id;
                 continue;
             }
 
             if (comment.UploadedBy.Id == lastUserId)
             {
-                _commentGroups.Last().Add(comment);
+                _commentGroups.Last().Comments.Add(comment);
             }
             else
             {
-                _commentGroups.Add([comment]);
+                _commentGroups.Add(new(comment));
             }
 
             lastUserId = comment.UploadedBy.Id;
@@ -115,14 +114,15 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     public void ApplyCommentCreated(ItemCommentDto comment)
     {
+        var firstGroup = _commentGroups.First();
         if (_commentGroups.Count == 0
-            || comment.UploadedBy.Id == _commentGroups.First().First().UploadedBy.Id)
+            || comment.UploadedBy.Id == firstGroup.UserId)
         {
-            _commentGroups.First().Insert(0, comment);
+            firstGroup.Comments.Insert(0, comment);
         }
         else
         {
-            _commentGroups.Insert(0, [comment]);
+            _commentGroups.Insert(0, new(comment));
         }
 
         StateHasChanged();
@@ -130,33 +130,29 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     public void ApplyCommentUpdated(ItemCommentDto updatedComment)
     {
-        var comment = _commentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
+        var comment = _commentGroups.SelectMany(g => g.Comments).FirstOrDefault(c => c.Id == updatedComment.Id);
         if (comment is null)
         {
             return;
         }
         comment = updatedComment;
-        _commentGroups = _commentGroups
-            .Select(g => g
-                .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
-                .ToList())
-            .ToList();
         StateHasChanged();
     }
 
     public void ApplyCommentDeleted(Guid commentId)
     {
         var group = _commentGroups
-            .FirstOrDefault(g => g.Any(c => c.Id == commentId));
+            .FirstOrDefault(g => g.Comments.Any(c => c.Id == commentId));
 
         if (group is null)
         {
             return;
         }
 
-        var comment = group.First(c => c.Id == commentId);
-        group.Remove(comment);
-        if (group.Count == 0)
+        var comment = group.Comments.First(c => c.Id == commentId);
+        group.Comments.Remove(comment);
+
+        if (group.Comments.Count == 0)
         {
             _commentGroups.Remove(group);
         }
