@@ -1,24 +1,25 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
-using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Components.Shared;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.ItemComments;
 
 public partial class ItemCommentsSection : IAsyncDisposable
 {
-    private List<ItemCommentDto> _comments = [];
+    private TextWithAttachmentsModel model = new();
+    private List<CommentGroup> _commentGroups = [];
     private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
     private DateTimeOffset? _lastLoadedAt = null;
-    private ICollection<IBrowserFile> _attachments = [];
     private ElementReference _trigger;
     private DotNetObjectReference<ItemCommentsSection>? _ref;
 
@@ -34,15 +35,16 @@ public partial class ItemCommentsSection : IAsyncDisposable
     [Inject] IItemCommentService CommentService { get; set; } = null!;
     [Inject] IAttachmentService AttachmentService { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
+    private bool IsMine(Guid id)
     {
-        _comments.Clear();
-        _lastLoadedAt = null;
-        _hasMore = true;
-        await LoadCommentsAsync();
+        if (AppState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return id == AppState.MyId;
     }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -79,13 +81,87 @@ public partial class ItemCommentsSection : IAsyncDisposable
         }
         _hasMore = result.Value.HasMore;
         _lastLoadedAt = result.Value.LastLoadedAt;
-        _comments.AddRange(result.Value.Items);
+        AddComments(result.Value.Items);
         StateHasChanged();
     }
 
-    private async Task CreateComment(string content)
+    private void AddComments(IReadOnlyList<ItemCommentDto> comments)
     {
-        var request = new CreateCommentRequest { Content = content };
+        Guid? lastUserId = _commentGroups.Count == 0
+            ? null
+            : _commentGroups.Last().UserId;
+        foreach (var comment in comments)
+        {
+            if (lastUserId is null || _commentGroups.Count == 0)
+            {
+                _commentGroups.Add(new(comment));
+                lastUserId = comment.UploadedBy.Id;
+                continue;
+            }
+
+            if (comment.UploadedBy.Id == lastUserId)
+            {
+                _commentGroups.Last().Comments.Add(comment);
+            }
+            else
+            {
+                _commentGroups.Add(new(comment));
+            }
+
+            lastUserId = comment.UploadedBy.Id;
+        }
+    }
+
+    public void ApplyCommentCreated(ItemCommentDto comment)
+    {
+        var firstGroup = _commentGroups.First();
+        if (_commentGroups.Count == 0
+            || comment.UploadedBy.Id == firstGroup.UserId)
+        {
+            firstGroup.Comments.Insert(0, comment);
+        }
+        else
+        {
+            _commentGroups.Insert(0, new(comment));
+        }
+
+        StateHasChanged();
+    }
+
+    public void ApplyCommentUpdated(ItemCommentDto updatedComment)
+    {
+        var comment = _commentGroups.SelectMany(g => g.Comments).FirstOrDefault(c => c.Id == updatedComment.Id);
+        if (comment is null)
+        {
+            return;
+        }
+        comment = updatedComment;
+        StateHasChanged();
+    }
+
+    public void ApplyCommentDeleted(Guid commentId)
+    {
+        var group = _commentGroups
+            .FirstOrDefault(g => g.Comments.Any(c => c.Id == commentId));
+
+        if (group is null)
+        {
+            return;
+        }
+
+        var comment = group.Comments.First(c => c.Id == commentId);
+        group.Comments.Remove(comment);
+
+        if (group.Comments.Count == 0)
+        {
+            _commentGroups.Remove(group);
+        }
+        StateHasChanged();
+    }
+
+    private async Task CreateCommentAsync()
+    {
+        var request = new CreateCommentRequest { Content = model.Text };
         var createCommentResult = await CommentService.CreateAsync(ItemId, request);
         if (createCommentResult.IsFailure)
         {
@@ -99,7 +175,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
         }
         var comment = createCommentResult.Value;
 
-        foreach (var attachment in _attachments)
+        foreach (var attachment in model.Attachments)
         {
             await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
             var result = await AttachmentService.UploadAsync(comment.Id,
@@ -110,30 +186,11 @@ public partial class ItemCommentsSection : IAsyncDisposable
                 comment.Attachments.Add(result.Value);
             }
         }
-        _comments.Insert(0, comment);
-    }
-
-    private async Task AddAttachmentsAsync(List<IBrowserFile> files)
-    {
-        foreach (var file in files)
-        {
-            if (!IsFileValid(file))
-            {
-                return;
-            }
-            _attachments.Add(file);
-            StateHasChanged();
-        }
-    }
-
-    private async Task AddAttachmentAsync(IBrowserFile file)
-    {
-        if (!IsFileValid(file))
-        {
-            return;
-        }
-        _attachments.Add(file);
         StateHasChanged();
+
+
+        ApplyCommentCreated(comment);
+        model = new();
     }
 
     public async ValueTask DisposeAsync()

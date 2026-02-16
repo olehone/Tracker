@@ -1,5 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Security.Cryptography;
+using MudBlazor;
+using Tracker.Domain.Dtos;
 
 namespace Tracker.WebApp.Shared;
 
@@ -69,6 +71,19 @@ public static class UiHelper
         var bytes = SHA256.HashData(id.ToByteArray());
         var hue = bytes[0] % 360;
         return $"background:hsl({hue}, 60%, 55%);";
+    }
+
+    // Could be file flags or mime content type
+    public static bool IsImage(FileDto file)
+    {
+        return IsImage(file.FileName);
+    }
+
+    public static bool IsImage(string fileName)
+    {
+        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg" };
+        return imageExtensions.Any(ext =>
+            fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
     }
 
     public static string FileSize(long bytes)

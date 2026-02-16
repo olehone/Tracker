@@ -1,0 +1,39 @@
+﻿@using Tracker.WebApp.Shared
+@implements IAsyncDisposable
+
+<MudStack Row
+          AlignItems="AlignItems.Center"
+          Justify="Justify.SpaceBetween"
+          Style=@($"background:{Colors.Gray.Lighten4};")
+          Class="pa-1">
+
+    @if (_previewDataUrl != null)
+    {
+        <MudImage Src=@_previewDataUrl
+                  Alt=@File.Name
+                  Height="60"
+                  Width="60"
+                  ObjectFit="ObjectFit.Cover"
+                  Class="mx-2 rounded" />
+    }
+    else if (_isLoadingPreview)
+    {
+        <MudProgressCircular Size="Size.Small"
+                             Indeterminate
+                             Class="mx-2" />
+    }
+
+    <MudText Class="mx-2 text-ellipsis">
+        @File.Name
+    </MudText>
+
+    <MudText Class="mx-2">
+        @UiHelper.FileSize(File.Size)
+    </MudText>
+
+    @if (OnDelete.HasDelegate)
+    {
+        <MudIconButton Icon=@Icons.Material.Filled.Delete
+                       OnClick=@OnDelete />
+    }
+</MudStack>

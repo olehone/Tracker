@@ -9,4 +9,6 @@ public interface IItemCommentService
 {
     Task<Result<CursorPage<ItemCommentDto>>> GetAsync(Guid itemId, CursorTimeRequest request);
     Task<Result<ItemCommentDto>> CreateAsync(Guid itemId, CreateCommentRequest request);
+    Task<Result> UpdateAsync(Guid commentId, Guid itemId, UpdateItemCommentRequest request);
+    Task<Result> DeleteAsync(Guid commentId, Guid itemId);
 }

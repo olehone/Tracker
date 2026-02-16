@@ -11,7 +11,7 @@ namespace Tracker.Application.UseCases.Attachments;
 internal static class AttachmentHelper
 {
     public static async Task<Result> DeleteAttachmentAsync(Guid attachmentId, AttachmentType type,
-        IUnitOfWork uow, IUserContext userContext, IAttachmentStorageService attachments, CancellationToken cancellationToken = default)
+        IUnitOfWork uow, IUserContext userContext, IAttachmentStorageService attachments, CancellationToken cancellationToken = default, bool isIndividual = true)
     {
         Result<FileUpload> updatedAttachment = await MarkAttachmentDeletedAsync(attachmentId,
             type, uow, userContext);
@@ -24,11 +24,16 @@ internal static class AttachmentHelper
 
         await attachments.DeleteAsync(attachment.StorageFolder,
             attachment.StorageFileName, cancellationToken);
-        var sc = await uow.SaveChangesAsync(cancellationToken);
 
-        return sc.IsSuccess
-            ? Result.Success()
-            : Error.Unknown;
+        if (isIndividual)
+        {
+            var sc = await uow.SaveChangesAsync(cancellationToken);
+
+            return sc.IsSuccess
+                ? Result.Success()
+                : Error.Unknown;
+        }
+        return Result.Success();
     }
 
     public static async Task<Result<FileUpload>> GetAttachmentAsync(Guid attachmentId, AttachmentType type,
@@ -46,7 +51,7 @@ internal static class AttachmentHelper
             return error;
         }
 
-        var board = await GetBoardAsync(attachmentId, type, uow);
+        var board = await GetBoardByAttachmentAsync(attachmentId, type, uow);
         if (board == null)
         {
             return Error.NotFound("Board");
@@ -87,7 +92,7 @@ internal static class AttachmentHelper
         };
     }
 
-    private static async Task<Board?> GetBoardAsync(Guid attachmentId, AttachmentType Type, IUnitOfWork uow)
+    private static async Task<Board?> GetBoardByAttachmentAsync(Guid attachmentId, AttachmentType Type, IUnitOfWork uow)
     {
         return Type switch
         {

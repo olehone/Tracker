@@ -1,0 +1,2 @@
+﻿ALTER TABLE [dbo].[ItemComments] 
+ALTER COLUMN UpdatedAt DATETIMEOFFSET NULL;

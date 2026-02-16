@@ -13,8 +13,10 @@ public interface IItemCommentApi
     [Post("/api/items/{itemId}/comments")]
     Task<IApiResponse<ItemCommentDto>> CreateAsync(Guid itemId, CreateCommentRequest request);
 
-    [Multipart]
-    [Post("/api/comments/{commentId}")]
-    Task<IApiResponse<FileDto>> UploadAttachmentAsync(Guid commentId, [AliasAs("File")] StreamPart file);
+    [Put("/api/items/{itemId}/comments/{commentId}")]
+    Task<IApiResponse> UpdateAsync(Guid commentId, Guid itemId, UpdateItemCommentRequest request);
+
+    [Delete("/api/items/{itemId}/comments/{commentId}")]
+    Task<IApiResponse> DeleteAsync(Guid commentId, Guid itemId);
 
 }

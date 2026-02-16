@@ -1,0 +1,56 @@
+﻿@using FluentValidation
+@using Severity = MudBlazor.Severity
+@using Tracker.WebApp.Shared
+
+<MudForm Model=@Model
+         @ref=@form
+         Validation=@ValidationRules
+         ValidationDelay="0">
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                   @ref=@_mudFileUpload
+                   @bind-Files=@Model.Attachments
+                   For=@(() => Model.Attachments)
+                   Accept=@AcceptedExtensions
+                   AppendMultipleFiles
+                   SuppressOnChangeWhenInvalid
+                   @onkeydown=@HandleKeys>
+        <SelectedTemplate>
+            @foreach (var file in context)
+            {
+                <BrowserFilePreview File=@file
+                                    OnDelete=@(() => RemoveFile(file)) />
+            }
+        </SelectedTemplate>
+    </MudFileUpload>
+
+    <MudStack Row
+              Justify="Justify.FlexStart"
+              AlignItems="AlignItems.Center">
+        <MudTextField @bind-Value=@Model.Text
+                      Label="Write a comment"
+                      AutoGrow
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      Counter=@MaxTextLength
+                      MaxLength=@MaxTextLength
+                      Adornment="Adornment.Start"
+                      AdornmentIcon=@Icons.Material.Filled.AttachFile
+                      Clearable
+                      OnClearButtonClick=Clear
+                      ClearIcon=@Icons.Material.Filled.Clear
+                      OnAdornmentClick=TriggerFileUpload />
+        @if (IsEditing)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick=@Submit
+                       Disabled=@_isSubmitting>
+                @if (_isSubmitting)
+                {
+                    <MudProgressCircular Indeterminate />
+                }
+                Submit
+            </MudButton>
+        }
+    </MudStack>
+</MudForm>

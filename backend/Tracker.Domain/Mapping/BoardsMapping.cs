@@ -79,8 +79,11 @@ public static class BoardsMapping
         return new ItemCommentDto()
         {
             Id = comment.Id,
+            ItemId = comment.BoardItemId,
             Content = comment.Content,
             UploadedAt = comment.UploadedAt,
+            UpdatedAt = comment.UpdatedAt,
+            UploadedBy = comment.UploadedBy.ToDto(),
             Attachments = comment.Attachments
                 .Select(a =>
                 {

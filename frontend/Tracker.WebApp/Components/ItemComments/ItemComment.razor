@@ -1,18 +1,63 @@
-﻿@using Tracker.Domain.Dtos
+@using Tracker.Domain.Dtos
+@using Tracker.Domain.Enums
+@using Tracker.Domain.Requests
+@using Tracker.Domain.Requests.ItemComment
+@using Tracker.Services
+@using Tracker.Services.Abstraction
 @using Tracker.WebApp.Components.Attachments
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
+@using Tracker.WebApp.States
 
-<MudPaper Class="ma-2 pa-2">
-    <MudText>@Comment.Content</MudText>
-    @foreach (var attachment in Comment.Attachments)
-    {
-        <FileView File=@attachment
-                  Disabled=@Disabled />
-    }
-</MudPaper>
+@if (_isEditing)
+{
+    <div>
+        <FormWithAttachments @bind-Model=@model
+                             OnSubmit=@UpdateCommentAsync
+                             OnClear=@CancelEdit
+                             ExistingAttachmentsCount=@(() => Comment.Attachments.Count(a=> !a.IsDeleted)) />
+        @foreach (var attachment in Comment.Attachments)
+        {
+            <FileView File=@attachment
+                      Disabled="false" />
+        }
+    </div>
+}
+else
+{
+    <MudChatBubble>
+        @Comment.Content
+        @foreach (var attachment in Comment.Attachments)
+        {
+            <FileView File=@attachment
+                      Disabled="true" />
+        }
 
-@code {
-    [Parameter, EditorRequired]
-    public ItemCommentDto Comment { get; set; }
-    [Parameter, EditorRequired]
-    public bool Disabled { get; set; }
+        <MudChatFooter>
+            <MudStack Justify="Justify.SpaceBetween"
+                      Row>
+                @Comment.UploadedAt.ToLocalTime().ToString("T")
+                @if (Comment.UpdatedAt.HasValue)
+                {
+                    <MudTooltip Text=@($"Edited at {Comment.UpdatedAt.Value.ToLocalTime().ToString("F")}")>
+                        <MudIcon Icon=@Icons.Material.Filled.Edit
+                                 Size="Size.Small"
+                                 Color="Color.Default" />
+                    </MudTooltip>
+                }
+                <MudSpacer />
+                @if (CanChange())
+                {
+                    <MudMenu Icon=@Icons.Material.Filled.MoreVert
+                             Size="Size.Small">
+                        <MudMenuItem Label="Edit"
+                                     OnClick=@StartEditing />
+                        <MudMenuItem Label="Delete"
+                                     OnClick=@DeleteCommentAsync />
+                    </MudMenu>
+                }
+
+            </MudStack>
+        </MudChatFooter>
+    </MudChatBubble>
 }

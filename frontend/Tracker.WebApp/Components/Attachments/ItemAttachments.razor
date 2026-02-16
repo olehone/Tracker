@@ -3,7 +3,7 @@
 
 <MudStack Row
           Justify="Justify.SpaceBetween"
-          AlignItems="AlignItems.Center">
+          AlignItems="AlignItems.Start">
     <MudListSubheader>Attachments</MudListSubheader>
 
     @if (!Disabled)
@@ -27,7 +27,6 @@
         @if (Attachments!.Any())
         {
             <MudPaper Outlined
-                      MaxHeight="400px"
                       MinHeight="30px"
                       Style="overflow-y:auto">
                 @foreach (var attachment in Attachments!.OrderBy(a => a.IsDeleted))

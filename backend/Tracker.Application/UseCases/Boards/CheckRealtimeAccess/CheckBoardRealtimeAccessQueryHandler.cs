@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Results;
 

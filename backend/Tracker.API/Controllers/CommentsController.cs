@@ -1,17 +1,26 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Tracker.API.Hubs;
+using Tracker.API.Hubs.Events;
 using Tracker.API.Requests;
 using Tracker.API.Services;
+using Tracker.Application.Common.Auth;
 using Tracker.Application.UseCases.ItemComments.Create;
+using Tracker.Application.UseCases.ItemComments.Delete;
 using Tracker.Application.UseCases.ItemComments.Get;
+using Tracker.Application.UseCases.ItemComments.Update;
+using Tracker.Domain.Entities;
 
 namespace Tracker.API.Controllers;
 
 [Route("api/items/{itemId:guid}/comments")]
 [ApiController]
 [Authorize]
-public class CommentsController(IMediator mediator) : ControllerBase
+public class CommentsController(IMediator mediator,
+    IHubContext<ItemHub, IClientItemHub> hubContext,
+     IUserContext userContext) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
@@ -25,6 +34,7 @@ public class CommentsController(IMediator mediator) : ControllerBase
             Take = request.Amount
         };
         var response = await mediator.Send(mediatorRequest);
+
         return response.ToActionResult();
     }
 
@@ -38,19 +48,58 @@ public class CommentsController(IMediator mediator) : ControllerBase
             Content = request.Content,
         };
         var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new CommentCreatedEvent(
+                UserId: userId,
+                ItemId: itemId,
+                Comment: response.Value);
+            await hubContext.Clients.Group($"item:{itemId}").CommentCreated(evt);
+        }
         return response.ToActionResult();
     }
 
-    [HttpPut("/api/attachments/{commentId:guid}")]
-    public async Task<IActionResult> UpdateAsync(Guid commentId,
-        [FromBody] UpdateBoardItemRequest request)
+    [HttpPut("{commentId:guid}")]
+    public async Task<IActionResult> UpdateAsync(Guid commentId, Guid itemId,
+        [FromBody] UpdateItemCommentRequest request)
     {
-        return BadRequest();
+        var mediatorRequest = new UpdateItemCommentCommand
+        {
+            CommentId = commentId,
+            Content = request.Content,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new CommentUpdatedEvent(
+                UserId: userId,
+                ItemId: itemId,
+                Comment: response.Value);
+            await hubContext.Clients.Group($"item:{itemId}").CommentUpdated(evt);
+        }
+        return response.ToActionResult();
     }
 
-    [HttpDelete("/api/comments/{commentId:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid commentId)
+    [HttpDelete("{commentId:guid}")]
+    public async Task<IActionResult> DeleteAsync(Guid commentId, Guid itemId)
     {
-        return BadRequest();
+        var mediatorRequest = new DeleteItemCommentCommand
+        {
+            CommentId = commentId
+        };
+        var response = await mediator.Send(mediatorRequest);
+        if (response.IsSuccess)
+        {
+            var userId = userContext.GetUserId();
+            var evt = new CommentDeletedEvent(
+                UserId: userId,
+                ItemId: itemId,
+                CommentId: commentId
+            );
+            await hubContext.Clients.Group($"item:{itemId}").CommentDeleted(evt);
+        }
+        return response.ToActionResult();
     }
 }

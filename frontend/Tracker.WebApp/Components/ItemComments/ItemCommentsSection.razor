@@ -3,55 +3,59 @@
 @using Tracker.Services.Abstraction
 @using Tracker.WebApp.Components.Attachments
 @using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Users
 
-<MudPaper Outlined
-          Style="overflow-y:auto;"
-          Class="pa-2 mud-width-full mud-background-gray">
-    @if (!Disabled)
+@if (!Disabled)
+{
+    <FormWithAttachments @bind-Model=@model
+                         OnSubmit=@CreateCommentAsync />
+    @foreach (var error in _errors)
     {
-        @foreach (var error in _errors)
-        {
-            <MudText Color="Color.Error">@error</MudText>
-        }
-        <OneLineCreateButton OnCreate=@CreateComment />
-        @foreach (var attachment in _attachments)
-        {
-            <BrowserFilePreview File=@attachment />
-        }
-        <MudFileUpload T="IBrowserFile"
-                       Disabled=@Disabled
-                       FilesChanged=@AddAttachmentAsync
-                       MaximumFileCount="1">
-            <ActivatorContent>
-                <MudButton Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon=@Icons.Material.Filled.CloudUpload>
-                    Upload attachments
-                </MudButton>
-            </ActivatorContent>
-        </MudFileUpload>
+        <MudText Color="Color.Error">@error</MudText>
     }
-    @foreach (var comment in _comments)
-    {
-        <ItemComment Comment=@comment
-                     Disabled=@Disabled />
-    }
+}
 
-    @if (_hasMore)
+@{
+    foreach (var commentGroup in _commentGroups)
     {
-        <div @ref="_trigger" style="height:1px"></div>
+        var isMine = IsMine(commentGroup.UserId);
+        var position = isMine
+            ? ChatBubblePosition.End
+            : ChatBubblePosition.Start;
+
+        <MudChat ChatPosition=@position
+                 ArrowPosition="ChatArrowPosition.None"
+                 @key=@commentGroup.Key>
+            <UserAvatarWithLookup User=@commentGroup.User />
+
+            <MudChatHeader Name=@(isMine ? null : commentGroup.User.Username)
+                           Time=@commentGroup.Comments.First().UploadedAt.ToLocalTime().DateTime.ToString("D") />
+            @foreach (var comment in commentGroup.Comments)
+            {
+                <ItemComment Comment=@comment
+                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                             OnDelete=@(() => ApplyCommentDeleted(comment.Id)) />
+            }
+        </MudChat>
     }
-    else
-    {
-        <MudText Align="Align.Center">
-            No more comments
-        </MudText>
-    }
-    @if (_isLoading)
-    {
-        <MudStack Justify="Justify.Center">
-            <MudProgressCircular Indeterminate
-                                 Color="Color.Primary" />
-        </MudStack>
-    }
-</MudPaper>
+}
+
+@if (_hasMore)
+{
+    <div @ref="_trigger" style="height:1px"></div>
+}
+else
+{
+    <MudText Typo="Typo.h6"
+             Align="Align.Center"
+             Class="ma-8">
+        No more comments
+    </MudText>
+}
+@if (_isLoading)
+{
+    <MudStack Justify="Justify.Center">
+        <MudProgressCircular Indeterminate
+                             Color="Color.Primary" />
+    </MudStack>
+}

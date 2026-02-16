@@ -12,11 +12,11 @@
         <MudDialog>
             <DialogContent>
                 <MudStack>
-                    <ItemSettingsHeader Item=@Item />
-                    <MudStack Row
-                              Style="max-height:700px">
-                        <MudStack Justify="Justify.FlexEnd"
-                                  Class="mud-width-full">
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <ItemSettingsHeader Item=@Item />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
                             @if (!Disabled)
                             {
                                 <MudStack Row>
@@ -72,10 +72,10 @@
                                                OpenAssign=@_openAssign />
                             <MudStack Row
                                       AlignItems="AlignItems.Center"
-                                      StretchItems="StretchItems.End">
+                                      StretchItems="StretchItems.None">
                                 @if (_date is not null || _openDate)
                                 {
-                                    <MudStack Spacing="0">
+                                    <MudStack Spacing="0" Class="mud-width-full">
                                         <MudText Typo="Typo.body2">
                                             Due date
                                         </MudText>
@@ -92,7 +92,7 @@
                                         </MudStack>
                                     </MudStack>
                                 }
-                                <MudStack Spacing="0">
+                                <MudStack Spacing="0" Class="mud-width-full">
                                     <MudText Typo="Typo.body2">
                                         Importance
                                     </MudText>
@@ -126,20 +126,24 @@
                                           Label="Description"
                                           Variant="Variant.Outlined"
                                           AutoGrow
-                                          MaxLines="10"
                                           @onfocus=@StartEditingDescription
                                           @onblur=@FinishEditingDescription />
+                        </MudItem>
 
+                        <MudItem xs="12" md="6">
                             <ItemAttachments Attachments=@_attachments
                                              Disabled=@Disabled
                                              UploadAsync=@UploadAttachmentAsync />
-                        </MudStack>
+                        </MudItem>
 
-                        <ItemCommentsSection ItemId=@Item.Id
-                                             IsFileValid=@IsFileValid 
-                                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
-                                             Disabled=@Disabled/>
-                    </MudStack>
+                        <MudItem xs="12">
+                            <ItemCommentsSection @ref=@_commentsRef
+                                                 ItemId=@Item.Id
+                                                 IsFileValid=@IsFileValid
+                                                 MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                                                 Disabled=@Disabled />
+                        </MudItem>
+                    </MudGrid>
                 </MudStack>
             </DialogContent>
         </MudDialog>
