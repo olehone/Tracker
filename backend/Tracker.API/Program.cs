@@ -65,5 +65,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<BoardHub>("/hubs/board")
    .RequireCors("DevCorsPolicy");
+app.MapHub<ItemHub>("/hubs/item")
+   .RequireCors("DevCorsPolicy");
 
 await app.RunAsync();

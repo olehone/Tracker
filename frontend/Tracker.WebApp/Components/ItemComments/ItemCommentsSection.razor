@@ -15,28 +15,21 @@
     }
 }
 
-@{
-    foreach (var commentGroup in _commentGroups)
-    {
-        var user = commentGroup.First().UploadedBy;
-        var isMine = IsMine(user.Id);
-        var position = isMine
-            ? ChatBubblePosition.End
-            : ChatBubblePosition.Start;
+@foreach (var commentGroup in _newCommentGroups)
+{
+    <CommentGroup Group=commentGroup
+                  IsMine=@((commentId) => IsMine(commentId))
+                  MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                  ApplyCommentDeleted=@ApplyCommentDeleted />
 
-        <MudChat ChatPosition=@position>
-            <UserAvatarWithLookup User=@user />
+}
+@foreach (var commentGroup in _oldCommentGroups)
+{
+    <CommentGroup Group=commentGroup
+                  IsMine=@((commentId) => IsMine(commentId))
+                  MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
+                  ApplyCommentDeleted=@ApplyCommentDeleted />
 
-            <MudChatHeader Name=@(isMine ? null : user.Username)
-                           Time=@commentGroup.First().UploadedAt.ToLocalTime().DateTime.ToString() />
-            @foreach (var comment in commentGroup)
-            {
-
-                <ItemComment Comment=@comment
-                             MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes />
-            }
-        </MudChat>
-    }
 }
 
 @if (_hasMore)

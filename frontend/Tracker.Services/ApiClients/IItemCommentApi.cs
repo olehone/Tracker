@@ -13,10 +13,10 @@ public interface IItemCommentApi
     [Post("/api/items/{itemId}/comments")]
     Task<IApiResponse<ItemCommentDto>> CreateAsync(Guid itemId, CreateCommentRequest request);
 
-    [Put("/api/comments/{commentId}")]
-    Task<IApiResponse> UpdateAsync(Guid commentId, UpdateItemCommentRequest request);
+    [Put("/api/items/{itemId}/comments/{commentId}")]
+    Task<IApiResponse> UpdateAsync(Guid commentId, Guid itemId, UpdateItemCommentRequest request);
 
-    [Delete("/api/comments/{commentId}")]
-    Task<IApiResponse> DeleteAsync(Guid commentId);
+    [Delete("/api/items/{itemId}/comments/{commentId}")]
+    Task<IApiResponse> DeleteAsync(Guid commentId, Guid itemId);
 
 }

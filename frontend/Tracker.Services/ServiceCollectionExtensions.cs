@@ -53,6 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAttachmentService, AttachmentService>();
 
         services.AddScoped<IBoardRealtimeService, BoardHubService>();
+        services.AddScoped<IItemRealtimeService, ItemHubService>();
         return services;
     }
 

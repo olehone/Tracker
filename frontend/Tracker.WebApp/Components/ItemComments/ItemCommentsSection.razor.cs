@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
@@ -15,7 +16,8 @@ namespace Tracker.WebApp.Components.ItemComments;
 public partial class ItemCommentsSection : IAsyncDisposable
 {
     private TextWithAttachmentsModel model = new();
-    private List<List<ItemCommentDto>> _commentGroups = [];
+    private List<List<ItemCommentDto>> _oldCommentGroups = [];
+    private List<List<ItemCommentDto>> _newCommentGroups = [];
     private string[] _errors = [];
     private bool _hasMore = true;
     private bool _isLoading = true;
@@ -87,29 +89,114 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     private void AddComments(IReadOnlyList<ItemCommentDto> comments)
     {
-        Guid? lastUserId = _commentGroups.Count == 0
+        Guid? lastUserId = _oldCommentGroups.Count == 0
             ? null
-            : _commentGroups.Last().Last().UploadedBy.Id;
+            : _oldCommentGroups.Last().Last().UploadedBy.Id;
         foreach (var comment in comments)
         {
             if (lastUserId is null
-                || _commentGroups.Count == 0)
+                || _oldCommentGroups.Count == 0)
             {
-                _commentGroups.Add([comment]);
+                _oldCommentGroups.Add([comment]);
                 lastUserId = comment.UploadedBy.Id;
                 continue;
             }
 
             if (comment.UploadedBy.Id == lastUserId)
             {
-                _commentGroups.Last().Add(comment);
+                _oldCommentGroups.Last().Add(comment);
             }
             else
             {
-                _commentGroups.Add([comment]);
+                _oldCommentGroups.Add([comment]);
             }
 
             lastUserId = comment.UploadedBy.Id;
+        }
+    }
+
+    public void ApplyCommentCreated(ItemCommentDto comment)
+    {
+        if (_newCommentGroups.Count > 1)
+        {
+            if (comment.UploadedBy.Id == _newCommentGroups.First().First().UploadedBy.Id)
+            {
+                _newCommentGroups.First().Insert(0, comment);
+            }
+            else
+            {
+                _newCommentGroups.Insert(0, [comment]);
+            }
+        }
+        else
+        {
+            if (comment.UploadedBy.Id == _oldCommentGroups.First().First().UploadedBy.Id)
+            {
+                _oldCommentGroups.First().Insert(0, comment);
+            }
+            else
+            {
+                _newCommentGroups.Insert(0, [comment]);
+            }
+        }
+        StateHasChanged();
+    }
+
+    public void ApplyCommentUpdated(ItemCommentDto updatedComment)
+    {
+        var oldComment = _oldCommentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
+        if (oldComment is not null)
+        {
+            //_oldCommentGroups = _oldCommentGroups
+            //    .Select(g => g
+            //        .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
+            //        .ToList())
+            //    .ToList();
+            oldComment = updatedComment;
+            StateHasChanged();
+            return;
+        }
+
+        var newComment = _newCommentGroups.SelectMany(g => g).FirstOrDefault(c => c.Id == updatedComment.Id);
+        if (newComment is not null)
+        {
+            //_oldCommentGroups = _oldCommentGroups
+            //    .Select(g => g
+            //        .Select(c => c.Id == updatedComment.Id ? updatedComment : c)
+            //        .ToList())
+            //    .ToList();
+            newComment = updatedComment;
+            StateHasChanged();
+            return;
+        }
+    }
+
+    public void DeleteCommentInGroup(List<List<ItemCommentDto>> groups, List<ItemCommentDto> group, Guid commentId)
+    {
+        var comment = group.First(c => c.Id == commentId);
+        group.Remove(comment);
+        if (group.Count == 0)
+        {
+            groups.Remove(group);
+        }
+        StateHasChanged();
+    }
+
+    public void ApplyCommentDeleted(Guid commentId)
+    {
+        var group = _oldCommentGroups
+            .FirstOrDefault(g => g.Any(c => c.Id == commentId));
+        if (group is not null)
+        {
+            DeleteCommentInGroup(_oldCommentGroups, group, commentId);
+            return;
+        }
+        group = _newCommentGroups
+            .FirstOrDefault(g => g.Any(c => c.Id == commentId));
+        if (group is not null)
+        {
+            DeleteCommentInGroup(_newCommentGroups, group, commentId);
+            return;
         }
     }
 
@@ -141,14 +228,7 @@ public partial class ItemCommentsSection : IAsyncDisposable
             }
         }
 
-        if (comment.UploadedBy.Id == _commentGroups.First().First().UploadedBy.Id)
-        {
-            _commentGroups.First().Insert(0, comment);
-        }
-        else
-        {
-            _commentGroups.Insert(0, [comment]);
-        }
+        ApplyCommentCreated(comment);
         model = new();
     }
 

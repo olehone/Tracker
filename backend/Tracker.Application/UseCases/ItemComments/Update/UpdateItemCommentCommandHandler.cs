@@ -33,9 +33,13 @@ public class UpdateItemCommentCommandHandler(
         uow.ItemCommentRepository.Update(comment);
 
         var sc = await uow.SaveChangesAsync(cancellationToken);
-
+        var newComment = await uow.ItemCommentRepository.GetByIdAsync(comment.Id);
+        if (newComment is null)
+        {
+            return Error.Unknown;
+        }
         return sc.IsFailure
             ? Error.Unknown
-            : comment.ToDto();
+            : newComment.ToDto();
     }
 }

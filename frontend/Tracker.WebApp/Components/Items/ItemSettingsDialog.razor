@@ -137,7 +137,8 @@
                         </MudItem>
 
                         <MudItem xs="12">
-                            <ItemCommentsSection ItemId=@Item.Id
+                            <ItemCommentsSection @ref=@_commentsRef
+                                                 ItemId=@Item.Id
                                                  IsFileValid=@IsFileValid
                                                  MaxAttachmentSizeBytes=@MaxAttachmentSizeBytes
                                                  Disabled=@Disabled />

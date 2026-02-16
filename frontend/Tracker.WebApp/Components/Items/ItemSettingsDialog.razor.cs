@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
+using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
+using Tracker.WebApp.Components.ItemComments;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Items;
 
-public partial class ItemSettingsDialog : IDisposable
+public partial class ItemSettingsDialog : IAsyncDisposable
 {
     private const int MaxAttachmentSizeBytes = 50 * 1024 * 1024;
 
@@ -21,7 +23,7 @@ public partial class ItemSettingsDialog : IDisposable
     private bool _isEditingDescription = false;
     private bool _openDate = false;
     private List<FileDto> _attachments { get; set; } = null!;
-
+    private ItemCommentsSection _commentsRef;
 
     [Parameter]
     public BoardState BoardState { get; set; } = null!;
@@ -33,6 +35,7 @@ public partial class ItemSettingsDialog : IDisposable
     [Inject] IAttachmentService Attachments { get; set; } = null!;
     [Inject] IBoardItemService ItemService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
+    [Inject] IItemRealtimeService Realtime { get; set; } = null!;
 
     private bool CanChange => IsMeAssigned
         || BoardState.Board.Permissions.CanChangeItem;
@@ -65,6 +68,7 @@ public partial class ItemSettingsDialog : IDisposable
             _attachments = attachments.Value;
             StateHasChanged();
         }
+        await ConnectRealtimeAsync();
     }
 
     private void StateHasChangedHandler()
@@ -190,8 +194,61 @@ public partial class ItemSettingsDialog : IDisposable
         return true;
     }
 
-    public void Dispose()
+    public async Task ConnectRealtimeAsync()
+    {
+        if (AppState.IsUnauthenticated)
+        {
+            return;
+        }
+
+        await Realtime.ConnectAndJoinItemAsync(Item.Id);
+        Realtime.OnCommentCreated += Apply;
+        Realtime.OnCommentUpdated += Apply;
+        Realtime.OnCommentDeleted += Apply;
+    }
+
+    public void Apply(CommentCreatedEvent evt)
+    {
+        if (IsMyId(evt.UserId))
+        {
+            return;
+        }
+        _commentsRef.ApplyCommentCreated(evt.Comment);
+    }
+
+    public void Apply(CommentUpdatedEvent evt)
+    {
+        if (IsMyId(evt.UserId))
+        {
+            return;
+        }
+        _commentsRef.ApplyCommentUpdated(evt.Comment);
+    }
+
+    public void Apply(CommentDeletedEvent evt)
+    {
+        if (IsMyId(evt.UserId))
+        {
+            return;
+        }
+        _commentsRef.ApplyCommentDeleted(evt.CommentId);
+    }
+
+    private bool IsMyId(Guid checkedId)
+    {
+        if (AppState.IsUnauthenticated)
+        {
+            return false;
+        }
+        return checkedId == AppState.MyId;
+    }
+
+    public async ValueTask DisposeAsync()
     {
         BoardState.ItemsState.OnChange -= StateHasChangedHandler;
+        Realtime.OnCommentCreated -= Apply;
+        Realtime.OnCommentUpdated -= Apply;
+        Realtime.OnCommentDeleted -= Apply;
+        await Realtime.DisposeAsync();
     }
 }

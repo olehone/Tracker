@@ -22,13 +22,13 @@ public class ItemCommentService(IApiErrorHandler apiErrorHandler,
         return apiErrorHandler.ExecuteAsync(() => api.CreateAsync(itemId, request));
     }
 
-    public Task<Result> UpdateAsync(Guid commentId, UpdateItemCommentRequest request)
+    public Task<Result> UpdateAsync(Guid commentId, Guid itemId, UpdateItemCommentRequest request)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(commentId, request));
+        return apiErrorHandler.ExecuteAsync(() => api.UpdateAsync(commentId, itemId, request));
     }
 
-    public Task<Result> DeleteAsync(Guid commentId)
+    public Task<Result> DeleteAsync(Guid commentId, Guid itemId)
     {
-        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(commentId));
+        return apiErrorHandler.ExecuteAsync(() => api.DeleteAsync(commentId, itemId));
     }
 }

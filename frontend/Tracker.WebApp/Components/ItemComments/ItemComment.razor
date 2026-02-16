@@ -9,50 +9,69 @@
 @using Tracker.WebApp.Components.Users
 @using Tracker.WebApp.States
 
-@if (!_isDeleted)
+@if (_isEditing)
 {
-    @if (_isEditing)
-    {
+    <div>
         <FormWithAttachments @bind-Model=@model
                              OnSubmit=@UpdateCommentAsync
-                             ExistingAttachmentsCount=@(() => Comment.Attachments.Count) />
+                             OnClear=@CancelEdit
+                             ExistingAttachmentsCount=@(() => Comment.Attachments.Count(a=> !a.IsDeleted)) />
         @foreach (var attachment in Comment.Attachments)
         {
             <FileView File=@attachment
                       Disabled="false" />
         }
-    }
-    else
-    {
-        <MudChatBubble>
+    </div>
+}
+else
+{
+    <MudChatBubble>
+        @Comment.Content
+        @foreach (var attachment in Comment.Attachments)
+        {
+            <FileView File=@attachment
+                      Disabled="true" />
+        }
 
-            @Comment.Content
-            @foreach (var attachment in Comment.Attachments)
-            {
-                <FileView File=@attachment
-                          Disabled="true" />
-            }
+        <MudChatFooter>
+            <MudStack Justify="Justify.SpaceBetween"
+                      Row>
+                @Comment.UploadedAt.ToLocalTime().ToString("T")
+                @if (Comment.UpdatedAt.HasValue)
+                {
+                    <MudTooltip Text=@($"Edited at {Comment.UpdatedAt.Value.ToLocalTime().ToString("F")}")>
+                        <MudIcon Icon=@Icons.Material.Filled.Edit
+                                 Size="Size.Small"
+                                 Color="Color.Default" />
+                    </MudTooltip>
+                }
+                <MudSpacer />
+                @if (CanChange())
+                {
+                    <MudMenu Icon=@Icons.Material.Filled.MoreVert
+                             Size="Size.Small">
+                        <MudMenuItem Label="Edit"
+                                     OnClick=@StartEditing />
+                        <MudMenuItem Label="Delete"
+                                     OnClick=@DeleteCommentAsync />
+                    </MudMenu>
+                }
 
-            @if (CanChange())
-            {
-                <MudChatFooter>
-                    <MudLink OnClick=@StartEditing> Edit </MudLink>
-                    <MudLink OnClick=@DeleteCommentAsync> Delete </MudLink>
-                </MudChatFooter>
-            }
-        </MudChatBubble>
-    }
+            </MudStack>
+        </MudChatFooter>
+    </MudChatBubble>
 }
 
 @code {
     private bool _isEditing = false;
-    private bool _isDeleted = false;
     private TextWithAttachmentsModel model = new();
 
     [Parameter, EditorRequired]
     public ItemCommentDto Comment { get; set; }
     [Parameter, EditorRequired]
     public int MaxAttachmentSizeBytes { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback OnDelete { get; set; }
 
     [Inject] AppState AppState { get; set; } = null!;
     [Inject] IItemCommentService CommentService { get; set; } = null!;
@@ -60,15 +79,6 @@
 
     private async Task UpdateCommentAsync()
     {
-        var request = new UpdateItemCommentRequest
-        {
-            Content = model.Text
-        };
-        var commentResult = await CommentService.UpdateAsync(Comment.Id, request);
-        if (commentResult.IsSuccess)
-        {
-            Comment.Content = model.Text;
-        }
         foreach (var attachment in model.Attachments)
         {
             await using var stream = attachment.OpenReadStream(MaxAttachmentSizeBytes);
@@ -80,16 +90,25 @@
                 Comment.Attachments.Add(result.Value);
             }
         }
+        var request = new UpdateItemCommentRequest
+        {
+            Content = model.Text
+        };
+        var commentResult = await CommentService.UpdateAsync(Comment.Id, Comment.ItemId, request);
+        if (commentResult.IsSuccess)
+        {
+            Comment.Content = model.Text;
+        }
         model = new();
         _isEditing = false;
     }
 
     private async Task DeleteCommentAsync()
     {
-        var result = await CommentService.DeleteAsync(Comment.Id);
+        var result = await CommentService.DeleteAsync(Comment.Id, Comment.ItemId);
         if (result.IsSuccess)
         {
-            _isDeleted = true;
+            await OnDelete.InvokeAsync();
         }
         _isEditing = false;
     }
@@ -97,6 +116,7 @@
     private void StartEditing()
     {
         model.Text = Comment.Content;
+        model.Attachments = [];
         _isEditing = true;
     }
 
@@ -107,5 +127,11 @@
             return false;
         }
         return Comment.UploadedBy.Id == AppState.MyId;
+    }
+
+    private void CancelEdit()
+    {
+        model = new();
+        _isEditing = false;
     }
 }

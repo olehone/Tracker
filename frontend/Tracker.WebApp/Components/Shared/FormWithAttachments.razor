@@ -35,6 +35,8 @@
                       MaxLength=@MaxTextLength
                       Adornment="Adornment.Start"
                       AdornmentIcon=@Icons.Material.Filled.AttachFile
+                      Clearable
+                      OnClearButtonClick=Clear
                       OnAdornmentClick=TriggerFileUpload />
         @if (IsEditing)
         {
@@ -70,6 +72,8 @@
 
     [Parameter]
     public Func<int> ExistingAttachmentsCount { get; set; } = (() => 0);
+    [Parameter]
+    public EventCallback OnClear { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<TextWithAttachmentsModel> OnSubmit { get; set; }
     [Parameter, EditorRequired]
@@ -111,9 +115,16 @@
         await _mudFileUpload.OpenFilePickerAsync();
     }
 
-    private void Clear()
+    private async Task Clear()
     {
-        Model = new();
+        if (OnClear.HasDelegate)
+        {
+            await OnClear.InvokeAsync();
+        }
+        else
+        {
+            Model = new();
+        }
     }
 
     private async Task HandleKeys(KeyboardEventArgs e)
