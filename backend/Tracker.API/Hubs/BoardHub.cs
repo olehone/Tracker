@@ -10,15 +10,9 @@ public class BoardHub(IMediator mediator) : Hub<IClientBoardHub>
 {
     public async Task JoinBoard(Guid boardId)
     {
-        if (!Guid.TryParse(Context.UserIdentifier, out var userId))
-        {
-            throw new HubException("User not authenticated");
-        }
-
         var result = await mediator.Send(new CheckBoardRealtimeAccessQuery
         {
             BoardId = boardId,
-            UserId = userId
         });
 
         if (result.IsFailure)

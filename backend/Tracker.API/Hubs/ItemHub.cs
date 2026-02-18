@@ -10,15 +10,9 @@ public class ItemHub(IMediator mediator) : Hub<IClientItemHub>
 {
     public async Task JoinItem(Guid itemId)
     {
-        if (!Guid.TryParse(Context.UserIdentifier, out var userId))
-        {
-            throw new HubException("User not authenticated");
-        }
-
         var result = await mediator.Send(new CheckItemRealtimeAccessQuery
         {
             ItemId = itemId,
-            UserId = userId
         });
 
         if (result.IsFailure)

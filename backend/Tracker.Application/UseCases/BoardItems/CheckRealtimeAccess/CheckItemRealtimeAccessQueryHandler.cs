@@ -18,12 +18,6 @@ public class CheckItemRealtimeAccessQueryHandler(
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var item = await BoardHelper.GetItemAsync(uow, userContext, request.ItemId);
-        if (item.IsFailure)
-        {
-            return item.Error;
-        }
-
-        return Result.Success();
+        return await BoardHelper.GetItemAsync(uow, userContext, request.ItemId);
     }
 }
