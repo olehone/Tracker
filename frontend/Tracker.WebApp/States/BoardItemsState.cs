@@ -2,7 +2,7 @@
 using Tracker.Domain.Enums;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 
 namespace Tracker.WebApp.States;
 

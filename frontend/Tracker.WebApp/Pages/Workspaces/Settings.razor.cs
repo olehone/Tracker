@@ -4,8 +4,8 @@ using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Workspace;
 using Tracker.Domain.ValueObjects;
-using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
+using Tracker.Services.Abstraction.Results;
+using Tracker.Services.Abstraction.Workspace;
 
 namespace Tracker.WebApp.Pages.Workspaces;
 

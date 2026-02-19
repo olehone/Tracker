@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;

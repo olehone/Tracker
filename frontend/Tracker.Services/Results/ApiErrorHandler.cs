@@ -1,7 +1,6 @@
 ﻿using Refit;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction.Results;
-using Tracker.WebApp.Shared;
 
 namespace Tracker.Services.Results;
 

@@ -7,6 +7,7 @@ using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.WebApp.Components.Shared;
 using Tracker.WebApp.States;
 

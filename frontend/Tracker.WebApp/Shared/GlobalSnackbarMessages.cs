@@ -1,5 +1,6 @@
 ﻿using MudBlazor;
 using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Results;
 
 namespace Tracker.WebApp.Shared;
 

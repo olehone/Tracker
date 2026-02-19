@@ -2,11 +2,11 @@
 using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
-using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.Services.Abstraction.Results;
 using Tracker.Services.ApiClients;
 
-namespace Tracker.Services;
+namespace Tracker.Services.Board;
 
 public class ItemCommentService(IApiErrorHandler apiErrorHandler,
     IItemCommentApi api) : IItemCommentService

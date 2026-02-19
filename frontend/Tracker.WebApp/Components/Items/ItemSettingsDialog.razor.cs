@@ -6,6 +6,7 @@ using Tracker.Domain.Enums;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.WebApp.Components.ItemComments;
 using Tracker.WebApp.Shared;

@@ -3,7 +3,7 @@ using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Board;
 
 public interface IItemCommentService
 {
