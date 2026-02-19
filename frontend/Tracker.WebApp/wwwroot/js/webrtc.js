@@ -92,7 +92,7 @@ function setUsername() {
 async function start() {
     try {
         await connection.start();  
-        await connection.invoke("JoinCall", currentCallId);
+        await connection.invoke("Join", currentCallId);
         console.log("SignalR Connected.");
 
     } catch (err) {
