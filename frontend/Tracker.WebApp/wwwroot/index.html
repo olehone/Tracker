@@ -25,11 +25,79 @@
           href="icon-192.png" />
 </head>
 <body>
-    <div id="app">
-        Loading...
+
+    <div class="container">
+        <div class="infobox">
+            <p>
+                This is a simple chat system implemented using WebSockets. It works by
+                sending packets of JSON back and forth with the server.
+                <a href="https://github.com/mdn/samples-server/tree/master/s/webrtc-from-chat">
+                    Check out the source
+                </a>
+                on Github.
+            </p>
+            <p class="mdn-disclaimer">
+                This text and audio/video chat example is offered as-is for
+                demonstration purposes only, and should not be used for any other
+                purpose.
+            </p>
+            <p>
+                Click a username in the user list to ask them to enter a one-on-one
+                video chat with you.
+            </p>
+            <p>
+                Enter a username:
+                <input id="name"
+                       type="text"
+                       maxlength="12"
+                       required
+                       autocomplete="username"
+                       inputmode="verbatim"
+                       placeholder="Username" />
+                <input type="button"
+                       name="login"
+                       value="Log in"
+                       onclick="connect()" />
+            </p>
+        </div>
+        <ul class="userlistbox"></ul>
+        <div class="chatbox"></div>
+        <div class="camerabox">
+            <video id="received_video" autoplay></video>
+            <video id="local_video" autoplay muted></video>
+            <button id="hangup-button"
+                    onclick="hangUpCall();"
+                    role="button"
+                    disabled>
+                Hang Up
+            </button>
+        </div>
+        <div class="empty-container"></div>
+        <div class="chat-controls">
+            Chat:<br />
+            <input id="text"
+                   type="text"
+                   name="text"
+                   size="100"
+                   maxlength="256"
+                   placeholder="Say something meaningful..."
+                   autocomplete="off"
+                   onkeyup="handleKey(event)"
+                   disabled />
+            <input type="button"
+                   id="send"
+                   name="send"
+                   value="Send"
+                   onclick="handleSendButton()"
+                   disabled />
+        </div>
     </div>
 
-    <div id="blazor-error-ui"
+    <!--<div id="app">
+        Loading...
+    </div>-->
+
+    <!--<div id="blazor-error-ui"
          style="background: red; bottom: 0; box-shadow: 0 -1px 2px rgba(0,0,0,0.2); display: none; left: 0; padding: 0.6rem 1.25rem; position: fixed; width: 100%; z-index: 1000; color: #000;">
         An unhandled error has occurred.
         <a href=""
@@ -37,12 +105,13 @@
            style="color: #000; margin-left: 0.5rem; font-weight:bold;">Reload</a>
         <a class="dismiss"
            style="color: #000; margin-left: 0.5rem; font-weight:bold;">Close</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    </div>-->
+
+    <!--<script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>-->
     <script>navigator.serviceWorker.register('js/service-worker.js');</script>
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
     <script src="js/scroll.js"></script>
-    <script src="js/peerjs.js"></script>
+    <script src="js/webrtc.js"></script>
 </body>
 </html>

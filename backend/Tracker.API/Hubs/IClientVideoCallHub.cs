@@ -2,4 +2,5 @@
 
 public interface IClientVideoCallHub
 {
+    Task SendData(string data);
 }
