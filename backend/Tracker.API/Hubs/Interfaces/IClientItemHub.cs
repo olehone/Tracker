@@ -1,6 +1,6 @@
 ﻿using Tracker.API.Hubs.Events;
 
-namespace Tracker.API.Hubs;
+namespace Tracker.API.Hubs.Interfaces;
 
 public interface IClientItemHub
 {

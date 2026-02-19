@@ -1,6 +1,7 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Realtime;
 
 namespace Tracker.WebApp.States;
 
@@ -79,7 +80,7 @@ public sealed class BoardState : IAsyncDisposable
             return;
         }
 
-        await _boardRealtime.ConnectAndJoinBoardAsync(Board.Id);
+        await _boardRealtime.ConnectAsync(Board.Id);
         _boardRealtime.OnItemCreated += ItemsState.Apply;
         _boardRealtime.OnItemMoved += ItemsState.Apply;
         _boardRealtime.OnItemUpdated += ItemsState.Apply;

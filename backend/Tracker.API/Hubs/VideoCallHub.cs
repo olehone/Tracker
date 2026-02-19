@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Tracker.API.Hubs.Interfaces;
 
 namespace Tracker.API.Hubs;
 
@@ -10,14 +11,13 @@ public class VideoCallHub() : Hub<IClientVideoCallHub>
 {
     private static readonly ConcurrentDictionary<string, string> _users = new();
 
-    public async Task JoinCall(Guid callId)
+    public async Task Join(Guid callId)
     {
         var username = Context.User?.Identity?.Name ?? Context.ConnectionId[..8];
         _users[Context.ConnectionId] = username;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, $"call:{callId}");
 
-        // Broadcast updated user list to the group
         await BroadcastUserList(callId);
 
         // Announce the new user
@@ -28,6 +28,11 @@ public class VideoCallHub() : Hub<IClientVideoCallHub>
             date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
         await Clients.Group($"call:{callId}").SendData(joinMsg);
+    }
+
+    public async Task Leave(Guid boardId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"board:{boardId}");
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)

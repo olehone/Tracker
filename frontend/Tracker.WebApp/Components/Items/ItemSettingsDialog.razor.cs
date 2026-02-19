@@ -6,6 +6,7 @@ using Tracker.Domain.Enums;
 using Tracker.Domain.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Realtime;
 using Tracker.WebApp.Components.ItemComments;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
@@ -201,7 +202,7 @@ public partial class ItemSettingsDialog : IAsyncDisposable
             return;
         }
 
-        await Realtime.ConnectAndJoinItemAsync(Item.Id);
+        await Realtime.ConnectAsync(Item.Id);
         Realtime.OnCommentCreated += Apply;
         Realtime.OnCommentUpdated += Apply;
         Realtime.OnCommentDeleted += Apply;

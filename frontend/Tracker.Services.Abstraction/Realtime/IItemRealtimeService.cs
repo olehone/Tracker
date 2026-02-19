@@ -1,10 +1,10 @@
 ﻿using Tracker.Domain.Events;
 
-namespace Tracker.Services.Abstraction;
+namespace Tracker.Services.Abstraction.Realtime;
 
 public interface IItemRealtimeService : IAsyncDisposable
 {
-    Task ConnectAndJoinItemAsync(Guid itemId);
+    Task ConnectAsync(Guid itemId);
     Task DisconnectAsync();
     bool IsConnected { get; }
 

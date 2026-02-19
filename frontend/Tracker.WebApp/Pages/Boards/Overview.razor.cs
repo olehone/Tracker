@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Realtime;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Boards;

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Tracker.API.Hubs.Interfaces;
 using Tracker.Application.UseCases.Boards.CheckRealtimeAccess;
 
 namespace Tracker.API.Hubs;
@@ -8,7 +9,7 @@ namespace Tracker.API.Hubs;
 [Authorize]
 public class BoardHub(IMediator mediator) : Hub<IClientBoardHub>
 {
-    public async Task JoinBoard(Guid boardId)
+    public async Task Join(Guid boardId)
     {
         var result = await mediator.Send(new CheckBoardRealtimeAccessQuery
         {
@@ -23,9 +24,8 @@ public class BoardHub(IMediator mediator) : Hub<IClientBoardHub>
         await Groups.AddToGroupAsync(Context.ConnectionId, $"board:{boardId}");
     }
 
-    public async Task LeaveBoard(Guid boardId)
+    public async Task Leave(Guid boardId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"board:{boardId}");
     }
-
 }
