@@ -43,7 +43,7 @@ let mediaConstraints = {
     },
 };
 
-let myUsername = null;
+let myUsername = self.crypto.randomUUID();;
 let targetUsername = null; // To store username of other peer
 let myPeerConnection = null; // RTCPeerConnection
 let transceiver = null; // RTCRtpTransceiver
@@ -91,8 +91,8 @@ function setUsername() {
 
 async function start() {
     try {
-        await connection.start();  // ← remove currentCallId argument
-        await connection.invoke("JoinCall", currentCallId);  // ← add this
+        await connection.start();  
+        await connection.invoke("JoinCall", currentCallId);
         console.log("SignalR Connected.");
 
     } catch (err) {
@@ -134,6 +134,11 @@ function connect() {
             msg = JSON.parse(rawMsg);   // ← parse the JSON string first
         } catch (e) {
             log_error("Failed to parse message: " + rawMsg);
+            return;
+        }
+
+        const signalingTypes = ["video-offer", "video-answer", "new-ice-candidate", "hang-up"];
+        if (signalingTypes.includes(msg.type) && msg.name === myUsername) {
             return;
         }
 
