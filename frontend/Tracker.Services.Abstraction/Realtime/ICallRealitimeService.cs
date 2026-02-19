@@ -1,8 +1,8 @@
 ﻿namespace Tracker.Services.Abstraction.Realtime;
 
-public interface ICallRealtimeService : IAsyncDisposable
+public interface ICallRealtimeService : IRealtimeService
 {
-    Task ConnectAsync(Guid callId);
-    Task DisconnectAsync();
-    bool IsConnected { get; }
+    event Action<string> OnDataSent; 
+
+    Task SendData(string data);
 }

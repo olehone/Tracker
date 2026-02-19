@@ -9,15 +9,7 @@
 // Any copyright is dedicated to the Public Domain.
 // http://creativecommons.org/publicdomain/zero/1.0/
 
-// Get our hostname
-
-let myHostname = window.location.hostname;
-if (!myHostname) {
-    myHostname = "localhost:7240";
-}
-log("Hostname: " + myHostname);
-
-// WebSocket chat/signaling channel variables.
+// Placeholder
 let currentCallId = "29063d2a-7bfb-4384-84b7-0f8625677b0b";
 let connection = null;
 let clientID = 0;
