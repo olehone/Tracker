@@ -7,6 +7,7 @@ using Tracker.Domain.Requests;
 using Tracker.Domain.Requests.ItemComment;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.WebApp.Components.Shared;
 using Tracker.WebApp.States;
 
@@ -114,17 +115,22 @@ public partial class ItemCommentsSection : IAsyncDisposable
 
     public void ApplyCommentCreated(ItemCommentDto comment)
     {
-        var firstGroup = _commentGroups.First();
-        if (_commentGroups.Count == 0
-            || comment.UploadedBy.Id == firstGroup.UserId)
+        if (_commentGroups.Count == 0)
         {
-            firstGroup.Comments.Insert(0, comment);
+            _commentGroups.Insert(0, new(comment));
+            StateHasChanged();
+            return;
+        }
+
+        var lastCommentGroup = _commentGroups.First();
+        if (lastCommentGroup.UserId == comment.UploadedBy.Id)
+        {
+            lastCommentGroup.Comments.Insert(0, comment);
         }
         else
         {
             _commentGroups.Insert(0, new(comment));
         }
-
         StateHasChanged();
     }
 

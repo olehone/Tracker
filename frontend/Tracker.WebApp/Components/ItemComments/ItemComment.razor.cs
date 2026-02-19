@@ -3,6 +3,7 @@ using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Board;
 using Tracker.WebApp.Components.Shared;
 using Tracker.WebApp.States;
 

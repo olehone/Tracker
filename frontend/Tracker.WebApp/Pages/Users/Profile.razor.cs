@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
 using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
+using Tracker.Services.Abstraction.Results;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages.Users;

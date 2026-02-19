@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests;
-using Tracker.Services.Abstraction;
-using Tracker.WebApp.Shared;
+using Tracker.Services.Abstraction.Results;
+using Tracker.Services.Abstraction.Workspace;
 
 namespace Tracker.WebApp.Pages.Admin;
 

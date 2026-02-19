@@ -8,11 +8,16 @@ using Tracker.Domain.Enums;
 using Tracker.Domain.Options;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Auth;
+using Tracker.Services.Abstraction.Board;
+using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Abstraction.Results;
+using Tracker.Services.Abstraction.Workspace;
 using Tracker.Services.ApiClients;
 using Tracker.Services.Auth;
-using Tracker.Services.RealTime;
+using Tracker.Services.Board;
+using Tracker.Services.Realtime;
 using Tracker.Services.Results;
+using Tracker.Services.Workspace;
 
 namespace Tracker.Services;
 
@@ -52,8 +57,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IItemCommentService, ItemCommentService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
 
-        services.AddScoped<IBoardRealtimeService, BoardHubService>();
-        services.AddScoped<IItemRealtimeService, ItemHubService>();
+        services.AddScoped<IBoardRealtimeService, BoardRealtimeService>();
+        services.AddScoped<IItemRealtimeService, ItemRealtimeService>();
         return services;
     }
 

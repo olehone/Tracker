@@ -1,0 +1,26 @@
+﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
+using Tracker.Domain.Results;
+using Tracker.Services.Abstraction.Board;
+using Tracker.Services.Abstraction.Results;
+using Tracker.Services.ApiClients;
+
+namespace Tracker.Services.Board;
+
+public class BoardUserService(IApiErrorHandler apiErrorHandler, IBoardUserApi api) : IBoardUserService
+{
+    public Task<Result<BoardUserDto>> AddAsync(Guid boardId, Guid userId, BoardUserRole role)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.AddAsync(boardId, userId, role));
+    }
+
+    public Task<Result> ChangeRoleAsync(Guid boardId, Guid userId, BoardUserRole role)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.ChangeRoleAsync(boardId, userId, role));
+    }
+
+    public Task<Result> RemoveAsync(Guid boardId, Guid userId)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.RemoveAsync(boardId, userId));
+    }
+}
