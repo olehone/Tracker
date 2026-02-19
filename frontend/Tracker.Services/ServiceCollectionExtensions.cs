@@ -59,6 +59,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IBoardRealtimeService, BoardRealtimeService>();
         services.AddScoped<IItemRealtimeService, ItemRealtimeService>();
+        services.AddScoped<ICallRealtimeService, CallRealtimeService>();
         return services;
     }
 

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Tracker.Services.Abstraction;
+using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Realtime.Methods;
 
 namespace Tracker.Services.Realtime;
 
-public abstract class RealtimeService(
-    IApiUrlService apiUrl,
-    IAuthService authService,
-    string endpoint)
+public abstract class RealtimeService(IApiUrlService apiUrl, IAuthService authService, string endpoint)
+    : IRealtimeService
 {
     private readonly string _hubUrl = $"{apiUrl.GetApiUrl()}/{endpoint}";
 
