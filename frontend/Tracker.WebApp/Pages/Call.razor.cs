@@ -7,6 +7,7 @@ namespace Tracker.WebApp.Pages;
 
 public partial class Call : IAsyncDisposable
 {
+    private bool _connected = false;
     private Guid currentCallId = Guid.Empty;
     private DotNetObjectReference<Call>? _objRef;
 
@@ -22,6 +23,20 @@ public partial class Call : IAsyncDisposable
         {
             _objRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("registerDotNetInstance", _objRef);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppState.OnUserChange += OnAppStateChanged;
+    }
+
+    private async void OnAppStateChanged()
+    {
+        if (!IsUnauthenticated && !_connected)
+        {
+            _connected = true;
+            await ConnectRealtimeAsync();
         }
     }
 
@@ -58,6 +73,7 @@ public partial class Call : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        AppState.OnUserChange -= OnAppStateChanged;
         CallService.OnDataReceived -= HandleReceivedData;
         _objRef?.Dispose();
         await CallService.DisconnectAsync();
