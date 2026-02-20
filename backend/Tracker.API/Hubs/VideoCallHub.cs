@@ -1,19 +1,28 @@
 ﻿using System.Collections.Concurrent;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
+using Azure.Identity;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Tracker.API.Hubs.Interfaces;
+using Tracker.Application.UseCases.Users.Current;
 
 namespace Tracker.API.Hubs;
 
-//[Authorize]
-public class VideoCallHub() : Hub<IClientVideoCallHub>
+[Authorize]
+public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
 {
     private static readonly ConcurrentDictionary<string, string> _users = new();
 
     public async Task Join(Guid callId)
     {
-        var username = Context.User?.Identity?.Name ?? Context.ConnectionId[..8];
+        var user = await mediator.Send(new GetCurrentUserQuery());
+        if (user.IsFailure)
+        {
+            Console.WriteLine("Can't load user");
+        }
+        var username = user.Value.Id.ToString();
         _users[Context.ConnectionId] = username;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, $"call:{callId}");
@@ -27,7 +36,7 @@ public class VideoCallHub() : Hub<IClientVideoCallHub>
             name = username,
             date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
-        await Clients.Group($"call:{callId}").SendData(joinMsg);
+        await SendData(callId, joinMsg);
     }
 
     public async Task Leave(Guid boardId)
@@ -43,7 +52,8 @@ public class VideoCallHub() : Hub<IClientVideoCallHub>
 
     public async Task SendData(Guid callId, string data)
     {
-        await Clients.Group($"call:{callId}").SendData(data);
+        Console.WriteLine($"Sending data to {callId}. Data is {data}");
+        await Clients.OthersInGroup($"call:{callId}").DataSent(data);
     }
 
     private async Task BroadcastUserList(Guid callId)
@@ -54,6 +64,6 @@ public class VideoCallHub() : Hub<IClientVideoCallHub>
             users = _users.Values.ToArray(),
             date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
-        await Clients.Group($"call:{callId}").SendData(userListMsg);
+        await SendData(callId, userListMsg);
     }
 }
