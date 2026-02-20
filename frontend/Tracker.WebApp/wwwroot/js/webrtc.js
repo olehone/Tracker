@@ -66,12 +66,6 @@ function handleReceiveData(data, username) {
     let timeStr = time.toLocaleTimeString();
 
     switch (msg.type) {
-        case "username":
-            text = `<b>User <em>${msg.name}</em> signed in at ${timeStr}</b><br>`;
-            break;
-        case "message":
-            text = `(${timeStr}) <b>${msg.name}</b>: ${msg.text}<br>`;
-            break;
         case "userlist":
             handleUserlistMsg(msg);
             break;

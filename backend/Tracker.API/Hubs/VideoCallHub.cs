@@ -28,15 +28,6 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
         await Groups.AddToGroupAsync(Context.ConnectionId, $"call:{callId}");
 
         await BroadcastUserList(callId);
-
-        // Announce the new user
-        var joinMsg = JsonSerializer.Serialize(new
-        {
-            type = "username",
-            name = username,
-            date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-        });
-        await SendData(callId, joinMsg);
     }
 
     public async Task Leave(Guid boardId)
@@ -64,6 +55,6 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
             users = _users.Values.ToArray(),
             date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
-        await SendData(callId, userListMsg);
+        await Clients.Group($"call:{callId}").DataSent(userListMsg);
     }
 }

@@ -1,24 +1,7 @@
 ﻿@page "/"
 
 <div class="container">
-    <div class="infobox">
-        <p>
-            Enter a username:
-            <input id="name"
-                   type="text"
-                   maxlength="12"
-                   required
-                   autocomplete="username"
-                   inputmode="verbatim"
-                   placeholder="Username" />
-            <input type="button"
-                   name="login"
-                   value="Log in"
-                   @onclick=@Connect />
-        </p>
-    </div>
     <ul class="userlistbox"></ul>
-    <div class="chatbox"></div>
     <div class="camerabox">
         <video id="received_video" autoplay></video>
         <video id="local_video" autoplay muted></video>
@@ -30,24 +13,6 @@
         </button>
     </div>
     <div class="empty-container"></div>
-    <div class="chat-controls">
-        Chat:<br />
-        <input id="text"
-               type="text"
-               name="text"
-               size="100"
-               maxlength="256"
-               placeholder="Say something meaningful..."
-               autocomplete="off"
-               onkeyup="handleKey(event)"
-               disabled />
-        <input type="button"
-               id="send"
-               name="send"
-               value="Send"
-               onclick="handleSendButton()"
-               disabled />
-    </div>
 </div>
 
 
