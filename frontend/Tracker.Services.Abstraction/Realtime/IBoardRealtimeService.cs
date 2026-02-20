@@ -1,4 +1,4 @@
-﻿using Tracker.Domain.Events;
+﻿using Tracker.Services.Abstraction.Realtime.Events;
 
 namespace Tracker.Services.Abstraction.Realtime;
 

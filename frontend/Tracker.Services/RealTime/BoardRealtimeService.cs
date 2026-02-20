@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Tracker.Domain.Events;
+using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Realtime.Methods;
