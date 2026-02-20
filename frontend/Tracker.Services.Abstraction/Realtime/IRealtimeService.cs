@@ -2,7 +2,7 @@
 
 public interface IRealtimeService : IAsyncDisposable
 {
-    Task ConnectAsync(Guid itemId);
+    Task ConnectAsync(Guid entityId);
     Task DisconnectAsync();
     bool IsConnected { get; }
 }

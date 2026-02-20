@@ -8,11 +8,15 @@ namespace Tracker.Services.Realtime;
 public class CallRealtimeService(IApiUrlService apiUrl,IAuthService authService) 
     : RealtimeService(apiUrl, authService, "hubs/call"), ICallRealtimeService
 {
-    public event Action<string> OnDataSent;
+    public event Action<string>? OnDataReceived;
 
     public Task SendData(string data)
     {
-        throw new NotImplementedException();
+        if (!IsConnected)
+        {
+            return Task.CompletedTask;
+        }
+        return Connection.InvokeAsync(CallRealtimeMethods.SendData, EntityId, data);
     }
 
     public override ValueTask DisposeAsync()
@@ -24,7 +28,7 @@ public class CallRealtimeService(IApiUrlService apiUrl,IAuthService authService)
     {
         connection.On<string>(CallRealtimeMethods.DataSent, (evt) =>
         {
-
-        })
+            OnDataReceived?.Invoke(evt);
+        });
     }
 }

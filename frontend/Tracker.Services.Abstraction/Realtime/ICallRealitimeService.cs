@@ -2,7 +2,7 @@
 
 public interface ICallRealtimeService : IRealtimeService
 {
-    event Action<string> OnDataSent; 
+    event Action<string> OnDataReceived; 
 
     Task SendData(string data);
 }
