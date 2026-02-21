@@ -5,7 +5,11 @@
         <video id="local_video" autoplay muted></video>
         @foreach (var userId in _remoteUsers)
         {
-            <video id="video-@userId" autoplay></video>
+            <div>
+                <video id="video-@userId" autoplay></video>
+                <p>@userId</p>
+            </div>
+
         }
         <button id="hangup-button"
                 @onclick=@HangUpCall

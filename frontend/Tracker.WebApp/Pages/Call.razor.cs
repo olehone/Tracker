@@ -8,7 +8,7 @@ namespace Tracker.WebApp.Pages;
 
 public partial class Call : IAsyncDisposable
 {
-    private bool _connected = false;
+    private bool _connecting = false;
     private Guid _callId = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
     private DotNetObjectReference<Call>? _objRef;
     private List<string> _remoteUsers = new();
@@ -21,10 +21,16 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
-            return;
-        _objRef = DotNetObjectReference.Create(this);
-        await JS.InvokeVoidAsync("registerDotNetInstance", _objRef);
+        if (firstRender)
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("registerDotNetInstance", _objRef);
+        }
+
+        foreach (var userId in _remoteUsers)
+        {
+            await JS.InvokeVoidAsync("attachRemoteStream", userId);
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -39,15 +45,21 @@ public partial class Call : IAsyncDisposable
 
     private async void OnAppStateChanged()
     {
-        if (!IsUnauthenticated && !_connected)
+        if (!IsUnauthenticated && !_connecting)
         {
-            _connected = true;
             await ConnectRealtimeAsync();
         }
     }
 
     private async Task ConnectRealtimeAsync()
     {
+        if (_connecting)
+        {
+            return;
+        }
+
+        _connecting = true;
+
         CallService.OnUserListUpdated += HandleUserListUpdated;
         CallService.OnVideoOffer += HandleVideoOffer;
         CallService.OnVideoAnswer += HandleVideoAnswer;
@@ -60,12 +72,13 @@ public partial class Call : IAsyncDisposable
     private async void HandleUserListUpdated(UserListUpdatedEvent evt)
     {
         var myId = AppState.MyId.ToString();
-        var iAmNewest = evt.UserIds.LastOrDefault() == myId;
-        if (iAmNewest)
+        var otherUsers = evt.UserIds.Where(id => id != myId).ToList();
+
+        foreach (var userId in otherUsers)
         {
-            foreach (var userId in evt.UserIds.Where(id => id != myId))
+            if (!_remoteUsers.Contains(userId))
             {
-                await JS.InvokeVoidAsync("initiateCall", userId);
+                await JS.InvokeVoidAsync("initiateCall", userId, myId);
             }
         }
     }
@@ -92,8 +105,6 @@ public partial class Call : IAsyncDisposable
         InvokeAsync(StateHasChanged);
     }
 
-    // JS → Service
-
     [JSInvokable]
     public Task SendVideoOffer(string targetUserId, string sdp)
         => CallService.SendVideoOffer(_callId, targetUserId, sdp);
@@ -110,16 +121,15 @@ public partial class Call : IAsyncDisposable
     public Task SendHangUp(string targetUserId)
         => CallService.SendHangUp(_callId, targetUserId);
 
-    // JS → Blazor UI state
-
     [JSInvokable]
     public async Task OnRemoteTrack(string userId)
     {
         if (!_remoteUsers.Contains(userId))
         {
             _remoteUsers.Add(userId);
-            await InvokeAsync(StateHasChanged);
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     [JSInvokable]
@@ -133,8 +143,6 @@ public partial class Call : IAsyncDisposable
     {
         await JS.InvokeVoidAsync("hangUpAll");
     }
-
-
 
     public async ValueTask DisposeAsync()
     {
