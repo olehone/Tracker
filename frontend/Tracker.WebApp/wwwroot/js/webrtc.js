@@ -62,9 +62,9 @@ function handleReceiveData(data, username) {
         case "userlist":
             handleUserlistMsg(msg);
             break;
-        //case "video-offer":
-        //    handleVideoOfferMsg(msg);
-        //    break;
+        case "video-offer":
+            handleVideoOfferMsg(msg);
+            break;
         case "video-answer":
             handleVideoAnswerMsg(msg);
             break;
@@ -176,18 +176,18 @@ function handleICEGatheringStateChangeEvent(event) {
 
 // Rebuild the user list UI and auto-connect if I'm the newest joiner
 async function handleUserlistMsg(msg) {
-    let listElem = document.querySelector(".userlistbox");
+    //let listElem = document.querySelector(".userlistbox");
 
-    while (listElem.firstChild) {
-        listElem.removeChild(listElem.firstChild);
-    }
+    //while (listElem.firstChild) {
+    //    listElem.removeChild(listElem.firstChild);
+    //}
 
-    msg.users.forEach(function (username) {
-        let item = document.createElement("li");
-        item.appendChild(document.createTextNode(username));
-        item.addEventListener("click", invite, false);
-        listElem.appendChild(item);
-    });
+    //msg.users.forEach(function (username) {
+    //    let item = document.createElement("li");
+    //    item.appendChild(document.createTextNode(username));
+    //    item.addEventListener("click", invite, false);
+    //    listElem.appendChild(item);
+    //});
 
     // Auto-connect: if there are 2+ users and I'm the last one (newest joiner), I call
     if (msg.users.length >= 2 && !myPeerConnection) {
@@ -248,64 +248,44 @@ async function handleVideoOfferMsg(msg) {
     return handleVideoOffer(msg.name, msg.sdp)
 }
 
-async function handleVideoOffer(targetUsername, sdp) {
-
-    log("Received video chat offer from " + targetUsername);
+async function handleVideoOffer(callerUsername, sdp) {
     if (!myPeerConnection) {
         createPeerConnection();
     }
 
-    let desc = new RTCSessionDescription(sdp);
+    if (!webcamStream) {
+        try {
+            webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+            document.getElementById("local_video").srcObject = webcamStream;
+            webcamStream.getTracks().forEach(track =>
+                myPeerConnection.addTrack(track, webcamStream)
+            );
+        } catch (err) {
+            handleGetUserMediaError(err);
+            return;
+        }
+    }
 
+    let desc = new RTCSessionDescription(sdp);
     if (myPeerConnection.signalingState != "stable") {
-        log("  - But the signaling state isn't stable, so triggering rollback");
         await Promise.all([
             myPeerConnection.setLocalDescription({ type: "rollback" }),
             myPeerConnection.setRemoteDescription(desc),
         ]);
-        return;
     } else {
-        log("  - Setting remote description");
         await myPeerConnection.setRemoteDescription(desc);
     }
 
-    // Flush any ICE candidates that arrived before the remote description
     for (const candidate of pendingCandidates) {
         await myPeerConnection.addIceCandidate(candidate).catch(reportError);
     }
     pendingCandidates = [];
 
-    if (!webcamStream) {
-        try {
-            webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        } catch (err) {
-            handleGetUserMediaError(err);
-            return;
-        }
-
-        document.getElementById("local_video").srcObject = webcamStream;
-
-        try {
-            webcamStream.getTracks().forEach(
-                (transceiver = (track) =>
-                    myPeerConnection.addTransceiver(track, {
-                        streams: [webcamStream],
-                    })),
-            );
-        } catch (err) {
-            handleGetUserMediaError(err);
-        }
-    }
-
-    log("---> Creating and sending answer to caller");
-
-    await myPeerConnection.setLocalDescription(
-        await myPeerConnection.createAnswer(),
-    );
+    await myPeerConnection.setLocalDescription(await myPeerConnection.createAnswer());
 
     sendToServer({
         name: myUsername,
-        target: targetUsername,
+        target: callerUsername,
         type: "video-answer",
         sdp: myPeerConnection.localDescription,
     });

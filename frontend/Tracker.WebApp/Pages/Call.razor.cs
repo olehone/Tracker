@@ -10,27 +10,31 @@ namespace Tracker.WebApp.Pages;
 public partial class Call : IAsyncDisposable
 {
     private bool _connected = false;
-    private Guid currentCallId = Guid.Empty;
+    private Guid _callId = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b"); // hardcoded until board wires it
     private DotNetObjectReference<Call>? _objRef;
 
     public bool IsUnauthenticated => AppState.IsUnauthenticated;
 
     [Inject] IJSRuntime JS { get; set; } = null!;
-    [Inject] ICallRealtimeService CallService { get; set; }
-    [Inject] AppState AppState { get; set; }
+    [Inject] ICallRealtimeService CallService { get; set; } = null!;
+    [Inject] AppState AppState { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            _objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("registerDotNetInstance", _objRef);
-        }
+        if (!firstRender)
+            return;
+        _objRef = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("registerDotNetInstance", _objRef);
     }
 
     protected override async Task OnInitializedAsync()
     {
         AppState.OnUserChange += OnAppStateChanged;
+
+        if (!IsUnauthenticated)
+        {
+            await ConnectRealtimeAsync();
+        }
     }
 
     private async void OnAppStateChanged()
@@ -42,25 +46,10 @@ public partial class Call : IAsyncDisposable
         }
     }
 
-    private async Task Connect()
-    {
-        await ConnectRealtimeAsync();
-    }
-    private async Task HangUpCall()
-    {
-        await JS.InvokeVoidAsync("hangUpCall");
-    }
-
     private async Task ConnectRealtimeAsync()
     {
-        if (IsUnauthenticated)
-        {
-            return;
-        }
-
         CallService.OnDataReceived += HandleReceivedData;
-        CallService.OnVideoOffer += HandleVideoOffer;
-        await CallService.ConnectAsync(currentCallId);
+        await CallService.ConnectAsync(_callId);
     }
 
     private void HandleReceivedData(string data)
@@ -73,16 +62,10 @@ public partial class Call : IAsyncDisposable
     {
         return CallService.SendData(data);
     }
- 
-    private void HandleVideoOffer(VideoOfferEvent evt)
-    {
-        JS.InvokeVoidAsync("handleVideoOffer", evt.CallerId, evt.SessionDescriptionProtocol);
-    }
 
-    [JSInvokable]
-    public Task SendOffer(Guid callerId, string sessionDescriptionProtocol)
+    private async Task HangUpCall()
     {
-        return CallService.;
+        await JS.InvokeVoidAsync("hangUpCall");
     }
 
     public async ValueTask DisposeAsync()

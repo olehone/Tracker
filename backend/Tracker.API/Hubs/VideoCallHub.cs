@@ -6,27 +6,28 @@ using Microsoft.AspNetCore.SignalR;
 using Tracker.API.Hubs.Events;
 using Tracker.API.Hubs.Interfaces;
 using Tracker.Application.UseCases.Users.Current;
-using Tracker.Infrastructure.Auth;
 
 namespace Tracker.API.Hubs;
 
 [Authorize]
 public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
 {
-    private static readonly ConcurrentDictionary<string, string> _users = new();
+    private static readonly ConcurrentDictionary<string, string> _userConnections = new(); // userId -> connectionId
+    private static readonly ConcurrentDictionary<string, string> _userCalls = new();       // userId -> callId
 
     public async Task Join(Guid callId)
     {
         var user = await mediator.Send(new GetCurrentUserQuery());
         if (user.IsFailure)
-        {
-            Console.WriteLine("Can't load user");
-        }
+            throw new HubException("Unauthorized");
+
         var userId = user.Value.Id.ToString();
-        _users[userId] = Context.ConnectionId;
+        var callIdStr = callId.ToString();
+
+        _userConnections[userId] = Context.ConnectionId;
+        _userCalls[userId] = callIdStr;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, $"call:{callId}");
-
         await BroadcastUserList(callId);
     }
 
@@ -45,33 +46,49 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
 
     private void RemoveCurrentUser()
     {
-        var entry = _users.FirstOrDefault(x => x.Value == Context.ConnectionId);
-        if (entry.Key != null)
-        {
-            _users.TryRemove(entry.Key, out _);
-        }
+        var entry = _userConnections.FirstOrDefault(x => x.Value == Context.ConnectionId);
+        if (entry.Key == null)
+            return;
+        _userConnections.TryRemove(entry.Key, out _);
+        _userCalls.TryRemove(entry.Key, out _);
     }
 
     private async Task BroadcastUserList(Guid callId)
     {
-        var userListMsg = JsonSerializer.Serialize(new
+        var callIdStr = callId.ToString();
+        var usersInCall = _userCalls
+            .Where(kvp => kvp.Value == callIdStr)
+            .Select(kvp => kvp.Key)
+            .ToArray();
+
+        var msg = JsonSerializer.Serialize(new
         {
             type = "userlist",
-            users = _users.Values.ToArray(),
+            users = usersInCall,
             date = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         });
-        await Clients.Group($"call:{callId}").DataSent(userListMsg);
+
+        await Clients.Group($"call:{callId}").DataSent(msg);
     }
 
     public async Task SendData(Guid callId, string data)
     {
-        Console.WriteLine($"Sending data to {callId}. Data is {data}");
-        await Clients.OthersInGroup($"call:{callId}").DataSent(data);
-    }
+        using var doc = JsonDocument.Parse(data);
+        if (!doc.RootElement.TryGetProperty("target", out var targetEl))
+            return;
+        var targetUserId = targetEl.GetString();
+        if (targetUserId == null)
+            return;
 
-    public async Task SendVideoOffer(VideoOfferEvent evt)
-    {
-        Console.WriteLine($"Sending data to {evt.CallerId}. Data is {evt.SessionDescriptionProtocol}");
-        await Clients.OthersInGroup($"call:{callId}").DataSent(data);
+        // security: is target actually in this call?
+        if (!_userCalls.TryGetValue(targetUserId, out var targetCallId))
+            return;
+        if (targetCallId != callId.ToString())
+            return;
+
+        if (!_userConnections.TryGetValue(targetUserId, out var connectionId))
+            return;
+
+        await Clients.Client(connectionId).DataSent(data);
     }
 }
