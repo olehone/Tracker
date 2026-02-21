@@ -80,15 +80,22 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
         if (targetUserId == null)
             return;
 
-        // security: is target actually in this call?
         if (!_userCalls.TryGetValue(targetUserId, out var targetCallId))
             return;
         if (targetCallId != callId.ToString())
             return;
-
         if (!_userConnections.TryGetValue(targetUserId, out var connectionId))
             return;
 
-        await Clients.Client(connectionId).DataSent(data);
+        var senderId = _userConnections.FirstOrDefault(x => x.Value == Context.ConnectionId).Key;
+
+        // inject name into payload
+        var dict = new Dictionary<string, object>();
+        foreach (var prop in doc.RootElement.EnumerateObject())
+            dict[prop.Name] = prop.Value;
+        dict["name"] = senderId;
+
+        var enriched = JsonSerializer.Serialize(dict);
+        await Clients.Client(connectionId).DataSent(enriched);
     }
 }

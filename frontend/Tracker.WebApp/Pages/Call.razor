@@ -2,8 +2,11 @@
 
 <div class="container">
     <div class="camerabox">
-        <video id="received_video" autoplay></video>
         <video id="local_video" autoplay muted></video>
+        @foreach (var userId in _remoteUsers)
+        {
+            <video id="video-@userId" autoplay></video>
+        }
         <button id="hangup-button"
                 @onclick=@HangUpCall
                 role="button"

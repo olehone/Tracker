@@ -75,4 +75,23 @@ public partial class Call : IAsyncDisposable
         _objRef?.Dispose();
         await CallService.DisconnectAsync();
     }
+
+    private List<string> _remoteUsers = new();
+
+    [JSInvokable]
+    public async Task OnRemoteTrack(string userId)
+    {
+        if (!_remoteUsers.Contains(userId))
+        {
+            _remoteUsers.Add(userId);
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnPeerDisconnected(string userId)
+    {
+        _remoteUsers.Remove(userId);
+        await InvokeAsync(StateHasChanged);
+    }
 }

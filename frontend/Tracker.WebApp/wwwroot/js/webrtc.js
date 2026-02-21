@@ -4,8 +4,6 @@ function registerDotNetInstance(instance) {
     dotNetInstance = instance;
 }
 
-let clientID = 0;
-
 let mediaConstraints = {
     audio: true,
     video: {
@@ -15,12 +13,10 @@ let mediaConstraints = {
     },
 };
 
-let myUsername = null;        // module-level so all functions can see it
-let targetUsername = null;
-let myPeerConnection = null;
-let transceiver = null;
+const peerConnections = new Map();
+const pendingCandidates = new Map();
+let myUsername = null;
 let webcamStream = null;
-let pendingCandidates = [];   // queue for ICE candidates that arrive before remote desc is set
 
 function log(text) {
     let time = new Date();
@@ -39,11 +35,8 @@ async function sendToServer(msg) {
 }
 
 function handleReceiveData(data, username) {
-    // Set myUsername from the second argument passed by Blazor (AppState.MyId)
     myUsername = username;
 
-    let chatBox = document.querySelector(".chatbox");
-    let text = "";
     log("Message received: ");
     log(data);
 
@@ -54,9 +47,6 @@ function handleReceiveData(data, username) {
         log_error("Failed to parse message: " + data);
         return;
     }
-
-    let time = new Date(msg.date);
-    let timeStr = time.toLocaleTimeString();
 
     switch (msg.type) {
         case "userlist":
@@ -78,300 +68,187 @@ function handleReceiveData(data, username) {
             log_error("Unknown message received:");
             log_error(msg);
     }
-
-    if (text.length) {
-        chatBox.innerHTML += text;
-        chatBox.scrollTop = chatBox.scrollHeight - chatBox.clientHeight;
-    }
 }
 
-async function createPeerConnection() {
-    log("Setting up a connection...");
+async function createPeerConnection(userId) {
+    log("Setting up connection with " + userId);
 
-    myPeerConnection = new RTCPeerConnection({
-        iceServers: [
-            {
-                urls: "stun:stun.l.google.com:19302",
-            },
-        ],
+    const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
     });
 
-    myPeerConnection.onicecandidate = handleICECandidateEvent;
-    myPeerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
-    myPeerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
-    myPeerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
-    myPeerConnection.onnegotiationneeded = handleNegotiationNeededEvent;
-    myPeerConnection.ontrack = handleTrackEvent;
-}
+    peerConnections.set(userId, pc);
+    pendingCandidates.set(userId, []);
 
-async function handleNegotiationNeededEvent() {
-    log("*** Negotiation needed");
-    try {
-        log("---> Creating offer");
-        const offer = await myPeerConnection.createOffer();
-
-        if (myPeerConnection.signalingState != "stable") {
-            log("     -- The connection isn't stable yet; postponing...");
-            return;
+    pc.onicecandidate = e => {
+        if (e.candidate) {
+            log("*** Outgoing ICE candidate to " + userId);
+            sendToServer({ type: "new-ice-candidate", target: userId, candidate: e.candidate });
         }
-
-        log("---> Setting local description to the offer");
-        await myPeerConnection.setLocalDescription(offer);
-
-        log("---> Sending the offer to the remote peer");
-        sendToServer({
-            name: myUsername,
-            target: targetUsername,
-            type: "video-offer",
-            sdp: myPeerConnection.localDescription,
+    };
+    pc.oniceconnectionstatechange = () => {
+        log("*** ICE state with " + userId + ": " + pc.iceConnectionState);
+        if (["closed", "failed", "disconnected"].includes(pc.iceConnectionState)) {
+            closePeerConnection(userId);
+        }
+    };
+    pc.onsignalingstatechange = () => {
+        log("*** Signaling state with " + userId + ": " + pc.signalingState);
+        if (pc.signalingState === "closed") closePeerConnection(userId);
+    };
+    pc.onnegotiationneeded = async () => {
+        log("*** Negotiation needed with " + userId);
+        try {
+            const offer = await pc.createOffer();
+            if (pc.signalingState !== "stable") {
+                log("     -- Not stable yet, postponing");
+                return;
+            }
+            await pc.setLocalDescription(offer);
+            log("---> Sending offer to " + userId);
+            sendToServer({ name: myUsername, target: userId, type: "video-offer", sdp: pc.localDescription });
+        } catch (err) { reportError(err); }
+    };
+    pc.ontrack = e => {
+        log("*** Track event from " + userId);
+        dotNetInstance.invokeMethodAsync("OnRemoteTrack", userId).then(() => {
+            let video = document.getElementById("video-" + userId);
+            if (video) video.srcObject = e.streams[0];
         });
-    } catch (err) {
-        log("*** The following error occurred while handling the negotiationneeded event:");
-        reportError(err);
-    }
+    };
+
+    return pc;
 }
 
-function handleTrackEvent(event) {
-    log("*** Track event");
-    document.getElementById("received_video").srcObject = event.streams[0];
-    document.getElementById("hangup-button").disabled = false;
+async function getLocalStream() {
+    if (webcamStream) return webcamStream;
+    webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    document.getElementById("local_video").srcObject = webcamStream;
+    return webcamStream;
 }
 
-function handleICECandidateEvent(event) {
-    if (event.candidate) {
-        log("*** Outgoing ICE candidate: " + event.candidate.candidate);
+async function inviteUser(userId) {
+    if (peerConnections.has(userId) || userId === myUsername) return;
 
-        sendToServer({
-            type: "new-ice-candidate",
-            target: targetUsername,
-            candidate: event.candidate,
-        });
-    }
+    log("Inviting user " + userId);
+    const pc = await createPeerConnection(userId);
+    const stream = await getLocalStream();
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
 }
 
-function handleICEConnectionStateChangeEvent(event) {
-    log("*** ICE connection state changed to " + myPeerConnection.iceConnectionState);
-
-    switch (myPeerConnection.iceConnectionState) {
-        case "closed":
-        case "failed":
-        case "disconnected":
-            closeVideoCall();
-            break;
-    }
-}
-
-function handleSignalingStateChangeEvent(event) {
-    log("*** WebRTC signaling state changed to: " + myPeerConnection.signalingState);
-    switch (myPeerConnection.signalingState) {
-        case "closed":
-            closeVideoCall();
-            break;
-    }
-}
-
-function handleICEGatheringStateChangeEvent(event) {
-    log("*** ICE gathering state changed to: " + myPeerConnection.iceGatheringState);
-}
-
-// Rebuild the user list UI and auto-connect if I'm the newest joiner
 async function handleUserlistMsg(msg) {
-    //let listElem = document.querySelector(".userlistbox");
-
-    //while (listElem.firstChild) {
-    //    listElem.removeChild(listElem.firstChild);
-    //}
-
-    //msg.users.forEach(function (username) {
-    //    let item = document.createElement("li");
-    //    item.appendChild(document.createTextNode(username));
-    //    item.addEventListener("click", invite, false);
-    //    listElem.appendChild(item);
-    //});
-
-    // Auto-connect: if there are 2+ users and I'm the last one (newest joiner), I call
-    if (msg.users.length >= 2 && !myPeerConnection) {
+    if (msg.users.length >= 2) {
         const iAmNewest = msg.users[msg.users.length - 1] === myUsername;
         if (iAmNewest) {
-            // Call the first other user in the list
-            const otherUser = msg.users.find(u => u !== myUsername);
-            if (otherUser) {
-                log("Auto-connecting to " + otherUser);
-                await inviteUser(otherUser);
+            for (const userId of msg.users) {
+                if (userId !== myUsername) {
+                    log("Auto-connecting to " + userId);
+                    await inviteUser(userId);
+                }
             }
         }
     }
 }
 
-// Shared invite logic (used by auto-connect and click handler)
-async function inviteUser(username) {
-    if (myPeerConnection) {
-        log("Already in a call, ignoring invite to " + username);
-        return;
-    }
-
-    if (username === myUsername) {
-        return;
-    }
-
-    targetUsername = username;
-    log("Inviting user " + targetUsername);
-
-    createPeerConnection();
-
-    try {
-        webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        document.getElementById("local_video").srcObject = webcamStream;
-    } catch (err) {
-        handleGetUserMediaError(err);
-        return;
-    }
-
-    try {
-        webcamStream.getTracks().forEach(
-            (transceiver = (track) =>
-                myPeerConnection.addTransceiver(track, {
-                    streams: [webcamStream],
-                })),
-        );
-    } catch (err) {
-        handleGetUserMediaError(err);
-    }
-}
-
-// Click handler on user list items
-async function invite(evt) {
-    await inviteUser(evt.target.textContent);
-}
-
 async function handleVideoOfferMsg(msg) {
-    return handleVideoOffer(msg.name, msg.sdp)
-}
+    const callerId = msg.name;
+    log("Received video offer from " + callerId);
 
-async function handleVideoOffer(callerUsername, sdp) {
-    if (!myPeerConnection) {
-        createPeerConnection();
+    let pc = peerConnections.get(callerId);
+    if (!pc) pc = await createPeerConnection(callerId);
+
+    const stream = await getLocalStream();
+    if (pc.getSenders().length === 0) {
+        stream.getTracks().forEach(track => pc.addTrack(track, stream));
     }
 
-    if (!webcamStream) {
-        try {
-            webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-            document.getElementById("local_video").srcObject = webcamStream;
-            webcamStream.getTracks().forEach(track =>
-                myPeerConnection.addTrack(track, webcamStream)
-            );
-        } catch (err) {
-            handleGetUserMediaError(err);
-            return;
-        }
-    }
-
-    let desc = new RTCSessionDescription(sdp);
-    if (myPeerConnection.signalingState != "stable") {
+    const desc = new RTCSessionDescription(msg.sdp);
+    if (pc.signalingState !== "stable") {
+        log("  - Signaling not stable, triggering rollback");
         await Promise.all([
-            myPeerConnection.setLocalDescription({ type: "rollback" }),
-            myPeerConnection.setRemoteDescription(desc),
+            pc.setLocalDescription({ type: "rollback" }),
+            pc.setRemoteDescription(desc),
         ]);
     } else {
-        await myPeerConnection.setRemoteDescription(desc);
+        await pc.setRemoteDescription(desc);
     }
 
-    for (const candidate of pendingCandidates) {
-        await myPeerConnection.addIceCandidate(candidate).catch(reportError);
+    for (const c of (pendingCandidates.get(callerId) || [])) {
+        await pc.addIceCandidate(c).catch(reportError);
     }
-    pendingCandidates = [];
+    pendingCandidates.set(callerId, []);
 
-    await myPeerConnection.setLocalDescription(await myPeerConnection.createAnswer());
-
-    sendToServer({
-        name: myUsername,
-        target: callerUsername,
-        type: "video-answer",
-        sdp: myPeerConnection.localDescription,
-    });
+    await pc.setLocalDescription(await pc.createAnswer());
+    log("---> Sending answer to " + callerId);
+    sendToServer({ name: myUsername, target: callerId, type: "video-answer", sdp: pc.localDescription });
 }
 
 async function handleVideoAnswerMsg(msg) {
-    log("*** Call recipient has accepted our call");
+    log("*** Call accepted by " + msg.name);
+    const pc = peerConnections.get(msg.name);
+    if (!pc) return;
 
-    let desc = new RTCSessionDescription(msg.sdp);
-    await myPeerConnection.setRemoteDescription(desc).catch(reportError);
+    await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).catch(reportError);
 
-    // Flush any ICE candidates that arrived before the remote description
-    for (const candidate of pendingCandidates) {
-        await myPeerConnection.addIceCandidate(candidate).catch(reportError);
+    for (const c of (pendingCandidates.get(msg.name) || [])) {
+        await pc.addIceCandidate(c).catch(reportError);
     }
-    pendingCandidates = [];
+    pendingCandidates.set(msg.name, []);
 }
 
 async function handleNewICECandidateMsg(msg) {
-    let candidate = new RTCIceCandidate(msg.candidate);
+    const candidate = new RTCIceCandidate(msg.candidate);
+    const pc = peerConnections.get(msg.name);
 
-    log("*** Adding received ICE candidate: " + JSON.stringify(candidate));
+    log("*** Incoming ICE candidate from " + msg.name);
 
-    // If peer connection doesn't exist or remote description isn't set yet, queue it
-    if (!myPeerConnection || !myPeerConnection.remoteDescription) {
-        log("*** Queuing ICE candidate (remote description not set yet)");
-        pendingCandidates.push(candidate);
+    if (!pc || !pc.remoteDescription) {
+        log("*** Queuing ICE candidate from " + msg.name);
+        if (!pendingCandidates.has(msg.name)) pendingCandidates.set(msg.name, []);
+        pendingCandidates.get(msg.name).push(candidate);
         return;
     }
-
-    try {
-        await myPeerConnection.addIceCandidate(candidate);
-    } catch (err) {
-        reportError(err);
-    }
+    await pc.addIceCandidate(candidate).catch(reportError);
 }
 
-function closeVideoCall() {
-    let localVideo = document.getElementById("local_video");
+function closePeerConnection(userId) {
+    const pc = peerConnections.get(userId);
+    if (!pc) return;
 
-    log("Closing the call");
+    log("Closing connection with " + userId);
+    pc.ontrack = null;
+    pc.onicecandidate = null;
+    pc.oniceconnectionstatechange = null;
+    pc.onsignalingstatechange = null;
+    pc.onnegotiationneeded = null;
+    pc.getTransceivers().forEach(t => t.stop());
+    pc.close();
 
-    if (myPeerConnection) {
-        log("--> Closing the peer connection");
-
-        myPeerConnection.ontrack = null;
-        myPeerConnection.onicecandidate = null;
-        myPeerConnection.oniceconnectionstatechange = null;
-        myPeerConnection.onsignalingstatechange = null;
-        myPeerConnection.onicegatheringstatechange = null;
-        myPeerConnection.onnegotiationneeded = null;
-
-        myPeerConnection.getTransceivers().forEach((transceiver) => {
-            transceiver.stop();
-        });
-
-        if (localVideo.srcObject) {
-            localVideo.pause();
-            localVideo.srcObject.getTracks().forEach((track) => {
-                track.stop();
-            });
-        }
-
-        myPeerConnection.close();
-        myPeerConnection = null;
-        webcamStream = null;
-    }
-
-    pendingCandidates = [];
-    document.getElementById("hangup-button").disabled = true;
-    targetUsername = null;
+    peerConnections.delete(userId);
+    pendingCandidates.delete(userId);
+    dotNetInstance.invokeMethodAsync("OnPeerDisconnected", userId);
 }
 
 function handleHangUpMsg(msg) {
-    log("*** Received hang up notification from other peer");
-    closeVideoCall();
+    log("*** Hang up from " + msg.name);
+    closePeerConnection(msg.name);
 }
 
 function hangUpCall() {
-    closeVideoCall();
+    log("Hanging up call");
 
-    sendToServer({
-        name: myUsername,
-        target: targetUsername,
-        type: "hang-up",
+    peerConnections.forEach((pc, userId) => {
+        sendToServer({ name: myUsername, target: userId, type: "hang-up" });
+        closePeerConnection(userId);
     });
+
+    const localVideo = document.getElementById("local_video");
+    if (localVideo?.srcObject) {
+        localVideo.pause();
+        localVideo.srcObject.getTracks().forEach(t => t.stop());
+        localVideo.srcObject = null;
+    }
+    webcamStream = null;
 }
 
 function handleGetUserMediaError(e) {
@@ -387,8 +264,6 @@ function handleGetUserMediaError(e) {
             alert("Error opening your camera and/or microphone: " + e.message);
             break;
     }
-
-    closeVideoCall();
 }
 
 function reportError(errMessage) {
