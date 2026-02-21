@@ -4,4 +4,5 @@ public static class CallRealtimeMethods
 {
     public const string DataSent = "DataSent";
     public const string SendData = "SendData";
+    public const string SendVideoOffer = "SendVideoOffer";
 }

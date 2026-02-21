@@ -1,6 +1,8 @@
+using System.Runtime.Intrinsics.Arm;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Tracker.Services.Abstraction.Realtime;
+using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
@@ -57,6 +59,7 @@ public partial class Call : IAsyncDisposable
         }
 
         CallService.OnDataReceived += HandleReceivedData;
+        CallService.OnVideoOffer += HandleVideoOffer;
         await CallService.ConnectAsync(currentCallId);
     }
 
@@ -69,6 +72,17 @@ public partial class Call : IAsyncDisposable
     public Task SendToServer(string data)
     {
         return CallService.SendData(data);
+    }
+ 
+    private void HandleVideoOffer(VideoOfferEvent evt)
+    {
+        JS.InvokeVoidAsync("handleVideoOffer", evt.CallerId, evt.SessionDescriptionProtocol);
+    }
+
+    [JSInvokable]
+    public Task SendOffer(Guid callerId, string sessionDescriptionProtocol)
+    {
+        return CallService.;
     }
 
     public async ValueTask DisposeAsync()

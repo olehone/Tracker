@@ -4,7 +4,6 @@ function registerDotNetInstance(instance) {
     dotNetInstance = instance;
 }
 
-let connection = null;
 let clientID = 0;
 
 let mediaConstraints = {
@@ -56,12 +55,6 @@ function handleReceiveData(data, username) {
         return;
     }
 
-    // Ignore signaling messages that we ourselves sent
-    const signalingTypes = ["video-offer", "video-answer", "new-ice-candidate", "hang-up"];
-    if (signalingTypes.includes(msg.type) && msg.name === myUsername) {
-        return;
-    }
-
     let time = new Date(msg.date);
     let timeStr = time.toLocaleTimeString();
 
@@ -69,9 +62,9 @@ function handleReceiveData(data, username) {
         case "userlist":
             handleUserlistMsg(msg);
             break;
-        case "video-offer":
-            handleVideoOfferMsg(msg);
-            break;
+        //case "video-offer":
+        //    handleVideoOfferMsg(msg);
+        //    break;
         case "video-answer":
             handleVideoAnswerMsg(msg);
             break;
@@ -89,25 +82,6 @@ function handleReceiveData(data, username) {
     if (text.length) {
         chatBox.innerHTML += text;
         chatBox.scrollTop = chatBox.scrollHeight - chatBox.clientHeight;
-    }
-}
-
-function handleSendButton() {
-    let msg = {
-        text: document.getElementById("text").value,
-        type: "message",
-        id: clientID,
-        date: Date.now(),
-    };
-    sendToServer(msg);
-    document.getElementById("text").value = "";
-}
-
-function handleKey(evt) {
-    if (evt.keyCode === 13 || evt.keyCode === 14) {
-        if (!document.getElementById("send").disabled) {
-            handleSendButton();
-        }
     }
 }
 
@@ -271,14 +245,17 @@ async function invite(evt) {
 }
 
 async function handleVideoOfferMsg(msg) {
-    targetUsername = msg.name;
+    return handleVideoOffer(msg.name, msg.sdp)
+}
+
+async function handleVideoOffer(targetUsername, sdp) {
 
     log("Received video chat offer from " + targetUsername);
     if (!myPeerConnection) {
         createPeerConnection();
     }
 
-    let desc = new RTCSessionDescription(msg.sdp);
+    let desc = new RTCSessionDescription(sdp);
 
     if (myPeerConnection.signalingState != "stable") {
         log("  - But the signaling state isn't stable, so triggering rollback");
@@ -441,5 +418,3 @@ function reportError(errMessage) {
 window.hangUpCall = hangUpCall;
 window.handleReceiveData = handleReceiveData;
 window.registerDotNetInstance = registerDotNetInstance;
-window.handleSendButton = handleSendButton;
-window.handleKey = handleKey;
