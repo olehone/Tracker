@@ -1,4 +1,4 @@
-﻿let dotNetInstance = null;
+let dotNetInstance = null;
 
 function registerDotNetInstance(instance) {
     dotNetInstance = instance;
@@ -15,7 +15,7 @@ let mediaConstraints = {
 
 const peerConnections = new Map();
 const pendingCandidates = new Map();
-let myUsername = null;
+let myUserId = null;
 let webcamStream = null;
 
 function log(text) {
@@ -28,46 +28,33 @@ function log_error(text) {
     console.trace("[" + time.toLocaleTimeString() + "] " + text);
 }
 
-async function sendToServer(msg) {
-    let msgJSON = JSON.stringify(msg);
-    log("Sending '" + msg.type + "' message: " + msgJSON);
-    dotNetInstance.invokeMethodAsync("SendToServer", msgJSON);
+function reportError(errMessage) {
+    log_error(`Error ${errMessage.name}: ${errMessage.message}`);
 }
 
-function handleReceiveData(data, username) {
-    myUsername = username;
+// Called by Blazor when user list arrives from hub
+async function handleUserList(userIds, myId) {
+    myUserId = myId;
+    log("User list received: " + userIds.join(", "));
 
-    log("Message received: ");
-    log(data);
-
-    let msg;
-    try {
-        msg = JSON.parse(data);
-    } catch (e) {
-        log_error("Failed to parse message: " + data);
-        return;
+    const iAmNewest = userIds[userIds.length - 1] === myUserId;
+    if (iAmNewest) {
+        for (const userId of userIds) {
+            if (userId !== myUserId) {
+                log("Auto-connecting to " + userId);
+                await initiateCall(userId);
+            }
+        }
     }
+}
 
-    switch (msg.type) {
-        case "userlist":
-            handleUserlistMsg(msg);
-            break;
-        case "video-offer":
-            handleVideoOfferMsg(msg);
-            break;
-        case "video-answer":
-            handleVideoAnswerMsg(msg);
-            break;
-        case "new-ice-candidate":
-            handleNewICECandidateMsg(msg);
-            break;
-        case "hang-up":
-            handleHangUpMsg(msg);
-            break;
-        default:
-            log_error("Unknown message received:");
-            log_error(msg);
-    }
+async function initiateCall(userId) {
+    if (peerConnections.has(userId) || userId === myUserId) return;
+
+    log("Initiating call with " + userId);
+    const pc = await createPeerConnection(userId);
+    const stream = await getLocalStream();
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
 }
 
 async function createPeerConnection(userId) {
@@ -83,38 +70,58 @@ async function createPeerConnection(userId) {
     pc.onicecandidate = e => {
         if (e.candidate) {
             log("*** Outgoing ICE candidate to " + userId);
-            sendToServer({ type: "new-ice-candidate", target: userId, candidate: e.candidate });
+            dotNetInstance.invokeMethodAsync("SendIceCandidate", userId, JSON.stringify(e.candidate));
         }
     };
+
     pc.oniceconnectionstatechange = () => {
         log("*** ICE state with " + userId + ": " + pc.iceConnectionState);
         if (["closed", "failed", "disconnected"].includes(pc.iceConnectionState)) {
             closePeerConnection(userId);
         }
     };
+
     pc.onsignalingstatechange = () => {
         log("*** Signaling state with " + userId + ": " + pc.signalingState);
         if (pc.signalingState === "closed") closePeerConnection(userId);
     };
+
     pc.onnegotiationneeded = async () => {
         log("*** Negotiation needed with " + userId);
         try {
             const offer = await pc.createOffer();
             if (pc.signalingState !== "stable") {
-                log("     -- Not stable yet, postponing");
+                log("     -- Not stable, postponing");
                 return;
             }
             await pc.setLocalDescription(offer);
             log("---> Sending offer to " + userId);
-            sendToServer({ name: myUsername, target: userId, type: "video-offer", sdp: pc.localDescription });
+            dotNetInstance.invokeMethodAsync("SendVideoOffer", userId, JSON.stringify(pc.localDescription));
         } catch (err) { reportError(err); }
     };
+
     pc.ontrack = e => {
         log("*** Track event from " + userId);
-        dotNetInstance.invokeMethodAsync("OnRemoteTrack", userId).then(() => {
-            let video = document.getElementById("video-" + userId);
-            if (video) video.srcObject = e.streams[0];
-        });
+        const stream = e.streams[0];
+        if (!dotNetInstance) {
+            log_error("dotNetInstance is null, cannot notify Blazor");
+            return;
+        }
+        dotNetInstance.invokeMethodAsync("OnRemoteTrack", userId)
+            .then(() => {
+                requestAnimationFrame(() => {
+                    const video = document.getElementById("video-" + userId);
+                    if (video) {
+                        video.srcObject = stream;
+                    } else {
+                        setTimeout(() => {
+                            const v = document.getElementById("video-" + userId);
+                            if (v) v.srcObject = stream;
+                        }, 100);
+                    }
+                });
+            })
+            .catch(err => log_error("OnRemoteTrack failed: " + err));
     };
 
     return pc;
@@ -127,44 +134,22 @@ async function getLocalStream() {
     return webcamStream;
 }
 
-async function inviteUser(userId) {
-    if (peerConnections.has(userId) || userId === myUsername) return;
+// Incoming signaling — called by Blazor from service events
 
-    log("Inviting user " + userId);
-    const pc = await createPeerConnection(userId);
-    const stream = await getLocalStream();
-    stream.getTracks().forEach(track => pc.addTrack(track, stream));
-}
+async function receiveVideoOffer(fromUserId, sdpJson) {
+    log("Received offer from " + fromUserId);
 
-async function handleUserlistMsg(msg) {
-    if (msg.users.length >= 2) {
-        const iAmNewest = msg.users[msg.users.length - 1] === myUsername;
-        if (iAmNewest) {
-            for (const userId of msg.users) {
-                if (userId !== myUsername) {
-                    log("Auto-connecting to " + userId);
-                    await inviteUser(userId);
-                }
-            }
-        }
-    }
-}
-
-async function handleVideoOfferMsg(msg) {
-    const callerId = msg.name;
-    log("Received video offer from " + callerId);
-
-    let pc = peerConnections.get(callerId);
-    if (!pc) pc = await createPeerConnection(callerId);
+    let pc = peerConnections.get(fromUserId);
+    if (!pc) pc = await createPeerConnection(fromUserId);
 
     const stream = await getLocalStream();
     if (pc.getSenders().length === 0) {
         stream.getTracks().forEach(track => pc.addTrack(track, stream));
     }
 
-    const desc = new RTCSessionDescription(msg.sdp);
+    const desc = new RTCSessionDescription(JSON.parse(sdpJson));
     if (pc.signalingState !== "stable") {
-        log("  - Signaling not stable, triggering rollback");
+        log("  - Not stable, rolling back");
         await Promise.all([
             pc.setLocalDescription({ type: "rollback" }),
             pc.setRemoteDescription(desc),
@@ -173,42 +158,47 @@ async function handleVideoOfferMsg(msg) {
         await pc.setRemoteDescription(desc);
     }
 
-    for (const c of (pendingCandidates.get(callerId) || [])) {
+    for (const c of (pendingCandidates.get(fromUserId) || [])) {
         await pc.addIceCandidate(c).catch(reportError);
     }
-    pendingCandidates.set(callerId, []);
+    pendingCandidates.set(fromUserId, []);
 
     await pc.setLocalDescription(await pc.createAnswer());
-    log("---> Sending answer to " + callerId);
-    sendToServer({ name: myUsername, target: callerId, type: "video-answer", sdp: pc.localDescription });
+    log("---> Sending answer to " + fromUserId);
+    dotNetInstance.invokeMethodAsync("SendVideoAnswer", fromUserId, JSON.stringify(pc.localDescription));
 }
 
-async function handleVideoAnswerMsg(msg) {
-    log("*** Call accepted by " + msg.name);
-    const pc = peerConnections.get(msg.name);
+async function receiveVideoAnswer(fromUserId, sdpJson) {
+    log("*** Answer received from " + fromUserId);
+    const pc = peerConnections.get(fromUserId);
     if (!pc) return;
 
-    await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp)).catch(reportError);
+    await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(sdpJson))).catch(reportError);
 
-    for (const c of (pendingCandidates.get(msg.name) || [])) {
+    for (const c of (pendingCandidates.get(fromUserId) || [])) {
         await pc.addIceCandidate(c).catch(reportError);
     }
-    pendingCandidates.set(msg.name, []);
+    pendingCandidates.set(fromUserId, []);
 }
 
-async function handleNewICECandidateMsg(msg) {
-    const candidate = new RTCIceCandidate(msg.candidate);
-    const pc = peerConnections.get(msg.name);
-
-    log("*** Incoming ICE candidate from " + msg.name);
+async function receiveIceCandidate(fromUserId, candidateJson) {
+    log("*** ICE candidate from " + fromUserId);
+    const candidate = new RTCIceCandidate(JSON.parse(candidateJson));
+    const pc = peerConnections.get(fromUserId);
 
     if (!pc || !pc.remoteDescription) {
-        log("*** Queuing ICE candidate from " + msg.name);
-        if (!pendingCandidates.has(msg.name)) pendingCandidates.set(msg.name, []);
-        pendingCandidates.get(msg.name).push(candidate);
+        log("*** Queuing ICE candidate from " + fromUserId);
+        if (!pendingCandidates.has(fromUserId)) pendingCandidates.set(fromUserId, []);
+        pendingCandidates.get(fromUserId).push(candidate);
         return;
     }
     await pc.addIceCandidate(candidate).catch(reportError);
+}
+
+function receiveHangUp(fromUserId) {
+    log("*** Hang up from " + fromUserId);
+    closePeerConnection(fromUserId);
+    dotNetInstance.invokeMethodAsync("OnPeerDisconnected", fromUserId);
 }
 
 function closePeerConnection(userId) {
@@ -226,19 +216,13 @@ function closePeerConnection(userId) {
 
     peerConnections.delete(userId);
     pendingCandidates.delete(userId);
-    dotNetInstance.invokeMethodAsync("OnPeerDisconnected", userId);
 }
 
-function handleHangUpMsg(msg) {
-    log("*** Hang up from " + msg.name);
-    closePeerConnection(msg.name);
-}
-
-function hangUpCall() {
-    log("Hanging up call");
+function hangUpAll() {
+    log("Hanging up all connections");
 
     peerConnections.forEach((pc, userId) => {
-        sendToServer({ name: myUsername, target: userId, type: "hang-up" });
+        dotNetInstance.invokeMethodAsync("SendHangUp", userId);
         closePeerConnection(userId);
     });
 
@@ -251,25 +235,42 @@ function hangUpCall() {
     webcamStream = null;
 }
 
-function handleGetUserMediaError(e) {
-    log_error(e);
-    switch (e.name) {
-        case "NotFoundError":
-            alert("Unable to open your call because no camera and/or microphone were found.");
-            break;
-        case "SecurityError":
-        case "PermissionDeniedError":
-            break;
-        default:
-            alert("Error opening your camera and/or microphone: " + e.message);
-            break;
-    }
+async function setMuted(muted) {
+    webcamStream?.getAudioTracks().forEach(t => t.enabled = !muted);
 }
 
-function reportError(errMessage) {
-    log_error(`Error ${errMessage.name}: ${errMessage.message}`);
+async function setVideoEnabled(enabled) {
+    webcamStream?.getVideoTracks().forEach(t => t.enabled = enabled);
 }
 
-window.hangUpCall = hangUpCall;
-window.handleReceiveData = handleReceiveData;
+async function startScreenShare() {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const screenTrack = screenStream.getVideoTracks()[0];
+
+    peerConnections.forEach(pc => {
+        const sender = pc.getSenders().find(s => s.track?.kind === "video");
+        sender?.replaceTrack(screenTrack);
+    });
+
+    screenTrack.onended = () => stopScreenShare();
+}
+
+async function stopScreenShare() {
+    const camTrack = webcamStream?.getVideoTracks()[0];
+    peerConnections.forEach(pc => {
+        const sender = pc.getSenders().find(s => s.track?.kind === "video");
+        sender?.replaceTrack(camTrack);
+    });
+}
+
 window.registerDotNetInstance = registerDotNetInstance;
+window.handleUserList = handleUserList;
+window.receiveVideoOffer = receiveVideoOffer;
+window.receiveVideoAnswer = receiveVideoAnswer;
+window.receiveIceCandidate = receiveIceCandidate;
+window.receiveHangUp = receiveHangUp;
+window.hangUpAll = hangUpAll;
+window.setMuted = setMuted;
+window.setVideoEnabled = setVideoEnabled;
+window.startScreenShare = startScreenShare;
+window.stopScreenShare = stopScreenShare;

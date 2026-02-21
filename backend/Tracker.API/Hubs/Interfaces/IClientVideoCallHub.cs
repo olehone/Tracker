@@ -1,9 +1,10 @@
-﻿using Tracker.API.Hubs.Events;
-
 namespace Tracker.API.Hubs.Interfaces;
 
 public interface IClientVideoCallHub
 {
-    Task DataSent(string data);
-    Task SendVideoOffer(VideoOfferEvent evt);
+    Task UserListUpdated(string[] userIds);
+    Task ReceiveVideoOffer(string fromUserId, string sdp);
+    Task ReceiveVideoAnswer(string fromUserId, string sdp);
+    Task ReceiveIceCandidate(string fromUserId, string candidateJson);
+    Task ReceiveHangUp(string fromUserId);
 }

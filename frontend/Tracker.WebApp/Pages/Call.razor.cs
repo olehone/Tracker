@@ -1,4 +1,3 @@
-using System.Runtime.Intrinsics.Arm;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Tracker.Services.Abstraction.Realtime;
@@ -10,14 +9,15 @@ namespace Tracker.WebApp.Pages;
 public partial class Call : IAsyncDisposable
 {
     private bool _connected = false;
-    private Guid _callId = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b"); // hardcoded until board wires it
+    private Guid _callId = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
     private DotNetObjectReference<Call>? _objRef;
-
-    public bool IsUnauthenticated => AppState.IsUnauthenticated;
+    private List<string> _remoteUsers = new();
 
     [Inject] IJSRuntime JS { get; set; } = null!;
     [Inject] ICallRealtimeService CallService { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
+
+    public bool IsUnauthenticated => AppState.IsUnauthenticated;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -48,35 +48,69 @@ public partial class Call : IAsyncDisposable
 
     private async Task ConnectRealtimeAsync()
     {
-        CallService.OnDataReceived += HandleReceivedData;
+        CallService.OnUserListUpdated += HandleUserListUpdated;
+        CallService.OnVideoOffer += HandleVideoOffer;
+        CallService.OnVideoAnswer += HandleVideoAnswer;
+        CallService.OnIceCandidate += HandleIceCandidate;
+        CallService.OnHangUp += HandleHangUp;
+
         await CallService.ConnectAsync(_callId);
     }
 
-    private void HandleReceivedData(string data)
+    private async void HandleUserListUpdated(UserListUpdatedEvent evt)
     {
-        JS.InvokeVoidAsync("handleReceiveData", data, AppState.MyId);
+        var myId = AppState.MyId.ToString();
+        var iAmNewest = evt.UserIds.LastOrDefault() == myId;
+        if (iAmNewest)
+        {
+            foreach (var userId in evt.UserIds.Where(id => id != myId))
+            {
+                await JS.InvokeVoidAsync("initiateCall", userId);
+            }
+        }
     }
+
+    private void HandleVideoOffer(VideoOfferEvent evt)
+    {
+        JS.InvokeVoidAsync("receiveVideoOffer", evt.FromUserId, evt.Sdp);
+    }
+
+    private void HandleVideoAnswer(VideoAnswerEvent evt)
+    {
+        JS.InvokeVoidAsync("receiveVideoAnswer", evt.FromUserId, evt.Sdp);
+    }
+
+    private void HandleIceCandidate(IceCandidateEvent evt)
+    {
+        JS.InvokeVoidAsync("receiveIceCandidate", evt.FromUserId, evt.CandidateJson);
+    }
+
+    private void HandleHangUp(HangUpEvent evt)
+    {
+        JS.InvokeVoidAsync("receiveHangUp", evt.FromUserId);
+        _remoteUsers.Remove(evt.FromUserId);
+        InvokeAsync(StateHasChanged);
+    }
+
+    // JS → Service
 
     [JSInvokable]
-    public Task SendToServer(string data)
-    {
-        return CallService.SendData(data);
-    }
+    public Task SendVideoOffer(string targetUserId, string sdp)
+        => CallService.SendVideoOffer(_callId, targetUserId, sdp);
 
-    private async Task HangUpCall()
-    {
-        await JS.InvokeVoidAsync("hangUpCall");
-    }
+    [JSInvokable]
+    public Task SendVideoAnswer(string targetUserId, string sdp)
+        => CallService.SendVideoAnswer(_callId, targetUserId, sdp);
 
-    public async ValueTask DisposeAsync()
-    {
-        AppState.OnUserChange -= OnAppStateChanged;
-        CallService.OnDataReceived -= HandleReceivedData;
-        _objRef?.Dispose();
-        await CallService.DisconnectAsync();
-    }
+    [JSInvokable]
+    public Task SendIceCandidate(string targetUserId, string candidateJson)
+        => CallService.SendIceCandidate(_callId, targetUserId, candidateJson);
 
-    private List<string> _remoteUsers = new();
+    [JSInvokable]
+    public Task SendHangUp(string targetUserId)
+        => CallService.SendHangUp(_callId, targetUserId);
+
+    // JS → Blazor UI state
 
     [JSInvokable]
     public async Task OnRemoteTrack(string userId)
@@ -93,5 +127,25 @@ public partial class Call : IAsyncDisposable
     {
         _remoteUsers.Remove(userId);
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HangUpCall()
+    {
+        await JS.InvokeVoidAsync("hangUpAll");
+    }
+
+
+
+    public async ValueTask DisposeAsync()
+    {
+        AppState.OnUserChange -= OnAppStateChanged;
+        CallService.OnUserListUpdated -= HandleUserListUpdated;
+        CallService.OnVideoOffer -= HandleVideoOffer;
+        CallService.OnVideoAnswer -= HandleVideoAnswer;
+        CallService.OnIceCandidate -= HandleIceCandidate;
+        CallService.OnHangUp -= HandleHangUp;
+        await JS.InvokeVoidAsync("hangUpAll");
+        _objRef?.Dispose();
+        await CallService.DisconnectAsync();
     }
 }
