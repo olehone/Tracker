@@ -1,24 +1,51 @@
-﻿@page "/"
+@page "/"
 
 <div class="container">
     <div class="camerabox">
-        <video id="local_video" autoplay muted></video>
+        <video id="local_video" autoplay muted style="width:160px;height:120px;object-fit:cover;"></video>
+
         @foreach (var userId in _remoteUsers)
         {
-            <div>
-                <video id="video-@userId" autoplay></video>
-                <p>@userId</p>
+            var state = _peerStates.GetValueOrDefault(userId);
+            <div class="remote-tile">
+                <video id="video-@userId" autoplay style="width:160px;height:120px;object-fit:cover;" class="@(state is { Video: false } ? "video--off" : "")"></video>
+                <div class="remote-tile__indicators">
+                    @if (state is { Audio: false })
+                    {
+                        <span class="indicator indicator--muted" title="Muted">🔇</span>
+                    }
+                </div>
             </div>
-
         }
-        <button id="hangup-button"
-                @onclick=@HangUpCall
-                role="button"
-                disabled>
-            Hang Up
+    </div>
+
+    @if (_remoteScreenUsers.Count > 0)
+    {
+        <div class="screenbox">
+            @foreach (var userId in _remoteScreenUsers)
+            {
+                <div class="screen-tile">
+                    <video id="screen-@userId" autoplay style="width:160px;height:120px;object-fit:cover;"></video>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="controls">
+        <button class="control-btn @(_isMuted ? "control-btn--active" : "")" @onclick="ToggleMute" title="@(_isMuted ? "Unmute" : "Mute")">
+            @(_isMuted ? "🔇" : "🎤")
+        </button>
+
+        <button class="control-btn @(!_isVideoEnabled ? "control-btn--active" : "")" @onclick="ToggleVideo" title="@(_isVideoEnabled ? "Turn off camera" : "Turn on camera")">
+            @(_isVideoEnabled ? "📷" : "🚫")
+        </button>
+
+        <button class="control-btn @(_isSharingScreen ? "control-btn--active" : "")" @onclick="ToggleScreenShare" title="@(_isSharingScreen ? "Stop sharing" : "Share screen")">
+            🖥
+        </button>
+
+        <button class="control-btn control-btn--hangup" @onclick="HangUpCall" title="Leave call">
+            📵
         </button>
     </div>
-    <div class="empty-container"></div>
 </div>
-
-

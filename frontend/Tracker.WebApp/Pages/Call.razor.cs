@@ -6,12 +6,20 @@ using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
 
+public record PeerState(bool Audio, bool Video, bool Screen);
+
 public partial class Call : IAsyncDisposable
 {
     private bool _connecting = false;
     private Guid _callId = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
     private DotNetObjectReference<Call>? _objRef;
     private List<string> _remoteUsers = new();
+    private HashSet<string> _remoteScreenUsers = new();
+    private Dictionary<string, PeerState> _peerStates = new();
+
+    private bool _isMuted = false;
+    private bool _isVideoEnabled = true;
+    private bool _isSharingScreen = false;
 
     [Inject] IJSRuntime JS { get; set; } = null!;
     [Inject] ICallRealtimeService CallService { get; set; } = null!;
@@ -30,6 +38,11 @@ public partial class Call : IAsyncDisposable
         foreach (var userId in _remoteUsers)
         {
             await JS.InvokeVoidAsync("attachRemoteStream", userId);
+        }
+
+        foreach (var userId in _remoteScreenUsers)
+        {
+            await JS.InvokeVoidAsync("attachRemoteScreenStream", userId);
         }
     }
 
@@ -102,6 +115,8 @@ public partial class Call : IAsyncDisposable
     {
         JS.InvokeVoidAsync("receiveHangUp", evt.FromUserId);
         _remoteUsers.Remove(evt.FromUserId);
+        _remoteScreenUsers.Remove(evt.FromUserId);
+        _peerStates.Remove(evt.FromUserId);
         InvokeAsync(StateHasChanged);
     }
 
@@ -133,10 +148,66 @@ public partial class Call : IAsyncDisposable
     }
 
     [JSInvokable]
+    public async Task OnRemoteScreenTrack(string userId)
+    {
+        _remoteScreenUsers.Add(userId);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
     public async Task OnPeerDisconnected(string userId)
     {
         _remoteUsers.Remove(userId);
+        _remoteScreenUsers.Remove(userId);
+        _peerStates.Remove(userId);
         await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task OnPeerStateChanged(string userId, bool audio, bool video, bool screen)
+    {
+        _peerStates[userId] = new PeerState(audio, video, screen);
+        if (!screen)
+        {
+            _remoteScreenUsers.Remove(userId);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task OnLocalScreenStopped()
+    {
+        _isSharingScreen = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ToggleMute()
+    {
+        _isMuted = !_isMuted;
+        await JS.InvokeVoidAsync("setMuted", _isMuted);
+    }
+
+    private async Task ToggleVideo()
+    {
+        _isVideoEnabled = !_isVideoEnabled;
+        await JS.InvokeVoidAsync("setVideoEnabled", _isVideoEnabled);
+    }
+
+    private async Task ToggleScreenShare()
+    {
+        if (_isSharingScreen)
+        {
+            await JS.InvokeVoidAsync("stopScreenShare");
+            _isSharingScreen = false;
+        }
+        else
+        {
+            var started = await JS.InvokeAsync<bool>("startScreenShare");
+            if (started)
+            {
+                _isSharingScreen = true;
+            }
+        }
     }
 
     private async Task HangUpCall()

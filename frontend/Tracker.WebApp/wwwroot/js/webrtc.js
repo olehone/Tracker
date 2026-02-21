@@ -16,11 +16,19 @@ const mediaConstraints = {
 };
 
 const peerConnections = new Map();
+const dataChannels = new Map();
 const makingOffer = new Map();
 const pendingCandidates = new Map();
 const remoteStreams = new Map();
+const remoteScreenStreams = new Map();
 const closingConnections = new Set();
+
 let webcamStream = null;
+let screenStream = null;
+let screenStreamId = null;
+let isMuted = false;
+let isVideoEnabled = true;
+let isSharingScreen = false;
 
 function log(text) {
     let time = new Date();
@@ -40,6 +48,67 @@ function isPolite(remoteUserId) {
     return myUserId > remoteUserId;
 }
 
+function buildStateMessage() {
+    return JSON.stringify({
+        type: "state",
+        audio: !isMuted,
+        video: isVideoEnabled,
+        screen: isSharingScreen,
+        screenStreamId: screenStreamId,
+    });
+}
+
+function broadcastLocalState() {
+    const msg = buildStateMessage();
+    dataChannels.forEach((dc, userId) => {
+        if (dc.readyState === "open") {
+            dc.send(msg);
+            log("Sent state to " + userId + ": audio=" + !isMuted + " video=" + isVideoEnabled + " screen=" + isSharingScreen);
+        }
+    });
+}
+
+function sendLocalStateTo(userId) {
+    const dc = dataChannels.get(userId);
+    if (dc && dc.readyState === "open") {
+        dc.send(buildStateMessage());
+        log("Sent initial state to " + userId);
+    }
+}
+
+function setupDataChannel(userId, dc) {
+    dataChannels.set(userId, dc);
+
+    dc.onopen = () => {
+        log("Data channel open with " + userId);
+        sendLocalStateTo(userId);
+    };
+
+    dc.onclose = () => {
+        log("Data channel closed with " + userId);
+    };
+
+    dc.onerror = err => {
+        log_error("Data channel error with " + userId + ": " + err);
+    };
+
+    dc.onmessage = e => {
+        try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === "state") {
+                log("Received state from " + userId + ": audio=" + msg.audio + " video=" + msg.video + " screen=" + msg.screen);
+                dataChannelScreenIds.set(userId, msg.screenStreamId || null);
+                dotNetInstance.invokeMethodAsync("OnPeerStateChanged", userId, msg.audio, msg.video, msg.screen)
+                    .catch(err => log_error("OnPeerStateChanged failed: " + err));
+            }
+        } catch (err) {
+            log_error("Failed to parse data channel message from " + userId + ": " + err);
+        }
+    };
+}
+
+const dataChannelScreenIds = new Map();
+
 async function initiateCall(userId, selfId) {
     if (peerConnections.has(userId)) {
         log("Already have connection with " + userId + ", skipping initiation");
@@ -56,6 +125,11 @@ async function initiateCall(userId, selfId) {
     log("Initiating call with " + userId + " (polite=" + isPolite(userId) + ")");
     const stream = await getLocalStream();
     const pc = createPeerConnection(userId);
+
+    const dc = pc.createDataChannel("state", { ordered: true });
+    setupDataChannel(userId, dc);
+    log("Created data channel for " + userId);
+
     stream.getTracks().forEach(track => {
         log("Adding local track " + track.kind + " to connection with " + userId);
         pc.addTrack(track, stream);
@@ -74,6 +148,11 @@ function createPeerConnection(userId) {
     });
 
     peerConnections.set(userId, pc);
+
+    pc.ondatachannel = e => {
+        log("Received data channel from " + userId);
+        setupDataChannel(userId, e.channel);
+    };
 
     pc.onicecandidate = e => {
         if (e.candidate) {
@@ -99,6 +178,17 @@ function createPeerConnection(userId) {
 
     pc.onconnectionstatechange = () => {
         log("Connection state with " + userId + ": " + pc.connectionState);
+
+        if (pc.connectionState === "connected") {
+            if (isSharingScreen && screenStream) {
+                const screenTrack = screenStream.getVideoTracks()[0];
+                const alreadySending = pc.getSenders().some(s => s.track && s.track === screenTrack);
+                if (!alreadySending) {
+                    log("Deferred: adding screen track to newly connected peer " + userId);
+                    pc.addTrack(screenTrack, screenStream);
+                }
+            }
+        }
 
         if (pc.connectionState === "failed") {
             log("Connection failed with " + userId);
@@ -127,12 +217,23 @@ function createPeerConnection(userId) {
     pc.ontrack = e => {
         log("Track event from " + userId + " (kind=" + e.track.kind + ", streams=" + e.streams.length + ")");
 
-        if (e.streams && e.streams[0]) {
-            remoteStreams.set(userId, e.streams[0]);
+        if (!e.streams || !e.streams[0]) {
+            log_error("Track event from " + userId + " had no streams");
+            return;
+        }
+
+        const stream = e.streams[0];
+        const knownScreenId = dataChannelScreenIds.get(userId);
+
+        if (e.track.kind === "video" && knownScreenId && stream.id === knownScreenId) {
+            log("Identified screen stream from " + userId + " (stream id=" + stream.id + ")");
+            remoteScreenStreams.set(userId, stream);
+            dotNetInstance.invokeMethodAsync("OnRemoteScreenTrack", userId)
+                .catch(err => log_error("OnRemoteScreenTrack failed: " + err));
+        } else if (e.track.kind !== "video" || stream.id !== (remoteScreenStreams.get(userId) || {}).id) {
+            remoteStreams.set(userId, stream);
             dotNetInstance.invokeMethodAsync("OnRemoteTrack", userId)
                 .catch(err => log_error("OnRemoteTrack failed: " + err));
-        } else {
-            log_error("Track event from " + userId + " had no streams");
         }
     };
 
@@ -178,6 +279,7 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
             log("Adding local track " + track.kind + " to incoming connection with " + fromUserId);
             pc.addTrack(track, stream);
         });
+
     }
 
     const offerCollision = makingOffer.get(fromUserId) || pc.signalingState !== "stable";
@@ -275,7 +377,20 @@ function closePeerConnection(userId) {
 
     log("Closing RTCPeerConnection with " + userId);
 
+    const dc = dataChannels.get(userId);
+    if (dc) {
+        dc.onopen = null;
+        dc.onclose = null;
+        dc.onerror = null;
+        dc.onmessage = null;
+        if (dc.readyState === "open") {
+            dc.close();
+        }
+        dataChannels.delete(userId);
+    }
+
     pc.ontrack = null;
+    pc.ondatachannel = null;
     pc.onicecandidate = null;
     pc.onicegatheringstatechange = null;
     pc.oniceconnectionstatechange = null;
@@ -296,6 +411,8 @@ function closePeerConnection(userId) {
     makingOffer.delete(userId);
     pendingCandidates.delete(userId);
     remoteStreams.delete(userId);
+    remoteScreenStreams.delete(userId);
+    dataChannelScreenIds.delete(userId);
 
     log("Closed connection with " + userId);
 }
@@ -318,6 +435,12 @@ async function hangUpAll() {
         closePeerConnection(userId);
     });
 
+    if (screenStream) {
+        screenStream.getTracks().forEach(t => t.stop());
+        screenStream = null;
+        screenStreamId = null;
+    }
+
     const localVideo = document.getElementById("local_video");
     if (localVideo && localVideo.srcObject) {
         localVideo.pause();
@@ -330,6 +453,9 @@ async function hangUpAll() {
 
     webcamStream = null;
     myUserId = null;
+    isMuted = false;
+    isVideoEnabled = true;
+    isSharingScreen = false;
     closingConnections.clear();
 
     log("All connections closed");
@@ -340,10 +466,12 @@ async function setMuted(muted) {
         return;
     }
 
+    isMuted = muted;
     webcamStream.getAudioTracks().forEach(t => {
         t.enabled = !muted;
-        log("Audio track " + (muted ? "muted" : "unmuted"));
     });
+    log("Audio " + (muted ? "muted" : "unmuted"));
+    broadcastLocalState();
 }
 
 async function setVideoEnabled(enabled) {
@@ -351,68 +479,106 @@ async function setVideoEnabled(enabled) {
         return;
     }
 
+    isVideoEnabled = enabled;
     webcamStream.getVideoTracks().forEach(t => {
         t.enabled = enabled;
-        log("Video track " + (enabled ? "enabled" : "disabled"));
     });
+    log("Video " + (enabled ? "enabled" : "disabled"));
+    broadcastLocalState();
 }
 
 async function startScreenShare() {
+    if (isSharingScreen) {
+        log("Already sharing screen");
+        return false;
+    }
+
     log("Starting screen share");
-    const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+    try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    } catch (err) {
+        log("Screen share cancelled or failed: " + err.message);
+        return false;
+    }
+
+    screenStreamId = screenStream.id;
+    log("Screen stream id: " + screenStreamId);
+
     const screenTrack = screenStream.getVideoTracks()[0];
 
     peerConnections.forEach((pc, userId) => {
-        const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
-        if (sender) {
-            log("Replacing video track with screen for " + userId);
-            sender.replaceTrack(screenTrack);
-        }
+        log("Adding screen track to connection with " + userId);
+        pc.addTrack(screenTrack, screenStream);
     });
 
+    isSharingScreen = true;
+    broadcastLocalState();
+
     screenTrack.onended = () => {
-        log("Screen share ended");
+        log("Screen share ended by browser");
         stopScreenShare();
     };
+
+    return true;
 }
 
 async function stopScreenShare() {
-    log("Stopping screen share, reverting to camera");
-    const camTrack = webcamStream && webcamStream.getVideoTracks()[0];
-
-    if (!camTrack) {
-        log_error("No camera track to revert to");
+    if (!isSharingScreen) {
         return;
     }
 
+    log("Stopping screen share");
+
+    const screenTrack = screenStream && screenStream.getVideoTracks()[0];
+
     peerConnections.forEach((pc, userId) => {
-        const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+        const sender = pc.getSenders().find(s => s.track && s.track === screenTrack);
         if (sender) {
-            log("Reverting video track to camera for " + userId);
-            sender.replaceTrack(camTrack);
+            log("Nulling screen sender track for " + userId + " (keeping transceiver)");
+            sender.replaceTrack(null).catch(err => log_error("replaceTrack null failed for " + userId + ": " + err));
         }
     });
+
+    if (screenStream) {
+        screenStream.getTracks().forEach(t => t.stop());
+        screenStream = null;
+        screenStreamId = null;
+    }
+
+    isSharingScreen = false;
+    broadcastLocalState();
+
+    dotNetInstance.invokeMethodAsync("OnLocalScreenStopped")
+        .catch(err => log_error("OnLocalScreenStopped failed: " + err));
 }
 
 function attachRemoteStream(userId) {
     const stream = remoteStreams.get(userId);
     const video = document.getElementById("video-" + userId);
 
-    if (!video) {
-        log_error("Video element not found for " + userId);
-        return;
+    if (video && stream) {
+        log("Attaching remote cam stream for " + userId);
+        video.srcObject = stream;
+    } else if (!video) {
+        log_error("Cam video element not found for " + userId);
     }
+}
 
-    if (!stream) {
-        log_error("No remote stream available for " + userId);
-        return;
+function attachRemoteScreenStream(userId) {
+    const stream = remoteScreenStreams.get(userId);
+    const video = document.getElementById("screen-" + userId);
+
+    if (video && stream) {
+        log("Attaching remote screen stream for " + userId);
+        video.srcObject = stream;
+    } else if (!video) {
+        log_error("Screen video element not found for " + userId);
     }
-
-    log("Attaching remote stream for " + userId);
-    video.srcObject = stream;
 }
 
 window.attachRemoteStream = attachRemoteStream;
+window.attachRemoteScreenStream = attachRemoteScreenStream;
 window.registerDotNetInstance = registerDotNetInstance;
 window.initiateCall = initiateCall;
 window.receiveVideoOffer = receiveVideoOffer;
