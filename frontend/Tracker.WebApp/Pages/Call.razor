@@ -1,14 +1,92 @@
 @page "/"
+@using Tracker.WebApp.Components.Call
 
-<div class="container">
-    <div class="camerabox">
-        <video id="local_video" autoplay muted style="width:160px;height:120px;object-fit:cover;"></video>
+@if (CallState.IsPreviewing)
+{
+    <div class="lobby">
+        <div class="lobby__preview">
+            <video id="local_video" autoplay muted class="lobby__camera"></video>
 
-        @foreach (var userId in _remoteUsers)
+            <button class="lobby__settings-toggle"
+                    @onclick="() => _showDeviceSettings = !_showDeviceSettings">
+                ⚙️
+            </button>
+
+            @if (_showDeviceSettings)
+            {
+                <div class="device-panel">
+                    <DeviceSelector />
+                </div>
+            }
+        </div>
+
+        <div class="lobby__info">
+            <h2 class="lobby__title">Ready to join?</h2>
+
+            @if (CallState.Metadata is { ParticipantCount: > 0 } meta)
+            {
+                <div class="lobby__meta">
+                    <span>
+                        👥 @meta.ParticipantCount
+                        @(meta.ParticipantCount == 1 ? "person" : "people") in the call
+                    </span>
+                    @if (meta.StartedAt.HasValue)
+                    {
+                        var elapsed = DateTimeOffset.UtcNow - meta.StartedAt.Value;
+                        var elapsedStr = elapsed.TotalHours >= 1
+                            ? $"{(int)elapsed.TotalHours}h {elapsed.Minutes}m"
+                            : $"{(int)elapsed.TotalMinutes}m";
+                        <span>🕐 Started @elapsedStr ago</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="lobby__empty">No one is in the call yet.</p>
+            }
+
+            <button class="lobby__join-btn" @onclick="() => CallState.JoinAsync()">
+                Join call
+            </button>
+        </div>
+    </div>
+}
+else if (CallState.IsInCall)
+{
+    <div class="container">
+        <!-- Local camera tile -->
+        <div class="local-tile">
+            <video id="local_video" autoplay muted
+                   style="width:160px;height:120px;object-fit:cover;">
+            </video>
+            <span class="local-tile__label">You</span>
+        </div>
+
+        <!-- Local screen preview (own share) -->
+        @if (CallState.IsSharingLocalScreen)
         {
-            var state = _peerStates.GetValueOrDefault(userId);
-            <div class="remote-tile">
-                <video id="video-@userId" autoplay style="width:160px;height:120px;object-fit:cover;" class="@(state is { Video: false } ? "video--off" : "")"></video>
+            <div class="screen-tile screen-tile--local">
+                <video id="local_screen" autoplay muted
+                       style="width:160px;height:120px;object-fit:cover;">
+                </video>
+                <span class="screen-tile__label">Your screen</span>
+            </div>
+        }
+
+        <!-- Remote camera tiles — sorted by userId for stable order -->
+        @foreach (var userId in CallState.RemoteUsers)
+        {
+            var state = CallState.PeerStates.GetValueOrDefault(userId);
+            var isExpanded = CallState.ExpandedUserId == userId;
+
+            <div class="remote-tile @(isExpanded ? "remote-tile--expanded" : "")"
+                 @key="userId"
+                 @onclick="() => CallState.SetExpandedUser(isExpanded ? null : userId)">
+                <video id="video-@userId"
+                       autoplay
+                       style="width:@(isExpanded ? "100%" : "160px");height:@(isExpanded ? "100%" : "120px");object-fit:cover;"
+                       class="@(state is { Video: false } ? "video--off" : "")">
+                </video>
                 <div class="remote-tile__indicators">
                     @if (state is { Audio: false })
                     {
@@ -17,35 +95,56 @@
                 </div>
             </div>
         }
-    </div>
 
-    @if (_remoteScreenUsers.Count > 0)
-    {
-        <div class="screenbox">
-            @foreach (var userId in _remoteScreenUsers)
-            {
-                <div class="screen-tile">
-                    <video id="screen-@userId" autoplay style="width:160px;height:120px;object-fit:cover;"></video>
-                </div>
-            }
+        <!-- Remote screen shares -->
+        @foreach (var userId in CallState.RemoteScreenUsers)
+        {
+            <div class="screen-tile" @key="@($"screen-{userId}")">
+                <video id="screen-@userId" autoplay
+                       style="width:160px;height:120px;object-fit:cover;">
+                </video>
+            </div>
+        }
+
+        <!-- Device settings -->
+        @if (_showDeviceSettings)
+        {
+            <div class="device-panel device-panel--incall">
+                <DeviceSelector />
+            </div>
+        }
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn @(CallState.IsMuted ? "control-btn--active" : "")"
+                    @onclick="() => CallState.ToggleMuteAsync()"
+                    title="@(CallState.IsMuted ? "Unmute" : "Mute")">
+                @(CallState.IsMuted ? "🔇" : "🎤")
+            </button>
+
+            <button class="control-btn @(!CallState.IsVideoEnabled ? "control-btn--active" : "")"
+                    @onclick="() => CallState.ToggleVideoAsync()"
+                    title="@(CallState.IsVideoEnabled ? "Turn off camera" : "Turn on camera")">
+                @(CallState.IsVideoEnabled ? "📷" : "🚫")
+            </button>
+
+            <button class="control-btn @(CallState.IsSharingScreen ? "control-btn--active" : "")"
+                    @onclick="() => CallState.ToggleScreenShareAsync()"
+                    title="@(CallState.IsSharingScreen ? "Stop sharing" : "Share screen")">
+                🖥
+            </button>
+
+            <button class="control-btn @(_showDeviceSettings ? "control-btn--active" : "")"
+                    @onclick="() => _showDeviceSettings = !_showDeviceSettings"
+                    title="Audio & video settings">
+                ⚙️
+            </button>
+
+            <button class="control-btn control-btn--hangup"
+                    @onclick="() => CallState.HangUpAsync()"
+                    title="Leave call">
+                📵
+            </button>
         </div>
-    }
-
-    <div class="controls">
-        <button class="control-btn @(_isMuted ? "control-btn--active" : "")" @onclick="ToggleMute" title="@(_isMuted ? "Unmute" : "Mute")">
-            @(_isMuted ? "🔇" : "🎤")
-        </button>
-
-        <button class="control-btn @(!_isVideoEnabled ? "control-btn--active" : "")" @onclick="ToggleVideo" title="@(_isVideoEnabled ? "Turn off camera" : "Turn on camera")">
-            @(_isVideoEnabled ? "📷" : "🚫")
-        </button>
-
-        <button class="control-btn @(_isSharingScreen ? "control-btn--active" : "")" @onclick="ToggleScreenShare" title="@(_isSharingScreen ? "Stop sharing" : "Share screen")">
-            🖥
-        </button>
-
-        <button class="control-btn control-btn--hangup" @onclick="HangUpCall" title="Leave call">
-            📵
-        </button>
     </div>
-</div>
+}

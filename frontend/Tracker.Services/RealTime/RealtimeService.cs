@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Realtime.Methods;
@@ -17,20 +17,12 @@ public abstract class RealtimeService(IApiUrlService apiUrl, IAuthService authSe
     protected Guid EntityId => _currentEntityId!.Value;
     public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
 
-    public async Task ConnectAsync(Guid entityId)
+    // Builds and starts the transport without invoking any hub method.
+    // Used when the first hub call should be something other than Join (e.g. Peek).
+    protected async Task StartConnectionAsync()
     {
-        Console.WriteLine($"Connect to entity {entityId}");
-        if (_hubConnection != null && _currentEntityId != entityId)
-        {
-            Console.WriteLine($"Disconnect from {entityId}");
-            await DisconnectAsync();
-        }
-
-        if (_hubConnection != null && _currentEntityId == entityId && IsConnected)
-        {
-            Console.WriteLine($"Same id {entityId}, connected");
+        if (IsConnected)
             return;
-        }
 
         _hubConnection = new HubConnectionBuilder()
             .WithUrl(_hubUrl, options =>
@@ -44,22 +36,41 @@ public abstract class RealtimeService(IApiUrlService apiUrl, IAuthService authSe
 
         _hubConnection.Reconnected += async connectionId =>
         {
-            Console.WriteLine($"Try to reconnect to {entityId} with {connectionId}");
+            Console.WriteLine($"Try to reconnect with {connectionId}");
             if (_currentEntityId.HasValue)
             {
-                Console.WriteLine($"Try reconection to {entityId} with {connectionId}");
                 await _hubConnection.InvokeAsync(RealtimeMethods.Join, _currentEntityId.Value);
             }
         };
 
-        _hubConnection.Closed += async (error) =>
+        _hubConnection.Closed += async error =>
         {
-            Console.WriteLine($"Closed connection with {entityId}, error {error}");
+            Console.WriteLine($"Closed connection, error {error}");
             await Task.CompletedTask;
         };
 
         await _hubConnection.StartAsync();
-        await _hubConnection.InvokeAsync(RealtimeMethods.Join, entityId);
+    }
+
+    public async Task ConnectAsync(Guid entityId)
+    {
+        Console.WriteLine($"Connect to entity {entityId}");
+
+        if (_hubConnection != null && _currentEntityId != entityId)
+        {
+            Console.WriteLine($"Disconnect from {_currentEntityId}");
+            await DisconnectAsync();
+        }
+
+        if (_hubConnection != null && _currentEntityId == entityId && IsConnected)
+        {
+            Console.WriteLine($"Same id {entityId}, connected");
+            return;
+        }
+
+        await StartConnectionAsync();
+
+        await _hubConnection!.InvokeAsync(RealtimeMethods.Join, entityId);
         _currentEntityId = entityId;
         Console.WriteLine($"Joined to {entityId}");
     }
@@ -68,7 +79,7 @@ public abstract class RealtimeService(IApiUrlService apiUrl, IAuthService authSe
     {
         if (_hubConnection == null)
         {
-            Console.WriteLine($"Tried to disconnect without connection");
+            Console.WriteLine("Tried to disconnect without connection");
             return;
         }
 

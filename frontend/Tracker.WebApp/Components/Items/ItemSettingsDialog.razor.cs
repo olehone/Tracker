@@ -11,7 +11,6 @@ using Tracker.Services.Abstraction.Realtime;
 using Tracker.WebApp.Components.ItemComments;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
-using Tracker.Services.Abstraction.Realtime.Events;
 
 namespace Tracker.WebApp.Components.Items;
 

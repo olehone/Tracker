@@ -1,10 +1,12 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using Tracker.WebApp.Components.Shared
 @using Tracker.WebApp.Components.Users
+@using Tracker.WebApp.States
 @inherits LayoutComponentBase
 
 <MudThemeProvider @bind-IsDarkMode=@_isDarkMode />
 <MudLayout Style="height: 100vh; display: flex; flex-direction: column;">
+
     <MudAppBar Elevation="1" Fixed Class="d-flex">
         <MudIconButton Icon=@Icons.Material.Filled.Menu
                        Color="Color.Inherit"
@@ -13,45 +15,71 @@
         <MudButton OnClick=@GoToHome
                    Color="Color.Inherit"
                    Style="background-color: inherit; box-shadow: none;">
-            <MudText Typo=Typo.h6 Color="Color.Inherit">
-                Tracker
-            </MudText>
+            <MudText Typo=Typo.h6 Color="Color.Inherit">Tracker</MudText>
         </MudButton>
 
         <MudSpacer />
 
-        <MudStack Row
-                  Spacing="2"
-                  AlignItems="AlignItems.Center">
+        @* ── Ongoing call strip ── *@
+        @if (CallState.IsInCall)
+        {
+            <MudStack Row Spacing="1" AlignItems="AlignItems.Center" Class="mr-4">
+                <MudIcon Icon=@Icons.Material.Filled.Circle Color="Color.Success" Size="Size.Small" />
+                <MudText Typo="Typo.body2">@CallDuration</MudText>
+
+                <MudIconButton Icon=@(CallState.IsMuted ? Icons.Material.Filled.MicOff : Icons.Material.Filled.Mic)
+                               Color="@(CallState.IsMuted ? Color.Error : Color.Inherit)"
+                               Size="Size.Small"
+                               Title=@(CallState.IsMuted ? "Unmute" : "Mute")
+                               OnClick=@CallState.ToggleMuteAsync />
+
+                <MudIconButton Icon=@(CallState.IsVideoEnabled ? Icons.Material.Filled.Videocam : Icons.Material.Filled.VideocamOff)
+                               Color="@(CallState.IsVideoEnabled ? Color.Inherit : Color.Error)"
+                               Size="Size.Small"
+                               Title=@(CallState.IsVideoEnabled ? "Turn off camera" : "Turn on camera")
+                               OnClick=@CallState.ToggleVideoAsync />
+
+                <MudIconButton Icon=@Icons.Material.Filled.CallEnd
+                               Color="Color.Error"
+                               Size="Size.Small"
+                               Title="Leave call"
+                               OnClick=@CallState.HangUpAsync />
+
+                <MudIconButton Icon=@Icons.Material.Filled.OpenInFull
+                               Color="Color.Inherit"
+                               Size="Size.Small"
+                               Title="Go to call"
+                               OnClick=@GoToCall />
+
+                @* Participant drawer toggle — hidden when already on call page *@
+                @if (!IsOnCallPage)
+                {
+                    <MudIconButton Icon=@Icons.Material.Filled.People
+                                   Color="@(_isParticipantDrawerOpen ? Color.Primary : Color.Inherit)"
+                                   Size="Size.Small"
+                                   Title="Participants"
+                                   OnClick=@ToggleParticipantDrawer />
+                }
+            </MudStack>
+        }
+
+        <MudStack Row Spacing="2" AlignItems="AlignItems.Center">
             <MudToggleIconButton @bind-Toggled=@_isDarkMode
                                  Icon=@Icons.Material.Outlined.WbSunny
                                  ToggledIcon=@Icons.Material.Outlined.DarkMode
                                  Color="Color.Inherit" />
             <AuthorizeView>
                 <NotAuthorized>
-                    <MudButton Variant="Variant.Text"
-                               Color="Color.Inherit"
-                               OnClick=@GoToLogin>
-                        Login
-                    </MudButton>
-
-                    <MudButton Variant="Variant.Text"
-                               Color="Color.Inherit"
-                               OnClick=@GoToRegister>
-                        Register
-                    </MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick=@GoToLogin>Login</MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick=@GoToRegister>Register</MudButton>
                 </NotAuthorized>
             </AuthorizeView>
 
-            @* Because user avatar is working based on UserDto from app state
-			it is important to check auth from app state, not from authorized view *@
             @if (AppState.IsAuthenticated)
             {
-                <UserAvatarWithLookup User=@AppState.CurrentUser
-                                      Size="Size.Medium">
+                <UserAvatarWithLookup User=@AppState.CurrentUser Size="Size.Medium">
                     <AdditionalActions>
-                        <MudButton OnClick=@Logout
-                                   IconColor="Color.Error">
+                        <MudButton OnClick=@Logout IconColor="Color.Error">
                             <MudIcon Icon=@Icons.Material.Filled.Logout />
                             Logout
                         </MudButton>
@@ -61,11 +89,80 @@
         </MudStack>
     </MudAppBar>
 
+    @* ── Left nav drawer ── *@
     <MudDrawer @bind-Open="_isDrawerOpen"
                ClipMode="DrawerClipMode.Always"
                Elevation="2">
         <NavMenu />
     </MudDrawer>
+
+    @* ── Right participant drawer (only when in call and not on call page) ── *@
+    @if (CallState.IsInCall && !IsOnCallPage)
+    {
+        <MudDrawer @bind-Open="_isParticipantDrawerOpen"
+                   Anchor="Anchor.End"
+                   ClipMode="DrawerClipMode.Always"
+                   Elevation="2"
+                   Width="220px">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.subtitle1">
+                    Participants (@CallState.RemoteUsers.Count + 1)
+                </MudText>
+            </MudDrawerHeader>
+
+            <MudList T="string" Dense>
+                @* Local tile first *@
+                <MudListItem>
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <video id="drawer_local_video"
+                               autoplay muted
+                               style="width:64px;height:48px;object-fit:cover;border-radius:4px;cursor:pointer;"
+                               @onclick=@GoToCall>
+                        </video>
+                        <MudText Typo="Typo.caption">You</MudText>
+                    </MudStack>
+                </MudListItem>
+
+                @* Remote participants — sorted, stable *@
+                @foreach (var userId in CallState.RemoteUsers)
+                {
+                    var state = CallState.PeerStates.GetValueOrDefault(userId);
+                    var shortId = userId[..8];
+
+                    <MudListItem @key="userId">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            @if (_expandedInDrawer.Contains(userId))
+                            {
+                                <video id="drawer_video-@userId"
+                                       autoplay
+                                       style="width:64px;height:48px;object-fit:cover;border-radius:4px;cursor:pointer;"
+                                       class="@(state is { Video: false } ? "video--off" : "")"
+                                       @onclick=@GoToCall>
+                                </video>
+                            }
+                            else
+                            {
+                                <MudIconButton Icon=@Icons.Material.Filled.PlayArrow
+                                               Size="Size.Small"
+                                               Title="Load video"
+                                               OnClick=@(() => ExpandInDrawer(userId)) />
+                            }
+
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.caption">@shortId…</MudText>
+                                @if (state is { Audio: false })
+                                {
+                                    <MudIcon Icon=@Icons.Material.Filled.MicOff
+                                             Size="Size.Small"
+                                             Color="Color.Error" />
+                                }
+                            </MudStack>
+                        </MudStack>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudDrawer>
+    }
 
     <MudMainContent>
         @Body

@@ -6,14 +6,25 @@ function registerDotNetInstance(instance) {
     log("DotNet instance registered");
 }
 
-const mediaConstraints = {
-    audio: true,
-    video: {
-        aspectRatio: {
-            ideal: 1.333333,
-        },
-    },
-};
+// -------------------------------------------------------------------------
+// Media constraints / selected devices
+// -------------------------------------------------------------------------
+
+let selectedAudioDeviceId = null;
+let selectedVideoDeviceId = null;
+
+function buildMediaConstraints() {
+    return {
+        audio: selectedAudioDeviceId ? { deviceId: { exact: selectedAudioDeviceId } } : true,
+        video: selectedVideoDeviceId
+            ? { deviceId: { exact: selectedVideoDeviceId }, aspectRatio: { ideal: 1.333333 } }
+            : { aspectRatio: { ideal: 1.333333 } },
+    };
+}
+
+// -------------------------------------------------------------------------
+// Peer state
+// -------------------------------------------------------------------------
 
 const peerConnections = new Map();
 const dataChannels = new Map();
@@ -22,6 +33,7 @@ const pendingCandidates = new Map();
 const remoteStreams = new Map();
 const remoteScreenStreams = new Map();
 const closingConnections = new Set();
+const dataChannelScreenIds = new Map();
 
 let webcamStream = null;
 let screenStream = null;
@@ -30,23 +42,33 @@ let isMuted = false;
 let isVideoEnabled = true;
 let isSharingScreen = false;
 
+// -------------------------------------------------------------------------
+// Logging
+// -------------------------------------------------------------------------
+
 function log(text) {
-    let time = new Date();
-    console.log("[" + time.toLocaleTimeString() + "] " + text);
+    console.log("[" + new Date().toLocaleTimeString() + "] " + text);
 }
 
 function log_error(text) {
-    let time = new Date();
-    console.trace("[" + time.toLocaleTimeString() + "] " + text);
+    console.trace("[" + new Date().toLocaleTimeString() + "] " + text);
 }
 
 function reportError(errMessage) {
     log_error("Error " + errMessage.name + ": " + errMessage.message);
 }
 
+// -------------------------------------------------------------------------
+// Polite peer logic
+// -------------------------------------------------------------------------
+
 function isPolite(remoteUserId) {
     return myUserId > remoteUserId;
 }
+
+// -------------------------------------------------------------------------
+// Data channel / state messages
+// -------------------------------------------------------------------------
 
 function buildStateMessage() {
     return JSON.stringify({
@@ -63,7 +85,7 @@ function broadcastLocalState() {
     dataChannels.forEach((dc, userId) => {
         if (dc.readyState === "open") {
             dc.send(msg);
-            log("Sent state to " + userId + ": audio=" + !isMuted + " video=" + isVideoEnabled + " screen=" + isSharingScreen);
+            log("Sent state to " + userId);
         }
     });
 }
@@ -84,13 +106,8 @@ function setupDataChannel(userId, dc) {
         sendLocalStateTo(userId);
     };
 
-    dc.onclose = () => {
-        log("Data channel closed with " + userId);
-    };
-
-    dc.onerror = err => {
-        log_error("Data channel error with " + userId + ": " + err);
-    };
+    dc.onclose = () => log("Data channel closed with " + userId);
+    dc.onerror = err => log_error("Data channel error with " + userId + ": " + err);
 
     dc.onmessage = e => {
         try {
@@ -107,28 +124,195 @@ function setupDataChannel(userId, dc) {
     };
 }
 
-const dataChannelScreenIds = new Map();
+// -------------------------------------------------------------------------
+// Local stream
+// -------------------------------------------------------------------------
+
+async function getLocalStream() {
+    if (webcamStream) {
+        log("Reusing existing local stream");
+        return webcamStream;
+    }
+
+    log("Requesting local media");
+    webcamStream = await navigator.mediaDevices.getUserMedia(buildMediaConstraints());
+    log("Local stream acquired (" + webcamStream.getTracks().length + " tracks)");
+    return webcamStream;
+}
+
+// Re-attach the local stream to #local_video — called from OnAfterRenderAsync
+// so it survives DOM replacement when switching preview <-> in-call UI.
+function attachLocalStream() {
+    const video = document.getElementById("local_video");
+    if (!video || !webcamStream) return;
+
+    if (video.srcObject !== webcamStream) {
+        log("Attaching local stream to #local_video");
+        video.srcObject = webcamStream;
+    }
+}
+
+// -------------------------------------------------------------------------
+// Device enumeration
+// -------------------------------------------------------------------------
+
+async function enumerateDevices() {
+    if (!webcamStream) {
+        try {
+            const probe = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            probe.getTracks().forEach(t => t.stop());
+        } catch (_) {
+            return { audioDevices: [], videoDevices: [] };
+        }
+    }
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+
+    const audioDevices = devices
+        .filter(d => d.kind === "audioinput")
+        .map(d => ({ deviceId: d.deviceId, label: d.label || "Microphone " + d.deviceId.slice(0, 4) }));
+
+    const videoDevices = devices
+        .filter(d => d.kind === "videoinput")
+        .map(d => ({ deviceId: d.deviceId, label: d.label || "Camera " + d.deviceId.slice(0, 4) }));
+
+    return { audioDevices, videoDevices };
+}
+
+// -------------------------------------------------------------------------
+// Preview (lobby)
+// -------------------------------------------------------------------------
+
+async function startLocalPreview() {
+    log("Starting local preview");
+    try {
+        await getLocalStream();
+        attachLocalStream();
+        log("Local preview started");
+    } catch (err) {
+        log_error("Failed to start local preview: " + err);
+    }
+}
+
+async function stopLocalPreview() {
+    log("Stopping local preview");
+    if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+    }
+    const localVideo = document.getElementById("local_video");
+    if (localVideo) localVideo.srcObject = null;
+    log("Local preview stopped");
+}
+
+// -------------------------------------------------------------------------
+// Device switching
+//
+// KEY FIX: stop the old track on webcamStream BEFORE calling getUserMedia
+// with the new deviceId. Some OSes (Windows + certain cameras) treat the
+// device as exclusively locked until every MediaStreamTrack using it is
+// stopped — opening it again while the old track is still live throws
+// "Device in use" / NotReadableError.
+// -------------------------------------------------------------------------
+
+async function switchAudioDevice(deviceId) {
+    selectedAudioDeviceId = deviceId;
+    log("Switching audio device to " + deviceId);
+
+    if (!webcamStream) return;
+
+    // 1. Stop and remove old audio tracks first to release the device
+    webcamStream.getAudioTracks().forEach(t => {
+        t.stop();
+        webcamStream.removeTrack(t);
+    });
+
+    // 2. Now acquire the new device — it's free
+    const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: { deviceId: { exact: deviceId } },
+        video: false,
+    });
+    const newAudioTrack = newStream.getAudioTracks()[0];
+
+    // 3. Swap into webcamStream and apply current mute state
+    webcamStream.addTrack(newAudioTrack);
+    newAudioTrack.enabled = !isMuted;
+
+    // 4. Replace in all active peer connections (no renegotiation needed)
+    for (const [userId, pc] of peerConnections) {
+        const sender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
+        if (sender) {
+            await sender.replaceTrack(newAudioTrack).catch(err =>
+                log_error("replaceTrack audio failed for " + userId + ": " + err));
+        }
+    }
+
+    log("Audio device switched");
+}
+
+async function switchVideoDevice(deviceId) {
+    selectedVideoDeviceId = deviceId;
+    log("Switching video device to " + deviceId);
+
+    if (!webcamStream) return;
+
+    // 1. Stop and remove old video tracks first to release the device
+    webcamStream.getVideoTracks().forEach(t => {
+        t.stop();
+        webcamStream.removeTrack(t);
+    });
+
+    // 2. Now acquire the new device
+    const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { deviceId: { exact: deviceId }, aspectRatio: { ideal: 1.333333 } },
+    });
+    const newVideoTrack = newStream.getVideoTracks()[0];
+
+    // 3. Swap into webcamStream and apply current video-enabled state
+    webcamStream.addTrack(newVideoTrack);
+    newVideoTrack.enabled = isVideoEnabled;
+
+    // 4. Replace in all active peer connections, skipping the screen sender
+    const screenTrack = screenStream && screenStream.getVideoTracks()[0];
+    for (const [userId, pc] of peerConnections) {
+        const sender = pc.getSenders().find(s =>
+            s.track && s.track.kind === "video" && s.track !== screenTrack);
+        if (sender) {
+            await sender.replaceTrack(newVideoTrack).catch(err =>
+                log_error("replaceTrack video failed for " + userId + ": " + err));
+        }
+    }
+
+    // 5. Re-attach to #local_video so the preview reflects the new camera
+    attachLocalStream();
+
+    log("Video device switched");
+}
+
+// -------------------------------------------------------------------------
+// In-call peer connection management
+// -------------------------------------------------------------------------
 
 async function initiateCall(userId, selfId) {
     if (peerConnections.has(userId)) {
-        log("Already have connection with " + userId + ", skipping initiation");
+        log("Already have connection with " + userId + ", skipping");
         return;
     }
-
     if (userId === selfId) {
         log("Skipping self: " + userId);
         return;
     }
 
     myUserId = selfId;
-
     log("Initiating call with " + userId + " (polite=" + isPolite(userId) + ")");
+
     const stream = await getLocalStream();
+    attachLocalStream();
     const pc = createPeerConnection(userId);
 
     const dc = pc.createDataChannel("state", { ordered: true });
     setupDataChannel(userId, dc);
-    log("Created data channel for " + userId);
 
     stream.getTracks().forEach(track => {
         log("Adding local track " + track.kind + " to connection with " + userId);
@@ -163,15 +347,12 @@ function createPeerConnection(userId) {
         }
     };
 
-    pc.onicegatheringstatechange = () => {
+    pc.onicegatheringstatechange = () =>
         log("ICE gathering state with " + userId + ": " + pc.iceGatheringState);
-    };
 
     pc.oniceconnectionstatechange = () => {
         log("ICE connection state with " + userId + ": " + pc.iceConnectionState);
-
         if (["closed", "failed", "disconnected"].includes(pc.iceConnectionState)) {
-            log("ICE connection lost with " + userId + " (" + pc.iceConnectionState + ")");
             handlePeerGone(userId);
         }
     };
@@ -179,29 +360,25 @@ function createPeerConnection(userId) {
     pc.onconnectionstatechange = () => {
         log("Connection state with " + userId + ": " + pc.connectionState);
 
-        if (pc.connectionState === "connected") {
-            if (isSharingScreen && screenStream) {
-                const screenTrack = screenStream.getVideoTracks()[0];
-                const alreadySending = pc.getSenders().some(s => s.track && s.track === screenTrack);
-                if (!alreadySending) {
-                    log("Deferred: adding screen track to newly connected peer " + userId);
-                    pc.addTrack(screenTrack, screenStream);
-                }
+        if (pc.connectionState === "connected" && isSharingScreen && screenStream) {
+            const screenTrack = screenStream.getVideoTracks()[0];
+            const alreadySending = pc.getSenders().some(s => s.track && s.track === screenTrack);
+            if (!alreadySending) {
+                log("Deferred: adding screen track to newly connected peer " + userId);
+                pc.addTrack(screenTrack, screenStream);
             }
         }
 
         if (pc.connectionState === "failed") {
-            log("Connection failed with " + userId);
             handlePeerGone(userId);
         }
     };
 
-    pc.onsignalingstatechange = () => {
+    pc.onsignalingstatechange = () =>
         log("Signaling state with " + userId + ": " + pc.signalingState);
-    };
 
     pc.onnegotiationneeded = async () => {
-        log("Negotiation needed with " + userId + " (polite=" + isPolite(userId) + ")");
+        log("Negotiation needed with " + userId);
         try {
             makingOffer.set(userId, true);
             await pc.setLocalDescription();
@@ -215,7 +392,7 @@ function createPeerConnection(userId) {
     };
 
     pc.ontrack = e => {
-        log("Track event from " + userId + " (kind=" + e.track.kind + ", streams=" + e.streams.length + ")");
+        log("Track event from " + userId + " (kind=" + e.track.kind + ")");
 
         if (!e.streams || !e.streams[0]) {
             log_error("Track event from " + userId + " had no streams");
@@ -226,7 +403,7 @@ function createPeerConnection(userId) {
         const knownScreenId = dataChannelScreenIds.get(userId);
 
         if (e.track.kind === "video" && knownScreenId && stream.id === knownScreenId) {
-            log("Identified screen stream from " + userId + " (stream id=" + stream.id + ")");
+            log("Identified screen stream from " + userId);
             remoteScreenStreams.set(userId, stream);
             dotNetInstance.invokeMethodAsync("OnRemoteScreenTrack", userId)
                 .catch(err => log_error("OnRemoteScreenTrack failed: " + err));
@@ -240,25 +417,10 @@ function createPeerConnection(userId) {
     return pc;
 }
 
-async function getLocalStream() {
-    if (webcamStream) {
-        log("Reusing existing local stream");
-        return webcamStream;
-    }
-
-    log("Requesting local media (audio + video)");
-    webcamStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    document.getElementById("local_video").srcObject = webcamStream;
-    log("Local stream acquired (" + webcamStream.getTracks().length + " tracks)");
-    return webcamStream;
-}
-
 async function flushPendingCandidates(userId) {
     const pc = peerConnections.get(userId);
     const queued = pendingCandidates.get(userId) || [];
-    if (queued.length === 0) {
-        return;
-    }
+    if (queued.length === 0) return;
 
     log("Flushing " + queued.length + " queued ICE candidates for " + userId);
     pendingCandidates.set(userId, []);
@@ -274,12 +436,12 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
     if (!pc) {
         log("No existing connection for " + fromUserId + ", creating one");
         const stream = await getLocalStream();
+        attachLocalStream();
         pc = createPeerConnection(fromUserId);
         stream.getTracks().forEach(track => {
             log("Adding local track " + track.kind + " to incoming connection with " + fromUserId);
             pc.addTrack(track, stream);
         });
-
     }
 
     const offerCollision = makingOffer.get(fromUserId) || pc.signalingState !== "stable";
@@ -293,8 +455,7 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
         log("Offer collision with " + fromUserId + ": polite peer rolling back");
     }
 
-    const desc = new RTCSessionDescription(JSON.parse(sdpJson));
-    await pc.setRemoteDescription(desc);
+    await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(sdpJson)));
     await flushPendingCandidates(fromUserId);
 
     if (pc.signalingState === "have-remote-offer") {
@@ -306,15 +467,11 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
 
 async function receiveVideoAnswer(fromUserId, sdpJson) {
     log("Received answer from " + fromUserId);
-
     const pc = peerConnections.get(fromUserId);
-    if (!pc) {
-        log_error("No peer connection for answer from " + fromUserId);
-        return;
-    }
+    if (!pc) { log_error("No peer connection for answer from " + fromUserId); return; }
 
     if (pc.signalingState !== "have-local-offer") {
-        log("Ignoring answer from " + fromUserId + " in state " + pc.signalingState + " (already settled)");
+        log("Ignoring answer from " + fromUserId + " in state " + pc.signalingState);
         return;
     }
 
@@ -326,17 +483,12 @@ async function receiveIceCandidate(fromUserId, candidateJson) {
     const pc = peerConnections.get(fromUserId);
     const candidate = new RTCIceCandidate(JSON.parse(candidateJson));
 
-    if (!pc) {
-        log("Dropping ICE candidate from " + fromUserId + " (no peer connection)");
-        return;
-    }
+    if (!pc) { log("Dropping ICE candidate from " + fromUserId + " (no peer connection)"); return; }
 
     if (!pc.remoteDescription || pc.remoteDescription.type === "") {
-        log("Queuing ICE candidate from " + fromUserId + " (no remote description yet)");
+        log("Queuing ICE candidate from " + fromUserId);
         const queue = pendingCandidates.get(fromUserId);
-        if (queue) {
-            queue.push(candidate);
-        }
+        if (queue) queue.push(candidate);
         return;
     }
 
@@ -358,10 +510,7 @@ function receiveHangUp(fromUserId) {
 }
 
 function handlePeerGone(userId) {
-    if (closingConnections.has(userId)) {
-        return;
-    }
-
+    if (closingConnections.has(userId)) return;
     closingConnections.add(userId);
     log("Peer gone: " + userId);
     closePeerConnection(userId);
@@ -371,42 +520,27 @@ function handlePeerGone(userId) {
 
 function closePeerConnection(userId) {
     const pc = peerConnections.get(userId);
-    if (!pc) {
-        return;
-    }
+    if (!pc) return;
 
     log("Closing RTCPeerConnection with " + userId);
 
     const dc = dataChannels.get(userId);
     if (dc) {
-        dc.onopen = null;
-        dc.onclose = null;
-        dc.onerror = null;
-        dc.onmessage = null;
-        if (dc.readyState === "open") {
-            dc.close();
-        }
+        dc.onopen = null; dc.onclose = null; dc.onerror = null; dc.onmessage = null;
+        if (dc.readyState === "open") dc.close();
         dataChannels.delete(userId);
     }
 
-    pc.ontrack = null;
-    pc.ondatachannel = null;
-    pc.onicecandidate = null;
-    pc.onicegatheringstatechange = null;
-    pc.oniceconnectionstatechange = null;
-    pc.onconnectionstatechange = null;
-    pc.onsignalingstatechange = null;
+    pc.ontrack = null; pc.ondatachannel = null; pc.onicecandidate = null;
+    pc.onicegatheringstatechange = null; pc.oniceconnectionstatechange = null;
+    pc.onconnectionstatechange = null; pc.onsignalingstatechange = null;
     pc.onnegotiationneeded = null;
 
     pc.getSenders().forEach(sender => {
-        if (sender.track) {
-            log("Detaching sender track " + sender.track.kind + " from connection with " + userId);
-            sender.replaceTrack(null).catch(() => {});
-        }
+        if (sender.track) sender.replaceTrack(null).catch(() => {});
     });
 
     pc.close();
-
     peerConnections.delete(userId);
     makingOffer.delete(userId);
     pendingCandidates.delete(userId);
@@ -417,12 +551,11 @@ function closePeerConnection(userId) {
     log("Closed connection with " + userId);
 }
 
-async function hangUpAll() {
-    log("Hanging up all connections (" + peerConnections.size + " peers)");
+async function hangUpAll({ keepLocalStream = false } = {}) {
+    log("Hanging up all (" + peerConnections.size + " peers), keepLocalStream=" + keepLocalStream);
 
     const hangUpPromises = [];
-    peerConnections.forEach((pc, userId) => {
-        log("Sending hang up to " + userId);
+    peerConnections.forEach((_, userId) => {
         hangUpPromises.push(
             dotNetInstance.invokeMethodAsync("SendHangUp", userId)
                 .catch(err => log_error("SendHangUp failed for " + userId + ": " + err))
@@ -430,10 +563,7 @@ async function hangUpAll() {
     });
 
     await Promise.allSettled(hangUpPromises);
-
-    Array.from(peerConnections.keys()).forEach(userId => {
-        closePeerConnection(userId);
-    });
+    Array.from(peerConnections.keys()).forEach(userId => closePeerConnection(userId));
 
     if (screenStream) {
         screenStream.getTracks().forEach(t => t.stop());
@@ -441,17 +571,15 @@ async function hangUpAll() {
         screenStreamId = null;
     }
 
-    const localVideo = document.getElementById("local_video");
-    if (localVideo && localVideo.srcObject) {
-        localVideo.pause();
-        localVideo.srcObject.getTracks().forEach(t => {
-            log("Stopping local track: " + t.kind);
-            t.stop();
-        });
-        localVideo.srcObject = null;
+    if (!keepLocalStream) {
+        if (webcamStream) {
+            webcamStream.getTracks().forEach(t => t.stop());
+            webcamStream = null;
+        }
+        const localVideo = document.getElementById("local_video");
+        if (localVideo) localVideo.srcObject = null;
     }
 
-    webcamStream = null;
     myUserId = null;
     isMuted = false;
     isVideoEnabled = true;
@@ -461,38 +589,28 @@ async function hangUpAll() {
     log("All connections closed");
 }
 
-async function setMuted(muted) {
-    if (!webcamStream) {
-        return;
-    }
+// -------------------------------------------------------------------------
+// Media controls
+// -------------------------------------------------------------------------
 
+async function setMuted(muted) {
+    if (!webcamStream) return;
     isMuted = muted;
-    webcamStream.getAudioTracks().forEach(t => {
-        t.enabled = !muted;
-    });
+    webcamStream.getAudioTracks().forEach(t => t.enabled = !muted);
     log("Audio " + (muted ? "muted" : "unmuted"));
     broadcastLocalState();
 }
 
 async function setVideoEnabled(enabled) {
-    if (!webcamStream) {
-        return;
-    }
-
+    if (!webcamStream) return;
     isVideoEnabled = enabled;
-    webcamStream.getVideoTracks().forEach(t => {
-        t.enabled = enabled;
-    });
+    webcamStream.getVideoTracks().forEach(t => t.enabled = enabled);
     log("Video " + (enabled ? "enabled" : "disabled"));
     broadcastLocalState();
 }
 
 async function startScreenShare() {
-    if (isSharingScreen) {
-        log("Already sharing screen");
-        return false;
-    }
-
+    if (isSharingScreen) return false;
     log("Starting screen share");
 
     try {
@@ -503,8 +621,6 @@ async function startScreenShare() {
     }
 
     screenStreamId = screenStream.id;
-    log("Screen stream id: " + screenStreamId);
-
     const screenTrack = screenStream.getVideoTracks()[0];
 
     peerConnections.forEach((pc, userId) => {
@@ -524,20 +640,15 @@ async function startScreenShare() {
 }
 
 async function stopScreenShare() {
-    if (!isSharingScreen) {
-        return;
-    }
-
+    if (!isSharingScreen) return;
     log("Stopping screen share");
 
     const screenTrack = screenStream && screenStream.getVideoTracks()[0];
 
     peerConnections.forEach((pc, userId) => {
         const sender = pc.getSenders().find(s => s.track && s.track === screenTrack);
-        if (sender) {
-            log("Nulling screen sender track for " + userId + " (keeping transceiver)");
-            sender.replaceTrack(null).catch(err => log_error("replaceTrack null failed for " + userId + ": " + err));
-        }
+        if (sender) sender.replaceTrack(null).catch(err =>
+            log_error("replaceTrack null failed for " + userId + ": " + err));
     });
 
     if (screenStream) {
@@ -553,13 +664,19 @@ async function stopScreenShare() {
         .catch(err => log_error("OnLocalScreenStopped failed: " + err));
 }
 
+// -------------------------------------------------------------------------
+// Attach helpers (called from Blazor OnAfterRenderAsync)
+// -------------------------------------------------------------------------
+
 function attachRemoteStream(userId) {
     const stream = remoteStreams.get(userId);
     const video = document.getElementById("video-" + userId);
 
     if (video && stream) {
-        log("Attaching remote cam stream for " + userId);
-        video.srcObject = stream;
+        if (video.srcObject !== stream) {
+            log("Attaching remote cam stream for " + userId);
+            video.srcObject = stream;
+        }
     } else if (!video) {
         log_error("Cam video element not found for " + userId);
     }
@@ -570,13 +687,53 @@ function attachRemoteScreenStream(userId) {
     const video = document.getElementById("screen-" + userId);
 
     if (video && stream) {
-        log("Attaching remote screen stream for " + userId);
-        video.srcObject = stream;
+        if (video.srcObject !== stream) {
+            log("Attaching remote screen stream for " + userId);
+            video.srcObject = stream;
+        }
     } else if (!video) {
         log_error("Screen video element not found for " + userId);
     }
 }
 
+// Attaches own screen share stream to the local screen preview element.
+function attachLocalScreenStream() {
+    const video = document.getElementById("local_screen");
+    if (!video || !screenStream) return;
+    if (video.srcObject !== screenStream) {
+        log("Attaching local screen stream to #local_screen");
+        video.srcObject = screenStream;
+    }
+}
+
+// Generic attach by element id — used by the participant drawer thumbnails.
+// userId = "local" uses webcamStream, otherwise looks up remoteStreams.
+function attachStreamToElement(elementId, userId) {
+    const video = document.getElementById(elementId);
+    if (!video) return;
+
+    const stream = userId === "local"
+        ? webcamStream
+        : remoteStreams.get(userId);
+
+    if (stream && video.srcObject !== stream) {
+        log("Attaching stream to #" + elementId + " (userId=" + userId + ")");
+        video.srcObject = stream;
+    }
+}
+
+// -------------------------------------------------------------------------
+// Exports
+// -------------------------------------------------------------------------
+
+window.startLocalPreview = startLocalPreview;
+window.stopLocalPreview = stopLocalPreview;
+window.attachLocalStream = attachLocalStream;
+window.attachLocalScreenStream = attachLocalScreenStream;
+window.attachStreamToElement = attachStreamToElement;
+window.enumerateDevices = enumerateDevices;
+window.switchAudioDevice = switchAudioDevice;
+window.switchVideoDevice = switchVideoDevice;
 window.attachRemoteStream = attachRemoteStream;
 window.attachRemoteScreenStream = attachRemoteScreenStream;
 window.registerDotNetInstance = registerDotNetInstance;
