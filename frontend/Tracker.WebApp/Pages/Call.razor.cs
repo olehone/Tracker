@@ -19,7 +19,13 @@ public partial class Call : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await CallState.AttachStreamsAsync();
+        // Only re-attach on first render. Subsequent re-renders are triggered by
+        // state changes (Notify) and attachment is handled explicitly at the call
+        // site (OnRemoteTrack, OnRemoteScreenTrack, ToggleScreenShareAsync etc.)
+        // Running AttachStreamsAsync on every render causes getLocalStream() to be
+        // called repeatedly, which contributes to spurious onnegotiationneeded events.
+        if (firstRender)
+            await CallState.AttachStreamsAsync();
     }
 
     private void OnCallStateChanged()

@@ -6,7 +6,6 @@ namespace Tracker.WebApp.States;
 
 public record PeerState(bool Audio, bool Video, bool Screen);
 public record CallMetadata(int ParticipantCount, DateTimeOffset? StartedAt);
-public record MediaDevice(string DeviceId, string Label);
 
 public class CallState(ICallRealtimeService service, AppState appState, IJSRuntime js) : IAsyncDisposable
 {
@@ -111,7 +110,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
     public async Task HangUpAsync()
     {
-        await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = true });
+        await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = false });
 
         UnsubscribeSignalR();
         await service.DisconnectAsync();
@@ -172,8 +171,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         Metadata = new CallMetadata(evt.ParticipantCount, evt.StartedAt);
     }
 
-    public string? MediaDeniedDevice { get; private set; }
-
     // -------------------------------------------------------------------------
     // JS-invokable callbacks
     // -------------------------------------------------------------------------
@@ -189,17 +186,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         screen = IsSharingScreen,
         screenStreamId = ScreenStreamId,
     };
-
-    /// <summary>
-    /// Called by JS when getUserMedia or getDisplayMedia is denied by the user or OS.
-    /// device: "webcam" | "screen"
-    /// </summary>
-    [JSInvokable]
-    public void OnMediaDeviceDenied(string device)
-    {
-        MediaDeniedDevice = device;
-        Notify();
-    }
 
     [JSInvokable]
     public async Task OnRemoteTrack(string userId)

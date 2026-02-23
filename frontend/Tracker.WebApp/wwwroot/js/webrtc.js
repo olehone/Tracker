@@ -257,6 +257,13 @@ function createPeerConnection(userId) {
     };
 
     pc.onnegotiationneeded = async () => {
+        // Guard: skip if we're already mid-negotiation. The browser fires this
+        // event on every signaling state transition, so without the check we
+        // get an infinite offer/answer loop.
+        if (pc.signalingState !== "stable" || makingOffer.get(userId)) {
+            log("Negotiation needed with " + userId + " — skipping (state=" + pc.signalingState + ")");
+            return;
+        }
         log("Negotiation needed with " + userId);
         try {
             makingOffer.set(userId, true);
@@ -515,6 +522,10 @@ async function setVideoEnabled(enabled) {
                 if (sender) { log("Replacing video for " + userId); return sender.replaceTrack(track); }
             })
         );
+
+        // Re-attach to local preview — srcObject was cleared on disable
+        const localVideo = document.getElementById("local_video");
+        if (localVideo) localVideo.srcObject = webcamStream;
         log("Camera re-acquired");
     }
 }
