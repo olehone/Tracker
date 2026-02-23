@@ -142,8 +142,18 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         foreach (var userId in others)
         {
             if (!RemoteUsers.Contains(userId))
+            {
+                var i = RemoteUsers.BinarySearch(userId, StringComparer.Ordinal);
+                RemoteUsers.Insert(i < 0 ? ~i : i, userId);
+
+                // Initialize a default PeerState so the UI doesn't skip them
+                PeerStates.TryAdd(userId, new PeerState(false, false, false));
+
                 await js.InvokeVoidAsync("initiateCall", userId, MyId);
+            }
         }
+
+        Notify();
     }
 
     private void HandleVideoOffer(VideoOfferEvent evt)
