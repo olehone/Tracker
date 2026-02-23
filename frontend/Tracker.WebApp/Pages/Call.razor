@@ -48,6 +48,10 @@
                             {
                                 <span class="indicator indicator--muted" title="Muted">🔇</span>
                             }
+                            @if (state is { Video: false })
+                            {
+                                <span class="indicator indicator--video-off" title="Camera off">📵</span>
+                            }
                         </div>
                     </div>
                 }

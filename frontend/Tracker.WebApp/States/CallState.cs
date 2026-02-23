@@ -1,4 +1,5 @@
 using Microsoft.JSInterop;
+using System.Text.Json;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Abstraction.Realtime.Events;
 
@@ -13,41 +14,43 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     private DotNetObjectReference<CallState>? _objRef;
 
     // -------------------------------------------------------------------------
+    // Element ID conventions — single place, never duplicated in JS
+    // -------------------------------------------------------------------------
+
+    public static string LocalVideoElementId => "local_video";
+    public static string LocalScreenElementId => "local_screen";
+    public static string RemoteCamElementId(string userId) => $"video-{userId}";
+    public static string RemoteScreenElementId(string userId) => $"screen-{userId}";
+
+    // -------------------------------------------------------------------------
     // Observable state
     // -------------------------------------------------------------------------
 
     public event Action? OnChange;
 
     public bool IsInCall { get; private set; } = false;
-
     public Guid CallId { get; private set; } = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
 
     public CallMetadata? Metadata { get; private set; }
-    public DateTimeOffset? CallStartedAt { get; private set; }
+    public DateTimeOffset? CallStartedAt => Metadata?.StartedAt;
 
-    public List<string> RemoteUsers { get; private set; } = new();
-    public HashSet<string> RemoteScreenUsers { get; private set; } = new();
-    public Dictionary<string, PeerState> PeerStates { get; private set; } = new();
+    public List<string> RemoteUsers { get; private set; } = [];
+    public HashSet<string> RemoteScreenUsers { get; private set; } = [];
+    public Dictionary<string, PeerState> PeerStates { get; private set; } = [];
 
     public bool IsMuted { get; private set; } = false;
     public bool IsVideoEnabled { get; private set; } = true;
     public bool IsSharingScreen { get; private set; } = false;
-
-    public List<MediaDevice> AudioDevices { get; private set; } = new();
-    public List<MediaDevice> VideoDevices { get; private set; } = new();
-    public string? SelectedAudioDeviceId { get; private set; }
-    public string? SelectedVideoDeviceId { get; private set; }
+    public string? ScreenStreamId { get; private set; } = null;
 
     public string? ExpandedUserId { get; private set; }
 
     private string MyId => appState.MyId.ToString();
-    private bool _connecting = false;
 
     // -------------------------------------------------------------------------
-    // Constructor
+    // Initialization
     // -------------------------------------------------------------------------
 
-    // Called once from the Call page. Safe to call multiple times.
     public async Task InitializeAsync()
     {
         if (_objRef != null)
@@ -57,53 +60,29 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     }
 
     // -------------------------------------------------------------------------
-    // Stream attachment — called from OnAfterRenderAsync so DOM is guaranteed ready
+    // Stream attachment — called from OnAfterRenderAsync (DOM guaranteed ready)
+    //
+    // C# decides which element IDs exist and what goes in each one.
+    // JS just does the srcObject assignment.
     // -------------------------------------------------------------------------
 
     public async Task AttachStreamsAsync()
     {
-        // Always re-attach local video — survives DOM replacement on state change
         await js.InvokeVoidAsync("getLocalStream");
-        await js.InvokeVoidAsync("attachLocalStream");
+        await js.InvokeVoidAsync("attachStream", LocalVideoElementId, "webcam", null);
 
-        if (IsInCall)
-        {
-            foreach (var userId in RemoteUsers)
-                await js.InvokeVoidAsync("attachRemoteStream", userId);
+        if (!IsInCall)
+            return;
 
-            foreach (var userId in RemoteScreenUsers)
-                await js.InvokeVoidAsync("attachRemoteScreenStream", userId);
+        foreach (var userId in RemoteUsers)
+            await js.InvokeVoidAsync("attachStream", RemoteCamElementId(userId), "remote-cam", userId);
 
-            if (IsSharingScreen)
-                await js.InvokeVoidAsync("attachLocalScreenStream");
-        }
+        foreach (var userId in RemoteScreenUsers)
+            await js.InvokeVoidAsync("attachStream", RemoteScreenElementId(userId), "remote-screen", userId);
+
+        if (IsSharingScreen)
+            await js.InvokeVoidAsync("attachStream", LocalScreenElementId, "screen", null);
     }
-
-    // -------------------------------------------------------------------------
-    // Peek (lobby)
-    // -------------------------------------------------------------------------
-
-    //public async Task StartPeekAsync(string myUserId)
-    //{
-    //    if (_connecting || IsInCall)
-    //        return;
-    //    _connecting = true;
-    //    IsPreviewing = true;
-    //    Service.OnCallMetadataUpdated += HandleCallMetadataUpdated;
-
-    //    await Service.PeekAsync(CallId);
-    //    await JS.InvokeVoidAsync("startLocalPreview");
-    //    await LoadDevicesAsync();
-
-    //    _connecting = false;
-    //    Notify();
-    //}
-
-    //private void HandleCallMetadataUpdated(CallMetadataEvent evt)
-    //{
-    //    Metadata = new CallMetadata(evt.ParticipantCount, evt.StartedAt);
-    //    Notify();
-    //}
 
     // -------------------------------------------------------------------------
     // Join
@@ -111,12 +90,10 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
     public async Task JoinAsync()
     {
-        if(appState.IsUnauthenticated || IsInCall)
-        {
+        if (appState.IsUnauthenticated || IsInCall)
             return;
-        }
+
         IsInCall = true;
-        CallStartedAt = DateTimeOffset.UtcNow;
         Notify();
 
         service.OnUserListUpdated += HandleUserListUpdated;
@@ -125,24 +102,18 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         service.OnIceCandidate += HandleIceCandidate;
         service.OnHangUp += HandleHangUp;
 
-        // ConnectAsync invokes Join on the hub — flips status peeking → active
         await service.ConnectAsync(CallId);
     }
 
     // -------------------------------------------------------------------------
-    // Hang up — tears down WebRTC but returns to preview lobby
+    // Hang up
     // -------------------------------------------------------------------------
 
     public async Task HangUpAsync()
     {
         await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = true });
 
-        service.OnUserListUpdated -= HandleUserListUpdated;
-        service.OnVideoOffer -= HandleVideoOffer;
-        service.OnVideoAnswer -= HandleVideoAnswer;
-        service.OnIceCandidate -= HandleIceCandidate;
-        service.OnHangUp -= HandleHangUp;
-
+        UnsubscribeSignalR();
         await service.DisconnectAsync();
 
         RemoteUsers.Clear();
@@ -151,15 +122,9 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         IsMuted = false;
         IsVideoEnabled = true;
         IsSharingScreen = false;
+        ScreenStreamId = null;
         IsInCall = false;
         ExpandedUserId = null;
-        CallStartedAt = null;
-
-        //// Re-enter peek on same connection
-        //IsPreviewing = true;
-        //_connecting = false;
-        //Service.OnCallMetadataUpdated += HandleCallMetadataUpdated;
-        //await Service.PeekAsync(CallId);
 
         Notify();
     }
@@ -206,6 +171,13 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     // JS-invokable callbacks
     // -------------------------------------------------------------------------
 
+    /// <summary>
+    /// Called by the data channel setup in JS immediately on open — JS needs
+    /// the current state JSON to send to the newly connected peer.
+    /// </summary>
+    [JSInvokable]
+    public string GetLocalStateMessage() => BuildStateJson();
+
     [JSInvokable]
     public void OnRemoteTrack(string userId)
     {
@@ -248,7 +220,13 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public void OnLocalScreenStopped()
     {
         IsSharingScreen = false;
+        ScreenStreamId = null;
         Notify();
+        // No need to call broadcastState from here — stopScreenShare in JS
+        // already called us; we'll broadcast after the state flip below via
+        // ToggleScreenShareAsync. If the browser ended the share natively
+        // (user clicked Stop), we broadcast manually.
+        _ = BroadcastStateAsync();
     }
 
     [JSInvokable]
@@ -275,6 +253,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     {
         IsMuted = !IsMuted;
         await js.InvokeVoidAsync("setMuted", IsMuted);
+        await BroadcastStateAsync();
         Notify();
     }
 
@@ -282,6 +261,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     {
         IsVideoEnabled = !IsVideoEnabled;
         await js.InvokeVoidAsync("setVideoEnabled", IsVideoEnabled);
+        await BroadcastStateAsync();
         Notify();
     }
 
@@ -290,18 +270,25 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         if (IsSharingScreen)
         {
             await js.InvokeVoidAsync("stopScreenShare");
-            IsSharingScreen = false;
+            // OnLocalScreenStopped will fire and handle the rest.
         }
         else
         {
-            var started = await js.InvokeAsync<bool>("startScreenShare");
-            if (started)
+            // JS returns the new stream ID on success, or null on cancel/failure.
+            var streamId = await js.InvokeAsync<string?>("startScreenShare");
+            if (streamId is not null)
             {
                 IsSharingScreen = true;
-                await js.InvokeVoidAsync("attachLocalScreenStream");
+                ScreenStreamId = streamId;
+                // Notify first so Blazor renders the @if (IsSharingScreen) block
+                // that contains #local_screen, then yield so the DOM is updated
+                // before we try to attach the stream to that element.
+                Notify();
+                await Task.Yield();
+                await js.InvokeVoidAsync("attachStream", LocalScreenElementId, "screen", null);
+                await BroadcastStateAsync();
             }
         }
-        Notify();
     }
 
     public void SetExpandedUser(string? userId)
@@ -311,27 +298,42 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     }
 
     // -------------------------------------------------------------------------
+    // State broadcasting — C# owns the payload, JS just sends it
+    // -------------------------------------------------------------------------
+
+    private string BuildStateJson() => JsonSerializer.Serialize(new
+    {
+        type = "state",
+        audio = !IsMuted,
+        video = IsVideoEnabled,
+        screen = IsSharingScreen,
+        screenStreamId = ScreenStreamId,
+    });
+
+    private Task BroadcastStateAsync()
+        => js.InvokeVoidAsync("broadcastState", BuildStateJson()).AsTask();
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private void Notify() => OnChange?.Invoke();
-
-    public async ValueTask DisposeAsync()
+    private void UnsubscribeSignalR()
     {
-        //Service.OnCallMetadataUpdated -= HandleCallMetadataUpdated;
         service.OnUserListUpdated -= HandleUserListUpdated;
         service.OnVideoOffer -= HandleVideoOffer;
         service.OnVideoAnswer -= HandleVideoAnswer;
         service.OnIceCandidate -= HandleIceCandidate;
         service.OnHangUp -= HandleHangUp;
+    }
 
+    private void Notify() => OnChange?.Invoke();
+
+    public async ValueTask DisposeAsync()
+    {
+        UnsubscribeSignalR();
         if (IsInCall)
             await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = false });
-
         _objRef?.Dispose();
         await service.DisconnectAsync();
     }
-
-    private record DeviceEnumerationResult(List<DeviceInfo> AudioDevices, List<DeviceInfo> VideoDevices);
-    private record DeviceInfo(string DeviceId, string Label);
 }
