@@ -1,49 +1,43 @@
-// -------------------------------------------------------------------------
-// webrtc.js — pure WebRTC plumbing.
-//
-// Responsibilities:
-//   - getUserMedia / getDisplayMedia
-//   - RTCPeerConnection lifecycle (ICE, SDP, negotiation)
-//   - Track management (add, replace, stop)
-//   - Data channel transport for peer state messages
-//   - Attaching streams to DOM elements by element ID (C# decides the ID)
-//
-// NOT responsible for:
-//   - Knowing which users exist or what their state means
-//   - Building element ID strings
-//   - Any list / map that C# can own instead
-// -------------------------------------------------------------------------
-
 let dotNetInstance = null;
 let myUserId = null;
+
+let webcamStream = null;
+let screenStream = null;
+
+const consoleOutput = true;
+
+const peerConnections = new Map();
+const dataChannels = new Map();
+const makingOffer = new Map();
+const pendingCandidates = new Map();
+const remoteStreams = new Map();
+const remoteScreenStreams = new Map();
+const closingConnections = new Set();
+const remoteScreenStreamIds = new Map();
 
 function registerDotNetInstance(instance) {
     dotNetInstance = instance;
     log("DotNet instance registered");
 }
 
-// -------------------------------------------------------------------------
-// Logging
-// -------------------------------------------------------------------------
-
 function log(text) {
-    console.log("[" + new Date().toLocaleTimeString() + "] " + text);
+    if (consoleOutput) {
+        console.log("[" + new Date().toLocaleTimeString() + "] " + text);
+    }
 }
 
 function log_error(text) {
-    console.trace("[" + new Date().toLocaleTimeString() + "] " + text);
+    if (consoleOutput) {
+        console.trace("[" + new Date().toLocaleTimeString() + "] " + text);
+    }
 }
 
 function reportError(err) {
-    log_error("Error " + err.name + ": " + err.message);
+    if (consoleOutput) {
+        log_error("Error " + err.name + ": " + err.message);
+    }
 }
 
-// -------------------------------------------------------------------------
-// Local streams
-// -------------------------------------------------------------------------
-
-let webcamStream = null;
-let screenStream = null;
 
 async function getLocalStream() {
     if (webcamStream) return webcamStream;
@@ -63,9 +57,6 @@ async function getLocalStream() {
     return webcamStream;
 }
 
-// Attach a stream held internally by JS to an element whose ID C# provides.
-// streamType: "webcam" | "screen" | "remote-cam-{userId}" | "remote-screen-{userId}"
-// C# calls this with the exact element ID it rendered into the DOM.
 function attachStream(elementId, streamType, userId) {
     const video = document.getElementById(elementId);
     if (!video) { log_error("Element not found: #" + elementId); return; }
@@ -88,41 +79,15 @@ function attachStream(elementId, streamType, userId) {
     }
 }
 
-// -------------------------------------------------------------------------
-// Peer connection state (internal only — C# is the source of truth for
-// application-level peer lists; JS just tracks what it needs for WebRTC)
-// -------------------------------------------------------------------------
-
-const peerConnections = new Map(); // userId → RTCPeerConnection
-const dataChannels = new Map(); // userId → RTCDataChannel
-const makingOffer = new Map(); // userId → bool
-const pendingCandidates = new Map(); // userId → RTCIceCandidate[]
-const remoteStreams = new Map(); // userId → MediaStream  (webcam)
-const remoteScreenStreams = new Map(); // userId → MediaStream  (screen)
-const closingConnections = new Set(); // userId
-
-// Each peer announces its screen stream ID over the data channel so we can
-// identify the right MediaStream in ontrack.
-const remoteScreenStreamIds = new Map(); // userId → streamId | null
-
-// -------------------------------------------------------------------------
-// Polite-peer glare resolution
-// -------------------------------------------------------------------------
-
 function isPolite(remoteUserId) {
     return myUserId > remoteUserId;
 }
-
-// -------------------------------------------------------------------------
-// Data channel — transports peer state blobs, nothing else
-// -------------------------------------------------------------------------
 
 function setupDataChannel(userId, dc) {
     dataChannels.set(userId, dc);
 
     dc.onopen = () => {
         log("Data channel open with " + userId);
-        // Ask C# for the current values and build the state message here.
         dotNetInstance.invokeMethodAsync("GetLocalState")
             .then(({ audio, video, screen, screenStreamId }) => {
                 if (dc.readyState === "open")
@@ -139,9 +104,7 @@ function setupDataChannel(userId, dc) {
             const msg = JSON.parse(e.data);
             if (msg.type === "state") {
                 log("State from " + userId + ": audio=" + msg.audio + " video=" + msg.video + " screen=" + msg.screen);
-                // Store the screen stream ID for ontrack identification.
                 remoteScreenStreamIds.set(userId, msg.screenStreamId || null);
-                // Let C# update its peer state.
                 dotNetInstance.invokeMethodAsync("OnPeerStateChanged", userId, msg.audio, msg.video, msg.screen)
                     .catch(err => log_error("OnPeerStateChanged failed: " + err));
             }
@@ -151,8 +114,6 @@ function setupDataChannel(userId, dc) {
     };
 }
 
-// Called by C# whenever local state changes so JS can broadcast it.
-// JS owns the serialization — C# just passes the values.
 function broadcastState(audio, video, screen, screenStreamId) {
     const msg = JSON.stringify({ type: "state", audio, video, screen, screenStreamId: screenStreamId ?? null });
     dataChannels.forEach((dc, userId) => {
@@ -163,20 +124,12 @@ function broadcastState(audio, video, screen, screenStreamId) {
     });
 }
 
-// -------------------------------------------------------------------------
-// Peer connection lifecycle
-// -------------------------------------------------------------------------
-
 async function initiateCall(userId, selfId) {
     if (peerConnections.has(userId)) { log("Already connected to " + userId); return; }
     if (userId === selfId) { log("Skipping self"); return; }
 
     myUserId = selfId;
     log("Initiating call with " + userId);
-
-    // Sentinel: mark the slot as taken BEFORE the async getUserMedia call so
-    // that any incoming offer arriving during the ~1s permission prompt sees
-    // an existing entry and skips creating a second RTCPeerConnection.
     peerConnections.set(userId, null);
 
     const stream = await getLocalStream();
@@ -187,8 +140,6 @@ async function initiateCall(userId, selfId) {
         return;
     }
 
-    // If an incoming offer arrived while we were awaiting getUserMedia it will
-    // have replaced the sentinel with a real PC — hand off to that one instead.
     if (peerConnections.get(userId) !== null) {
         log("Offer arrived while awaiting stream for " + userId + " — skipping initiator role");
         return;
@@ -242,7 +193,6 @@ function createPeerConnection(userId) {
     pc.onconnectionstatechange = () => {
         log("Connection state: " + userId + " → " + pc.connectionState);
 
-        // If we started screen sharing before this peer connected, add the track now.
         if (pc.connectionState === "connected" && screenStream) {
             const screenTrack = screenStream.getVideoTracks()[0];
             const alreadySending = pc.getSenders().some(s => s.track === screenTrack);
@@ -257,9 +207,6 @@ function createPeerConnection(userId) {
     };
 
     pc.onnegotiationneeded = async () => {
-        // Guard: skip if we're already mid-negotiation. The browser fires this
-        // event on every signaling state transition, so without the check we
-        // get an infinite offer/answer loop.
         if (pc.signalingState !== "stable" || makingOffer.get(userId)) {
             log("Negotiation needed with " + userId + " — skipping (state=" + pc.signalingState + ")");
             return;
@@ -306,17 +253,11 @@ async function flushPendingCandidates(userId) {
     for (const c of queued) await pc.addIceCandidate(c).catch(reportError);
 }
 
-// -------------------------------------------------------------------------
-// Signalling handlers (called from C# SignalR event handlers)
-// -------------------------------------------------------------------------
-
 async function receiveVideoOffer(fromUserId, sdpJson) {
     log("Offer from " + fromUserId);
     let pc = peerConnections.get(fromUserId);
 
     if (pc === null) {
-        // initiateCall set a sentinel and is still awaiting getUserMedia.
-        // We are the answerer — clear the sentinel and create the real PC.
         log("Clearing sentinel for " + fromUserId + " — taking answerer role");
         peerConnections.delete(fromUserId);
         pc = null;
@@ -337,9 +278,6 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
         }
         log("Polite: rolling back local offer for " + fromUserId);
         await pc.setLocalDescription({ type: "rollback" });
-        // Candidates queued before rollback belong to the abandoned local offer
-        // and are now stale — discard them so flushPendingCandidates only applies
-        // candidates that arrive after the new remote description is set.
         pendingCandidates.set(fromUserId, []);
     }
 
@@ -387,10 +325,6 @@ function receiveHangUp(fromUserId) {
     log("Hang up from " + fromUserId);
     closePeerConnection(fromUserId);
 }
-
-// -------------------------------------------------------------------------
-// Peer teardown
-// -------------------------------------------------------------------------
 
 function handlePeerGone(userId) {
     if (closingConnections.has(userId)) return;
@@ -459,10 +393,6 @@ async function hangUpAll({ keepLocalStream = false } = {}) {
     log("All connections closed");
 }
 
-// -------------------------------------------------------------------------
-// Media controls — hard release / re-acquire
-// -------------------------------------------------------------------------
-
 async function setMuted(muted) {
     if (!webcamStream) return;
 
@@ -517,31 +447,25 @@ async function setVideoEnabled(enabled) {
 
         await Promise.allSettled(
             Array.from(peerConnections.entries()).map(([userId, pc]) => {
-                // Find sender that is null (was cleared) or had a video track
                 const sender = pc.getSenders().find(s => s.track === null || s.track?.kind === "video");
                 if (sender) { log("Replacing video for " + userId); return sender.replaceTrack(track); }
             })
         );
 
-        // Re-attach to local preview — srcObject was cleared on disable
         const localVideo = document.getElementById("local_video");
         if (localVideo) localVideo.srcObject = webcamStream;
         log("Camera re-acquired");
     }
 }
 
-// -------------------------------------------------------------------------
-// Screen sharing
-// -------------------------------------------------------------------------
 
 async function startScreenShare() {
-    if (screenStream) return screenStream.id; // already sharing — return existing ID
+    if (screenStream) return screenStream.id;
     log("Starting screen share");
 
     try {
         screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
     } catch (err) {
-        // User denied or dismissed — return null so C# string? deserializes cleanly
         log("Screen share cancelled: " + err.message);
         return null;
     }
@@ -558,7 +482,6 @@ async function startScreenShare() {
         stopScreenShare();
     };
 
-    // Return the stream ID so C# can include it in state broadcasts.
     return screenStream.id;
 }
 
@@ -580,10 +503,6 @@ async function stopScreenShare() {
     dotNetInstance.invokeMethodAsync("OnLocalScreenStopped")
         .catch(err => log_error("OnLocalScreenStopped failed: " + err));
 }
-
-// -------------------------------------------------------------------------
-// Exports
-// -------------------------------------------------------------------------
 
 window.registerDotNetInstance = registerDotNetInstance;
 window.getLocalStream = getLocalStream;

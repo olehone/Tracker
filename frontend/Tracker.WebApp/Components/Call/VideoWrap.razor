@@ -1,5 +1,4 @@
-﻿
-<MudPaper @onclick=Click
+﻿<MudPaper @onclick=Click
           @key=@Id
           Style=@GetStyle()>
     <video id=@Id
@@ -7,36 +6,3 @@
            muted=@(IsOwn || IsMuted)
            playsinline />
 </MudPaper>
-
-@code {
-    [Parameter, EditorRequired]
-    public string Id { get; set; }
-    [Parameter, EditorRequired]
-    public bool IsOwn { get; set; }
-    [Parameter, EditorRequired]
-    public bool IsMuted { get; set; }
-    [Parameter, EditorRequired]
-    public bool IsCameraOff { get; set; }
-    [Parameter]
-    public EventCallback<string>? OnClick { get; set; }
-
-
-    private async Task Click()
-    {
-        if (!OnClick.HasValue)
-        {
-            return;
-        }
-        await OnClick.Value.InvokeAsync(Id);
-    }
-
-    private string GetStyle()
-    {
-        var style = string.Empty;
-        if (IsCameraOff)
-        {
-            style += $"background-color: {Colors.Gray.Darken4.ToString()};";
-        }
-        return style;
-    }
-}
