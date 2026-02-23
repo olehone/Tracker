@@ -179,33 +179,6 @@ async function enumerateDevices() {
     return { audioDevices, videoDevices };
 }
 
-// -------------------------------------------------------------------------
-// Preview (lobby)
-// -------------------------------------------------------------------------
-
-async function startLocalPreview() {
-    log("Starting local preview");
-    try {
-        await getLocalStream();
-        attachLocalStream();
-        log("Local preview started");
-    } catch (err) {
-        log_error("Failed to start local preview: " + err);
-    }
-}
-
-async function stopLocalPreview() {
-    log("Stopping local preview");
-    if (webcamStream) {
-        webcamStream.getTracks().forEach(t => t.stop());
-        webcamStream = null;
-    }
-    const localVideo = document.getElementById("local_video");
-    if (localVideo) localVideo.srcObject = null;
-    log("Local preview stopped");
-}
-
-// -------------------------------------------------------------------------
 // Device switching
 //
 // KEY FIX: stop the old track on webcamStream BEFORE calling getUserMedia
@@ -726,8 +699,6 @@ function attachStreamToElement(elementId, userId) {
 // Exports
 // -------------------------------------------------------------------------
 
-window.startLocalPreview = startLocalPreview;
-window.stopLocalPreview = stopLocalPreview;
 window.attachLocalStream = attachLocalStream;
 window.attachLocalScreenStream = attachLocalScreenStream;
 window.attachStreamToElement = attachStreamToElement;

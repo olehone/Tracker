@@ -52,15 +52,6 @@
                                Title="Go to call"
                                OnClick=@GoToCall />
 
-                @* Participant drawer toggle — hidden when already on call page *@
-                @if (!IsOnCallPage)
-                {
-                    <MudIconButton Icon=@Icons.Material.Filled.People
-                                   Color="@(_isParticipantDrawerOpen ? Color.Primary : Color.Inherit)"
-                                   Size="Size.Small"
-                                   Title="Participants"
-                                   OnClick=@ToggleParticipantDrawer />
-                }
             </MudStack>
         }
 
@@ -90,80 +81,11 @@
         </MudStack>
     </MudAppBar>
 
-    @* ── Left nav drawer ── *@
     <MudDrawer @bind-Open="_isDrawerOpen"
                ClipMode="DrawerClipMode.Always"
                Elevation="2">
         <NavMenu />
     </MudDrawer>
-
-    @* ── Right participant drawer (only when in call and not on call page) ── *@
-    @if (CallState.IsInCall && !IsOnCallPage)
-    {
-        <MudDrawer @bind-Open="_isParticipantDrawerOpen"
-                   Anchor="Anchor.End"
-                   ClipMode="DrawerClipMode.Always"
-                   Elevation="2"
-                   Width="220px">
-            <MudDrawerHeader>
-                <MudText Typo="Typo.subtitle1">
-                    Participants (@CallState.RemoteUsers.Count + 1)
-                </MudText>
-            </MudDrawerHeader>
-
-            <MudList T="string" Dense>
-                @* Local tile first *@
-                <MudListItem>
-                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                        <video id="drawer_local_video"
-                               autoplay muted
-                               style="width:64px;height:48px;object-fit:cover;border-radius:4px;cursor:pointer;"
-                               @onclick=@GoToCall>
-                        </video>
-                        <MudText Typo="Typo.caption">You</MudText>
-                    </MudStack>
-                </MudListItem>
-
-                @* Remote participants — sorted, stable *@
-                @foreach (var userId in CallState.RemoteUsers)
-                {
-                    var state = CallState.PeerStates.GetValueOrDefault(userId);
-                    var shortId = userId[..8];
-
-                    <MudListItem @key="userId">
-                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
-                            @if (_expandedInDrawer.Contains(userId))
-                            {
-                                <video id="drawer_video-@userId"
-                                       autoplay
-                                       style="width:64px;height:48px;object-fit:cover;border-radius:4px;cursor:pointer;"
-                                       class="@(state is { Video: false } ? "video--off" : "")"
-                                       @onclick=@GoToCall>
-                                </video>
-                            }
-                            else
-                            {
-                                <MudIconButton Icon=@Icons.Material.Filled.PlayArrow
-                                               Size="Size.Small"
-                                               Title="Load video"
-                                               OnClick=@(() => ExpandInDrawer(userId)) />
-                            }
-
-                            <MudStack Spacing="0">
-                                <MudText Typo="Typo.caption">@shortId…</MudText>
-                                @if (state is { Audio: false })
-                                {
-                                    <MudIcon Icon=@Icons.Material.Filled.MicOff
-                                             Size="Size.Small"
-                                             Color="Color.Error" />
-                                }
-                            </MudStack>
-                        </MudStack>
-                    </MudListItem>
-                }
-            </MudList>
-        </MudDrawer>
-    }
 
     <MudMainContent>
         @Body

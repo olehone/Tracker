@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Tracker.Services;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
@@ -10,8 +9,6 @@ public partial class MainLayout : IDisposable
 {
     private bool _isDarkMode;
     private bool _isDrawerOpen = true;
-    private bool _isParticipantDrawerOpen = false;
-    private HashSet<string> _expandedInDrawer = new();
     private System.Threading.Timer? _durationTimer;
 
     [CascadingParameter]
@@ -21,8 +18,6 @@ public partial class MainLayout : IDisposable
     [Inject] IAuthService AuthService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
-
-    private bool IsOnCallPage => Nav.Uri == Nav.BaseUri || Nav.Uri.TrimEnd('/') == Nav.BaseUri.TrimEnd('/');
 
     private string CallDuration
     {
@@ -48,39 +43,9 @@ public partial class MainLayout : IDisposable
             TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        // Attach local video to the drawer thumbnail after each render
-        if (CallState.IsInCall && !IsOnCallPage && _isParticipantDrawerOpen)
-        {
-            await JS.InvokeVoidAsync("attachStreamToElement", "drawer_local_video", "local");
-
-            foreach (var userId in _expandedInDrawer)
-                await JS.InvokeVoidAsync("attachStreamToElement", $"drawer_video-{userId}", userId);
-        }
-    }
-
     private void OnCallStateChanged()
     {
-        // Close participant drawer if call ended
-        if (!CallState.IsInCall)
-        {
-            _isParticipantDrawerOpen = false;
-            _expandedInDrawer.Clear();
-        }
-
         InvokeAsync(StateHasChanged);
-    }
-
-    private void ExpandInDrawer(string userId)
-    {
-        _expandedInDrawer.Add(userId);
-        StateHasChanged();
-    }
-
-    private void ToggleParticipantDrawer()
-    {
-        _isParticipantDrawerOpen = !_isParticipantDrawerOpen;
     }
 
     private async Task Logout()
@@ -94,7 +59,7 @@ public partial class MainLayout : IDisposable
     private void GoToLogin() => Nav.NavigateTo("/login");
     private void GoToRegister() => Nav.NavigateTo("/register");
     private void GoToHome() => Nav.NavigateTo("/");
-    private void GoToCall() => Nav.NavigateTo("/");
+    private void GoToCall() => Nav.NavigateTo("/call");
 
     private void StateHasChangedHandler() => InvokeAsync(StateHasChanged);
 
