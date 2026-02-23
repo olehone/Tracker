@@ -1,13 +1,9 @@
-﻿using Tracker.Domain.Events;
+﻿using Tracker.Services.Abstraction.Realtime.Events;
 
 namespace Tracker.Services.Abstraction.Realtime;
 
-public interface IBoardRealtimeService : IAsyncDisposable
+public interface IBoardRealtimeService : IRealtimeService
 {
-    Task ConnectAsync(Guid boardId);
-    Task DisconnectAsync();
-    bool IsConnected { get; }
-
     event Action<ItemCreatedEvent>? OnItemCreated;
     event Action<ItemMovedEvent>? OnItemMoved;
     event Action<ItemUpdatedEvent>? OnItemUpdated;

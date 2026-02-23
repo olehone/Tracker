@@ -1,13 +1,10 @@
-﻿using Tracker.Domain.Events;
+﻿using Tracker.Services.Abstraction.Realtime.Events;
+using Tracker.Services.Abstraction.Realtime.Events;
 
 namespace Tracker.Services.Abstraction.Realtime;
 
-public interface IItemRealtimeService : IAsyncDisposable
+public interface IItemRealtimeService : IRealtimeService
 {
-    Task ConnectAsync(Guid itemId);
-    Task DisconnectAsync();
-    bool IsConnected { get; }
-
     event Action<CommentCreatedEvent>? OnCommentCreated;
     event Action<CommentUpdatedEvent>? OnCommentUpdated;
     event Action<CommentDeletedEvent>? OnCommentDeleted;

@@ -1,0 +1,8 @@
+﻿<MudPaper @onclick=Click
+          @key=@Id
+          Style=@GetStyle()>
+    <video id=@Id
+           autoplay
+           muted=@(IsOwn || IsMuted)
+           playsinline />
+</MudPaper>

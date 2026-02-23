@@ -1,6 +1,6 @@
 ﻿using Tracker.Domain.Dtos;
 
-namespace Tracker.Domain.Events;
+namespace Tracker.Services.Abstraction.Realtime.Events;
 
 public sealed record CommentUpdatedEvent(
     Guid UserId,

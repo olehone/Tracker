@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
-using Tracker.Domain.Events;
+using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Board;

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Tracker.Services;
+using MudBlazor;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
@@ -11,10 +11,32 @@ public partial class MainLayout : IDisposable
     private bool _isDrawerOpen = true;
 
     [CascadingParameter]
-    private AppState AppState { get; set; } = null!;
+    AppState AppState { get; set; } = null!;
 
+    [Inject] CallState CallState { get; set; } = null!;
     [Inject] IAuthService AuthService { get; set; } = null!;
-    [Inject] private NavigationManager Nav { get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        AppState.OnUserChange += StateHasChangedHandler;
+        CallState.OnChange += OnCallStateChanged;
+
+    }
+
+    private Color GetAppBarColor()
+    {
+        if (CallState.IsInCall)
+        {
+            return Color.Tertiary;
+        }
+        return Color.Primary;
+    }
+
+    private void OnCallStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
     private async Task Logout()
     {
@@ -23,38 +45,17 @@ public partial class MainLayout : IDisposable
         Nav.NavigateTo("/");
     }
 
-    protected override void OnInitialized()
-    {
-        AppState.OnUserChange += StateHasChangedHandler;
-    }
+    private void DrawerToggle() => _isDrawerOpen = !_isDrawerOpen;
+    private void GoToLogin() => Nav.NavigateTo("/login");
+    private void GoToRegister() => Nav.NavigateTo("/register");
+    private void GoToHome() => Nav.NavigateTo("/");
+    private void GoToCall() => Nav.NavigateTo("/call");
 
-    private void DrawerToggle()
-    {
-        _isDrawerOpen = !_isDrawerOpen;
-    }
-
-    private void GoToLogin()
-    {
-        Nav.NavigateTo("/login");
-    }
-
-    private void GoToRegister()
-    {
-        Nav.NavigateTo("/register");
-    }
-
-    private void GoToHome()
-    {
-        Nav.NavigateTo("/");
-    }
-
-    private void StateHasChangedHandler()
-    {
-        InvokeAsync(StateHasChanged);
-    }
+    private void StateHasChangedHandler() => InvokeAsync(StateHasChanged);
 
     public void Dispose()
     {
         AppState.OnUserChange -= StateHasChangedHandler;
+        CallState.OnChange -= OnCallStateChanged;
     }
 }

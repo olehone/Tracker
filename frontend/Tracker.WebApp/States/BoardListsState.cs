@@ -1,5 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
-using Tracker.Domain.Events;
+using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction.Board;
 

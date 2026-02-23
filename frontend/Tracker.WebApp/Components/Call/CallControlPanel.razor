@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.States
+
+<MudStack Row
+          Justify="Justify.Center"
+          AlignItems="AlignItems.Center">
+    <DurationTimer @key=CallState.CallId
+                   StartTime=@CallState.CallStartedAt />
+
+    <MudToggleIconButton Toggled=@CallState.IsMuted
+                         ToggledChanged=@CallState.ToggleMuteAsync
+                         ToggledIcon=@Icons.Material.Filled.MicOff
+                         Icon=@Icons.Material.Filled.Mic
+                         Color="Color.Inherit"
+                         ToggledColor="Color.Error" />
+
+    <MudToggleIconButton Toggled=@CallState.IsVideoEnabled
+                         ToggledChanged=@CallState.ToggleVideoAsync
+                         ToggledIcon=@Icons.Material.Filled.Videocam
+                         Icon=@Icons.Material.Filled.VideocamOff
+                         Color="Color.Error"
+                         ToggledColor="Color.Inherit" />
+
+    <MudToggleIconButton Toggled=@CallState.IsSharingScreen
+                         ToggledChanged=@CallState.ToggleScreenShareAsync
+                         ToggledIcon=@Icons.Material.Filled.StopScreenShare
+                         Icon=@Icons.Material.Filled.ScreenShare
+                         Color="Color.Inherit"
+                         ToggledColor="Color.Error" />
+
+    <MudIconButton OnClick=@CallState.HangUpAsync
+                   Icon=@Icons.Material.Filled.CallEnd
+                   Color="Color.Error" />
+
+</MudStack>
