@@ -6,19 +6,10 @@ function registerDotNetInstance(instance) {
     log("DotNet instance registered");
 }
 
-// -------------------------------------------------------------------------
-// Media constraints / selected devices
-// -------------------------------------------------------------------------
-
-let selectedAudioDeviceId = null;
-let selectedVideoDeviceId = null;
-
 function buildMediaConstraints() {
     return {
-        audio: selectedAudioDeviceId ? { deviceId: { exact: selectedAudioDeviceId } } : true,
-        video: selectedVideoDeviceId
-            ? { deviceId: { exact: selectedVideoDeviceId }, aspectRatio: { ideal: 1.333333 } }
-            : { aspectRatio: { ideal: 1.333333 } },
+        audio: true,
+        video: { aspectRatio: { ideal: 1.333333 } },
     };
 }
 
@@ -150,33 +141,6 @@ function attachLocalStream() {
         log("Attaching local stream to #local_video");
         video.srcObject = webcamStream;
     }
-}
-
-// -------------------------------------------------------------------------
-// Device enumeration
-// -------------------------------------------------------------------------
-
-async function enumerateDevices() {
-    if (!webcamStream) {
-        try {
-            const probe = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-            probe.getTracks().forEach(t => t.stop());
-        } catch (_) {
-            return { audioDevices: [], videoDevices: [] };
-        }
-    }
-
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    const audioDevices = devices
-        .filter(d => d.kind === "audioinput")
-        .map(d => ({ deviceId: d.deviceId, label: d.label || "Microphone " + d.deviceId.slice(0, 4) }));
-
-    const videoDevices = devices
-        .filter(d => d.kind === "videoinput")
-        .map(d => ({ deviceId: d.deviceId, label: d.label || "Camera " + d.deviceId.slice(0, 4) }));
-
-    return { audioDevices, videoDevices };
 }
 
 // -------------------------------------------------------------------------
@@ -615,13 +579,12 @@ function attachStreamToElement(elementId, userId) {
 // Exports
 // -------------------------------------------------------------------------
 
+window.registerDotNetInstance = registerDotNetInstance;
 window.attachLocalStream = attachLocalStream;
 window.attachLocalScreenStream = attachLocalScreenStream;
 window.attachStreamToElement = attachStreamToElement;
-window.enumerateDevices = enumerateDevices;
 window.attachRemoteStream = attachRemoteStream;
 window.attachRemoteScreenStream = attachRemoteScreenStream;
-window.registerDotNetInstance = registerDotNetInstance;
 window.initiateCall = initiateCall;
 window.receiveVideoOffer = receiveVideoOffer;
 window.receiveVideoAnswer = receiveVideoAnswer;
