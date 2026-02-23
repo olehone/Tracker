@@ -23,6 +23,7 @@
         @* ── Ongoing call strip ── *@
         @if (CallState.IsInCall)
         {
+            <MudText>In call</MudText>
             <MudStack Row Spacing="1" AlignItems="AlignItems.Center" Class="mr-4">
                 <MudIcon Icon=@Icons.Material.Filled.Circle Color="Color.Success" Size="Size.Small" />
                 <MudText Typo="Typo.body2">@CallDuration</MudText>

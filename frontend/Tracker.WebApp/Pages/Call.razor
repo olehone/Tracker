@@ -1,57 +1,12 @@
-@page "/"
+@page "/call"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using Tracker.WebApp.Components.Call
 
-@if (CallState.IsPreviewing)
-{
-    <div class="lobby">
-        <div class="lobby__preview">
-            <video id="local_video" autoplay muted class="lobby__camera"></video>
+@attribute [Authorize]
 
-            <button class="lobby__settings-toggle"
-                    @onclick="() => _showDeviceSettings = !_showDeviceSettings">
-                ⚙️
-            </button>
-
-            @if (_showDeviceSettings)
-            {
-                <div class="device-panel">
-                    <DeviceSelector />
-                </div>
-            }
-        </div>
-
-        <div class="lobby__info">
-            <h2 class="lobby__title">Ready to join?</h2>
-
-            @if (CallState.Metadata is { ParticipantCount: > 0 } meta)
-            {
-                <div class="lobby__meta">
-                    <span>
-                        👥 @meta.ParticipantCount
-                        @(meta.ParticipantCount == 1 ? "person" : "people") in the call
-                    </span>
-                    @if (meta.StartedAt.HasValue)
-                    {
-                        var elapsed = DateTimeOffset.UtcNow - meta.StartedAt.Value;
-                        var elapsedStr = elapsed.TotalHours >= 1
-                            ? $"{(int)elapsed.TotalHours}h {elapsed.Minutes}m"
-                            : $"{(int)elapsed.TotalMinutes}m";
-                        <span>🕐 Started @elapsedStr ago</span>
-                    }
-                </div>
-            }
-            else
-            {
-                <p class="lobby__empty">No one is in the call yet.</p>
-            }
-
-            <button class="lobby__join-btn" @onclick="() => CallState.JoinAsync()">
-                Join call
-            </button>
-        </div>
-    </div>
-}
-else if (CallState.IsInCall)
+@if (CallState.IsInCall)
 {
     <div class="container">
         <!-- Local camera tile -->

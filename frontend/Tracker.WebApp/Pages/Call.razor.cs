@@ -18,13 +18,12 @@ public partial class Call : IDisposable
         CallState.OnChange += OnCallStateChanged;
         await CallState.InitializeAsync();
 
-        if (!AppState.IsUnauthenticated && !CallState.IsActive)
-            await CallState.StartPeekAsync(AppState.MyId.ToString());
+        if (AppState.IsAuthenticated && !CallState.IsInCall)
+            await CallState.JoinAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Re-attach local video every render — survives DOM swap between preview/in-call
         await JS.InvokeVoidAsync("attachLocalStream");
 
         if (CallState.IsInCall)
