@@ -32,7 +32,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public bool IsMuted { get; private set; } = false;
     public bool IsVideoEnabled { get; private set; } = true;
     public bool IsSharingScreen { get; private set; } = false;
-    public bool IsSharingLocalScreen { get; private set; } = false;
 
     public List<MediaDevice> AudioDevices { get; private set; } = new();
     public List<MediaDevice> VideoDevices { get; private set; } = new();
@@ -74,7 +73,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
             foreach (var userId in RemoteScreenUsers)
                 await js.InvokeVoidAsync("attachRemoteScreenStream", userId);
 
-            if (IsSharingLocalScreen)
+            if (IsSharingScreen)
                 await js.InvokeVoidAsync("attachLocalScreenStream");
         }
     }
@@ -147,7 +146,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         IsMuted = false;
         IsVideoEnabled = true;
         IsSharingScreen = false;
-        IsSharingLocalScreen = false;
         IsInCall = false;
         ExpandedUserId = null;
         CallStartedAt = null;
@@ -245,7 +243,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public void OnLocalScreenStopped()
     {
         IsSharingScreen = false;
-        IsSharingLocalScreen = false;
         Notify();
     }
 
@@ -289,7 +286,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         {
             await js.InvokeVoidAsync("stopScreenShare");
             IsSharingScreen = false;
-            IsSharingLocalScreen = false;
         }
         else
         {
@@ -297,7 +293,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
             if (started)
             {
                 IsSharingScreen = true;
-                IsSharingLocalScreen = true;
                 await js.InvokeVoidAsync("attachLocalScreenStream");
             }
         }

@@ -21,24 +21,7 @@ public partial class Call : IDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JS.InvokeVoidAsync("attachLocalStream");
-
-        if (CallState.IsInCall)
-        {
-            foreach (var userId in CallState.RemoteUsers)
-                await JS.InvokeVoidAsync("attachRemoteStream", userId);
-
-            foreach (var userId in CallState.RemoteScreenUsers)
-                await JS.InvokeVoidAsync("attachRemoteScreenStream", userId);
-
-            if (CallState.IsSharingLocalScreen)
-                await JS.InvokeVoidAsync("attachLocalScreenStream");
-        }
-    }
-
-    private async Task JoinAsync()
-    {
-        await CallState.JoinAsync();
+        await CallState.AttachStreamsAsync();
     }
 
     private void OnCallStateChanged()
