@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Shared;
 
@@ -105,5 +106,18 @@ public static class UiHelper
         }
 
         return $"{size:0.##} {units[unit]}";
+    }
+
+    public static string TimeDuration(DateTimeOffset? start)
+    {
+        if (start is null)
+        {
+            return "0:00";
+        }
+
+        var elapsed = DateTimeOffset.UtcNow - start.Value;
+        return elapsed.TotalHours >= 1
+            ? $"{(int)elapsed.TotalHours}:{elapsed:mm\\:ss}"
+            : elapsed.ToString("m\\:ss");
     }
 }

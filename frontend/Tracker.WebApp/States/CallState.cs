@@ -25,6 +25,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     // -------------------------------------------------------------------------
 
     public event Action? OnChange;
+    public event Action? OnLeaveCall;
 
     public bool IsInCall { get; private set; } = false;
     public Guid CallId { get; private set; } = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
@@ -123,8 +124,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         IsSharingScreen = false;
         ScreenStreamId = null;
         IsInCall = false;
-        ExpandedUserId = null;
-
+        OnLeaveCall?.Invoke();
         Notify();
     }
 
@@ -161,8 +161,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         RemoteScreenUsers.Remove(evt.FromUserId);
         PeerStates.Remove(evt.FromUserId);
         js.InvokeVoidAsync("receiveHangUp", evt.FromUserId);
-        if (ExpandedUserId == evt.FromUserId)
-            ExpandedUserId = null;
         Notify();
     }
 
@@ -218,8 +216,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         RemoteUsers.Remove(userId);
         RemoteScreenUsers.Remove(userId);
         PeerStates.Remove(userId);
-        if (ExpandedUserId == userId)
-            ExpandedUserId = null;
         Notify();
     }
 
@@ -305,12 +301,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
                 await BroadcastStateAsync();
             }
         }
-    }
-
-    public void SetExpandedUser(string? userId)
-    {
-        ExpandedUserId = userId;
-        Notify();
     }
 
     // -------------------------------------------------------------------------

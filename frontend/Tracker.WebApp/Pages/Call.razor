@@ -2,96 +2,76 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
+@using Tracker.WebApp.Components.Call
 @using Tracker.WebApp.Components.Shared
 
 
 <LoadingWrapper LoadingCondition=@AppState.IsUnauthenticated>
     <Content>
-        <div class="container">
-            <!-- Local camera tile -->
-            <div class="local-tile">
-                <video id="local_video" autoplay muted
-                       style="width:160px;height:120px;object-fit:cover;">
-                </video>
-                <span class="local-tile__label">You</span>
-            </div>
+        <MudStack Justify="Justify.FlexStart"
+                  AlignItems="AlignItems.Center">
 
-            <!-- Local screen preview (own share) -->
-            @if (CallState.IsSharingScreen)
-            {
-                <div class="screen-tile screen-tile--local">
-                    <video id="local_screen" autoplay muted
+            <div class="container">
+                <!-- Local camera tile -->
+                <div class="local-tile">
+                    <video id="local_video" autoplay muted
                            style="width:160px;height:120px;object-fit:cover;">
                     </video>
-                    <span class="screen-tile__label">Your screen</span>
+                    <span class="local-tile__label">You</span>
                 </div>
-            }
-            @if (CallState.IsInCall)
-            {
 
-                <!-- Remote camera tiles — sorted by userId for stable order -->
-                @foreach (var userId in CallState.RemoteUsers)
+                <!-- Local screen preview (own share) -->
+                @if (CallState.IsSharingScreen)
                 {
-                    var state = CallState.PeerStates.GetValueOrDefault(userId);
-                    var isExpanded = CallState.ExpandedUserId == userId;
-
-                    <div class="remote-tile"
-                         @key="userId"
-                         @onclick=@(() => CallState.SetExpandedUser(isExpanded ? null : userId))>
-                        <video id="video-@userId"
-                               autoplay
-                               style="width:@(isExpanded ? "100%" : "160px");height:@(isExpanded ? "100%" : "120px");object-fit:cover;"
-                               class="@(state is { Video: false } ? "video--off" : "")">
-                        </video>
-                        <div class="remote-tile__indicators">
-                            @if (state is { Audio: false })
-                            {
-                                <span class="indicator indicator--muted" title="Muted">🔇</span>
-                            }
-                            @if (state is { Video: false })
-                            {
-                                <span class="indicator indicator--video-off" title="Camera off">📵</span>
-                            }
-                        </div>
-                    </div>
-                }
-
-                <!-- Remote screen shares -->
-                @foreach (var userId in CallState.RemoteScreenUsers)
-                {
-                    <div class="screen-tile" @key="@($"screen-{userId}")">
-                        <video id="screen-@userId" autoplay
+                    <div class="screen-tile screen-tile--local">
+                        <video id="local_screen" autoplay muted
                                style="width:160px;height:120px;object-fit:cover;">
                         </video>
+                        <span class="screen-tile__label">Your screen</span>
                     </div>
                 }
-            }
+                @if (CallState.IsInCall)
+                {
 
-            <div class="controls">
-                <button class="control-btn @(CallState.IsMuted ? "control-btn--active" : "")"
-                        @onclick="() => CallState.ToggleMuteAsync()"
-                        title="@(CallState.IsMuted ? "Unmute" : "Mute")">
-                    @(CallState.IsMuted ? "🔇" : "🎤")
-                </button>
+                    <!-- Remote camera tiles — sorted by userId for stable order -->
+                    @foreach (var userId in CallState.RemoteUsers)
+                    {
+                        var state = CallState.PeerStates.GetValueOrDefault(userId);
+                        var isExpanded = CallState.ExpandedUserId == userId;
 
-                <button class="control-btn @(!CallState.IsVideoEnabled ? "control-btn--active" : "")"
-                        @onclick="() => CallState.ToggleVideoAsync()"
-                        title="@(CallState.IsVideoEnabled ? "Turn off camera" : "Turn on camera")">
-                    @(CallState.IsVideoEnabled ? "📷" : "🚫")
-                </button>
+                        <div class="remote-tile"
+                             @key="userId">
+                            <video id="video-@userId"
+                                   autoplay
+                                   style="width:@(isExpanded ? "100%" : "160px");height:@(isExpanded ? "100%" : "120px");object-fit:cover;"
+                                   class="@(state is { Video: false } ? "video--off" : "")">
+                            </video>
+                            <div class="remote-tile__indicators">
+                                @if (state is { Audio: false })
+                                {
+                                    <span class="indicator indicator--muted" title="Muted">🔇</span>
+                                }
+                                @if (state is { Video: false })
+                                {
+                                    <span class="indicator indicator--video-off" title="Camera off">📵</span>
+                                }
+                            </div>
+                        </div>
+                    }
 
-                <button class="control-btn @(CallState.IsSharingScreen ? "control-btn--active" : "")"
-                        @onclick="() => CallState.ToggleScreenShareAsync()"
-                        title="@(CallState.IsSharingScreen ? "Stop sharing" : "Share screen")">
-                    🖥
-                </button>
-
-                <button class="control-btn control-btn--hangup"
-                        @onclick="() => CallState.HangUpAsync()"
-                        title="Leave call">
-                    📵
-                </button>
+                    <!-- Remote screen shares -->
+                    @foreach (var userId in CallState.RemoteScreenUsers)
+                    {
+                        <div class="screen-tile" @key="@($"screen-{userId}")">
+                            <video id="screen-@userId" autoplay
+                                   style="width:160px;height:120px;object-fit:cover;">
+                            </video>
+                        </div>
+                    }
+                }
             </div>
-        </div>
+
+            <CallControlPanel />
+        </MudStack>
     </Content>
 </LoadingWrapper>
