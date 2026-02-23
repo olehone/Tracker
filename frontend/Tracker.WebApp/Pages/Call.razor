@@ -2,7 +2,6 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@using Tracker.WebApp.Components.Call
 
 @attribute [Authorize]
 
@@ -61,15 +60,6 @@
             </div>
         }
 
-        <!-- Device settings -->
-        @if (_showDeviceSettings)
-        {
-            <div class="device-panel device-panel--incall">
-                <DeviceSelector />
-            </div>
-        }
-
-        <!-- Controls -->
         <div class="controls">
             <button class="control-btn @(CallState.IsMuted ? "control-btn--active" : "")"
                     @onclick="() => CallState.ToggleMuteAsync()"
@@ -87,12 +77,6 @@
                     @onclick="() => CallState.ToggleScreenShareAsync()"
                     title="@(CallState.IsSharingScreen ? "Stop sharing" : "Share screen")">
                 🖥
-            </button>
-
-            <button class="control-btn @(_showDeviceSettings ? "control-btn--active" : "")"
-                    @onclick="() => _showDeviceSettings = !_showDeviceSettings"
-                    title="Audio & video settings">
-                ⚙️
             </button>
 
             <button class="control-btn control-btn--hangup"

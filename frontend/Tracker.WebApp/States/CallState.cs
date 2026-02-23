@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Abstraction.Realtime.Events;
@@ -308,38 +307,6 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public void SetExpandedUser(string? userId)
     {
         ExpandedUserId = userId;
-        Notify();
-    }
-
-    // -------------------------------------------------------------------------
-    // Device management
-    // -------------------------------------------------------------------------
-
-    public async Task LoadDevicesAsync()
-    {
-        var result = await js.InvokeAsync<DeviceEnumerationResult>("enumerateDevices");
-        AudioDevices = result.AudioDevices.Select(d => new MediaDevice(d.DeviceId, d.Label)).ToList();
-        VideoDevices = result.VideoDevices.Select(d => new MediaDevice(d.DeviceId, d.Label)).ToList();
-
-        if (SelectedAudioDeviceId == null && AudioDevices.Count > 0)
-            SelectedAudioDeviceId = AudioDevices[0].DeviceId;
-        if (SelectedVideoDeviceId == null && VideoDevices.Count > 0)
-            SelectedVideoDeviceId = VideoDevices[0].DeviceId;
-
-        Notify();
-    }
-
-    public async Task SwitchAudioDeviceAsync(string deviceId)
-    {
-        SelectedAudioDeviceId = deviceId;
-        await js.InvokeVoidAsync("switchAudioDevice", deviceId);
-        Notify();
-    }
-
-    public async Task SwitchVideoDeviceAsync(string deviceId)
-    {
-        SelectedVideoDeviceId = deviceId;
-        await js.InvokeVoidAsync("switchVideoDevice", deviceId);
         Notify();
     }
 

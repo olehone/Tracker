@@ -6,12 +6,9 @@ namespace Tracker.WebApp.Pages;
 
 public partial class Call : IDisposable
 {
-    private bool _showDeviceSettings = false;
-    
     [Inject] CallState CallState { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
     [Inject] IJSRuntime JS { get; set; } = null!;
-
 
     protected override async Task OnInitializedAsync()
     {

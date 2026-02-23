@@ -179,90 +179,6 @@ async function enumerateDevices() {
     return { audioDevices, videoDevices };
 }
 
-// Device switching
-//
-// KEY FIX: stop the old track on webcamStream BEFORE calling getUserMedia
-// with the new deviceId. Some OSes (Windows + certain cameras) treat the
-// device as exclusively locked until every MediaStreamTrack using it is
-// stopped — opening it again while the old track is still live throws
-// "Device in use" / NotReadableError.
-// -------------------------------------------------------------------------
-
-async function switchAudioDevice(deviceId) {
-    selectedAudioDeviceId = deviceId;
-    log("Switching audio device to " + deviceId);
-
-    if (!webcamStream) return;
-
-    // 1. Stop and remove old audio tracks first to release the device
-    webcamStream.getAudioTracks().forEach(t => {
-        t.stop();
-        webcamStream.removeTrack(t);
-    });
-
-    // 2. Now acquire the new device — it's free
-    const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: { deviceId: { exact: deviceId } },
-        video: false,
-    });
-    const newAudioTrack = newStream.getAudioTracks()[0];
-
-    // 3. Swap into webcamStream and apply current mute state
-    webcamStream.addTrack(newAudioTrack);
-    newAudioTrack.enabled = !isMuted;
-
-    // 4. Replace in all active peer connections (no renegotiation needed)
-    for (const [userId, pc] of peerConnections) {
-        const sender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
-        if (sender) {
-            await sender.replaceTrack(newAudioTrack).catch(err =>
-                log_error("replaceTrack audio failed for " + userId + ": " + err));
-        }
-    }
-
-    log("Audio device switched");
-}
-
-async function switchVideoDevice(deviceId) {
-    selectedVideoDeviceId = deviceId;
-    log("Switching video device to " + deviceId);
-
-    if (!webcamStream) return;
-
-    // 1. Stop and remove old video tracks first to release the device
-    webcamStream.getVideoTracks().forEach(t => {
-        t.stop();
-        webcamStream.removeTrack(t);
-    });
-
-    // 2. Now acquire the new device
-    const newStream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { deviceId: { exact: deviceId }, aspectRatio: { ideal: 1.333333 } },
-    });
-    const newVideoTrack = newStream.getVideoTracks()[0];
-
-    // 3. Swap into webcamStream and apply current video-enabled state
-    webcamStream.addTrack(newVideoTrack);
-    newVideoTrack.enabled = isVideoEnabled;
-
-    // 4. Replace in all active peer connections, skipping the screen sender
-    const screenTrack = screenStream && screenStream.getVideoTracks()[0];
-    for (const [userId, pc] of peerConnections) {
-        const sender = pc.getSenders().find(s =>
-            s.track && s.track.kind === "video" && s.track !== screenTrack);
-        if (sender) {
-            await sender.replaceTrack(newVideoTrack).catch(err =>
-                log_error("replaceTrack video failed for " + userId + ": " + err));
-        }
-    }
-
-    // 5. Re-attach to #local_video so the preview reflects the new camera
-    attachLocalStream();
-
-    log("Video device switched");
-}
-
 // -------------------------------------------------------------------------
 // In-call peer connection management
 // -------------------------------------------------------------------------
@@ -703,8 +619,6 @@ window.attachLocalStream = attachLocalStream;
 window.attachLocalScreenStream = attachLocalScreenStream;
 window.attachStreamToElement = attachStreamToElement;
 window.enumerateDevices = enumerateDevices;
-window.switchAudioDevice = switchAudioDevice;
-window.switchVideoDevice = switchVideoDevice;
 window.attachRemoteStream = attachRemoteStream;
 window.attachRemoteScreenStream = attachRemoteScreenStream;
 window.registerDotNetInstance = registerDotNetInstance;
