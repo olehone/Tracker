@@ -1,5 +1,4 @@
 using Microsoft.JSInterop;
-using System.Text.Json;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Abstraction.Realtime.Events;
 
@@ -101,6 +100,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         service.OnVideoAnswer += HandleVideoAnswer;
         service.OnIceCandidate += HandleIceCandidate;
         service.OnHangUp += HandleHangUp;
+        service.OnCallMetadataUpdated += HandleMetadata;
 
         await service.ConnectAsync(CallId);
     }
@@ -167,33 +167,63 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         Notify();
     }
 
+    private void HandleMetadata(CallMetadataEvent evt)
+    {
+        Metadata = new CallMetadata(evt.ParticipantCount, evt.StartedAt);
+    }
+
+    public string? MediaDeniedDevice { get; private set; }
+
     // -------------------------------------------------------------------------
     // JS-invokable callbacks
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Called by the data channel setup in JS immediately on open — JS needs
-    /// the current state JSON to send to the newly connected peer.
+    /// Called by JS on data channel open — returns raw values; JS serializes.
     /// </summary>
     [JSInvokable]
-    public string GetLocalStateMessage() => BuildStateJson();
+    public object GetLocalState() => new
+    {
+        audio = !IsMuted,
+        video = IsVideoEnabled,
+        screen = IsSharingScreen,
+        screenStreamId = ScreenStreamId,
+    };
+
+    /// <summary>
+    /// Called by JS when getUserMedia or getDisplayMedia is denied by the user or OS.
+    /// device: "webcam" | "screen"
+    /// </summary>
+    [JSInvokable]
+    public void OnMediaDeviceDenied(string device)
+    {
+        MediaDeniedDevice = device;
+        Notify();
+    }
 
     [JSInvokable]
-    public void OnRemoteTrack(string userId)
+    public async Task OnRemoteTrack(string userId)
     {
         if (!RemoteUsers.Contains(userId))
         {
             var i = RemoteUsers.BinarySearch(userId, StringComparer.Ordinal);
             RemoteUsers.Insert(i < 0 ? ~i : i, userId);
         }
+        // Notify first so Blazor renders <video id="video-{userId}">,
+        // then yield so the DOM is ready before we assign srcObject.
         Notify();
+        await Task.Yield();
+        await js.InvokeVoidAsync("attachStream", RemoteCamElementId(userId), "remote-cam", userId);
     }
 
     [JSInvokable]
-    public void OnRemoteScreenTrack(string userId)
+    public async Task OnRemoteScreenTrack(string userId)
     {
         RemoteScreenUsers.Add(userId);
+        // Same render-then-attach pattern.
         Notify();
+        await Task.Yield();
+        await js.InvokeVoidAsync("attachStream", RemoteScreenElementId(userId), "remote-screen", userId);
     }
 
     [JSInvokable]
@@ -298,20 +328,11 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     }
 
     // -------------------------------------------------------------------------
-    // State broadcasting — C# owns the payload, JS just sends it
+    // State broadcasting — JS owns the serialization, C# just passes values
     // -------------------------------------------------------------------------
 
-    private string BuildStateJson() => JsonSerializer.Serialize(new
-    {
-        type = "state",
-        audio = !IsMuted,
-        video = IsVideoEnabled,
-        screen = IsSharingScreen,
-        screenStreamId = ScreenStreamId,
-    });
-
     private Task BroadcastStateAsync()
-        => js.InvokeVoidAsync("broadcastState", BuildStateJson()).AsTask();
+        => js.InvokeVoidAsync("broadcastState", !IsMuted, IsVideoEnabled, IsSharingScreen, ScreenStreamId).AsTask();
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -324,6 +345,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         service.OnVideoAnswer -= HandleVideoAnswer;
         service.OnIceCandidate -= HandleIceCandidate;
         service.OnHangUp -= HandleHangUp;
+        service.OnCallMetadataUpdated -= HandleMetadata;
     }
 
     private void Notify() => OnChange?.Invoke();

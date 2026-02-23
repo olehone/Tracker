@@ -48,10 +48,17 @@ let screenStream = null;
 async function getLocalStream() {
     if (webcamStream) return webcamStream;
     log("Requesting webcam/mic");
-    webcamStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { aspectRatio: { ideal: 1.333333 } },
-    });
+    try {
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: { aspectRatio: { ideal: 1.333333 } },
+        });
+    } catch (err) {
+        log_error("getUserMedia denied: " + err.message);
+        dotNetInstance.invokeMethodAsync("OnMediaDeviceDenied", "webcam")
+            .catch(e => log_error("OnMediaDeviceDenied failed: " + e));
+        return null;
+    }
     log("Webcam stream acquired (" + webcamStream.getTracks().length + " tracks)");
     return webcamStream;
 }
@@ -115,10 +122,13 @@ function setupDataChannel(userId, dc) {
 
     dc.onopen = () => {
         log("Data channel open with " + userId);
-        // Ask C# for the current state blob and send it immediately.
-        dotNetInstance.invokeMethodAsync("GetLocalStateMessage")
-            .then(msg => { if (dc.readyState === "open") dc.send(msg); })
-            .catch(err => log_error("GetLocalStateMessage failed: " + err));
+        // Ask C# for the current values and build the state message here.
+        dotNetInstance.invokeMethodAsync("GetLocalState")
+            .then(({ audio, video, screen, screenStreamId }) => {
+                if (dc.readyState === "open")
+                    dc.send(JSON.stringify({ type: "state", audio, video, screen, screenStreamId: screenStreamId ?? null }));
+            })
+            .catch(err => log_error("GetLocalState failed: " + err));
     };
 
     dc.onclose = () => log("Data channel closed with " + userId);
@@ -142,10 +152,12 @@ function setupDataChannel(userId, dc) {
 }
 
 // Called by C# whenever local state changes so JS can broadcast it.
-function broadcastState(stateJson) {
+// JS owns the serialization — C# just passes the values.
+function broadcastState(audio, video, screen, screenStreamId) {
+    const msg = JSON.stringify({ type: "state", audio, video, screen, screenStreamId: screenStreamId ?? null });
     dataChannels.forEach((dc, userId) => {
         if (dc.readyState === "open") {
-            dc.send(stateJson);
+            dc.send(msg);
             log("Broadcast state to " + userId);
         }
     });
@@ -168,6 +180,12 @@ async function initiateCall(userId, selfId) {
     peerConnections.set(userId, null);
 
     const stream = await getLocalStream();
+
+    if (!stream) {
+        log("No local stream for " + userId + " — aborting call initiation");
+        peerConnections.delete(userId); // clear sentinel
+        return;
+    }
 
     // If an incoming offer arrived while we were awaiting getUserMedia it will
     // have replaced the sentinel with a real PC — hand off to that one instead.
@@ -299,6 +317,7 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
 
     if (!pc) {
         const stream = await getLocalStream();
+        if (!stream) { log("No local stream — cannot answer offer from " + fromUserId); return; }
         pc = createPeerConnection(fromUserId);
         stream.getTracks().forEach(t => pc.addTrack(t, stream));
     }
@@ -311,6 +330,10 @@ async function receiveVideoOffer(fromUserId, sdpJson) {
         }
         log("Polite: rolling back local offer for " + fromUserId);
         await pc.setLocalDescription({ type: "rollback" });
+        // Candidates queued before rollback belong to the abandoned local offer
+        // and are now stale — discard them so flushPendingCandidates only applies
+        // candidates that arrive after the new remote description is set.
+        pendingCandidates.set(fromUserId, []);
     }
 
     await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(sdpJson)));
@@ -501,14 +524,15 @@ async function setVideoEnabled(enabled) {
 // -------------------------------------------------------------------------
 
 async function startScreenShare() {
-    if (screenStream) return false;
+    if (screenStream) return screenStream.id; // already sharing — return existing ID
     log("Starting screen share");
 
     try {
         screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
     } catch (err) {
+        // User denied or dismissed — return null so C# string? deserializes cleanly
         log("Screen share cancelled: " + err.message);
-        return false;
+        return null;
     }
 
     const track = screenStream.getVideoTracks()[0];

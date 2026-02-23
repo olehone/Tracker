@@ -83,6 +83,9 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
         // Broadcast updated participant list and metadata to everyone in the call
         await BroadcastUserList(callId);
         await BroadcastCallMetadata(callId);
+
+        var metadata = BuildCallMetadata(callId);
+        await Clients.Caller.ReceiveCallMetadata(metadata.ParticipantCount, metadata.StartedAt);
     }
 
     // -------------------------------------------------------------------------
