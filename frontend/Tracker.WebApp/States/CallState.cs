@@ -63,6 +63,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public async Task AttachStreamsAsync()
     {
         // Always re-attach local video — survives DOM replacement on state change
+        await js.InvokeVoidAsync("getLocalStream");
         await js.InvokeVoidAsync("attachLocalStream");
 
         if (IsInCall)
@@ -110,6 +111,10 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
     public async Task JoinAsync()
     {
+        if(appState.IsUnauthenticated || IsInCall)
+        {
+            return;
+        }
         IsInCall = true;
         CallStartedAt = DateTimeOffset.UtcNow;
         Notify();

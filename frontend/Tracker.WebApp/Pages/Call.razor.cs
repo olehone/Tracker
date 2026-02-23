@@ -8,15 +8,13 @@ public partial class Call : IDisposable
 {
     [Inject] CallState CallState { get; set; } = null!;
     [Inject] AppState AppState { get; set; } = null!;
-    [Inject] IJSRuntime JS { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
         CallState.OnChange += OnCallStateChanged;
+        AppState.OnUserChange += OnCallStateChanged;
         await CallState.InitializeAsync();
-
-        if (AppState.IsAuthenticated && !CallState.IsInCall)
-            await CallState.JoinAsync();
+        await CallState.JoinAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -32,5 +30,6 @@ public partial class Call : IDisposable
     public void Dispose()
     {
         CallState.OnChange -= OnCallStateChanged;
+        AppState.OnUserChange -= OnCallStateChanged;
     }
 }
