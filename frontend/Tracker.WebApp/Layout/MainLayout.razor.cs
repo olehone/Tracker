@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.Services.Abstraction;
 using Tracker.WebApp.States;
 
@@ -21,6 +22,15 @@ public partial class MainLayout : IDisposable
         AppState.OnUserChange += StateHasChangedHandler;
         CallState.OnChange += OnCallStateChanged;
 
+    }
+
+    private Color GetAppBarColor()
+    {
+        if (CallState.IsInCall)
+        {
+            return Color.Tertiary;
+        }
+        return Color.Primary;
     }
 
     private void OnCallStateChanged()

@@ -229,7 +229,10 @@ public class VideoCallHub(IMediator mediator) : Hub<IClientVideoCallHub>
             kvp.Value == callIdStr && _userStatus.GetValueOrDefault(kvp.Key) == "active");
 
         if (!hasActiveUsers)
+        {
             _callStartTimes.TryRemove(callIdStr, out _);
+
+        }
     }
 
     // Sends the active participant list to everyone in the group (including peekers).

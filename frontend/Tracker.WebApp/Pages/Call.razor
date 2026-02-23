@@ -9,68 +9,71 @@
 <LoadingWrapper LoadingCondition=@AppState.IsUnauthenticated>
     <Content>
         <MudStack Justify="Justify.FlexStart"
-                  AlignItems="AlignItems.Center">
-
-            <div class="container">
-                <!-- Local camera tile -->
-                <div class="local-tile">
-                    <video id="local_video" autoplay muted
-                           style="width:160px;height:120px;object-fit:cover;">
-                    </video>
-                    <span class="local-tile__label">You</span>
-                </div>
-
-                <!-- Local screen preview (own share) -->
-                @if (CallState.IsSharingScreen)
-                {
-                    <div class="screen-tile screen-tile--local">
-                        <video id="local_screen" autoplay muted
-                               style="width:160px;height:120px;object-fit:cover;">
+                  AlignItems="AlignItems.Center"
+                  Class="mud-height-full">
+            <MudStack Row
+                      Justify="Justify.FlexEnd"
+                      AlignItems="AlignItems.Center"
+                      Class="flex-grow-1">
+                    <div class="local-tile">
+                        <video id="local_video" autoplay muted
+                               style="width:200px;height:150px;object-fit:cover;">
                         </video>
-                        <span class="screen-tile__label">Your screen</span>
+                        <span class="local-tile__label">You</span>
                     </div>
-                }
-                @if (CallState.IsInCall)
-                {
 
-                    <!-- Remote camera tiles — sorted by userId for stable order -->
-                    @foreach (var userId in CallState.RemoteUsers)
+                    <!-- Local screen preview (own share) -->
+                    @if (CallState.IsSharingScreen)
                     {
-                        var state = CallState.PeerStates.GetValueOrDefault(userId);
-                        var isExpanded = CallState.ExpandedUserId == userId;
-
-                        <div class="remote-tile"
-                             @key="userId">
-                            <video id="video-@userId"
-                                   autoplay
-                                   style="width:@(isExpanded ? "100%" : "160px");height:@(isExpanded ? "100%" : "120px");object-fit:cover;"
-                                   class="@(state is { Video: false } ? "video--off" : "")">
+                        <div class="screen-tile screen-tile--local">
+                            <video id="local_screen" autoplay muted
+                                   style="width:200px;height:150px;object-fit:cover;">
                             </video>
-                            <div class="remote-tile__indicators">
-                                @if (state is { Audio: false })
-                                {
-                                    <span class="indicator indicator--muted" title="Muted">🔇</span>
-                                }
-                                @if (state is { Video: false })
-                                {
-                                    <span class="indicator indicator--video-off" title="Camera off">📵</span>
-                                }
+                            <span class="screen-tile__label">Your screen</span>
+                        </div>
+                    }
+                    @if (CallState.IsInCall)
+                    {
+
+                        <!-- Remote camera tiles — sorted by userId for stable order -->
+                        @foreach (var userId in CallState.RemoteUsers)
+                        {
+                            var state = CallState.PeerStates.GetValueOrDefault(userId);
+                            var isExpanded = CallState.ExpandedUserId == userId;
+
+                            <div class="remote-tile"
+                                 @key="userId">
+                                <video id="video-@userId"
+                                       autoplay
+                                       style="width:@(isExpanded ? "100%" : "200px");height:@(isExpanded ? "100%" : "150px");object-fit:cover;"
+                                       class="@(state is { Video: false } ? "video--off" : "")">
+                                </video>
+                                <div class="remote-tile__indicators">
+                                    @if (state is { Audio: false })
+                                    {
+                                        <span class="indicator indicator--muted" title="Muted">🔇</span>
+                                    }
+                                    @if (state is { Video: false })
+                                    {
+                                        <span class="indicator indicator--video-off" title="Camera off">📵</span>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
 
-                    <!-- Remote screen shares -->
-                    @foreach (var userId in CallState.RemoteScreenUsers)
-                    {
-                        <div class="screen-tile" @key="@($"screen-{userId}")">
-                            <video id="screen-@userId" autoplay
-                                   style="width:160px;height:120px;object-fit:cover;">
-                            </video>
-                        </div>
+                        <!-- Remote screen shares -->
+                        @foreach (var userId in CallState.RemoteScreenUsers)
+                        {
+                            <div class="screen-tile" @key="@($"screen-{userId}")">
+                                <video id="screen-@userId" autoplay
+                                       style="width:200px;height:150px;object-fit:cover;">
+                                </video>
+                            </div>
+                        }
                     }
-                }
-            </div>
+            </MudStack>
 
+            <MudSpacer />
             <CallControlPanel />
         </MudStack>
     </Content>
