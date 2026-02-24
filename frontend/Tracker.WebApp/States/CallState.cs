@@ -49,11 +49,15 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         await js.InvokeVoidAsync("registerDotNetInstance", _objRef);
     }
 
+    public async Task AttachStreamAsync(string elementId, string type, string? userId)
+    {
+        await js.InvokeVoidAsync("attachStream", elementId, type, userId);
+    }
+
     public async Task AttachStreamsAsync()
     {
         await js.InvokeVoidAsync("getLocalStream");
-        await js.InvokeVoidAsync("attachStream", LocalVideoElementId, "webcam", null);
-
+        await AttachStreamAsync(LocalVideoElementId, "webcam", null);
         if (!IsInCall)
         {
             return;
@@ -61,17 +65,17 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
         foreach (var userId in RemoteUsers)
         {
-            await js.InvokeVoidAsync("attachStream", RemoteCamElementId(userId), "remote-cam", userId);
+            await AttachStreamAsync(RemoteCamElementId(userId), "remote-cam", userId);
         }
 
         foreach (var userId in RemoteScreenUsers)
         {
-            await js.InvokeVoidAsync("attachStream", RemoteScreenElementId(userId), "remote-screen", userId);
+            await AttachStreamAsync(RemoteScreenElementId(userId), "remote-screen", userId);
         }
 
         if (IsSharingScreen)
         {
-            await js.InvokeVoidAsync("attachStream", LocalScreenElementId, "screen", null);
+            await AttachStreamAsync(LocalScreenElementId, "screen", null);
         }
     }
 
@@ -179,7 +183,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         }
         Notify();
         await Task.Yield();
-        await js.InvokeVoidAsync("attachStream", RemoteCamElementId(userId), "remote-cam", userId);
+        await AttachStreamAsync(RemoteCamElementId(userId), "remote-cam", userId);
     }
 
     [JSInvokable]
@@ -188,7 +192,7 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         RemoteScreenUsers.Add(userId);
         Notify();
         await Task.Yield();
-        await js.InvokeVoidAsync("attachStream", RemoteScreenElementId(userId), "remote-screen", userId);
+        await AttachStreamAsync(RemoteScreenElementId(userId), "remote-screen", userId);
     }
 
     [JSInvokable]

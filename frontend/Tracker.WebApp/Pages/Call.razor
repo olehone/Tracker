@@ -1,29 +1,31 @@
 @page "/call"
+
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Tracker.WebApp.Components.Call
 @using Tracker.WebApp.Components.Shared
 @using MudBlazor
 
-<LoadingWrapper LoadingCondition=@AppState.IsUnauthenticated>
+<LoadingWrapper LoadingCondition="@AppState.IsUnauthenticated">
     <Content>
-        <MudStack Justify="Justify.Center"
-                  StretchItems="StretchItems.Middle"
-                  AlignItems="AlignItems.Center"
-                  Class="mud-height-full">
-            <MudStack Row
-                      Justify="Justify.Center"
-                      AlignItems="AlignItems.Center"
-                      Style="overflow-x:auto; height:20vh"
-                      Class="mud-width-full">
 
+        <MudStack Style="height:90vh"
+                  Justify="Justify.FlexStart"
+                  AlignItems="AlignItems.Stretch"
+                  Class="pa-2">
+
+            <MudStack Row
+                      Justify="Justify.FlexStart"
+                      AlignItems="AlignItems.Stretch"
+                      Style="overflow-x:auto; overflow-y:hidden; height:20vh; flex-shrink:0; flex-wrap:nowrap;"
+                      Class="mud-width-full">
                 @if (ExpandedVideoId != "local_video")
                 {
                     <VideoWrap Id="local_video"
                                IsCameraOff="@(!CallState.IsVideoEnabled)"
                                IsMuted="@CallState.IsMuted"
                                IsOwn
-                               OnClick=@(EventCallback.Factory.Create<string>(this, ExpandVideo)) />
+                               OnClick="@(EventCallback.Factory.Create<string>(this, ExpandVideo))" />
                 }
 
                 @if (CallState.IsSharingScreen && ExpandedVideoId != "local_screen")
@@ -32,7 +34,7 @@
                                IsCameraOff="false"
                                IsMuted
                                IsOwn
-                               OnClick=@(EventCallback.Factory.Create<string>(this, ExpandVideo)) />
+                               OnClick="@(EventCallback.Factory.Create<string>(this, ExpandVideo))" />
                 }
 
                 @foreach (var userId in CallState.RemoteUsers)
@@ -40,38 +42,68 @@
                     var id = $"video-{userId}";
                     var state = CallState.PeerStates.GetValueOrDefault(userId);
 
-                    @if (ExpandedVideoId == id || state is null) { continue; }
-                    <VideoWrap Id=@id
-                               IsCameraOff=@(!state.Video)
-                               IsMuted=@(!state.Audio)
+                    if (ExpandedVideoId == id || state is null) continue;
+
+                    <VideoWrap Id="@id"
+                               IsCameraOff="@(!state.Video)"
+                               IsMuted="@(!state.Audio)"
                                IsOwn="false"
-                               OnClick=@(EventCallback.Factory.Create<string>(this, ExpandVideo)) />
+                               OnClick="@(EventCallback.Factory.Create<string>(this, ExpandVideo))" />
                 }
 
                 @foreach (var userId in CallState.RemoteScreenUsers)
                 {
                     var id = $"screen-{userId}";
 
-                    @if (ExpandedVideoId == id) { continue; }
+                    if (ExpandedVideoId == id) continue;
 
-                    <VideoWrap Id=@id
+                    <VideoWrap Id="@id"
                                IsCameraOff="false"
                                IsMuted="true"
                                IsOwn="false"
-                               OnClick=@(EventCallback.Factory.Create<string>(this, ExpandVideo)) />
+                               OnClick="@(EventCallback.Factory.Create<string>(this, ExpandVideo))" />
                 }
 
             </MudStack>
 
-            @if (ExpandedVideoId != null)
-            {
-                <VideoWrap Id=@ExpandedVideoId
-                           IsCameraOff="false"
-                           IsMuted="true"
-                           IsOwn="false"
-                           OnClick=@(EventCallback.Factory.Create<string>(this, CollapseVideo)) />
-            }
+            <MudStack Style="flex:1; min-height:0;">
+
+                @if (ExpandedVideoId != null)
+                {
+                    var cameraOff = false;
+                    var muted = true;
+                    var isOwn = false;
+
+                    if (ExpandedVideoId == "local_video")
+                    {
+                        cameraOff = !CallState.IsVideoEnabled;
+                        muted = CallState.IsMuted;
+                        isOwn = true;
+                    }
+                    else if (ExpandedVideoId?.StartsWith("video-") == true)
+                    {
+                        var uid = ExpandedVideoId.Replace("video-", "");
+                        var st = CallState.PeerStates.GetValueOrDefault(uid);
+                        if (st != null)
+                        {
+                            cameraOff = !st.Video;
+                            muted = !st.Audio;
+                        }
+                    }
+
+                    <VideoWrap Id="@ExpandedVideoId"
+                               Fill
+                               IsCameraOff="@cameraOff"
+                               IsMuted="@muted"
+                               IsOwn="@isOwn"
+                               OnClick="@(EventCallback.Factory.Create<string>(this, CollapseVideo))" />
+                }
+
+            </MudStack>
+
             <CallControlPanel />
+
         </MudStack>
+
     </Content>
 </LoadingWrapper>

@@ -14,25 +14,32 @@ public partial class VideoWrap
     [Parameter, EditorRequired]
     public bool IsCameraOff { get; set; }
     [Parameter]
-    public EventCallback<string>? OnClick { get; set; }
-
-
-    private async Task Click()
-    {
-        if (!OnClick.HasValue)
-        {
-            return;
-        }
-        await OnClick.Value.InvokeAsync(Id);
-    }
+    public EventCallback<string> OnClick { get; set; }
+    [Parameter] public bool Fill { get; set; }
 
     private string GetStyle()
     {
-        var style = string.Empty;
-        if (IsCameraOff)
-        {
-            style += $"background-color: {Colors.Gray.Darken4.ToString()};";
-        }
+        var style = "justify-content:center; align-items:center; display:flex; flex-shrink:0; ";
+        style += IsCameraOff ? $"background-color: {Colors.Gray.Darken4}; " : "";
+        style += Fill
+            ? "flex:1; min-height:0; width:100%;"
+            : "height:100%; width:auto; aspect-ratio:16/9; min-width:0;";
         return style;
+    }
+
+    private string GetVideoStyle()
+    {
+        return IsCameraOff
+            ? "position:absolute; height:0; width:0; visibility:hidden;"
+            : "object-fit:contain; height:100%; width:100%;";
+    }
+
+    private async Task Click()
+    {
+        if (!OnClick.HasDelegate)
+        {
+            return;
+        }
+        await OnClick.InvokeAsync(Id);
     }
 }

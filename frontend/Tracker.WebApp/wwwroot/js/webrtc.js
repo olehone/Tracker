@@ -45,7 +45,7 @@ async function getLocalStream() {
     try {
         webcamStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: { aspectRatio: { ideal: 1.333333 } },
+            video: { aspectRatio: { ideal: 1.777777 } },
         });
     } catch (err) {
         log_error("getUserMedia denied: " + err.message);
@@ -410,7 +410,10 @@ async function setMuted(muted) {
         await Promise.allSettled(
             Array.from(peerConnections.entries()).map(([userId, pc]) => {
                 const sender = pc.getSenders().find(s => s.track?.kind === "audio");
-                if (sender) { log("Replacing audio for " + userId); return sender.replaceTrack(track); }
+                if (sender && sender.track != track) {
+                    log("Replacing audio for " + userId);
+                    return sender.replaceTrack(track);
+                }
             })
         );
         log("Microphone re-acquired");
@@ -438,7 +441,7 @@ async function setVideoEnabled(enabled) {
         try {
             fresh = await navigator.mediaDevices.getUserMedia({
                 audio: false,
-                video: { aspectRatio: { ideal: 1.333333 } },
+                video: { aspectRatio: { ideal: 1.777777 } },
             });
         } catch (err) { log_error("Camera re-acquire failed: " + err); return; }
 
@@ -448,7 +451,10 @@ async function setVideoEnabled(enabled) {
         await Promise.allSettled(
             Array.from(peerConnections.entries()).map(([userId, pc]) => {
                 const sender = pc.getSenders().find(s => s.track === null || s.track?.kind === "video");
-                if (sender) { log("Replacing video for " + userId); return sender.replaceTrack(track); }
+                if (sender && sender.track != track) {
+                    log("Replacing video for " + userId);
+                    return sender.replaceTrack(track);
+                }
             })
         );
 
