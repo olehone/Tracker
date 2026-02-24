@@ -37,9 +37,18 @@ services:
     networks:
       - main
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
 volumes:
   sqlserver_data:
   azurite_data:
+  redis_data:
 
 networks: 
   main:
