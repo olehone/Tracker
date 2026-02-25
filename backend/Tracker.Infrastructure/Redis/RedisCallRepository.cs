@@ -2,25 +2,36 @@
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using Tracker.Application.Common.Repositories;
-using Tracker.Domain.Dtos;
+using Tracker.Domain.Entities;
 using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Redis;
 
+// Naming this a repository hides implementation details,
+// but it may be confusing because it is not part of the Unit of Work.
+// Would RedisCallState and ICallState be a better choice ?
 internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOptions> options) 
     : ICallRepository
 {
     private readonly IDatabase _db = redis.GetDatabase();
 
-    public async Task<CallDto?> GetCallAsync(Guid callId)
+    public async Task<Call?> GetCallByIdAsync(Guid callId)
     {
         var json = await _db.StringGetAsync(CallKey(callId));
         return json.HasValue 
-            ? JsonSerializer.Deserialize<CallDto>(json!) 
+            ? JsonSerializer.Deserialize<Call>(json!) 
             : null;
     }
 
-    public async Task SaveCallAsync(CallDto call)
+    public async Task<Call?> GetCallByConnectionAsync(string connectionId)
+    {
+        var call = await _db.StringGetAsync(ConnectionKey(connectionId));
+        return call.HasValue
+            ? JsonSerializer.Deserialize<Call>(call!)
+            : null;
+    }
+
+    public async Task SaveCallAsync(Call call)
     {
         var json = JsonSerializer.Serialize(call);
         var transaction = _db.CreateTransaction();
@@ -36,7 +47,7 @@ internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOp
 
     public async Task RemoveCallAsync(Guid callId)
     {
-        var call = await GetCallAsync(callId);
+        var call = await GetCallByIdAsync(callId);
         if (call is null)
         {
             return;
@@ -51,14 +62,6 @@ internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOp
         }
 
         await transaction.ExecuteAsync();
-    }
-
-    public async Task<UserDto?> GetUserByConnectionAsync(string connectionId)
-    {
-        var user = await _db.StringGetAsync(ConnectionKey(connectionId));
-        return user.HasValue
-            ? JsonSerializer.Deserialize<UserDto>(user!)
-            : null;
     }
 
     private TimeSpan Expiration => options.Value.CallExpiration;

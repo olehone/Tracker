@@ -1,10 +1,10 @@
 ﻿using Tracker.Domain.Enums;
 
-namespace Tracker.Domain.Dtos;
+namespace Tracker.Domain.Entities;
 
-public class CallUserDto
+public class CallUser
 {
-    public required UserDto User { get; set; }
+    public required User User { get; set; }
     public required string ConnectionId { get; set; }
     public required CallUserStatus Status { get; set; }
 }

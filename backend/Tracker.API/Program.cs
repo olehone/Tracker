@@ -68,7 +68,7 @@ app.MapHub<BoardHub>("/hubs/board")
    .RequireCors("DevCorsPolicy");
 app.MapHub<ItemHub>("/hubs/item")
    .RequireCors("DevCorsPolicy");
-app.MapHub<VideoCallHub>("/hubs/call")
+app.MapHub<CallHub>("/hubs/call")
    .RequireCors("DevCorsPolicy");
 
 await app.RunAsync();

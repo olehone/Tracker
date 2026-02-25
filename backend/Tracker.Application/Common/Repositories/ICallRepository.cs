@@ -1,11 +1,12 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Entities;
 
 namespace Tracker.Application.Common.Repositories;
 
 public interface ICallRepository
 {
-    Task<CallDto?> GetCallAsync(Guid callId);
-    Task SaveCallAsync(CallDto call);
+    Task<Call?> GetCallByIdAsync(Guid callId);
+    Task<Call?> GetCallByConnectionAsync(string connectionId);
+    Task SaveCallAsync(Call call);
     Task RemoveCallAsync(Guid callId);
-    Task<UserDto?> GetUserByConnectionAsync(string connectionId);
 }

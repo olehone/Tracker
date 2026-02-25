@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Tracker.Application\Tracker.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Redis\" />
-  </ItemGroup>
-
 </Project>

@@ -57,7 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddOptions<RedisOptions>()
             .BindConfiguration(RedisOptions.SectionName);
 
-        services.AddSingleton((serviceProvider) =>
+        services.AddSingleton<IConnectionMultiplexer>((serviceProvider) =>
         {
             var redisOptions = serviceProvider.GetRequiredService<IOptions<RedisOptions>>().Value;
             return ConnectionMultiplexer.Connect(redisOptions.ConnectionString);
