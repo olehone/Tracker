@@ -28,8 +28,7 @@
     @if (Board.CallId is not null)
     {
         <PeekingCall CallId=@(Board.CallId.Value)
-                     OnEnded=BoardState.ApplyCallEnded
-                     OnJoinPressed=OpenCall />
+                     OnEnded=BoardState.ApplyCallEnded/>
     }
     else
     {

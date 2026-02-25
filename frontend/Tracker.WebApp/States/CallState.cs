@@ -51,6 +51,8 @@ public class CallState(ICallService callService,
         await js.InvokeVoidAsync("registerDotNetInstance", _objRef);
     }
 
+    
+
     public async Task ConnectToCallAsync(Guid callId)
     {
         if (IsInCall)
@@ -61,7 +63,7 @@ public class CallState(ICallService callService,
         if (result.IsSuccess)
         {
             _currentCall = result.Value;
-            IsInCall = true;
+            await JoinAsync();
         }
     }
 
@@ -107,7 +109,7 @@ public class CallState(ICallService callService,
 
         realtimeService.OnCallEnded += HandleCallEnded;
         realtimeService.OnUserJoined += HandleUserJoined;
-        realtimeService.OnUserLeaved += HandleUserLeave;
+        realtimeService.OnUserLeaved += HandleUserLeaved;
 
         realtimeService.OnVideoOffer += HandleVideoOffer;
         realtimeService.OnVideoAnswer += HandleVideoAnswer;
@@ -118,11 +120,9 @@ public class CallState(ICallService callService,
 
     public async Task LeaveAsync()
     {
-        HandleCallEnded();
-
         await realtimeService.LeaveAsync(Call.Id);
         await realtimeService.DisconnectAsync();
-        await js.InvokeVoidAsync("closeStreams");
+        HandleCallEnded();
     }
 
     private async void HandleCallEnded()
@@ -138,6 +138,7 @@ public class CallState(ICallService callService,
         IsInCall = false;
         _currentCall = null;
         OnLeaveCall?.Invoke();
+        await js.InvokeVoidAsync("closeStreams");
         Notify();
     }
 
@@ -176,14 +177,6 @@ public class CallState(ICallService callService,
     private void HandleIceCandidate(IceCandidateEvent evt)
         => js.InvokeVoidAsync("receiveIceCandidate", evt.FromUserId, evt.CandidateJson);
 
-    private void HandleUserLeave(UserLeavedEvent evt)
-    {
-        RemoteUsers.Remove(evt.UserId);
-        RemoteScreenUsers.Remove(evt.UserId);
-        PeerStates.Remove(evt.UserId);
-        js.InvokeVoidAsync("receiveHangUp", evt.UserId);
-        Notify();
-    }
 
     [JSInvokable]
     public object GetLocalState() => new
@@ -302,7 +295,7 @@ public class CallState(ICallService callService,
     {
         realtimeService.OnCallEnded -= HandleCallEnded;
         realtimeService.OnUserJoined -= HandleUserJoined;
-        realtimeService.OnUserLeaved -= HandleUserLeave;
+        realtimeService.OnUserLeaved -= HandleUserLeaved;
         realtimeService.OnVideoOffer -= HandleVideoOffer;
         realtimeService.OnVideoAnswer -= HandleVideoAnswer;
         realtimeService.OnIceCandidate -= HandleIceCandidate;

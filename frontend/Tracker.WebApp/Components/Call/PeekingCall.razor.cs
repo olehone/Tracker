@@ -12,8 +12,6 @@ public partial class PeekingCall
     public Guid CallId { get; set; }
     [Parameter, EditorRequired]
     public EventCallback OnEnded { get; set; }
-    [Parameter, EditorRequired]
-    public EventCallback OnJoinPressed { get; set; }
 
     public event Action? OnCallEnded;
 
@@ -21,6 +19,7 @@ public partial class PeekingCall
 
     [Inject] ICallRealtimeService CallStateService { get; set; } = null!;
     [Inject] ICallService CallService { get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -30,6 +29,11 @@ public partial class PeekingCall
             Call = result.Value;
             OnCallEnded += HandleCallEnded;
         }
+    }
+
+    private void OpenCall()
+    {
+        Nav.NavigateTo($"/calls/{CallId}");
     }
 
     public void HandleCallEnded()
