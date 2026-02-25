@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IBoardItemApi>();
         services.AddApiClientWithAuth<IItemCommentApi>();
         services.AddApiClientWithAuth<IAttachmentApi>();
+        services.AddApiClientWithAuth<ICallApi>();
 
         services.AddScoped<IApiUrlService, ApiUrlService>();
         services.AddScoped<IUserService, UserService>();
@@ -56,6 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBoardItemService, BoardItemService>();
         services.AddScoped<IItemCommentService, ItemCommentService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<ICallService, CallService>();
 
         services.AddScoped<IBoardRealtimeService, BoardRealtimeService>();
         services.AddScoped<IItemRealtimeService, ItemRealtimeService>();
@@ -109,7 +111,7 @@ public static class ServiceCollectionExtensions
                 client.BaseAddress = new Uri(options.ApiBaseUrl);
             })
             .AddHttpMessageHandler<AuthHeaderHandler>();
-            //.AddStandardResilienceHandler();
+        //.AddStandardResilienceHandler();
 
         return services;
     }

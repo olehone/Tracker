@@ -6,7 +6,7 @@
 <MudStack Row
           Justify="Justify.Center"
           AlignItems="AlignItems.Center">
-    <DurationTimer @key=CallState.CallId
+    <DurationTimer @key=CallState.Call.Id
                    StartTime=@CallState.CallStartedAt />
 
     <MudToggleIconButton Toggled=@CallState.IsMuted
@@ -30,7 +30,7 @@
                          Color="Color.Inherit"
                          ToggledColor="Color.Error" />
 
-    <MudIconButton OnClick=@CallState.HangUpAsync
+    <MudIconButton OnClick=@CallState.LeaveAsync
                    Icon=@Icons.Material.Filled.CallEnd
                    Color="Color.Error" />
 

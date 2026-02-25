@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
 
 public partial class Call : IAsyncDisposable
 {
+    [Parameter]
+    public Guid CallId { get; set; }
+
     [Inject] AppState AppState { get; set; } = null!;
     [Inject] CallState CallState { get; set; } = null!;
-    [Inject] IJSRuntime JS { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
     private string? _expandedVideoId;
@@ -26,6 +27,7 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        await CallState.SetCallAsync(CallId);
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
         AppState.OnUserChange += OnCallStateChanged;
@@ -64,7 +66,7 @@ public partial class Call : IAsyncDisposable
 
     public Task LeaveCall()
     {
-        return CallState.HangUpAsync();
+        return CallState.LeaveAsync();
     }
 
     public void LeavePage()

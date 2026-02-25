@@ -11,5 +11,5 @@ public interface IClientCallHub
 
     Task CallEnded();
     Task UserJoined(UserDto user);
-    Task UserLeaved(Guid userId);
+    Task UserLeaved(string userId);
 }

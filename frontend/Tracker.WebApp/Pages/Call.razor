@@ -1,4 +1,4 @@
-@page "/call"
+@page "/call/{CallId:guid}"
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -6,7 +6,7 @@
 @using Tracker.WebApp.Components.Shared
 @using MudBlazor
 
-<LoadingWrapper LoadingCondition="@AppState.IsUnauthenticated">
+<LoadingWrapper LoadingCondition=@(AppState.IsUnauthenticated || !CallState.IsInCall)>
     <Content>
 
         <MudStack Style="height:90vh"

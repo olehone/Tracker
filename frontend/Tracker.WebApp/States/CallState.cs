@@ -1,13 +1,18 @@
 using Microsoft.JSInterop;
 using Tracker.Domain.Dtos;
+using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Abstraction.Realtime.Events;
 
 namespace Tracker.WebApp.States;
 
-public class CallState(ICallRealtimeService service, AppState appState, IJSRuntime js) : IAsyncDisposable
+public class CallState(ICallService callService,
+    ICallRealtimeService realtimeService,
+    AppState appState,
+    IJSRuntime js) : IAsyncDisposable
 {
     private DotNetObjectReference<CallState>? _objRef;
+    private CallDto? _currentCall;
 
     public static string LocalVideoElementId => "local_video";
     public static string LocalScreenElementId => "local_screen";
@@ -17,12 +22,9 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     public event Action? OnChange;
     public event Action? OnLeaveCall;
 
+    public CallDto Call => _currentCall!;
     public bool IsInCall { get; private set; } = false;
-    // Placeholder
-    public Guid CallId { get; private set; } = Guid.Parse("29063d2a-7bfb-4384-84b7-0f8625677b0b");
-
-    public CallMetadata? Metadata { get; private set; }
-    public DateTimeOffset? CallStartedAt => Metadata?.StartedAt;
+    public DateTimeOffset? CallStartedAt => Call?.StartedAt;
 
     public List<string> RemoteUsers { get; private set; } = [];
     public HashSet<string> RemoteScreenUsers { get; private set; } = [];
@@ -47,6 +49,16 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
         _objRef = DotNetObjectReference.Create(this);
         await js.InvokeVoidAsync("registerDotNetInstance", _objRef);
+    }
+
+    public async Task SetCallAsync(Guid callId)
+    {
+        var result = await callService.GetByIdAsync(callId);
+        if (result.IsSuccess)
+        {
+            _currentCall = result.Value;
+            IsInCall = true;
+        }
     }
 
     public async Task AttachStreamAsync(string elementId, string type, string? userId)
@@ -89,23 +101,29 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         IsInCall = true;
         Notify();
 
-        service.OnUserListUpdated += HandleUserListUpdated;
-        service.OnVideoOffer += HandleVideoOffer;
-        service.OnVideoAnswer += HandleVideoAnswer;
-        service.OnIceCandidate += HandleIceCandidate;
-        service.OnHangUp += HandleHangUp;
-        service.OnCallMetadataUpdated += HandleMetadata;
+        realtimeService.OnCallEnded += HandleCallEnded;
+        realtimeService.OnUserJoined += HandleUserJoined;
+        realtimeService.OnUserLeaved += HandleUserLeave;
 
-        await service.ConnectAsync(CallId);
+        realtimeService.OnVideoOffer += HandleVideoOffer;
+        realtimeService.OnVideoAnswer += HandleVideoAnswer;
+        realtimeService.OnIceCandidate += HandleIceCandidate;
+
+        await realtimeService.ConnectAsync(Call.Id);
     }
 
-    public async Task HangUpAsync()
+    public async Task LeaveAsync()
     {
-        await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = false });
+        HandleCallEnded();
 
+        await realtimeService.LeaveAsync(Call.Id);
+        await realtimeService.DisconnectAsync();
+        await js.InvokeVoidAsync("closeStreams");
+    }
+
+    private async void HandleCallEnded()
+    {
         UnsubscribeSignalR();
-        await service.DisconnectAsync();
-
         RemoteUsers.Clear();
         RemoteScreenUsers.Clear();
         PeerStates.Clear();
@@ -114,29 +132,33 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         IsSharingScreen = false;
         ScreenStreamId = null;
         IsInCall = false;
+        _currentCall = null;
         OnLeaveCall?.Invoke();
         Notify();
     }
 
-    private async void HandleUserListUpdated(UserListUpdatedEvent evt)
+    private async void HandleUserJoined(UserJoinedEvent evt)
     {
-        var others = evt.UserIds
-            .Where(id => id != MyId)
-            .OrderBy(id => id)
-            .ToList();
+        var userId = evt.User.Id.ToString();
 
-        foreach (var userId in others)
-        {
-            if (!RemoteUsers.Contains(userId))
-            {
-                var i = RemoteUsers.BinarySearch(userId, StringComparer.Ordinal);
-                RemoteUsers.Insert(i < 0 ? ~i : i, userId);
+        var i = RemoteUsers.BinarySearch(userId, StringComparer.Ordinal);
+        RemoteUsers.Insert(i < 0 ? ~i : i, userId);
 
-                PeerStates.TryAdd(userId, new PeerState(false, false, false));
+        PeerStates.TryAdd(userId, new PeerState(false, false, false));
 
-                await js.InvokeVoidAsync("initiateCall", userId, MyId);
-            }
-        }
+        await js.InvokeVoidAsync("initiateCall", userId, MyId);
+
+        Notify();
+    }
+
+    private async void HandleUserLeaved(UserLeavedEvent evt)
+    {
+        var userId = evt.UserId.ToString();
+
+        RemoteUsers.Remove(userId);
+        RemoteScreenUsers.Remove(userId);
+        PeerStates.Remove(userId);
+        await js.InvokeVoidAsync("receiveLeave", userId);
 
         Notify();
     }
@@ -150,18 +172,13 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
     private void HandleIceCandidate(IceCandidateEvent evt)
         => js.InvokeVoidAsync("receiveIceCandidate", evt.FromUserId, evt.CandidateJson);
 
-    private void HandleHangUp(HangUpEvent evt)
+    private void HandleUserLeave(UserLeavedEvent evt)
     {
-        RemoteUsers.Remove(evt.FromUserId);
-        RemoteScreenUsers.Remove(evt.FromUserId);
-        PeerStates.Remove(evt.FromUserId);
-        js.InvokeVoidAsync("receiveHangUp", evt.FromUserId);
+        RemoteUsers.Remove(evt.UserId);
+        RemoteScreenUsers.Remove(evt.UserId);
+        PeerStates.Remove(evt.UserId);
+        js.InvokeVoidAsync("receiveHangUp", evt.UserId);
         Notify();
-    }
-
-    private void HandleMetadata(CallMetadataEvent evt)
-    {
-        Metadata = new CallMetadata(evt.ParticipantCount, evt.StartedAt);
     }
 
     [JSInvokable]
@@ -227,19 +244,15 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
     [JSInvokable]
     public Task SendVideoOffer(string targetUserId, string sdp)
-        => service.SendVideoOffer(CallId, targetUserId, sdp);
+        => realtimeService.SendVideoOffer(Call.Id, targetUserId, sdp);
 
     [JSInvokable]
     public Task SendVideoAnswer(string targetUserId, string sdp)
-        => service.SendVideoAnswer(CallId, targetUserId, sdp);
+        => realtimeService.SendVideoAnswer(Call.Id, targetUserId, sdp);
 
     [JSInvokable]
     public Task SendIceCandidate(string targetUserId, string candidateJson)
-        => service.SendIceCandidate(CallId, targetUserId, candidateJson);
-
-    [JSInvokable]
-    public Task SendHangUp(string targetUserId)
-        => service.SendHangUp(CallId, targetUserId);
+        => realtimeService.SendIceCandidate(Call.Id, targetUserId, candidateJson);
 
     public async Task ToggleMuteAsync()
     {
@@ -283,12 +296,12 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
 
     private void UnsubscribeSignalR()
     {
-        service.OnUserListUpdated -= HandleUserListUpdated;
-        service.OnVideoOffer -= HandleVideoOffer;
-        service.OnVideoAnswer -= HandleVideoAnswer;
-        service.OnIceCandidate -= HandleIceCandidate;
-        service.OnHangUp -= HandleHangUp;
-        service.OnCallMetadataUpdated -= HandleMetadata;
+        realtimeService.OnCallEnded -= HandleCallEnded;
+        realtimeService.OnUserJoined -= HandleUserJoined;
+        realtimeService.OnUserLeaved -= HandleUserLeave;
+        realtimeService.OnVideoOffer -= HandleVideoOffer;
+        realtimeService.OnVideoAnswer -= HandleVideoAnswer;
+        realtimeService.OnIceCandidate -= HandleIceCandidate;
     }
 
     private void Notify() => OnChange?.Invoke();
@@ -298,10 +311,10 @@ public class CallState(ICallRealtimeService service, AppState appState, IJSRunti
         UnsubscribeSignalR();
         if (IsInCall)
         {
-            await js.InvokeVoidAsync("hangUpAll", new { keepLocalStream = false });
+            await js.InvokeVoidAsync("closeStreams", new { keepLocalStream = false });
         }
 
         _objRef?.Dispose();
-        await service.DisconnectAsync();
+        await realtimeService.DisconnectAsync();
     }
 }

@@ -97,12 +97,6 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
         await Clients.Client(info.ConnectionId).ReceiveIceCandidate(info.SenderId, candidateJson);
     }
 
-    public async Task SendHangUp(Guid callId, string targetUserId)
-    {
-        var info = await GetTransferInfoAsync(callId, targetUserId);
-        await Clients.Client(info.ConnectionId).ReceiveHangUp(info.SenderId);
-    }
-
     private async Task<TransferInfo> GetTransferInfoAsync(Guid callId, string targetUserId)
     {
         var request = new GetTransferInfoQuery
@@ -133,7 +127,7 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
         }
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(callId));
-        await Clients.Group(GroupName(callId)).UserLeaved(info.UserId);
+        await Clients.Group(GroupName(callId)).UserLeaved(info.UserId.ToString());
     }
 
     private static string GroupName(Guid callId)
