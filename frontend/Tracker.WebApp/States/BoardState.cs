@@ -3,6 +3,7 @@ using Tracker.Domain.Requests.Board;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Board;
 using Tracker.Services.Abstraction.Realtime;
+using Tracker.Services.Abstraction.Realtime.Events.Calls;
 
 namespace Tracker.WebApp.States;
 
@@ -91,6 +92,19 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnListMoved += ListsState.Apply;
         _boardRealtime.OnListUpdated += ListsState.Apply;
         _boardRealtime.OnListDeleted += ListsState.Apply;
+
+        _boardRealtime.OnCallStarted += ApplyCallStarted;
+    }
+
+    public async Task StartCallAsync()
+    {
+        var id = await _boardService.StartCallAsync(Board.Id);
+        if (id.IsSuccess)
+        {
+            Board.CallId = id.Value;
+        }
+
+        Notify();
     }
 
     public async Task UpdateBoardAsync(UpdateBoardRequest request)
@@ -123,6 +137,18 @@ public sealed class BoardState : IAsyncDisposable
         Notify();
     }
 
+    private void ApplyCallStarted(BoardCallStartedEvent evt)
+    {
+        Board.CallId = evt.CallId;
+        Notify();
+    }
+
+    public void ApplyCallEnded()
+    {
+        Board.CallId = null;
+        Notify();
+    }
+
     public bool IsMyId(Guid checkedId)
     {
         if (_appState.IsUnauthenticated)
@@ -143,6 +169,8 @@ public sealed class BoardState : IAsyncDisposable
         _boardRealtime.OnListMoved -= ListsState.Apply;
         _boardRealtime.OnListUpdated -= ListsState.Apply;
         _boardRealtime.OnListDeleted -= ListsState.Apply;
+
+        _boardRealtime.OnCallStarted -= ApplyCallStarted;
         await _boardRealtime.DisconnectAsync();
     }
 

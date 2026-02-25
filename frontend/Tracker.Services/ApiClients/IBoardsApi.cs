@@ -17,4 +17,7 @@ public interface IBoardsApi
 
     [Get("/api/boards/my")]
     Task<IApiResponse<List<BoardSummaryDto>>> GetForCurrentUserAsync();
+
+    [Post("/api/boards/{id}/call")]
+    Task<IApiResponse<Guid>> StartCallAsync(Guid id);
 }

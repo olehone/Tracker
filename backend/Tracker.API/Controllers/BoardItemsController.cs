@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Tracker.API.Hubs;
-using Tracker.API.Hubs.Events;
+using Tracker.API.Hubs.Events.Items;
 using Tracker.API.Hubs.Interfaces;
 using Tracker.API.Requests;
 using Tracker.API.Services;

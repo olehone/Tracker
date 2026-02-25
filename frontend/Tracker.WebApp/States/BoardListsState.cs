@@ -1,7 +1,7 @@
 ﻿using Tracker.Domain.Dtos;
-using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Domain.Requests.BoardList;
 using Tracker.Services.Abstraction.Board;
+using Tracker.Services.Abstraction.Realtime.Events.Lists;
 
 namespace Tracker.WebApp.States;
 

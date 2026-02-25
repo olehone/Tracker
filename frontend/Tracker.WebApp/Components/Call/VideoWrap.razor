@@ -1,8 +1,35 @@
-﻿<MudPaper @onclick=Click
-          @key=@Id
-          Style=@GetStyle()>
-    <video id=@Id
-           autoplay
-           muted=@(IsOwn || IsMuted)
-           playsinline />
+﻿<MudPaper @onclick="Click"
+          @key="Id"
+          Elevation="0"
+          Class="d-flex"
+          Style="@GetStyle()">
+
+    <MudStack Style="position:relative; height:100%; width:100%; aspect-ratio:16/9; flex-shrink:0;"
+              AlignItems="AlignItems.Center"
+              Justify="Justify.Center">
+        <video id="@Id"
+               autoplay
+               muted="@(IsOwn || IsMuted)"
+               playsinline
+               style=@GetVideoStyle() />
+
+        @if (IsCameraOff)
+        {
+            <MudStack Style="height:100%;"
+                      AlignItems="AlignItems.Center"
+                      Justify="Justify.Center">
+                <MudIcon Icon="@Icons.Material.Filled.VideocamOff" Size="Size.Large" />
+
+            </MudStack>
+        }
+
+        @if (IsMuted && !IsOwn)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.MicOff"
+                     Size="Size.Large"
+                     Color="Color.Error"
+                     Class="mt-2 mr-2 pa-2"
+                     Style="position:absolute; top:0; right:0;" />
+        }
+    </MudStack>
 </MudPaper>

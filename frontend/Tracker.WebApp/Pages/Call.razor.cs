@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Pages;
 
 public partial class Call : IAsyncDisposable
 {
-    [Inject] AppState AppState{ get; set; } = null!;
+    [Parameter]
+    public Guid CallId { get; set; }
+
+    [Inject] AppState AppState { get; set; } = null!;
     [Inject] CallState CallState { get; set; } = null!;
-    [Inject] IJSRuntime JS { get; set; } = null!;
-    [Inject] NavigationManager Nav{ get; set; } = null!;
+    [Inject] NavigationManager Nav { get; set; } = null!;
 
     private string? _expandedVideoId;
 
@@ -26,6 +27,7 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        await CallState.ConnectToCallAsync(CallId);
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
         AppState.OnUserChange += OnCallStateChanged;
@@ -35,58 +37,9 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await AttachAllStreamsAsync();
-    }
-
-    public async Task OnStreamReady(string streamType, string? userId = null)
-    {
-        string elementId = streamType switch
+        if (firstRender)
         {
-            "webcam" => "local_video",
-            "screen" => "local_screen",
-            "remote-cam" => $"video-{userId}",
-            "remote-screen" => $"screen-{userId}",
-            _ => throw new ArgumentOutOfRangeException(nameof(streamType))
-        };
-
-        await AttachStreamAsync(elementId, streamType, userId);
-    }
-
-    private async Task AttachAllStreamsAsync()
-    {
-        await AttachStreamAsync("local_video", "webcam", null);
-
-        if (CallState.IsSharingScreen)
-        {
-            await AttachStreamAsync("local_screen", "screen", null);
-        }
-
-        foreach (var uid in CallState.RemoteUsers)
-        {
-            await AttachStreamAsync($"video-{uid}", "remote-cam", uid);
-        }
-
-        foreach (var uid in CallState.RemoteScreenUsers)
-        {
-            await AttachStreamAsync($"screen-{uid}", "remote-screen", uid);
-        }
-
-        if (ExpandedVideoId != null)
-        {
-            var (st, uid) = ElementIdToStreamType(ExpandedVideoId);
-            await AttachStreamAsync(ExpandedVideoId, st, uid);
-        }
-    }
-
-    private async Task AttachStreamAsync(string elementId, string streamType, string? userId)
-    {
-        try
-        {
-            await JS.InvokeVoidAsync("attachStream", elementId, streamType, userId);
-        }
-        catch (JSException ex)
-        {
-            Console.Error.WriteLine($"[attachStream] {elementId}: {ex.Message}");
+            await CallState.AttachStreamsAsync();
         }
     }
 
@@ -95,39 +48,15 @@ public partial class Call : IAsyncDisposable
         ExpandedVideoId = videoId;
         StateHasChanged();
         await Task.Yield();
-        var (st, uid) = ElementIdToStreamType(videoId);
-        await AttachStreamAsync(videoId, st, uid);
+        await CallState.AttachStreamsAsync();
     }
 
-    private void CollapseVideo()
+    private async Task CollapseVideo()
     {
         ExpandedVideoId = null;
         StateHasChanged();
-    }
-
-    private static (string streamType, string? userId) ElementIdToStreamType(string elementId)
-    {
-        if (elementId == "local_video")
-        {
-            return ("webcam", null);
-        }
-
-        if (elementId == "local_screen")
-        {
-            return ("screen", null);
-        }
-
-        if (elementId.StartsWith("video-"))
-        {
-            return ("remote-cam", elementId["video-".Length..]);
-        }
-
-        if (elementId.StartsWith("screen-"))
-        {
-            return ("remote-screen", elementId["screen-".Length..]);
-        }
-
-        throw new InvalidOperationException($"Unknown element id: {elementId}");
+        await Task.Yield();
+        await CallState.AttachStreamsAsync();
     }
 
     private void OnCallStateChanged()
@@ -137,7 +66,7 @@ public partial class Call : IAsyncDisposable
 
     public Task LeaveCall()
     {
-        return CallState.HangUpAsync();
+        return CallState.LeaveAsync();
     }
 
     public void LeavePage()

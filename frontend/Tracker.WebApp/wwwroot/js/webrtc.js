@@ -45,7 +45,7 @@ async function getLocalStream() {
     try {
         webcamStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: { aspectRatio: { ideal: 1.333333 } },
+            video: { aspectRatio: { ideal: 1.777777 } },
         });
     } catch (err) {
         log_error("getUserMedia denied: " + err.message);
@@ -187,7 +187,7 @@ function createPeerConnection(userId) {
     pc.oniceconnectionstatechange = () => {
         log("ICE connection: " + userId + " → " + pc.iceConnectionState);
         if (["closed", "failed", "disconnected"].includes(pc.iceConnectionState))
-            handlePeerGone(userId);
+            handlePeerLeaved(userId);
     };
 
     pc.onconnectionstatechange = () => {
@@ -203,7 +203,7 @@ function createPeerConnection(userId) {
         }
 
         if (pc.connectionState === "failed")
-            handlePeerGone(userId);
+            handlePeerLeaved(userId);
     };
 
     pc.onnegotiationneeded = async () => {
@@ -321,12 +321,7 @@ async function receiveIceCandidate(fromUserId, candidateJson) {
     log("Added ICE from " + fromUserId);
 }
 
-function receiveHangUp(fromUserId) {
-    log("Hang up from " + fromUserId);
-    closePeerConnection(fromUserId);
-}
-
-function handlePeerGone(userId) {
+function handleLeaved(userId) {
     if (closingConnections.has(userId)) return;
     closingConnections.add(userId);
     log("Peer gone: " + userId);
@@ -364,18 +359,8 @@ function closePeerConnection(userId) {
     log("Closed connection with " + userId);
 }
 
-async function hangUpAll({ keepLocalStream = false } = {}) {
-    log("Hanging up all (" + peerConnections.size + " peers)");
-
-    await Promise.allSettled(
-        Array.from(peerConnections.keys()).map(userId =>
-            dotNetInstance.invokeMethodAsync("SendHangUp", userId)
-                .catch(err => log_error("SendHangUp failed for " + userId + ": " + err))
-        )
-    );
-
-    Array.from(peerConnections.keys()).forEach(closePeerConnection);
-
+async function closeStreams({ keepLocalStream = false } = {}) {
+    log("Closing streams");
     if (screenStream) {
         screenStream.getTracks().forEach(t => t.stop());
         screenStream = null;
@@ -390,7 +375,7 @@ async function hangUpAll({ keepLocalStream = false } = {}) {
 
     myUserId = null;
     closingConnections.clear();
-    log("All connections closed");
+    log("All streams closed");
 }
 
 async function setMuted(muted) {
@@ -410,7 +395,10 @@ async function setMuted(muted) {
         await Promise.allSettled(
             Array.from(peerConnections.entries()).map(([userId, pc]) => {
                 const sender = pc.getSenders().find(s => s.track?.kind === "audio");
-                if (sender) { log("Replacing audio for " + userId); return sender.replaceTrack(track); }
+                if (sender && sender.track != track) {
+                    log("Replacing audio for " + userId);
+                    return sender.replaceTrack(track);
+                }
             })
         );
         log("Microphone re-acquired");
@@ -438,7 +426,7 @@ async function setVideoEnabled(enabled) {
         try {
             fresh = await navigator.mediaDevices.getUserMedia({
                 audio: false,
-                video: { aspectRatio: { ideal: 1.333333 } },
+                video: { aspectRatio: { ideal: 1.777777 } },
             });
         } catch (err) { log_error("Camera re-acquire failed: " + err); return; }
 
@@ -448,7 +436,10 @@ async function setVideoEnabled(enabled) {
         await Promise.allSettled(
             Array.from(peerConnections.entries()).map(([userId, pc]) => {
                 const sender = pc.getSenders().find(s => s.track === null || s.track?.kind === "video");
-                if (sender) { log("Replacing video for " + userId); return sender.replaceTrack(track); }
+                if (sender && sender.track != track) {
+                    log("Replacing video for " + userId);
+                    return sender.replaceTrack(track);
+                }
             })
         );
 
@@ -509,11 +500,14 @@ window.getLocalStream = getLocalStream;
 window.attachStream = attachStream;
 window.broadcastState = broadcastState;
 window.initiateCall = initiateCall;
+
 window.receiveVideoOffer = receiveVideoOffer;
 window.receiveVideoAnswer = receiveVideoAnswer;
 window.receiveIceCandidate = receiveIceCandidate;
-window.receiveHangUp = receiveHangUp;
-window.hangUpAll = hangUpAll;
+window.handleLeaved = handleLeaved;
+
+window.closeStreams = closeStreams;
+
 window.setMuted = setMuted;
 window.setVideoEnabled = setVideoEnabled;
 window.startScreenShare = startScreenShare;

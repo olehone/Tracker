@@ -11,4 +11,6 @@ public static class BoardRealtimeMethods
     public const string ListMoved = "ListMoved";
     public const string ListUpdated = "ListUpdated";
     public const string ListDeleted = "ListDeleted";
+
+    public const string CallStarted = "CallStarted";
 }

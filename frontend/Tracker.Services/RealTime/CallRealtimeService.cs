@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
+using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
-using Tracker.Services.Abstraction.Realtime.Events;
+using Tracker.Services.Abstraction.Realtime.Events.Calls;
 using Tracker.Services.Realtime.Methods;
 
 namespace Tracker.Services.Realtime;
@@ -9,17 +10,24 @@ namespace Tracker.Services.Realtime;
 public class CallRealtimeService(IApiUrlService apiUrl, IAuthService authService)
     : RealtimeService(apiUrl, authService, "hubs/call"), ICallRealtimeService
 {
-    public event Action<UserListUpdatedEvent>? OnUserListUpdated;
+    public event Action? OnCallEnded;
+    public event Action<UserJoinedEvent>? OnUserJoined;
+    public event Action<UserLeavedEvent>? OnUserLeaved;
+
     public event Action<VideoOfferEvent>? OnVideoOffer;
     public event Action<VideoAnswerEvent>? OnVideoAnswer;
     public event Action<IceCandidateEvent>? OnIceCandidate;
-    public event Action<HangUpEvent>? OnHangUp;
-    public event Action<CallMetadataEvent>? OnCallMetadataUpdated;
 
     public override void RegisterEvents(HubConnection connection)
     {
-        connection.On<string[]>(CallRealtimeMethods.UserListUpdated, userIds =>
-            OnUserListUpdated?.Invoke(new UserListUpdatedEvent(userIds)));
+        connection.On(CallRealtimeMethods.CallEnded, () =>
+            OnCallEnded?.Invoke());
+
+        connection.On<UserDto>(CallRealtimeMethods.UserJoined, user =>
+            OnUserJoined?.Invoke(new UserJoinedEvent(user)));
+
+        connection.On<string>(CallRealtimeMethods.UserLeaved, user =>
+            OnUserLeaved?.Invoke(new UserLeavedEvent(user)));
 
         connection.On<string, string>(CallRealtimeMethods.ReceiveVideoOffer, (fromUserId, sdp) =>
             OnVideoOffer?.Invoke(new VideoOfferEvent(fromUserId, sdp)));
@@ -29,18 +37,18 @@ public class CallRealtimeService(IApiUrlService apiUrl, IAuthService authService
 
         connection.On<string, string>(CallRealtimeMethods.ReceiveIceCandidate, (fromUserId, candidateJson) =>
             OnIceCandidate?.Invoke(new IceCandidateEvent(fromUserId, candidateJson)));
-
-        connection.On<string>(CallRealtimeMethods.ReceiveHangUp, fromUserId =>
-            OnHangUp?.Invoke(new HangUpEvent(fromUserId)));
-
-        connection.On<int, DateTimeOffset?>(CallRealtimeMethods.ReceiveCallMetadata, (participantCount, startedAt) =>
-            OnCallMetadataUpdated?.Invoke(new CallMetadataEvent(participantCount, startedAt)));
     }
 
     public async Task PeekAsync(Guid callId)
     {
         await StartConnectionAsync();
         await Connection.InvokeAsync(CallRealtimeMethods.Peek, callId);
+    }
+
+    public async Task LeaveAsync(Guid callId)
+    {
+        await StartConnectionAsync();
+        await Connection.InvokeAsync(CallRealtimeMethods.Leave, callId);
     }
 
     public Task SendVideoOffer(Guid callId, string targetUserId, string sdp)
@@ -85,12 +93,13 @@ public class CallRealtimeService(IApiUrlService apiUrl, IAuthService authService
 
     public override ValueTask DisposeAsync()
     {
-        OnUserListUpdated = null;
+        OnCallEnded = null;
+        OnUserJoined = null;
+        OnUserLeaved = null;
+
         OnVideoOffer = null;
         OnVideoAnswer = null;
         OnIceCandidate = null;
-        OnHangUp = null;
-        OnCallMetadataUpdated = null;
         return base.DisposeAsync();
     }
 }

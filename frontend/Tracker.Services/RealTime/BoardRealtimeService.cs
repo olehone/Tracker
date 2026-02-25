@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Realtime.Methods;
+using Tracker.Services.Abstraction.Realtime.Events.Items;
+using Tracker.Services.Abstraction.Realtime.Events.Lists;
+using Tracker.Services.Abstraction.Realtime.Events.Calls;
 
 namespace Tracker.Services.Realtime;
 
@@ -19,6 +21,8 @@ public class BoardRealtimeService(IApiUrlService apiUrl, IAuthService authServic
     public event Action<ListUpdatedEvent>? OnListUpdated;
     public event Action<ListDeletedEvent>? OnListDeleted;
 
+    public event Action<BoardCallStartedEvent>? OnCallStarted;
+
     public override ValueTask DisposeAsync()
     {
         OnItemCreated = null;
@@ -30,6 +34,8 @@ public class BoardRealtimeService(IApiUrlService apiUrl, IAuthService authServic
         OnListMoved = null;
         OnListUpdated = null;
         OnListDeleted = null;
+
+        OnCallStarted = null;
 
         return base.DisposeAsync();
     }
@@ -60,17 +66,25 @@ public class BoardRealtimeService(IApiUrlService apiUrl, IAuthService authServic
         {
             OnListCreated?.Invoke(evt);
         });
+
         connection!.On<ListMovedEvent>(BoardRealtimeMethods.ListMoved, (evt) =>
         {
             OnListMoved?.Invoke(evt);
         });
+
         connection!.On<ListUpdatedEvent>(BoardRealtimeMethods.ListUpdated, (evt) =>
         {
             OnListUpdated?.Invoke(evt);
         });
+
         connection!.On<ListDeletedEvent>(BoardRealtimeMethods.ListDeleted, (evt) =>
         {
             OnListDeleted?.Invoke(evt);
+        });
+
+        connection.On<BoardCallStartedEvent>(BoardRealtimeMethods.CallStarted, (evt) =>
+        {
+            OnCallStarted?.Invoke(evt);
         });
     }
 }

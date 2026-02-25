@@ -1,0 +1,21 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Services.Abstraction
+@using Tracker.Services.Abstraction.Realtime
+@using Tracker.WebApp.Components.Shared
+
+<LoadingWrapper LoadingCondition=@(Call is null)>
+    <Content>
+        <MudStack Row
+                  Justify="Justify.Center"
+                  AlignItems="AlignItems.Center">
+            <DurationTimer @key=Call!.Id
+                           StartTime=@Call!.StartedAt />
+
+            <MudIconButton OnClick=@(() => EventCallback.Factory.Create(this, OnJoinPressed))
+                           Icon=@Icons.Material.Filled.AddIcCall
+                           Color="Color.Error" />
+
+        </MudStack>
+    </Content>
+</LoadingWrapper>
+

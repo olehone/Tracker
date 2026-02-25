@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
-using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Board;
@@ -11,6 +10,7 @@ using Tracker.Services.Abstraction.Realtime;
 using Tracker.WebApp.Components.ItemComments;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
+using Tracker.Services.Abstraction.Realtime.Events.Comments;
 
 namespace Tracker.WebApp.Components.Items;
 
