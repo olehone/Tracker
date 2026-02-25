@@ -36,13 +36,15 @@ internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOp
         var json = JsonSerializer.Serialize(call);
         var transaction = _db.CreateTransaction();
 
-        await transaction.StringSetAsync(CallKey(call.Id), json, Expiration);
-        foreach(var user in call.Users)
-        {
-            await transaction.StringSetAsync(ConnectionKey(user.ConnectionId), user.User.Id.ToString(), Expiration);
-        }
+        var callTask = transaction.StringSetAsync(CallKey(call.Id), json, Expiration);
+        var userTasks = call.Users
+            .Select(user => transaction.StringSetAsync(ConnectionKey(user.ConnectionId), user.User.Id.ToString(), Expiration))
+            .ToList();
 
         await transaction.ExecuteAsync();
+
+        await callTask;
+        await Task.WhenAll(userTasks);
     }
 
     public async Task RemoveCallAsync(Guid callId)
@@ -55,13 +57,15 @@ internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOp
 
         var transaction = _db.CreateTransaction();
 
-        await transaction.KeyDeleteAsync(CallKey(call.Id));
-        foreach (var user in call.Users)
-        {
-            await transaction.KeyDeleteAsync(ConnectionKey(user.ConnectionId));
-        }
+        var callTask = transaction.KeyDeleteAsync(CallKey(call.Id));
+        var userTasks = call.Users
+            .Select(user => transaction.KeyDeleteAsync(ConnectionKey(user.ConnectionId)))
+            .ToList();
 
         await transaction.ExecuteAsync();
+
+        await callTask;
+        await Task.WhenAll(userTasks);
     }
 
     private TimeSpan Expiration => options.Value.CallExpiration;
