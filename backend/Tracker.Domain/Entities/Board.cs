@@ -15,4 +15,6 @@ public class Board : BaseEntity
         = BoardVisibility.Private;
     public BoardPermissionRoles PermissionRoles { get; set; } = new();
     public List<BoardUser> BoardUsers { get; set; } = [];
+
+    public ArchiveStatus ArchiveStatus { get; set; } = ArchiveStatus.NotArchived;
 }

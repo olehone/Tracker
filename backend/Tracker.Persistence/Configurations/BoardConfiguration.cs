@@ -37,5 +37,8 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
             settings.Property(s => s.MinChangeListRole)
                 .HasColumnName("MinChangeListRole");
         });
+        
+        builder.Property(b => b.ArchiveStatus)
+            .IsRequired();
     }
 }
