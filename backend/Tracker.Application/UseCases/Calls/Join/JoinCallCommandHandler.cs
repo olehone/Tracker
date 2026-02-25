@@ -42,7 +42,7 @@ public class JoinCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
         {
             call.Users.Add(new CallUser
             {
-                User = user,
+                User = user.ToDto(),
                 ConnectionId = request.ConnectionId,
                 Status = CallUserStatus.Joined
             });

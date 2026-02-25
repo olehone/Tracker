@@ -11,7 +11,7 @@ public static class CallMapping
         {
             Id = call.Id,
             StartedAt = call.StartedAt,
-            Users = call.Users.Select(user => user.User.ToDto()).ToList(),
+            Users = call.Users.Select(u => u.User).ToList(),
         };
     }
 }
