@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
-using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
 using Tracker.Services.Realtime.Methods;
-using Tracker.Services.Abstraction.Realtime.Events;
+using Tracker.Services.Abstraction.Realtime.Events.Comments;
 
 namespace Tracker.Services.Realtime;
 

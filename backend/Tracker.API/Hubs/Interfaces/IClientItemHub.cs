@@ -1,4 +1,4 @@
-﻿using Tracker.API.Hubs.Events;
+﻿using Tracker.API.Hubs.Events.Comments;
 
 namespace Tracker.API.Hubs.Interfaces;
 

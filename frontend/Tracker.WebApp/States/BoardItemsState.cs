@@ -1,8 +1,8 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
-using Tracker.Services.Abstraction.Realtime.Events;
 using Tracker.Domain.Requests.BoardItem;
 using Tracker.Services.Abstraction.Board;
+using Tracker.Services.Abstraction.Realtime.Events.Items;
 
 namespace Tracker.WebApp.States;
 

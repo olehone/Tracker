@@ -1,4 +1,4 @@
-using Tracker.Services.Abstraction.Realtime.Events;
+using Tracker.Services.Abstraction.Realtime.Events.Calls;
 
 namespace Tracker.Services.Abstraction.Realtime;
 

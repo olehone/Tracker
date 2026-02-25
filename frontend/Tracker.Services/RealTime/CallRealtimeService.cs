@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Tracker.Domain.Dtos;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Realtime;
-using Tracker.Services.Abstraction.Realtime.Events;
+using Tracker.Services.Abstraction.Realtime.Events.Calls;
 using Tracker.Services.Realtime.Methods;
 
 namespace Tracker.Services.Realtime;
