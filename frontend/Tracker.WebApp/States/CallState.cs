@@ -72,6 +72,11 @@ public class CallState(ICallService callService,
 
     public async Task AttachStreamsAsync()
     {
+        if (!IsInCall || _objRef == null)
+        {
+            return;
+        }
+
         await js.InvokeVoidAsync("getLocalStream");
         await AttachStreamAsync(LocalVideoElementId, "webcam", null);
         if (!IsInCall)

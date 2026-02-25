@@ -25,17 +25,30 @@ public class StartBoardCallCommandHandler(
             return boardResult.Error;
         }
         var board = boardResult.Value;
+        Call? call;
+
+        var callId = await boardCallRepository.GetCallIdAsync(board.Id);
+
+        if (callId.HasValue)
+        {
+            call = await callRepository.GetCallByIdAsync(callId.Value);
+            if (call is not null)
+            {
+                return call.Id;
+            }
+        }
 
         var newCallId = Guid.NewGuid();
 
         await boardCallRepository.AddCallAsync(board.Id, newCallId);
 
-        var call = new Call
+        call = new Call
         {
             Id = newCallId,
             StartedAt = DateTimeOffset.UtcNow,
             Users = []
         };
+
         await callRepository.SaveCallAsync(call);
 
         return newCallId;

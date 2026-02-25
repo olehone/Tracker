@@ -29,10 +29,12 @@
                          Icon=@Icons.Material.Filled.ScreenShare
                          Color="Color.Inherit"
                          ToggledColor="Color.Error" />
-
-    <MudIconButton OnClick=@OpenCall
-                   Icon=@Icons.Material.Filled.OpenInFull
-                   Color="Color.Inherit" />
+    @if (!IsOnCallPage())
+    {
+        <MudIconButton OnClick=@OpenCall
+                       Icon=@Icons.Material.Filled.OpenInFull
+                       Color="Color.Inherit" />
+    }
 
     <MudIconButton OnClick=@CallState.LeaveAsync
                    Icon=@Icons.Material.Filled.CallEnd

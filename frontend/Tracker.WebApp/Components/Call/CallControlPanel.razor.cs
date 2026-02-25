@@ -12,6 +12,11 @@ public partial class CallControlPanel : IDisposable
     {
         Nav.NavigateTo($"/calls/{CallState.Call.Id}");
     }
+    private bool IsOnCallPage()
+    {
+        var relative = Nav.ToBaseRelativePath(Nav.Uri);
+        return relative.StartsWith("calls/");
+    }
 
     protected override void OnInitialized()
     {

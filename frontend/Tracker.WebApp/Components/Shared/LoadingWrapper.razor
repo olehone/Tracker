@@ -2,15 +2,15 @@
 {
     @if (IsLinear)
     {
+        <MudProgressLinear Color="Color.Primary"
+                           Indeterminate />
+    }
+    else
+    {
         <MudStack Justify="Justify.Center">
             <MudProgressCircular Indeterminate
                                  Color="Color.Primary" />
         </MudStack>
-    }
-    else
-    {
-        <MudProgressLinear Color="Color.Primary"
-                           Indeterminate />
     }
 }
 else
@@ -24,5 +24,5 @@ else
     [Parameter, EditorRequired]
     public RenderFragment Content { get; set; }
     [Parameter]
-    public bool IsLinear { get; set; } = false;
+    public bool IsLinear { get; set; } = true;
 }

@@ -9,6 +9,9 @@
         <MudStack Row
                   Justify="Justify.Center"
                   AlignItems="AlignItems.Center">
+                  <MudText Color="Color.Inherit">
+                      Call in progress
+                  </MudText>
             <DurationTimer @key=Call!.Id
                            StartTime=@Call!.StartedAt />
 

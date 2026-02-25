@@ -28,11 +28,14 @@
     @if (Board.CallId is not null)
     {
         <PeekingCall CallId=@(Board.CallId.Value)
-                     OnEnded=BoardState.ApplyCallEnded/>
+                     OnEnded=BoardState.ApplyCallEnded />
     }
     else
     {
-        <MudButton OnClick=StartCall>
+        <MudButton OnClick=StartCall
+                   Size="Size.Small"
+                   Color="Color.Inherit"
+                   Variant="Variant.Outlined">
             Start call
         </MudButton>
     }
