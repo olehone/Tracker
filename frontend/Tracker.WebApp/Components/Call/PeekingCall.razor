@@ -3,17 +3,21 @@
 @using Tracker.Services.Abstraction.Realtime
 @using Tracker.WebApp.Components.Shared
 
-<LoadingWrapper LoadingCondition=@(Call is null)>
+<LoadingWrapper LoadingCondition=@(Call is null)
+                IsLinear="false">
     <Content>
         <MudStack Row
                   Justify="Justify.Center"
                   AlignItems="AlignItems.Center">
+                  <MudText Color="Color.Inherit">
+                      Call in progress
+                  </MudText>
             <DurationTimer @key=Call!.Id
                            StartTime=@Call!.StartedAt />
 
-            <MudIconButton OnClick=@(() => EventCallback.Factory.Create(this, OnJoinPressed))
+            <MudIconButton OnClick=@OpenCall
                            Icon=@Icons.Material.Filled.AddIcCall
-                           Color="Color.Error" />
+                           Color="Color.Inherit" />
 
         </MudStack>
     </Content>

@@ -187,7 +187,7 @@ function createPeerConnection(userId) {
     pc.oniceconnectionstatechange = () => {
         log("ICE connection: " + userId + " → " + pc.iceConnectionState);
         if (["closed", "failed", "disconnected"].includes(pc.iceConnectionState))
-            handlePeerLeaved(userId);
+            handleLeaved(userId);
     };
 
     pc.onconnectionstatechange = () => {

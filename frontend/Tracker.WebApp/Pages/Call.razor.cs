@@ -12,6 +12,7 @@ public partial class Call : IAsyncDisposable
     [Inject] CallState CallState { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
+    private bool _disposed = false;
     private string? _expandedVideoId;
 
     private string? ExpandedVideoId
@@ -20,27 +21,32 @@ public partial class Call : IAsyncDisposable
         set
         {
             _expandedVideoId = value;
-
             StateHasChanged();
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await CallState.ConnectToCallAsync(CallId);
+        if (CallState.IsInCall)
+        {
+            if (CallState.Call.Id != CallId)
+            {
+                await CallState.ConnectToCallAsync(CallId);
+            }
+            return;
+        }
+
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
         AppState.OnUserChange += OnCallStateChanged;
+
         await CallState.InitializeAsync();
-        await CallState.JoinAsync();
+        await CallState.ConnectToCallAsync(CallId);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await CallState.AttachStreamsAsync();
-        }
+        await CallState.AttachStreamsAsync();
     }
 
     private async Task ExpandVideo(string videoId)
@@ -61,6 +67,11 @@ public partial class Call : IAsyncDisposable
 
     private void OnCallStateChanged()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
         InvokeAsync(StateHasChanged);
     }
 
@@ -69,14 +80,21 @@ public partial class Call : IAsyncDisposable
         return CallState.LeaveAsync();
     }
 
-    public void LeavePage()
+    public async Task LeavePage()
     {
+        if (_disposed)
+        {
+            return;
+        }
+
         Nav.NavigateTo("/");
     }
 
     public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         CallState.OnChange -= OnCallStateChanged;
+        CallState.OnLeaveCall -= LeavePage;
         AppState.OnUserChange -= OnCallStateChanged;
     }
 }

@@ -44,16 +44,15 @@ public partial class BoardHeader
         return $"workspaces/{workspaceId}/overview";
     }
 
-    private void OpenCall()
-    {
-        var link = $"calls/{Board.CallId}";
-        Nav.NavigateTo(link);
-    }
-
     private async Task StartCall()
     {
         await BoardState.StartCallAsync();
         OpenCall();
+    }
+
+    private void OpenCall()
+    {
+        Nav.NavigateTo($"/calls/{Board.CallId}");
     }
 
     private async Task OpenSettings()

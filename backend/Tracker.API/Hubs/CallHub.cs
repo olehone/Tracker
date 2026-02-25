@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Tracker.API.Hubs.Interfaces;
 using Tracker.Application.UseCases.Calls;
-using Tracker.Application.UseCases.Calls.Disconnect;
 using Tracker.Application.UseCases.Calls.GetTransferInfo;
 using Tracker.Application.UseCases.Calls.Join;
 using Tracker.Application.UseCases.Calls.Leave;
@@ -52,31 +51,33 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
     {
         var request = new LeaveCallCommand
         {
-            CallId = callId,
+            CallId = callId
         };
+
         var result = await mediator.Send(request);
         if (result.IsFailure)
         {
             throw new HubException(result.Error.Description);
         }
 
-        await HandleLeaving(callId, result.Value);
-    }
+        if (result.Value is not null)
+        {
+            var info = result.Value;
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        var request = new DisconnectFromCallCommand
-        {
-            ConnectionId = Context.ConnectionId
-        };
-        var result = await mediator.Send(request);
-        if (result.IsFailure)
-        {
-            throw new HubException(result.Error.Description);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(callId));
+            if (info.IsCallEnded)
+            {
+                await Clients.Group(GroupName(callId)).CallEnded();
+                foreach (var connectionId in info.ConnectionIds)
+                {
+                    await Groups.RemoveFromGroupAsync(connectionId, GroupName(callId));
+                }
+            }
+            else
+            {
+                await Clients.Group(GroupName(callId)).UserLeaved(info.UserId.ToString());
+            }
         }
-
-        await HandleLeaving(result.Value.CallId, result.Value.LeaveInfo);
-        await base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendVideoOffer(Guid callId, string targetUserId, string sdp)
@@ -113,21 +114,6 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
             throw new HubException(message);
         }
         return result.Value;
-    }
-
-    private async Task HandleLeaving(Guid callId, LeaveInfo info)
-    {
-        if (info.CallEnded)
-        {
-            await Clients.Group(GroupName(callId)).CallEnded();
-            foreach (var connectionId in info.ConnectionIds)
-            {
-                await Groups.RemoveFromGroupAsync(connectionId, GroupName(callId));
-            }
-        }
-
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GroupName(callId));
-        await Clients.Group(GroupName(callId)).UserLeaved(info.UserId.ToString());
     }
 
     private static string GroupName(Guid callId)

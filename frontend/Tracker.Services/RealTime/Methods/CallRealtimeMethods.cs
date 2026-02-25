@@ -9,7 +9,6 @@ public static class CallRealtimeMethods
     public const string SendVideoOffer = "SendVideoOffer";
     public const string SendVideoAnswer = "SendVideoAnswer";
     public const string SendIceCandidate = "SendIceCandidate";
-    public const string SendHangUp = "SendHangUp";
 
     public const string CallEnded = "CallEnded";
     public const string UserJoined = "UserJoined";
