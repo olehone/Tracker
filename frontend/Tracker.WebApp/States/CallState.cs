@@ -105,7 +105,7 @@ public class CallState(ICallService callService,
         IsInCall = true;
         Notify();
 
-        realtimeService.OnCallEnded += HandleCallEndedFromSignalR;
+        realtimeService.OnCallEnded += HandleCallEndedAsync;
         realtimeService.OnUserJoined += HandleUserJoined;
         realtimeService.OnUserLeaved += HandleUserLeaved;
         realtimeService.OnVideoOffer += HandleVideoOffer;
@@ -123,7 +123,7 @@ public class CallState(ICallService callService,
         await CleanupAsync();
     }
 
-    private async void HandleCallEndedFromSignalR()
+    private async void HandleCallEndedAsync()
     {
         UnsubscribeSignalR();
         await realtimeService.DisconnectAsync();
@@ -160,8 +160,9 @@ public class CallState(ICallService callService,
         RemoteUsers.Insert(i < 0 ? ~i : i, userId);
         PeerStates.TryAdd(userId, new PeerState(false, false, false));
 
-        await js.InvokeVoidAsync("initiateCall", userId, MyId);
         Notify();
+        await Task.Yield();
+        await js.InvokeVoidAsync("initiateCall", userId, MyId);
     }
 
     private async void HandleUserLeaved(UserLeavedEvent evt)
@@ -299,7 +300,7 @@ public class CallState(ICallService callService,
 
     private void UnsubscribeSignalR()
     {
-        realtimeService.OnCallEnded -= HandleCallEndedFromSignalR;
+        realtimeService.OnCallEnded -= HandleCallEndedAsync;
         realtimeService.OnUserJoined -= HandleUserJoined;
         realtimeService.OnUserLeaved -= HandleUserLeaved;
         realtimeService.OnVideoOffer -= HandleVideoOffer;

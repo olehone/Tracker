@@ -27,6 +27,15 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        if (CallState.IsInCall)
+        {
+            if (CallState.Call.Id != CallId)
+            {
+                await CallState.ConnectToCallAsync(CallId);
+            }
+            return;
+        }
+
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
         AppState.OnUserChange += OnCallStateChanged;
@@ -37,10 +46,7 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await CallState.AttachStreamsAsync();
-        }
+        await CallState.AttachStreamsAsync();
     }
 
     private async Task ExpandVideo(string videoId)

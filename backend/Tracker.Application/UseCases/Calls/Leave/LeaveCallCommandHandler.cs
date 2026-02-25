@@ -10,7 +10,7 @@ namespace Tracker.Application.UseCases.Calls.Leave;
 public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
     ICallRepository repo,
     IUserContext userContext)
-    : IRequestHandler<LeaveCallCommand, Result<LeaveInfo>>
+    : IRequestHandler<LeaveCallCommand, Result<LeaveInfo?>>
 {
     public async Task<Result<LeaveInfo?>> Handle(LeaveCallCommand request, CancellationToken cancellationToken)
     {

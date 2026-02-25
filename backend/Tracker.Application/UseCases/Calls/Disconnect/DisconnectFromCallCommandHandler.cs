@@ -8,7 +8,7 @@ namespace Tracker.Application.UseCases.Calls.Disconnect;
 
 public class DisconnectFromCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
     ICallRepository repo)
-    : IRequestHandler<DisconnectFromCallCommand, Result<DisconnectInfo>>
+    : IRequestHandler<DisconnectFromCallCommand, Result<DisconnectInfo?>>
 {
     public async Task<Result<DisconnectInfo?>> Handle(DisconnectFromCallCommand request, CancellationToken cancellationToken)
     {
