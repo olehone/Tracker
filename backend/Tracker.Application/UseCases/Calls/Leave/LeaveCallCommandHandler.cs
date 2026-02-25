@@ -2,8 +2,7 @@
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
-using Tracker.Domain.Dtos;
-using Tracker.Domain.Mapping;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Calls.Leave;
@@ -11,9 +10,9 @@ namespace Tracker.Application.UseCases.Calls.Leave;
 public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
     ICallRepository repo,
     IUserContext userContext)
-    : IRequestHandler<LeaveCallCommand, Result<Guid>>
+    : IRequestHandler<LeaveCallCommand, Result<LeaveInfo>>
 {
-    public async Task<Result<Guid>> Handle(LeaveCallCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LeaveInfo>> Handle(LeaveCallCommand request, CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
@@ -33,15 +32,14 @@ public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
 
         call.Users.Remove(user);
 
-        if(call.Users.Count == 0)
-        {
-            await repo.RemoveCallAsync(call.Id);
-        }
-        else
+        if (call.Users.Any(user => user.Status == CallUserStatus.Joined))
         {
             await repo.SaveCallAsync(call);
+            return new LeaveInfo(userId, false, []);
         }
 
-        return userId;
+        await repo.RemoveCallAsync(call.Id);
+        var connectIds = call.Users.Select(u => u.ConnectionId).ToList();
+        return new LeaveInfo(call.Id, true, connectIds);
     }
 }

@@ -1,16 +1,16 @@
 ﻿using MediatR;
-using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Calls.Disconnect;
 
 public class DisconnectFromCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
     ICallRepository repo)
-    : IRequestHandler<DisconnectFromCallCommand, Result<(Guid UserId, Guid CallId)>>
+    : IRequestHandler<DisconnectFromCallCommand, Result<DisconnectInfo>>
 {
-    public async Task<Result<(Guid UserId, Guid CallId)>> Handle(DisconnectFromCallCommand request, CancellationToken cancellationToken)
+    public async Task<Result<DisconnectInfo>> Handle(DisconnectFromCallCommand request, CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
@@ -28,15 +28,19 @@ public class DisconnectFromCallCommandHandler(IUnitOfWorkFactory unitOfWorkFacto
 
         call.Users.Remove(user);
 
-        if (call.Users.Count == 0)
+        LeaveInfo leaveInfo;
+        if (call.Users.Any(u => u.Status == CallUserStatus.Joined))
         {
-            await repo.RemoveCallAsync(call.Id);
+            await repo.SaveCallAsync(call);
+            leaveInfo = new LeaveInfo(user.User.Id, false, []);
         }
         else
         {
-            await repo.SaveCallAsync(call);
+            await repo.RemoveCallAsync(call.Id);
+            var connectIds = call.Users.Select(u => u.ConnectionId).ToList();
+            leaveInfo = new LeaveInfo(call.Id, true, connectIds);
         }
 
-        return (user.User.Id, call.Id);
+        return new DisconnectInfo(user.User.Id, leaveInfo);
     }
 }

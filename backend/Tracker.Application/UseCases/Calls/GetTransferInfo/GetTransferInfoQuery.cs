@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Calls.GetUserConnection;
+namespace Tracker.Application.UseCases.Calls.GetTransferInfo;
 
 public class GetTransferInfoQuery : IRequest<Result<TransferInfo>>
 {

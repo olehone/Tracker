@@ -4,7 +4,7 @@ using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Results;
 
-namespace Tracker.Application.UseCases.Calls.GetUserConnection;
+namespace Tracker.Application.UseCases.Calls.GetTransferInfo;
 
 public class GetTransferInfoQueryHandler(IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext,
