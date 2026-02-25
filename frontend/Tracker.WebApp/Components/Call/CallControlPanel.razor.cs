@@ -5,6 +5,9 @@ namespace Tracker.WebApp.Components.Call;
 
 public partial class CallControlPanel : IDisposable
 {
+    [Parameter]
+    public bool ShowLinkToPage { get; set; } = true;
+
     [Inject] CallState CallState { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
 
@@ -12,12 +15,6 @@ public partial class CallControlPanel : IDisposable
     {
         Nav.NavigateTo($"/calls/{CallState.Call.Id}");
     }
-    private bool IsOnCallPage()
-    {
-        var relative = Nav.ToBaseRelativePath(Nav.Uri);
-        return relative.StartsWith("calls/");
-    }
-
     protected override void OnInitialized()
     {
         CallState.OnChange += StateHasChanged;

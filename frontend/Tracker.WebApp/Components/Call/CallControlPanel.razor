@@ -29,7 +29,7 @@
                          Icon=@Icons.Material.Filled.ScreenShare
                          Color="Color.Inherit"
                          ToggledColor="Color.Error" />
-    @if (!IsOnCallPage())
+    @if (ShowLinkToPage)
     {
         <MudIconButton OnClick=@OpenCall
                        Icon=@Icons.Material.Filled.OpenInFull
