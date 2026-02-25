@@ -112,26 +112,23 @@ public class CallState(ICallService callService,
         realtimeService.OnVideoAnswer += HandleVideoAnswer;
         realtimeService.OnIceCandidate += HandleIceCandidate;
 
-        await realtimeService.ConnectAsync(Call.Id);
+        await realtimeService.JoinAsync(Call.Id);
     }
 
     public async Task LeaveAsync()
     {
-        UnsubscribeSignalR();
         await realtimeService.LeaveAsync(Call.Id);
-        await realtimeService.DisconnectAsync();
         await CleanupAsync();
     }
 
     private async void HandleCallEndedAsync()
     {
-        UnsubscribeSignalR();
-        await realtimeService.DisconnectAsync();
         await CleanupAsync();
     }
 
     private async Task CleanupAsync()
     {
+        UnsubscribeSignalR();
         RemoteUsers.Clear();
         RemoteScreenUsers.Clear();
         PeerStates.Clear();

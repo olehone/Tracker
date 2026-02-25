@@ -45,10 +45,16 @@ public class CallRealtimeService(IApiUrlService apiUrl, IAuthService authService
         await Connection.InvokeAsync(CallRealtimeMethods.Peek, callId);
     }
 
-    public async Task LeaveAsync(Guid callId)
+    public async Task JoinAsync(Guid callId)
     {
         await StartConnectionAsync();
+        await Connection.InvokeAsync(CallRealtimeMethods.Join, callId);
+    }
+
+    public async Task LeaveAsync(Guid callId)
+    {
         await Connection.InvokeAsync(CallRealtimeMethods.Leave, callId);
+        await DisconnectAsync();
     }
 
     public Task SendVideoOffer(Guid callId, string targetUserId, string sdp)
@@ -79,16 +85,6 @@ public class CallRealtimeService(IApiUrlService apiUrl, IAuthService authService
         }
 
         return Connection.InvokeAsync(CallRealtimeMethods.SendIceCandidate, callId, targetUserId, candidateJson);
-    }
-
-    public Task SendHangUp(Guid callId, string targetUserId)
-    {
-        if (!IsConnected)
-        {
-            return Task.CompletedTask;
-        }
-
-        return Connection.InvokeAsync(CallRealtimeMethods.SendHangUp, callId, targetUserId);
     }
 
     public override ValueTask DisposeAsync()

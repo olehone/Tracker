@@ -16,6 +16,7 @@ public interface ICallRealtimeService : IAsyncDisposable
     Task DisconnectAsync();
 
     Task PeekAsync(Guid callId);
+    Task JoinAsync(Guid callId);
     Task LeaveAsync(Guid callId);
 
     Task SendVideoOffer(Guid callId, string targetUserId, string sdp);
