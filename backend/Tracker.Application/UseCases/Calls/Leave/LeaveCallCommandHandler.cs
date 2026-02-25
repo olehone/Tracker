@@ -12,7 +12,7 @@ public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext)
     : IRequestHandler<LeaveCallCommand, Result<LeaveInfo>>
 {
-    public async Task<Result<LeaveInfo>> Handle(LeaveCallCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LeaveInfo?>> Handle(LeaveCallCommand request, CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
@@ -21,13 +21,13 @@ public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
         var call = await repo.GetCallByIdAsync(request.CallId);
         if (call is null)
         {
-            return Error.NotFound("Call");
+            return Result.SuccessOf<LeaveInfo?>(null);
         }
 
         var user = call.Users.FirstOrDefault(u => u.User.Id == userId);
         if (user is null)
         {
-            return Error.NotFound("User");
+            return Result.SuccessOf<LeaveInfo?>(null);
         }
 
         call.Users.Remove(user);

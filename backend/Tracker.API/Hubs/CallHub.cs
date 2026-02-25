@@ -59,8 +59,10 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
         {
             throw new HubException(result.Error.Description);
         }
-
-        await HandleLeaving(callId, result.Value);
+        if (result.Value is not null)
+        {
+            await HandleLeaving(callId, result.Value);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -75,7 +77,10 @@ public class CallHub(IMediator mediator) : Hub<IClientCallHub>
             throw new HubException(result.Error.Description);
         }
 
-        await HandleLeaving(result.Value.CallId, result.Value.LeaveInfo);
+        if (result.Value is not null)
+        {
+            await HandleLeaving(result.Value.CallId, result.Value.LeaveInfo);
+        }
         await base.OnDisconnectedAsync(exception);
     }
 

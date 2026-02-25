@@ -10,20 +10,20 @@ public class DisconnectFromCallCommandHandler(IUnitOfWorkFactory unitOfWorkFacto
     ICallRepository repo)
     : IRequestHandler<DisconnectFromCallCommand, Result<DisconnectInfo>>
 {
-    public async Task<Result<DisconnectInfo>> Handle(DisconnectFromCallCommand request, CancellationToken cancellationToken)
+    public async Task<Result<DisconnectInfo?>> Handle(DisconnectFromCallCommand request, CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
 
         var call = await repo.GetCallByConnectionAsync(request.ConnectionId);
         if (call is null)
         {
-            return Error.NotFound("Call", "connection");
+            return Result.SuccessOf<DisconnectInfo?>(null);
         }
 
         var user = call.Users.FirstOrDefault(u => u.ConnectionId == request.ConnectionId);
         if (user is null)
         {
-            return Error.NotFound("User", "connection");
+            return Result.SuccessOf<DisconnectInfo?>(null);
         }
 
         call.Users.Remove(user);

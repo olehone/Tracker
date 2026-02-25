@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Tracker.Services.Abstraction;
-using Tracker.WebApp.Pages;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Call;
@@ -14,7 +12,8 @@ public partial class CallControlPanel : IDisposable
     {
         Nav.NavigateTo($"/calls/{CallState.Call.Id}");
     }
-    protected override void OnParametersSet()
+
+    protected override void OnInitialized()
     {
         CallState.OnChange += StateHasChanged;
     }

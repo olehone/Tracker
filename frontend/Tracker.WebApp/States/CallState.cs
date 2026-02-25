@@ -20,7 +20,7 @@ public class CallState(ICallService callService,
     public static string RemoteScreenElementId(string userId) => $"screen-{userId}";
 
     public event Action? OnChange;
-    public event Action? OnLeaveCall;
+    public event Func<Task>? OnLeaveCall;
 
     public CallDto Call => _currentCall!;
     public bool IsInCall { get; private set; } = false;
@@ -39,7 +39,6 @@ public class CallState(ICallService callService,
 
     private string MyId => appState.MyId.ToString();
 
-
     public async Task InitializeAsync()
     {
         if (_objRef != null)
@@ -51,14 +50,13 @@ public class CallState(ICallService callService,
         await js.InvokeVoidAsync("registerDotNetInstance", _objRef);
     }
 
-    
-
     public async Task ConnectToCallAsync(Guid callId)
     {
         if (IsInCall)
         {
             await LeaveAsync();
         }
+
         var result = await callService.GetByIdAsync(callId);
         if (result.IsSuccess)
         {
@@ -107,10 +105,9 @@ public class CallState(ICallService callService,
         IsInCall = true;
         Notify();
 
-        realtimeService.OnCallEnded += HandleCallEnded;
+        realtimeService.OnCallEnded += HandleCallEndedFromSignalR;
         realtimeService.OnUserJoined += HandleUserJoined;
         realtimeService.OnUserLeaved += HandleUserLeaved;
-
         realtimeService.OnVideoOffer += HandleVideoOffer;
         realtimeService.OnVideoAnswer += HandleVideoAnswer;
         realtimeService.OnIceCandidate += HandleIceCandidate;
@@ -120,14 +117,21 @@ public class CallState(ICallService callService,
 
     public async Task LeaveAsync()
     {
+        UnsubscribeSignalR();
         await realtimeService.LeaveAsync(Call.Id);
         await realtimeService.DisconnectAsync();
-        HandleCallEnded();
+        await CleanupAsync();
     }
 
-    private async void HandleCallEnded()
+    private async void HandleCallEndedFromSignalR()
     {
         UnsubscribeSignalR();
+        await realtimeService.DisconnectAsync();
+        await CleanupAsync();
+    }
+
+    private async Task CleanupAsync()
+    {
         RemoteUsers.Clear();
         RemoteScreenUsers.Clear();
         PeerStates.Clear();
@@ -137,9 +141,15 @@ public class CallState(ICallService callService,
         ScreenStreamId = null;
         IsInCall = false;
         _currentCall = null;
-        OnLeaveCall?.Invoke();
+
         await js.InvokeVoidAsync("closeStreams");
+
         Notify();
+
+        if (OnLeaveCall is not null)
+        {
+            await OnLeaveCall.Invoke();
+        }
     }
 
     private async void HandleUserJoined(UserJoinedEvent evt)
@@ -148,11 +158,9 @@ public class CallState(ICallService callService,
 
         var i = RemoteUsers.BinarySearch(userId, StringComparer.Ordinal);
         RemoteUsers.Insert(i < 0 ? ~i : i, userId);
-
         PeerStates.TryAdd(userId, new PeerState(false, false, false));
 
         await js.InvokeVoidAsync("initiateCall", userId, MyId);
-
         Notify();
     }
 
@@ -163,8 +171,7 @@ public class CallState(ICallService callService,
         RemoteUsers.Remove(userId);
         RemoteScreenUsers.Remove(userId);
         PeerStates.Remove(userId);
-        await js.InvokeVoidAsync("receiveLeave", userId);
-
+        await js.InvokeVoidAsync("handleLeaved", userId);
         Notify();
     }
 
@@ -176,7 +183,6 @@ public class CallState(ICallService callService,
 
     private void HandleIceCandidate(IceCandidateEvent evt)
         => js.InvokeVoidAsync("receiveIceCandidate", evt.FromUserId, evt.CandidateJson);
-
 
     [JSInvokable]
     public object GetLocalState() => new
@@ -293,7 +299,7 @@ public class CallState(ICallService callService,
 
     private void UnsubscribeSignalR()
     {
-        realtimeService.OnCallEnded -= HandleCallEnded;
+        realtimeService.OnCallEnded -= HandleCallEndedFromSignalR;
         realtimeService.OnUserJoined -= HandleUserJoined;
         realtimeService.OnUserLeaved -= HandleUserLeaved;
         realtimeService.OnVideoOffer -= HandleVideoOffer;
