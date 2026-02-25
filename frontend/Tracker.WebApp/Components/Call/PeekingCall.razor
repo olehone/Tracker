@@ -1,0 +1,59 @@
+﻿@using Tracker.Domain.Dtos
+@using Tracker.Services.Abstraction
+@using Tracker.Services.Abstraction.Realtime
+@using Tracker.WebApp.Components.Shared
+
+<LoadingWrapper LoadingCondition=@(Call is null)>
+    <Content>
+        <MudStack Row
+                  Justify="Justify.Center"
+                  AlignItems="AlignItems.Center">
+            <DurationTimer @key=Call!.Id
+                           StartTime=@Call!.StartedAt />
+
+            <MudIconButton OnClick=@(() => EventCallback.Factory.Create(this, OnJoinPressed))
+                           Icon=@Icons.Material.Filled.AddIcCall
+                           Color="Color.Error" />
+
+        </MudStack>
+    </Content>
+</LoadingWrapper>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid CallId { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback OnEnded { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback OnJoinPressed { get; set; }
+
+    public event Action? OnCallEnded;
+
+    private CallDto? Call { get; set; }
+
+    [Inject] ICallRealtimeService CallStateService { get; set; } = null!;
+    [Inject] ICallService CallService { get; set; } = null!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await CallService.GetByIdAsync(CallId);
+        if (result.IsSuccess)
+        {
+            Call = result.Value;
+            OnCallEnded += HandleCallEnded;
+        }
+    }
+
+    public void HandleCallEnded()
+    {
+        if (OnEnded.HasDelegate)
+        {
+            OnEnded.InvokeAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        OnCallEnded -= HandleCallEnded;
+    }
+}

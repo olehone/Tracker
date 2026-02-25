@@ -28,4 +28,9 @@ public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IB
     {
         return apiErrorHandler.ExecuteAsync(api.GetForCurrentUserAsync);
     }
+
+    public Task<Result<Guid>> StartCallAsync(Guid id)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.StartCallAsync(id));
+    }
 }

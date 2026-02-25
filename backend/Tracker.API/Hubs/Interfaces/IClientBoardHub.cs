@@ -13,4 +13,6 @@ public interface IClientBoardHub
     Task ListMoved(ListMovedEvent evt);
     Task ListUpdated(ListUpdatedEvent evt);
     Task ListDeleted(ListDeletedEvent evt);
+
+    Task CallStarted(BoardCallStartedEvent evt);
 }

@@ -9,4 +9,5 @@ public class RedisOptions
     public required TimeSpan CallExpiration { get; init; }
     public required string CallsKey { get; init; }
     public required string ConnectionsKey { get; init; }
+    public required string BoardCallKey { get; init; }
 }

@@ -27,7 +27,7 @@ public partial class Call : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        await CallState.SetCallAsync(CallId);
+        await CallState.ConnectToCallAsync(CallId);
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
         AppState.OnUserChange += OnCallStateChanged;

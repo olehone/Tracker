@@ -13,4 +13,6 @@ public interface IBoardRealtimeService : IRealtimeService
     event Action<ListMovedEvent>? OnListMoved;
     event Action<ListUpdatedEvent>? OnListUpdated;
     event Action<ListDeletedEvent>? OnListDeleted;
+
+    event Action<BoardCallStartedEvent>? OnCallStarted;
 }

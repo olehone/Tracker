@@ -1,12 +1,16 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Tracker.API.Hubs;
+using Tracker.API.Hubs.Events;
+using Tracker.API.Hubs.Interfaces;
 using Tracker.API.Requests;
 using Tracker.API.Services;
-using Tracker.Application.UseCases.Boards.Create;
 using Tracker.Application.UseCases.Boards.Delete;
 using Tracker.Application.UseCases.Boards.GetById;
 using Tracker.Application.UseCases.Boards.GetForCurrentUser;
+using Tracker.Application.UseCases.Boards.StartCall;
 using Tracker.Application.UseCases.Boards.Update;
 
 namespace Tracker.API.Controllers;
@@ -14,7 +18,8 @@ namespace Tracker.API.Controllers;
 [Route("api/boards")]
 [ApiController]
 [Authorize]
-public class BoardsController(IMediator mediator) : ControllerBase
+public class BoardsController(IMediator mediator, 
+    IHubContext<BoardHub, IClientBoardHub> hubContext) : ControllerBase
 {
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
@@ -56,6 +61,23 @@ public class BoardsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetForCurrentUserAsync()
     {
         var response = await mediator.Send(new GetBoardsForCurrentUserQuery());
+        return response.ToActionResult();
+    }
+
+    [HttpPost("{id:guid}/call")]
+    public async Task<IActionResult> StartCallAsync(Guid id)
+    {
+        var mediatorRequest = new StartBoardCallCommand
+        {
+            BoardId = id,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        if (response.IsFailure)
+        {
+            var evt = new BoardCallStartedEvent(response.Value);
+            await hubContext.Clients.Group($"board:{id}").CallStarted(evt);
+        }
+
         return response.ToActionResult();
     }
 }

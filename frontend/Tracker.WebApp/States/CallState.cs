@@ -51,8 +51,12 @@ public class CallState(ICallService callService,
         await js.InvokeVoidAsync("registerDotNetInstance", _objRef);
     }
 
-    public async Task SetCallAsync(Guid callId)
+    public async Task ConnectToCallAsync(Guid callId)
     {
+        if (IsInCall)
+        {
+            await LeaveAsync();
+        }
         var result = await callService.GetByIdAsync(callId);
         if (result.IsSuccess)
         {

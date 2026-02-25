@@ -26,13 +26,11 @@ public class JoinCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
             return AuthErrors.Unauthenticated;
         }
 
-        var call = await repo.GetCallByIdAsync(request.CallId)
-            ?? new Call
-            {
-                Id = request.CallId,
-                StartedAt = DateTimeOffset.UtcNow,
-                Users = []
-            };
+        var call = await repo.GetCallByIdAsync(request.CallId);
+        if (call is null)
+        {
+            return Error.NotFound("Call");
+        }
 
         var existing = call.Users.FirstOrDefault(u => u.User.Id == user.Id);
         if (existing is not null)

@@ -64,5 +64,6 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddScoped<ICallRepository, RedisCallRepository>();
+        services.AddScoped<IBoardCallRepository, RedisBoardCallRepository>();
     }
 }
