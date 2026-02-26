@@ -42,13 +42,9 @@ public class BoardRepository(ApplicationDbContext dbContext)
             .ExecuteDeleteAsync();
     }
 
-    public void RestoreBoardContent(Board snapshot)
+    public async Task RestoreBoardContent(Board snapshot)
     {
         dbContext.BoardLists.AddRange(snapshot.BoardLists);
-    }
-
-    public Task SaveChangesAsync()
-    {
-        return dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
     }
 }
