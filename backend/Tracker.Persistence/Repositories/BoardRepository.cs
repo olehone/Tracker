@@ -126,26 +126,4 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .Where(b => b.ArchiveStatus == status)
             .ToListAsync();
     }
-
-    public Task<Board?> GetFullByIdAsync(Guid id)
-    {
-        return _dbSet
-            .AsNoTracking()
-            .AsSplitQuery()
-            .Include(b => b.BoardLists)
-                .ThenInclude(bl => bl.BoardItems)
-                    .ThenInclude(bi => bi.Assignees)
-                        .ThenInclude(a => a.BoardUser)
-            .Include(b => b.BoardLists)
-                .ThenInclude(bl => bl.BoardItems)
-                    .ThenInclude(bi => bi.Comments)
-                        .ThenInclude(c => c.Attachments)
-            .Include(b => b.BoardLists)
-                .ThenInclude(bl => bl.BoardItems)
-                    .ThenInclude(c => c.Attachments)
-            .Include(b => b.PermissionRoles)
-            .Include(b => b.BoardUsers)
-                .ThenInclude(bu => bu.User)
-            .FirstOrDefaultAsync(b => b.Id == id);
-    }
 }

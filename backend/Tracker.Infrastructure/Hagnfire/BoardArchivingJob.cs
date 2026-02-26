@@ -58,8 +58,7 @@ internal class BoardArchivingJob(IUnitOfWorkFactory unitOfWorkFactory,
                 await sender.SendMessagesAsync(batch);
                 batch.Dispose();
 
-                var newBatch = await sender.CreateMessageBatchAsync();
-                batch = newBatch;
+                batch = await sender.CreateMessageBatchAsync();
                 if (!batch.TryAddMessage(message))
                 {
                     throw new Exception("Message is too large");

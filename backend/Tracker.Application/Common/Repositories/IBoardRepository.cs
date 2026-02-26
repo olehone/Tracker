@@ -15,5 +15,4 @@ public interface IBoardRepository : IRepository<Board, Guid>
     Task<IReadOnlyList<Board>> GetPublicByWorkspaceAsync(Guid workspaceId);
     Task<IReadOnlyList<Board>> GetByWorkspaceAndUserAsync(Guid workspaceId, Guid userId);
     Task<IReadOnlyList<Board>> GetByArchiveStatusAsync(ArchiveStatus status);
-    Task<Board?> GetFullByIdAsync(Guid id);
 }
