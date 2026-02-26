@@ -1,30 +1,42 @@
 @using Tracker.WebApp.Shared
 
-<a href=@($"/boards/{Board.Id}")>
-	<MudCard Elevation="2">
-		<MudCardMedia Height="70"
-					  Style=@CustomColor>
-		</MudCardMedia>
+<MudCard Elevation="2"
+         @onclick=@(OpenBoard)>
+    <MudCardMedia Height="70"
+                  Style=@(IsArchived ? $"background: {Colors.Gray.Lighten1};" : CustomColor)>
+    </MudCardMedia>
 
-		<MudCardContent>
-			<MudStack Row
-					  Justify="Justify.SpaceBetween">
-				<MudText Typo="Typo.h5"
-						 Class="text-ellipsis">
-					@Board.Title
-				</MudText>
+    <MudCardContent>
+        <MudStack Row
+                  AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.h5"
+                     Class="text-ellipsis">
+                @Board.Title
+            </MudText>
 
-				<MudStack Row>
-					<BoardVisibilityIcon Visibility=@Board.Visibility/>
-					@if (Board.IsParticipating)
-					{
-						<MudTooltip Text="You are member of this board">
-							<MudIcon Icon="@Icons.Material.Outlined.Star" Color="Color.Warning" />
-						</MudTooltip>
-					}
-				</MudStack>
-			</MudStack>
-		</MudCardContent>
-	</MudCard>
-</a>
+            <MudSpacer />
 
+            @if (IsArchived)
+            {
+                <MudChip T="string"
+                         Label="true"
+                         Icon=@Icons.Material.Filled.Archive
+                         Size="Size.Small">
+                    Archived
+                </MudChip>
+            }
+            else
+            {
+                <MudStack Row>
+                    <BoardVisibilityIcon Visibility=@Board.Visibility />
+                    @if (Board.IsParticipating)
+                    {
+                        <MudTooltip Text="You are member of this board">
+                            <MudIcon Icon="@Icons.Material.Outlined.Star" Color="Color.Warning" />
+                        </MudTooltip>
+                    }
+                </MudStack>
+            }
+        </MudStack>
+    </MudCardContent>
+</MudCard>

@@ -8,10 +8,12 @@ using Tracker.API.Hubs.Events.Calls;
 using Tracker.API.Hubs.Interfaces;
 using Tracker.API.Requests;
 using Tracker.API.Services;
+using Tracker.Application.UseCases.Boards.Archive;
 using Tracker.Application.UseCases.Boards.Delete;
 using Tracker.Application.UseCases.Boards.GetById;
 using Tracker.Application.UseCases.Boards.GetForCurrentUser;
 using Tracker.Application.UseCases.Boards.StartCall;
+using Tracker.Application.UseCases.Boards.Unarchive;
 using Tracker.Application.UseCases.Boards.Update;
 
 namespace Tracker.API.Controllers;
@@ -79,6 +81,28 @@ public class BoardsController(IMediator mediator,
             await hubContext.Clients.Group($"board:{id}").CallStarted(evt);
         }
 
+        return response.ToActionResult();
+    }
+
+    [HttpPut("{id:guid}/archive")]
+    public async Task<IActionResult> ArchiveAsync(Guid id)
+    {
+        var mediatorRequest = new ArchiveBoardCommand
+        {
+            Id = id,
+        };
+        var response = await mediator.Send(mediatorRequest);
+        return response.ToActionResult();
+    }
+
+    [HttpPut("{id:guid}/unarchive")]
+    public async Task<IActionResult> UnarchiveAsync(Guid id)
+    {
+        var mediatorRequest = new UnarchiveBoardCommand
+        {
+            Id = id
+        };
+        var response = await mediator.Send(mediatorRequest);
         return response.ToActionResult();
     }
 }

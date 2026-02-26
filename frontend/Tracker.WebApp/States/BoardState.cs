@@ -1,5 +1,7 @@
-﻿using Tracker.Domain.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using Tracker.Domain.Dtos;
 using Tracker.Domain.Requests.Board;
+using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
 using Tracker.Services.Abstraction.Board;
 using Tracker.Services.Abstraction.Realtime;
@@ -116,6 +118,15 @@ public sealed class BoardState : IAsyncDisposable
             await ReloadAsync();
         }
         ApplyBoardUpdated(request);
+    }
+
+    public async Task Archive()
+    {
+        var result = await _boardService.ArchiveAsync(Board.Id);
+        if (result.IsSuccess)
+        {
+            OnBoardNotFound?.Invoke();
+        }
     }
 
     public async Task DeleteBoardAsync()

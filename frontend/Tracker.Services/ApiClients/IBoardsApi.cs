@@ -20,4 +20,10 @@ public interface IBoardsApi
 
     [Post("/api/boards/{id}/call")]
     Task<IApiResponse<Guid>> StartCallAsync(Guid id);
+
+    [Put("/api/boards/{id}/archive")]
+    Task<IApiResponse> ArchiveAsync(Guid id);
+
+    [Put("/api/boards/{id}/unarchive")]
+    Task<IApiResponse> UnarchiveAsync(Guid id);
 }
