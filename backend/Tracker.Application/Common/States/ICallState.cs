@@ -1,9 +1,9 @@
 ﻿using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
 
-namespace Tracker.Application.Common.Repositories;
+namespace Tracker.Application.Common.States;
 
-public interface ICallRepository
+public interface ICallState
 {
     Task<Call?> GetCallByIdAsync(Guid callId);
     Task<Call?> GetCallByConnectionAsync(string connectionId);

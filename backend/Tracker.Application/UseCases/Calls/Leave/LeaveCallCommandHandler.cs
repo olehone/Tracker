@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
@@ -8,7 +8,7 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Calls.Leave;
 
 public class LeaveCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
-    ICallRepository repo,
+    ICallState repo,
     IUserContext userContext)
     : IRequestHandler<LeaveCallCommand, Result<LeaveInfo?>>
 {

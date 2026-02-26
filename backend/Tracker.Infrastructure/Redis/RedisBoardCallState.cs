@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Redis;
 
-
-internal class RedisBoardCallRepository(IConnectionMultiplexer redis, IOptions<RedisOptions> options)
-    : IBoardCallRepository
+internal class RedisBoardCallState(IConnectionMultiplexer redis, IOptions<RedisOptions> options)
+    : IBoardCallState
 {
     private readonly IDatabase _db = redis.GetDatabase();
 
