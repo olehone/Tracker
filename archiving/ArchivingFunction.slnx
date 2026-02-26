@@ -4,5 +4,5 @@
   <Project Path="../Domain/Domain.csproj" Id="a80ec5e6-53b1-49fd-b6b9-f74e8b286e89" />
   <Project Path="../Services.Abstractions/Services.Abstractions.csproj" Id="c3d0ca8e-f7f6-4098-b4c6-569209ec6d86" />
   <Project Path="../Services/Services.csproj" Id="8e2a0f17-87ec-40fd-9d59-744cbd936a10" />
-  <Project Path="ArchivingFunction.csproj" />
+  <Project Path="Functions.csproj" />
 </Solution>
