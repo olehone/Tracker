@@ -1,0 +1,27 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "sbemulatorns",
+        "Properties": {
+          "MessagingSku": "Standard"
+        },
+        "Queues": [
+          {
+            "Name": "archive-queue",
+            "Properties": {
+              "DeadLetteringOnMessageExpiration": true,
+              "DefaultMessageTimeToLive": "PT1H",
+              "RequiresDuplicateDetection": false,
+              "RequiresSession": false,
+              "EnablePartitioning": false
+            }
+          }
+        ]
+      }
+    ],
+    "Logging": {
+      "Type": "Console"
+    }
+  }
+}

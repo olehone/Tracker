@@ -12,8 +12,6 @@ services:
     networks:
       - main
 
-
-
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
     restart: unless-stopped
@@ -24,7 +22,6 @@ services:
       - azurite_data:/data
     networks:
       - main
-
 
   nginx:
     image: nginx:alpine
@@ -39,16 +36,39 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
+    networks:
+      - main
+  
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "5300:5300"
+    environment:
+      ACCEPT_EULA: "Y"
+      SQL_SERVER: sqlserver
+      MSSQL_SA_PASSWORD: ${SQL_SA_PASSWORD}
+      CONFIG_FILE: /ServiceBus_Emulator/ConfigFiles/Config.json
+    volumes:
+      - ./servicebus-config.json:/ServiceBus_Emulator/ConfigFiles/Config.json
+      - servicebus_data:/ServiceBus_Emulator
+    depends_on:
+      - sqlserver
+    networks:
+      - main
 
 volumes:
   sqlserver_data:
   azurite_data:
   redis_data:
+  servicebus_data:
 
 networks: 
   main:
