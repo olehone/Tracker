@@ -1,4 +1,7 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Enums;
+using Domain.ValueObjects;
+
+namespace Domain.Entities;
 
 public class Board : BaseEntity
 {

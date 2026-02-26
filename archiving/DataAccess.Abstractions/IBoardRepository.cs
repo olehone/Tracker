@@ -1,4 +1,7 @@
-﻿namespace DataAccess.Abstractions;
+﻿using Domain.Entities;
+using Domain.Enums;
+
+namespace DataAccess.Abstractions;
 
 public interface IBoardRepository
 {

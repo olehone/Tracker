@@ -1,8 +1,8 @@
 <Solution>
-  <Project Path="../DataAccess.Abstractions/DataAccess.Abstractions.csproj" Id="5d260f97-ca11-4659-8a34-5899811dafa3" />
-  <Project Path="../DataAccess/DataAccess.csproj" Id="997b73cc-4f4a-4265-8f56-c98bc2138684" />
-  <Project Path="../Domain/Domain.csproj" Id="a80ec5e6-53b1-49fd-b6b9-f74e8b286e89" />
-  <Project Path="../Services.Abstractions/Services.Abstractions.csproj" Id="c3d0ca8e-f7f6-4098-b4c6-569209ec6d86" />
-  <Project Path="../Services/Services.csproj" Id="8e2a0f17-87ec-40fd-9d59-744cbd936a10" />
-  <Project Path="Functions.csproj" />
+  <Project Path="DataAccess.Abstractions/DataAccess.Abstractions.csproj" />
+  <Project Path="DataAccess/DataAccess.csproj" />
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Functions/Functions.csproj" />
+  <Project Path="Services.Abstractions/Services.Abstractions.csproj" />
+  <Project Path="Services/Services.csproj" />
 </Solution>

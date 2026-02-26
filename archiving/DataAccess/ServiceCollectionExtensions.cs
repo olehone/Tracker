@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using DataAccess.Abstractions;
+using Domain.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

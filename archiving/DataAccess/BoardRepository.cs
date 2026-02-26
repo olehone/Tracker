@@ -1,4 +1,6 @@
 ﻿using DataAccess.Abstractions;
+using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess;
