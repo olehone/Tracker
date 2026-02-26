@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Results;
@@ -8,8 +8,8 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Boards.StartCall;
 
 public class StartBoardCallCommandHandler(
-    IBoardCallRepository boardCallRepository,
-    ICallRepository callRepository,
+    IBoardCallState boardCallRepository,
+    ICallState callRepository,
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<StartBoardCallCommand, Result<Guid>>

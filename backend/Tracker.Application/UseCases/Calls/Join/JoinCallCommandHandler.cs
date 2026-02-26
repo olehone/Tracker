@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Entities;
@@ -11,7 +11,7 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Calls.Join;
 
 public class JoinCallCommandHandler(IUnitOfWorkFactory unitOfWorkFactory,
-    ICallRepository repo,
+    ICallState repo,
     IUserContext userContext)
     : IRequestHandler<JoinCallCommand, Result<UserDto>>
 {

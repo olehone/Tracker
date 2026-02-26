@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Mapping;
@@ -9,8 +9,8 @@ using Tracker.Domain.Results;
 namespace Tracker.Application.UseCases.Boards.GetById;
 
 public class GetBoardByIdQueryHandler(
-    IBoardCallRepository boardCallRepo,
-    ICallRepository callRepo,
+    IBoardCallState boardCallRepo,
+    ICallState callRepo,
     IUserContext userContext,
     IUnitOfWorkFactory unitOfWorkFactory)
     : IRequestHandler<GetBoardByIdQuery, Result<BoardFullDto>>

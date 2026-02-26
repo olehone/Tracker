@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.Services;
+using Tracker.Application.Common.States;
 using Tracker.Domain.Options;
 using Tracker.Infrastructure.Auth;
 using Tracker.Infrastructure.Redis;
@@ -63,7 +63,7 @@ public static class ServiceCollectionExtensions
             return ConnectionMultiplexer.Connect(redisOptions.ConnectionString);
         });
 
-        services.AddScoped<ICallRepository, RedisCallRepository>();
-        services.AddScoped<IBoardCallRepository, RedisBoardCallRepository>();
+        services.AddScoped<ICallState, RedisCallState>();
+        services.AddScoped<IBoardCallState, RedisBoardCallState>();
     }
 }

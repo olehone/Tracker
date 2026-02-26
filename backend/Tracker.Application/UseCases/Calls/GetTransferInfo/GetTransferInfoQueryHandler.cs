@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Tracker.Application.Common.Auth;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Results;
 
@@ -8,7 +8,7 @@ namespace Tracker.Application.UseCases.Calls.GetTransferInfo;
 
 public class GetTransferInfoQueryHandler(IUnitOfWorkFactory unitOfWorkFactory,
     IUserContext userContext,
-    ICallRepository repo)
+    ICallState repo)
     : IRequestHandler<GetTransferInfoQuery, Result<TransferInfo>>
 {
     public async Task<Result<TransferInfo>> Handle(GetTransferInfoQuery request, CancellationToken cancellationToken)

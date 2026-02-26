@@ -1,6 +1,6 @@
-﻿namespace Tracker.Application.Common.Repositories;
+﻿namespace Tracker.Application.Common.States;
 
-public interface IBoardCallRepository
+public interface IBoardCallState
 {
     Task<Guid?> GetCallIdAsync(Guid boardId);
     Task AddCallAsync(Guid boardId, Guid callId);

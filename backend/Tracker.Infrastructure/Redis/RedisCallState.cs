@@ -1,17 +1,14 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using Tracker.Application.Common.Repositories;
+using Tracker.Application.Common.States;
 using Tracker.Domain.Entities;
 using Tracker.Domain.Options;
 
 namespace Tracker.Infrastructure.Redis;
 
-// Naming this a repository hides implementation details,
-// but it may be confusing because it is not part of the Unit of Work.
-// Would RedisCallState and ICallState be a better choice ?
-internal class RedisCallRepository(IConnectionMultiplexer redis,IOptions<RedisOptions> options) 
-    : ICallRepository
+internal class RedisCallState(IConnectionMultiplexer redis,IOptions<RedisOptions> options) 
+    : ICallState
 {
     private readonly IDatabase _db = redis.GetDatabase();
 
