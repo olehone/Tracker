@@ -21,6 +21,8 @@ public static class BoardPolicy
             CanCreateList = role >= permissionRoles.MinCreateListRole,
             CanChangeList = role >= permissionRoles.MinChangeListRole,
             CanChangeOwner = CanChangeOwner(globalRole, workspaceRole, boardRole),
+            CanChangeArchiveStatus = CanChangeArchiveState(globalRole, workspaceRole, boardRole),
+            CanDeleteBoard = CanDeleteBoard(globalRole, workspaceRole, boardRole),
         };
     }
 
@@ -86,6 +88,26 @@ public static class BoardPolicy
         WorkspaceUserRole workspaceRole,
         BoardUserRole boardRole)
     {
+        return IsHighestPosition(globalRole, workspaceRole, boardRole)
+            || workspaceRole >= WorkspaceUserRole.Admin;
+    }
+
+    public static bool CanChangeArchiveState(GlobalRole globalRole,
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
+    {
+        return IsHighestPosition(globalRole, workspaceRole, boardRole);
+    }
+
+    public static bool CanDeleteBoard(GlobalRole globalRole,
+        WorkspaceUserRole workspaceRole,
+        BoardUserRole boardRole)
+    {
+        return IsHighestPosition(globalRole, workspaceRole, boardRole);
+    }
+
+    private static bool IsHighestPosition(GlobalRole globalRole, WorkspaceUserRole workspaceRole, BoardUserRole boardRole)
+    {
         if (globalRole >= GlobalRole.Admin)
         {
             return true;
@@ -96,7 +118,7 @@ public static class BoardPolicy
             return true;
         }
 
-        if (boardRole >= BoardUserRole.Admin)
+        if (boardRole >= BoardUserRole.Owner)
         {
             return true;
         }
@@ -115,6 +137,8 @@ public static class BoardPolicy
             BoardAction.ChangeList => permissions.CanChangeList,
             BoardAction.ChangeBoard => permissions.CanChangeBoard,
             BoardAction.ChangeOwner => permissions.CanChangeOwner,
+            BoardAction.ChangeArchiveStatus => permissions.CanChangeArchiveStatus,
+            BoardAction.DeleteBoard => permissions.CanDeleteBoard,
             _ => false
         };
     }

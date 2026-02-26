@@ -54,6 +54,20 @@ public partial class BoardSettingsDialog : IDisposable
         MudDialog.Close(DialogResult.Ok(true));
     }
 
+    private async Task Archive()
+    {
+        bool? dialogResult = await DialogService.ShowMessageBox(
+            "Warning",
+            "You are about to archive this board",
+            yesText: "Archive", cancelText: "Cancel");
+        if (dialogResult == null)
+        {
+            return;
+        }
+        await BoardState.Archive();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
     private async Task Submit()
     {
         if (_form is null || model is null)
@@ -103,8 +117,13 @@ public partial class BoardSettingsDialog : IDisposable
 
     private void Cancel() => MudDialog.Cancel();
 
-    private bool IsDisabled() =>
+    private bool IsSettingsDisabled =>
         BoardState.Board?.Permissions.CanChangeBoard != true;
+    private bool IsDeleteDisabled =>
+        BoardState.Board?.Permissions.CanDeleteBoard != true;
+
+    private bool IsArchivingDisabled =>
+        BoardState.Board?.Permissions.CanChangeArchiveStatus != true;
 
     private void StateHasChangedHandler()
     {

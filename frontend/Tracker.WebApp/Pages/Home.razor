@@ -21,7 +21,8 @@
             @foreach (var board in Boards)
             {
                 <MudItem xs="12" sm="6" lg="3" @key="board.Id">
-                    <BoardSummary Board="@board" />
+                    <BoardSummary Board=@board
+                                  IsInWorkspace="false" />
                 </MudItem>
             }
         </MudGrid>

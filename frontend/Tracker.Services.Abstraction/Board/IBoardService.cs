@@ -11,4 +11,6 @@ public interface IBoardService
     Task<Result> DeleteAsync(Guid id);
     Task<Result<List<BoardSummaryDto>>> GetForCurrentUserAsync();
     Task<Result<Guid>> StartCallAsync(Guid id);
+    Task<Result> ArchiveAsync(Guid id);
+    Task<Result> UnarchiveAsync(Guid id);
 }

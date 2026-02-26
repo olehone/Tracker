@@ -33,4 +33,14 @@ public class BoardService(IApiErrorHandler apiErrorHandler, IBoardsApi api) : IB
     {
         return apiErrorHandler.ExecuteAsync(() => api.StartCallAsync(id));
     }
+
+    public Task<Result> ArchiveAsync(Guid id)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.ArchiveAsync(id));
+    }
+
+    public Task<Result> UnarchiveAsync(Guid id)
+    {
+        return apiErrorHandler.ExecuteAsync(() => api.UnarchiveAsync(id));
+    }
 }

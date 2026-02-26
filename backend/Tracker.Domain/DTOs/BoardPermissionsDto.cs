@@ -10,6 +10,8 @@ public class BoardPermissionsDto
         CanCreateList = false,
         CanChangeList = false,
         CanChangeOwner = false,
+        CanChangeArchiveStatus = false,
+        CanDeleteBoard = false,
     };
 
     public required bool CanChangeBoard { get; set; }
@@ -18,4 +20,6 @@ public class BoardPermissionsDto
     public required bool CanCreateList { get; set; }
     public required bool CanChangeList { get; set; }
     public required bool CanChangeOwner { get; set; }
+    public required bool CanChangeArchiveStatus { get; set; }
+    public required bool CanDeleteBoard { get; set; }
 }

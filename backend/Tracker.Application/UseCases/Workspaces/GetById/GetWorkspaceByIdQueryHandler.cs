@@ -88,7 +88,13 @@ public sealed class GetWorkspaceByIdQueryHandler(
                 .Select(b => new BoardSummaryDto
                 {
                     Id = b.Id,
+                    WorkspaceId = b.WorkspaceId,
                     Title = b.Title,
+                    IsArchived = b.ArchiveStatus != ArchiveStatus.NotArchived,
+                    ArchiveStatus = b.ArchiveStatus,
+                    IsAbleToUnarchive = BoardPolicy
+                        .CanChangeArchiveState(globalRole, workspaceRole, b.BoardUsers
+                            .FirstOrDefault(ub => ub.UserId == userId)?.Role ?? BoardUserRole.None),
                     IsParticipating = b.BoardUsers.Any(ub => ub.UserId == userId),
                     Visibility = b.Visibility
                 })

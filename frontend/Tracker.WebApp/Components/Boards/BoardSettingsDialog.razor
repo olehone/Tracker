@@ -1,63 +1,76 @@
 ﻿<CascadingValue Value="BoardState">
-	<MudDialog>
-		<DialogContent>
-			<MudForm @ref=@_form
-					 Model=@model
-					 Validation=@validator
-					 ValidationDelay="300"
-					 Disabled=@IsDisabled()>
-				<MudTextField @bind-Value=@model.Title
-							  Label="Title"
-							  Required
-							  Variant="Variant.Outlined" />
+    <MudDialog>
+        <DialogContent>
+            <MudForm @ref=@_form
+                     Model=@model
+                     Validation=@validator
+                     ValidationDelay="300"
+                     Disabled=@IsSettingsDisabled>
+                <MudTextField @bind-Value=@model.Title
+                              Label="Title"
+                              Required
+                              Variant="Variant.Outlined" />
 
-				<MudTextField @bind-Value=@model.Description
-							  Label="Description"
-							  Lines="3"
-							  Variant="Variant.Outlined" />
+                <MudTextField @bind-Value=@model.Description
+                              Label="Description"
+                              Lines="3"
+                              Variant="Variant.Outlined" />
 
-				<BoardVisibilitySelect @bind-value=@model.Visibility />
+                <BoardVisibilitySelect @bind-value=@model.Visibility />
 
-				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
-										   Label="Who can create lists" />
+                <BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateListRole
+                                           Label="Who can create lists" />
 
-				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
-										   Label="Who can change lists" />
+                <BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeListRole
+                                           Label="Who can change lists" />
 
-				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
-										   Label="Who can create items" />
+                <BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinCreateItemRole
+                                           Label="Who can create items" />
 
-				<BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
-										   Label="Who can change items" />
-			</MudForm>
+                <BoardPermissionRoleSelect @bind-value=@model.PermissionRoles.MinChangeItemRole
+                                           Label="Who can change items" />
+            </MudForm>
 
-			<MudDivider/>
+            <MudDivider />
 
-			<MudButton Variant="Variant.Filled"
-					   Color="Color.Error"
-					   FullWidth
-					   OnClick=@Delete>Delete</MudButton>
-		</DialogContent>
-		<DialogActions>
-			<MudButton OnClick="Cancel">
-				<MudText>Cancel</MudText>
-			</MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Default"
+                       FullWidth
+                       Disabled=IsArchivingDisabled
+                       OnClick=@Archive
+                       Class="ma-1">
+                Archive
+            </MudButton>
 
-			<MudButton Disabled=@(isSubmitting || IsDisabled())
-					   OnClick=@Submit
-					   Variant="Variant.Filled"
-					   Color="Color.Primary">
-				@if (isSubmitting)
-				{
-					<MudProgressCircular Size="Size.Small"
-										 Indeterminate
-										 Color="Color.Inherit" />
-				}
-				else
-				{
-					<MudText>Save</MudText>
-				}
-			</MudButton>
-		</DialogActions>
-	</MudDialog>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Error"
+                       FullWidth
+                       Disabled=IsDeleteDisabled
+                       OnClick=@Delete
+                       Class="ma-1">
+                Delete
+            </MudButton>
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">
+                <MudText>Cancel</MudText>
+            </MudButton>
+
+            <MudButton Disabled=@(isSubmitting || IsSettingsDisabled)
+                       OnClick=@Submit
+                       Variant="Variant.Filled"
+                       Color="Color.Primary">
+                @if (isSubmitting)
+                {
+                    <MudProgressCircular Size="Size.Small"
+                                         Indeterminate
+                                         Color="Color.Inherit" />
+                }
+                else
+                {
+                    <MudText>Save</MudText>
+                }
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
 </CascadingValue>

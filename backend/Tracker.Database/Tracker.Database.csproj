@@ -30,9 +30,11 @@
 		<EmbeddedResource Include="Scripts\021-Rename-UserWorkspaces-To-WorkspaceUsers.sql" />
 		<EmbeddedResource Include="Scripts\022-Add-Avatar-Version.sql" />
 		<EmbeddedResource Include="Scripts\023-Add-BoardItemAttachment.sql" />
-		<EmbeddedResource Include="Scripts\027-Make-ItemComments-UpdatedAt-Nullable.sql" />
 		<EmbeddedResource Include="Scripts\024-Add-ItemComments.sql" />
 		<EmbeddedResource Include="Scripts\025-Add-CommentAttachments.sql" />
+		<EmbeddedResource Include="Scripts\027-Make-ItemComments-UpdatedAt-Nullable.sql" />
+		<EmbeddedResource Include="Scripts\029-Drop-Default-ArchiveStatus.sql" />
+		<EmbeddedResource Include="Scripts\028-Add-ArchiveStatus-To-Boards.sql" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -17,6 +17,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
         return await _dbSet
             .AsNoTracking()
+            .Include(b => b.BoardUsers)
             .Where(b => b.BoardUsers.Any(ub => ub.UserId == userId))
             .ToListAsync();
     }
@@ -93,6 +94,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
         _dbContext.Entry(board).Property(b => b.Title).IsModified = true;
         _dbContext.Entry(board).Property(b => b.Description).IsModified = true;
         _dbContext.Entry(board).Property(b => b.Visibility).IsModified = true;
+        _dbContext.Entry(board).Property(b => b.ArchiveStatus).IsModified = true;
         var permissionRoles = _dbContext.Entry(board).Reference(b => b.PermissionRoles).TargetEntry;
         if (permissionRoles is not null)
         {

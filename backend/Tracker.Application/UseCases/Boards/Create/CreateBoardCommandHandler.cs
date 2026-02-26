@@ -63,6 +63,8 @@ public sealed class CreateBoardCommandHandler(
 
         var boardDto = board.ToSummaryDto();
         boardDto.IsParticipating = true;
+        boardDto.IsAbleToUnarchive = true;
+
         return sc.IsFailure
             ? Error.Unknown
             : boardDto;

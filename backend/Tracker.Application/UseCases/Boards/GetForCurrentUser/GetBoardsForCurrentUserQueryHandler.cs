@@ -23,10 +23,10 @@ public sealed class GetBoardsForCurrentUserQueryHandler(
         var userId = userContext.GetUserId();
 
         await using var uow = unitOfWorkFactory.Create();
-        var workspaces = await uow.BoardRepository.GetByUserAsync(userId);
+        var boards = await uow.BoardRepository.GetByUserAsync(userId);
 
-        return workspaces is null
+        return boards is null
             ? Error.NotFound("Board", "user")
-            : workspaces.Select(workspace => workspace.ToSummaryDto()).ToList();
+            : boards.Select(board => board.ToSummaryDto()).ToList();
     }
 }
