@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
         AddBlobStorage(services);
         AddRedis(services);
         AddHangfire(services);
+        AddServiceBus(services);
 
         return services;
     }
@@ -77,18 +79,31 @@ public static class ServiceCollectionExtensions
         services.AddOptions<HangfireOptions>()
             .BindConfiguration(HangfireOptions.SectionName);
 
-        services.AddHangfire((sp, cfg) =>
+        services.AddHangfire((serviceProvider, config) =>
         {
-            var options = sp.GetRequiredService<IOptions<DbOptions>>().Value;
+            var options = serviceProvider.GetRequiredService<IOptions<DbOptions>>().Value;
 
-            cfg.UseSimpleAssemblyNameTypeSerializer()
+            config.UseSimpleAssemblyNameTypeSerializer()
                .UseRecommendedSerializerSettings()
                .UseSqlServerStorage(options.DefaultConnectionString);
         });
 
         services.AddHangfireServer();
         services.AddScoped<IBoardArchivingJob, BoardArchivingJob>();
-        
+
+        return services;
+    }
+
+    public static IServiceCollection AddServiceBus(this IServiceCollection services)
+    {
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName);
+
+        services.AddSingleton(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<ServiceBusOptions>>().Value;
+            return new ServiceBusClient(options.ConnectionString);
+        });
         return services;
     }
 }
