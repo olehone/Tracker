@@ -1,0 +1,13 @@
+﻿using Tracker.Domain.Entities.Common;
+
+namespace Tracker.Application.Common.Repositories;
+
+public interface IRepository<TEntity, TId> where TEntity : BaseEntity
+{
+    Task<TEntity?> GetByIdAsync(TId id);
+    Task<IReadOnlyList<TEntity>> GetAllAsync();
+    Task<IReadOnlyList<TEntity>> GetAllAsync(int skip, int take);
+    Task AddAsync(TEntity entity);
+    void Update(TEntity entity);
+    Task RemoveAsync(TId id);
+}
