@@ -8,4 +8,6 @@ public enum BoardAction
     CreateList = 4,
     ChangeList = 5,
     ChangeOwner = 6,
+    DeleteBoard = 7,
+    ChangeArchiveStatus = 8,
 }

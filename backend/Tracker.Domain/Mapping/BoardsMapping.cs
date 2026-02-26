@@ -11,8 +11,9 @@ public static class BoardsMapping
         return new BoardSummaryDto
         {
             Id = board.Id,
+            WorkspaceId = board.WorkspaceId,
             Title = board.Title,
-            IsParticipating = false,
+            IsArchived = board.ArchiveStatus != ArchiveStatus.NotArchived,
             Visibility = board.Visibility
         };
     }
