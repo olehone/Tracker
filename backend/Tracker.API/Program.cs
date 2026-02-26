@@ -1,6 +1,9 @@
+using Hangfire;
+using Microsoft.Extensions.Options;
 using Tracker.API;
 using Tracker.API.Hubs;
 using Tracker.Application;
+using Tracker.Application.Common.Jobs;
 using Tracker.Database;
 using Tracker.Domain.Options;
 using Tracker.Infrastructure;
@@ -57,6 +60,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHangfireDashboard("/hangfire");
 }
 app.UseHttpsRedirection();
 app.UseCors("DevCorsPolicy");
@@ -70,5 +74,12 @@ app.MapHub<ItemHub>("/hubs/item")
    .RequireCors("DevCorsPolicy");
 app.MapHub<CallHub>("/hubs/call")
    .RequireCors("DevCorsPolicy");
+
+var hangfireOptions = app.Services.GetRequiredService<IOptions<HangfireOptions>>().Value;
+
+RecurringJob.AddOrUpdate<IBoardArchivingJob>(
+    "archive-boards",
+    job => job.ExecuteAsync(),
+    hangfireOptions.BoardArchivingCron);
 
 await app.RunAsync();
