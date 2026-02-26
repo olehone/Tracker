@@ -1,6 +1,4 @@
-﻿using ArchivingFunction.Domain.Options;
-using ArchivingFunction.Persistence;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using DataAccess.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

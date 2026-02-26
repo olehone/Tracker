@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using ArchivingFunction.Domain.Entities;
-
-namespace ArchivingFunction.Persistence;
+namespace DataAccess;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
     : DbContext(options)

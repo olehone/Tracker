@@ -1,8 +1,7 @@
-﻿using ArchivingFunction.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ArchivingFunction.Persistence.Configurations;
+namespace DataAccess.Configurations;
 
 public class BoardListConfiguration : BaseEntityConfiguration<BoardList>
 {

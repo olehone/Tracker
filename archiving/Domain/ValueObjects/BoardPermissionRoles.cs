@@ -1,15 +1,13 @@
-﻿using ArchivingFunction.Domain.Enums;
-
-namespace ArchivingFunction.Domain.ValueObjects;
+﻿namespace Domain.ValueObjects;
 
 public class BoardPermissionRoles
 {
-    public BoardPermissionRole MinCreateItemRole { get; set; } 
+    public BoardPermissionRole MinCreateItemRole { get; set; }
         = BoardPermissionRole.Member;
-    public BoardPermissionRole MinChangeItemRole { get; set; } 
+    public BoardPermissionRole MinChangeItemRole { get; set; }
         = BoardPermissionRole.Member;
-    public BoardPermissionRole MinCreateListRole { get; set; } 
+    public BoardPermissionRole MinCreateListRole { get; set; }
         = BoardPermissionRole.Admin;
-    public BoardPermissionRole MinChangeListRole { get; set; } 
+    public BoardPermissionRole MinChangeListRole { get; set; }
         = BoardPermissionRole.Admin;
 }

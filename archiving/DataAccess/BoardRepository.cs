@@ -1,9 +1,7 @@
-﻿using ArchivingFunction.Domain.Entities;
-using ArchivingFunction.Domain.Enums;
+﻿using DataAccess.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using DataAccess.Abstractions;
 
-namespace ArchivingFunction.Persistence;
+namespace DataAccess;
 
 public class BoardRepository(ApplicationDbContext dbContext)
     : IBoardRepository

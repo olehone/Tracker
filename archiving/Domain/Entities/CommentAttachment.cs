@@ -1,4 +1,4 @@
-﻿namespace ArchivingFunction.Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class CommentAttachment : FileUpload
 {

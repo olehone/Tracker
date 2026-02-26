@@ -1,4 +1,4 @@
-﻿namespace ArchivingFunction.Domain.Enums;
+﻿namespace Domain.Enums;
 
 public enum ArchiveStatus
 {

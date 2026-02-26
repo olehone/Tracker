@@ -1,6 +1,4 @@
-﻿using ArchivingFunction.Domain.Enums;
-
-namespace ArchivingFunction.Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class BoardItem : BaseEntity
 {
