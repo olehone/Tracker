@@ -2,8 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ArchivingFunction.Domain.Entities;
 using ArchivingFunction.Domain.Enums;
-using ArchivingFunction.Interfaces;
 using Azure.Messaging.ServiceBus;
+using DataAccess.Abstractions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 

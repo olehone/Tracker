@@ -1,7 +1,7 @@
 ﻿using ArchivingFunction.Domain.Entities;
 using ArchivingFunction.Domain.Enums;
-using ArchivingFunction.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using DataAccess.Abstractions;
 
 namespace ArchivingFunction.Persistence;
 

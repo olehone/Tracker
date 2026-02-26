@@ -1,7 +1,7 @@
 ﻿using ArchivingFunction.Domain.Entities;
 using ArchivingFunction.Domain.Enums;
 
-namespace ArchivingFunction.Interfaces;
+namespace DataAccess.Abstractions;
 
 public interface IBoardRepository
 {

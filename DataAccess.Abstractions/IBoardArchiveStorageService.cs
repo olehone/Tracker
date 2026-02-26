@@ -1,5 +1,4 @@
-﻿
-namespace ArchivingFunction.Interfaces;
+﻿namespace DataAccess.Abstractions;
 
 public interface IBoardArchiveStorageService
 {
