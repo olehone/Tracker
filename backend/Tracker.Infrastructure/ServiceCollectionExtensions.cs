@@ -1,12 +1,17 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Messaging.ServiceBus;
+using Azure.Storage.Blobs;
+using Hangfire;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using Tracker.Application.Common.Auth;
+using Tracker.Application.Common.Jobs;
 using Tracker.Application.Common.Services;
 using Tracker.Application.Common.States;
 using Tracker.Domain.Options;
 using Tracker.Infrastructure.Auth;
+using Tracker.Infrastructure.Hagnfire;
 using Tracker.Infrastructure.Redis;
 using Tracker.Infrastructure.Services;
 
@@ -19,6 +24,8 @@ public static class ServiceCollectionExtensions
         AddJwtAuth(services);
         AddBlobStorage(services);
         AddRedis(services);
+        AddHangfire(services);
+        AddServiceBus(services);
 
         return services;
     }
@@ -65,5 +72,38 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ICallState, RedisCallState>();
         services.AddScoped<IBoardCallState, RedisBoardCallState>();
+    }
+
+    public static IServiceCollection AddHangfire(this IServiceCollection services)
+    {
+        services.AddOptions<HangfireOptions>()
+            .BindConfiguration(HangfireOptions.SectionName);
+
+        services.AddHangfire((serviceProvider, config) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<DbOptions>>().Value;
+
+            config.UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UseSqlServerStorage(options.DefaultConnectionString);
+        });
+
+        services.AddHangfireServer();
+        services.AddScoped<IBoardArchivingJob, BoardArchivingJob>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddServiceBus(this IServiceCollection services)
+    {
+        services.AddOptions<ServiceBusOptions>()
+            .BindConfiguration(ServiceBusOptions.SectionName);
+
+        services.AddSingleton(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<ServiceBusOptions>>().Value;
+            return new ServiceBusClient(options.ConnectionString);
+        });
+        return services;
     }
 }

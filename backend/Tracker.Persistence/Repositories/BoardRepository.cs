@@ -68,7 +68,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .FirstOrDefaultAsync(b =>
                 b.BoardLists.Any(l =>
                     l.BoardItems.Any(bi =>
-                        bi.Comments.Any(c => 
+                        bi.Comments.Any(c =>
                             c.Attachments.Any(a => a.Id == attachmentId)))));
     }
 
@@ -116,6 +116,14 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .AsNoTracking()
             .Where(b => b.WorkspaceId == workspaceId)
             .Include(b => b.BoardUsers.Where(ub => ub.UserId == userId))
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<Board>> GetByArchiveStatusAsync(ArchiveStatus status)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .Where(b => b.ArchiveStatus == status)
             .ToListAsync();
     }
 }

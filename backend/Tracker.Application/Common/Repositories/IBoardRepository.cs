@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 
 namespace Tracker.Application.Common.Repositories;
 
@@ -13,4 +14,5 @@ public interface IBoardRepository : IRepository<Board, Guid>
     Task<Board?> GetByIdWithListsItemsUsersAsync(Guid id);
     Task<IReadOnlyList<Board>> GetPublicByWorkspaceAsync(Guid workspaceId);
     Task<IReadOnlyList<Board>> GetByWorkspaceAndUserAsync(Guid workspaceId, Guid userId);
+    Task<IReadOnlyList<Board>> GetByArchiveStatusAsync(ArchiveStatus status);
 }
