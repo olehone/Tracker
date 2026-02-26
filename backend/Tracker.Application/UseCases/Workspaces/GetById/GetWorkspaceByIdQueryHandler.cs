@@ -91,6 +91,7 @@ public sealed class GetWorkspaceByIdQueryHandler(
                     WorkspaceId = b.WorkspaceId,
                     Title = b.Title,
                     IsArchived = b.ArchiveStatus != ArchiveStatus.NotArchived,
+                    ArchiveStatus = b.ArchiveStatus,
                     IsAbleToUnarchive = BoardPolicy
                         .CanChangeArchiveState(globalRole, workspaceRole, b.BoardUsers
                             .FirstOrDefault(ub => ub.UserId == userId)?.Role ?? BoardUserRole.None),

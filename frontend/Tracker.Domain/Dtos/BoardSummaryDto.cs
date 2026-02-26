@@ -9,6 +9,7 @@ public class BoardSummaryDto
     public required string Title { get; set; }
     public required bool IsParticipating { get; set; }
     public required bool IsArchived { get; set; }
+    public required ArchiveStatus ArchiveStatus { get; set; }
     public bool IsAbleToUnarchive { get; set; } = false;
     public required BoardVisibility Visibility { get; set; }
 }

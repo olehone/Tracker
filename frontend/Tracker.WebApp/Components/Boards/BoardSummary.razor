@@ -20,9 +20,10 @@
             {
                 <MudChip T="string"
                          Label="true"
-                         Icon=@Icons.Material.Filled.Archive
+                         Icon=@ArchiveStatusHelper.GetIcon(Board.ArchiveStatus)
+                         Color=@ArchiveStatusHelper.GetColor(Board.ArchiveStatus)
                          Size="Size.Small">
-                    Archived
+                    @Board.ArchiveStatus.ToString()
                 </MudChip>
             }
             else

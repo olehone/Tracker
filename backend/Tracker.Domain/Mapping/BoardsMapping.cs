@@ -14,6 +14,7 @@ public static class BoardsMapping
             WorkspaceId = board.WorkspaceId,
             Title = board.Title,
             IsArchived = board.ArchiveStatus != ArchiveStatus.NotArchived,
+            ArchiveStatus = board.ArchiveStatus,
             Visibility = board.Visibility
         };
     }
