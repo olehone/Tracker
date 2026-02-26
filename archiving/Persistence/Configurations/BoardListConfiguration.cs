@@ -17,6 +17,7 @@ public class BoardListConfiguration : IEntityTypeConfiguration<BoardList>
 
         builder.HasMany(bl => bl.BoardItems)
             .WithOne(bi => bi.BoardList)
-            .HasForeignKey(bi => bi.BoardListId);
+            .HasForeignKey(bi => bi.BoardListId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

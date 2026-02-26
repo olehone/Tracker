@@ -21,7 +21,8 @@ public class BoardConfiguration : IEntityTypeConfiguration<Board>
 
         builder.HasMany(b => b.BoardLists)
             .WithOne(bl => bl.Board)
-            .HasForeignKey(bl => bl.BoardId);
+            .HasForeignKey(bl => bl.BoardId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.OwnsOne(b => b.PermissionRoles, settings =>
         {

@@ -1,4 +1,5 @@
 ﻿using ArchivingFunction.Domain.Entities;
+using ArchivingFunction.Domain.Enums;
 using ArchivingFunction.Interfaces;
 
 using Microsoft.EntityFrameworkCore;
@@ -8,50 +9,44 @@ namespace ArchivingFunction.Persistence;
 public class BoardRepository(ApplicationDbContext dbContext)
     : IBoardRepository
 {
-    public async Task<Board?> LoadFullBoardAsync(Guid boardId, CancellationToken ct = default)
+    public async Task<Board?> LoadFullBoardAsync(Guid boardId)
     {
         return await dbContext.Boards
             .AsNoTracking()
+            .AsSplitQuery()
             .Include(b => b.BoardLists)
                 .ThenInclude(l => l.BoardItems)
                     .ThenInclude(i => i.Assignees)
             .Include(b => b.BoardLists)
                 .ThenInclude(l => l.BoardItems)
-                    .ThenInclude(i => i.Comments)
-                        .ThenInclude(c => c.Attachments)
-            .Include(b => b.BoardLists)
-                .ThenInclude(l => l.BoardItems)
                     .ThenInclude(i => i.Attachments)
-            .FirstOrDefaultAsync(b => b.Id == boardId, ct);
-    }
-
-    public async Task DeleteBoardContentAsync(Guid boardId, CancellationToken ct = default)
-    {
-        var board = await dbContext.Boards
-            .Include(b => b.BoardLists)
-                .ThenInclude(l => l.BoardItems)
-                    .ThenInclude(i => i.Assignees)
             .Include(b => b.BoardLists)
                 .ThenInclude(l => l.BoardItems)
                     .ThenInclude(i => i.Comments)
                         .ThenInclude(c => c.Attachments)
-            .Include(b => b.BoardLists)
-                .ThenInclude(l => l.BoardItems)
-                    .ThenInclude(i => i.Attachments)
-            .FirstOrDefaultAsync(b => b.Id == boardId, ct);
-
-        if (board is null)
-        {
-            return;
-        }
-
-        dbContext.RemoveRange(board.BoardLists);
-        await dbContext.SaveChangesAsync(ct);
+            .FirstOrDefaultAsync(b => b.Id == boardId);
     }
 
-    public async Task RestoreBoardContentAsync(Board snapshot, CancellationToken ct = default)
+    public void UpdateBoardArchiveStatusAsync(Guid boardId, ArchiveStatus status)
     {
-        dbContext.BoardLists.AddRange(snapshot.BoardLists);
-        await dbContext.SaveChangesAsync(ct);
+        var board = new Board { Id = boardId, ArchiveStatus = status };
+
+        dbContext.Attach(board);
+        dbContext.Entry(board).Property(x => x.ArchiveStatus).IsModified = true;
+    }
+
+    public async Task DeleteBoardContentAsync(Guid boardId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task RestoreBoardContentAsync(Board snapshot)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SaveChangesAsync()
+    {
+        return dbContext.SaveChangesAsync();
     }
 }

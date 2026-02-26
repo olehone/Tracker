@@ -47,7 +47,8 @@ internal class BoardArchivingJob(IUnitOfWorkFactory unitOfWorkFactory,
     {
         foreach (var board in boards)
         {
-            var message = new ServiceBusMessage(board.Id.ToString())
+            var payload = new ArchiveBoardMessage(board.Id);
+            var message = new ServiceBusMessage(BinaryData.FromObjectAsJson(payload))
             {
                 MessageId = board.Id.ToString(),
                 Subject = subject
