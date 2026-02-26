@@ -1,22 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ArchivingFunction.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ArchivingFunction.Domain.Entities;
 
 namespace ArchivingFunction.Persistence.Configurations;
 
-public class BoardListConfiguration : IEntityTypeConfiguration<BoardList>
+public class BoardListConfiguration : BaseEntityConfiguration<BoardList>
 {
-    public void Configure(EntityTypeBuilder<BoardList> builder)
+    public override void Configure(EntityTypeBuilder<BoardList> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("BoardLists");
 
-        builder.HasKey(b => b.Id);
-
-        builder.Property(b => b.Title)
-            .IsRequired();
+        builder.Property(bl => bl.Title).IsRequired();
 
         builder.HasMany(bl => bl.BoardItems)
-            .WithOne(bi => bi.BoardList)
+            .WithOne()
             .HasForeignKey(bi => bi.BoardListId)
             .OnDelete(DeleteBehavior.Cascade);
     }

@@ -1,7 +1,6 @@
 ﻿using ArchivingFunction.Domain.Entities;
 using ArchivingFunction.Domain.Enums;
 using ArchivingFunction.Interfaces;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace ArchivingFunction.Persistence;
@@ -27,22 +26,25 @@ public class BoardRepository(ApplicationDbContext dbContext)
             .FirstOrDefaultAsync(b => b.Id == boardId);
     }
 
-    public void UpdateBoardArchiveStatusAsync(Guid boardId, ArchiveStatus status)
+    public async Task UpdateBoardArchiveStatusAsync(Guid boardId, ArchiveStatus status)
     {
-        var board = new Board { Id = boardId, ArchiveStatus = status };
-
-        dbContext.Attach(board);
-        dbContext.Entry(board).Property(x => x.ArchiveStatus).IsModified = true;
+        await dbContext.Boards
+            .Where(b => b.Id == boardId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.ArchiveStatus, status));
     }
 
     public async Task DeleteBoardContentAsync(Guid boardId)
     {
-        throw new NotImplementedException();
+        var lists = await dbContext.BoardLists
+            .AsNoTracking()
+            .Where(bl => bl.BoardId == boardId)
+            .ExecuteDeleteAsync();
     }
 
-    public async Task RestoreBoardContentAsync(Board snapshot)
+    public void RestoreBoardContent(Board snapshot)
     {
-        throw new NotImplementedException();
+        dbContext.BoardLists.AddRange(snapshot.BoardLists);
     }
 
     public Task SaveChangesAsync()

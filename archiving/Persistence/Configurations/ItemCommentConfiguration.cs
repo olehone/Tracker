@@ -1,22 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ArchivingFunction.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using ArchivingFunction.Domain.Entities;
 
 namespace ArchivingFunction.Persistence.Configurations;
 
-public class ItemCommentConfiguration : IEntityTypeConfiguration<ItemComment>
+public class ItemCommentConfiguration : BaseEntityConfiguration<ItemComment>
 {
-    public void Configure(EntityTypeBuilder<ItemComment> builder)
+    public override void Configure(EntityTypeBuilder<ItemComment> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("ItemComments");
 
-        builder.HasKey(c => c.Id);
-
         builder.Property(c => c.Content).IsRequired();
+        builder.Property(c => c.UserId).IsRequired();
+        builder.Property(c => c.UploadedAt).IsRequired();
+        builder.Property(c => c.IsDeleted).IsRequired();
 
         builder.HasMany(c => c.Attachments)
-            .WithOne(a => a.Comment)
+            .WithOne()
             .HasForeignKey(a => a.ItemCommentId)
             .OnDelete(DeleteBehavior.Cascade);
     }

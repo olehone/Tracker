@@ -1,45 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ArchivingFunction.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ArchivingFunction.Domain.Entities;
-using ArchivingFunction.Domain.Enums;
 
 namespace ArchivingFunction.Persistence.Configurations;
 
-public class BoardConfiguration : IEntityTypeConfiguration<Board>
+public class BoardConfiguration : BaseEntityConfiguration<Board>
 {
-    public void Configure(EntityTypeBuilder<Board> builder)
+    public override void Configure(EntityTypeBuilder<Board> builder)
     {
+        base.Configure(builder);
+
         builder.ToTable("Boards");
 
-        builder.HasKey(b => b.Id);
+        builder.Property(b => b.Title).IsRequired();
+        builder.Property(b => b.Visibility).IsRequired();
+        builder.Property(b => b.ArchiveStatus).IsRequired();
 
-        builder.Property(b => b.Title)
-            .IsRequired();
-
-        builder.Property(b => b.Visibility)
-            .IsRequired();
+        builder.OwnsOne(b => b.PermissionRoles, owned =>
+        {
+            owned.Property(p => p.MinCreateItemRole).HasColumnName("MinCreateItemRole");
+            owned.Property(p => p.MinChangeItemRole).HasColumnName("MinChangeItemRole");
+            owned.Property(p => p.MinCreateListRole).HasColumnName("MinCreateListRole");
+            owned.Property(p => p.MinChangeListRole).HasColumnName("MinChangeListRole");
+        });
 
         builder.HasMany(b => b.BoardLists)
-            .WithOne(bl => bl.Board)
+            .WithOne()
             .HasForeignKey(bl => bl.BoardId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.OwnsOne(b => b.PermissionRoles, settings =>
-        {
-            settings.Property(s => s.MinCreateItemRole)
-                .HasColumnName("MinCreateItemRole");
-
-            settings.Property(s => s.MinChangeItemRole)
-                .HasColumnName("MinChangeItemRole");
-
-            settings.Property(s => s.MinCreateListRole)
-                .HasColumnName("MinCreateListRole");
-
-            settings.Property(s => s.MinChangeListRole)
-                .HasColumnName("MinChangeListRole");
-        });
-        
-        builder.Property(b => b.ArchiveStatus)
-            .IsRequired();
     }
 }
