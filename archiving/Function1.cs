@@ -1,27 +1,37 @@
+using ArchivingFunction.Domain.Options;
+
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ArchivingFunction;
 
-public class Function1
+public class Function1(ILogger<Function1> logger)
 {
-    private readonly ILogger<Function1> _logger;
+    private const string ArchiveQueueName = "archive-queue";
 
-    public Function1(ILogger<Function1> logger)
-    {
-        _logger = logger;
-    }
+    //[Function("ArchiveBoard")]
+    //public async Task Run(
+    //    [ServiceBusTrigger("archive-queue",
+    //    Connection = "ServiceBusConnection")] string boardIdStr,
+    //    ServiceBusMessageActions messageActions)
+    //{
+    //    _logger.LogInformation("Board to archive: {Id}", boardIdStr);
+
+    //    // Complete the message
+    //    await messageActions.CompleteMessageAsync(message);
+    //}
 
     [Function(nameof(Function1))]
     public async Task Run(
-        [ServiceBusTrigger("archive-queue", Connection = "")]
+        [ServiceBusTrigger(ArchiveQueueName, Connection = "ServiceBusConnection")]
         ServiceBusReceivedMessage message,
         ServiceBusMessageActions messageActions)
     {
-        _logger.LogInformation("Message ID: {id}", message.MessageId);
-        _logger.LogInformation("Message Body: {body}", message.Body);
-        _logger.LogInformation("Message Content-Type: {contentType}", message.ContentType);
+        logger.LogInformation("Message ID: {id}", message.MessageId);
+        logger.LogInformation("Message Body: {body}", message.Body);
+        logger.LogInformation("Message Content-Type: {contentType}", message.ContentType);
 
         // Complete the message
         await messageActions.CompleteMessageAsync(message);

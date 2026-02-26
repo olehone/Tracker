@@ -8,6 +8,5 @@ public class ItemComment : BaseEntity
     public DateTimeOffset UploadedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? UpdatedAt { get; set; }
     public bool IsDeleted { get; set; } = false;
-    public User UploadedBy { get; set; } = null!;
     public ICollection<CommentAttachment> Attachments { get; set; } = [];
 }

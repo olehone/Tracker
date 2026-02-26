@@ -3,7 +3,6 @@
 public class FileUpload : BaseEntity
 {
     public required Guid UserId { get; set; }
-    public User UploadedBy { get; set; } = null!;
     public required string OriginalFileName { get; set; }
     public required string ContentType { get; set; }
     public required long SizeBytes { get; set; }

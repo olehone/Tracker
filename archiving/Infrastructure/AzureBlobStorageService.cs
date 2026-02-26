@@ -1,14 +1,12 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
-using Tracker.Domain.Results;
 
-namespace Tracker.Infrastructure.Services;
+namespace ArchivingFunction.Infrastructure;
 
-// Separate container/folder name in case that same entity would have different containers
 internal class AzureBlobStorageService(BlobServiceClient blobServiceClient, TimeSpan expiration)
 {
-    public async Task<Result<string>> GetUrlAsync(string folderName, string fileName, string originalName,
+    public async Task<string?> GetUrlAsync(string folderName, string fileName, string originalName,
         bool isInline, CancellationToken cancellationToken = default)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);
@@ -16,7 +14,7 @@ internal class AzureBlobStorageService(BlobServiceClient blobServiceClient, Time
         var isExist = await blob.ExistsAsync(cancellationToken);
         if (!isExist)
         {
-            return Error.NotFound("File");
+            return null;
         }
 
         var dispositionType = isInline ? "inline" : "attachment";
@@ -38,7 +36,7 @@ internal class AzureBlobStorageService(BlobServiceClient blobServiceClient, Time
         return sasUri.ToString();
     }
 
-    public async Task<Result<Stream>> GetStreamAsync(string folderName,
+    public async Task<Stream?> GetStreamAsync(string folderName,
         string fileName, CancellationToken cancellationToken = default)
     {
         var container = blobServiceClient.GetBlobContainerClient(folderName);
@@ -46,7 +44,7 @@ internal class AzureBlobStorageService(BlobServiceClient blobServiceClient, Time
         var isExist = await blob.ExistsAsync(cancellationToken);
         if (!isExist)
         {
-            return Error.NotFound("File");
+            return null;
         }
 
         var stream = await blob.OpenReadAsync(cancellationToken: cancellationToken);

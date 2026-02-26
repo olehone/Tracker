@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tracker.Domain.Entities;
-using Tracker.Domain.Enums;
+using ArchivingFunction.Domain.Entities;
+using ArchivingFunction.Domain.Enums;
 
-namespace Tracker.Persistence.Configurations;
+namespace ArchivingFunction.Persistence.Configurations;
 
 public class BoardConfiguration : IEntityTypeConfiguration<Board>
 {

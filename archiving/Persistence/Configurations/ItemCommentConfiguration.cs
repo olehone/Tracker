@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tracker.Domain.Entities;
+using ArchivingFunction.Domain.Entities;
 
-namespace Tracker.Persistence.Configurations;
+namespace ArchivingFunction.Persistence.Configurations;
 
 public class ItemCommentConfiguration : IEntityTypeConfiguration<ItemComment>
 {

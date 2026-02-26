@@ -1,18 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Tracker.Domain.Entities;
+using ArchivingFunction.Domain.Entities;
 
-namespace Tracker.Persistence.Configurations;
+namespace ArchivingFunction.Persistence.Configurations;
 
 public class BoardItemAssigneeConfiguration : IEntityTypeConfiguration<BoardItemAssignee>
 {
     public void Configure(EntityTypeBuilder<BoardItemAssignee> builder)
     {
         builder.ToTable("BoardItemAssignees");
-
-        builder.HasOne(bia => bia.BoardUser)
-            .WithMany(bu => bu.AssignedItems)
-            .HasForeignKey(ub => ub.BoardUserId);
 
         builder.HasOne(bia => bia.Item)
             .WithMany(bi => bi.Assignees)
