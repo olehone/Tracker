@@ -102,6 +102,7 @@ internal class BoardArchivingService(IBoardRepository boardRepository,
 
         var newMetadata = new BoardMetadata
         {
+            Id = boardId.ToString(),
             BoardId = boardId,
             LastLog = newLog,
             Logs = [newLog]
