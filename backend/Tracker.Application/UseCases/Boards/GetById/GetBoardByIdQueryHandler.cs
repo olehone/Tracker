@@ -29,11 +29,9 @@ public class GetBoardByIdQueryHandler(
 
         if (userContext.IsUnauthenticated())
         {
-            if (BoardPolicy.CanAnonView(board.Visibility))
-            {
-                return board.ToFullDto(BoardPermissionsDto.None);
-            }
-            return AuthErrors.Forbidden("Board is private");
+            return BoardPolicy.CanAnonView(board.Visibility)
+                ? (Result<BoardFullDto>)board.ToFullDto(BoardPermissionsDto.None)
+                : (Result<BoardFullDto>)AuthErrors.Forbidden("Board is private");
         }
 
         var userId = userContext.GetUserId();
@@ -42,6 +40,7 @@ public class GetBoardByIdQueryHandler(
         {
             return AuthErrors.Unauthenticated;
         }
+
         var userRole = user.Role;
 
         var workspaceRole = await uow.WorkspaceUserRepository
@@ -55,6 +54,11 @@ public class GetBoardByIdQueryHandler(
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
             return AuthErrors.Forbidden("Board is private");
+        }
+
+        if (BoardHelper.IsArchiveStatusBlocking(board))
+        {
+            return Error.Archived("Board");
         }
 
         var boardDto = board.ToFullDto(permissions);
