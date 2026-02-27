@@ -30,13 +30,6 @@ public sealed record Error(
             $"{memberName} is already a member of this {containerType}");
     }
 
-    public static Error Archived(string entityName)
-    {
-        return new($"{entityName}.Archived",
-            ErrorType.Forbidden,
-            $"{entityName} is archived");
-    }
-
     public static Error Gone(string entityName)
     {
         return new($"{entityName}.Gone",

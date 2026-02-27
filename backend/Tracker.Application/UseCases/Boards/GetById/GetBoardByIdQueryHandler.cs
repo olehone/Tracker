@@ -58,7 +58,7 @@ public class GetBoardByIdQueryHandler(
 
         if (BoardHelper.IsArchiveStatusBlocking(board))
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         var boardDto = board.ToFullDto(permissions);

@@ -66,7 +66,7 @@ internal class BoardUnarchivingJob(IUnitOfWorkFactory unitOfWorkFactory,
                 }
             }
 
-            board.ArchiveStatus = ArchiveStatus.QueuedArchive;
+            board.ArchiveStatus = ArchiveStatus.QueuedUnarchive;
             uow.BoardRepository.Update(board);
         }
 

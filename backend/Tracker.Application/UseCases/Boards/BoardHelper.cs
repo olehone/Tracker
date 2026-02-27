@@ -23,9 +23,9 @@ public static class BoardHelper
             return Error.NotFound("Board");
         }
 
-        if (IsArchiveStatusBlocking(board))
+        if (IsArchiveStatusBlocking(board) && action != BoardAction.ChangeArchiveStatus)
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
@@ -58,7 +58,7 @@ public static class BoardHelper
 
         if (IsArchiveStatusBlocking(board))
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
@@ -94,7 +94,7 @@ public static class BoardHelper
 
         if (IsArchiveStatusBlocking(board))
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         if (boardId is not null && board.Id != boardId)
@@ -137,7 +137,7 @@ public static class BoardHelper
 
         if (IsArchiveStatusBlocking(board))
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         if (userContext.IsUnauthenticated())
@@ -170,7 +170,7 @@ public static class BoardHelper
     {
         if (IsArchiveStatusBlocking(board))
         {
-            return Error.Archived("Board");
+            return ArchiveErrors.Archived("Board");
         }
 
         if (userContext.IsUnauthenticated())
@@ -227,9 +227,13 @@ public static class BoardHelper
             return comment;
         }
 
+        if (ArchiveErrors.IsArchived(item.Error))
+        {
+            return item.Error;
+        }
+
         if (item.Error.Type == ErrorType.Forbidden
-            && item.Error.Code != Error.Archived("Board").Code
-                && ownComment)
+            && ownComment)
         {
             return comment;
         }

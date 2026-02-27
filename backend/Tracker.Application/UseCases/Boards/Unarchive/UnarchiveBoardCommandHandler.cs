@@ -25,6 +25,11 @@ public class UnarchiveBoardCommandHandler
         }
 
         var board = boardResult.Value;
+        if (board.ArchiveStatus != ArchiveStatus.Archived)
+        {
+            return ArchiveErrors.NotUnarchivable("Board");
+        }
+
         var updatedBoard = new Board
         {
             Id = board.Id,
