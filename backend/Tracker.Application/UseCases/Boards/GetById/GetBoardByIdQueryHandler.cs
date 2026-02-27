@@ -42,6 +42,7 @@ public class GetBoardByIdQueryHandler(
         if (user is null)
         {
             return AuthErrors.Unauthenticated;
+
         }
 
         var userRole = user.Role;
