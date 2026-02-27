@@ -12,7 +12,7 @@ public class UnarchiveBoardCommandHandler
     IUserContext userContext
     ) : IRequestHandler<UnarchiveBoardCommand, Result>
 {
-    public async Task<Result> Handle(UnarchiveBoardCommand request, 
+    public async Task<Result> Handle(UnarchiveBoardCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -23,7 +23,13 @@ public class UnarchiveBoardCommandHandler
         {
             return boardResult.Error;
         }
+
         var board = boardResult.Value;
+        if (board.ArchiveStatus != ArchiveStatus.Archived)
+        {
+            return ArchiveErrors.NotUnarchivable("Board");
+        }
+
         var updatedBoard = new Board
         {
             Id = board.Id,
@@ -32,15 +38,13 @@ public class UnarchiveBoardCommandHandler
             Description = board.Description,
             Visibility = board.Visibility,
             PermissionRoles = board.PermissionRoles,
-            ArchiveStatus = ArchiveStatus.NotArchived
+            ArchiveStatus = ArchiveStatus.PendingUnarchive,
         };
         uow.BoardRepository.Update(updatedBoard);
 
         var result = await uow.SaveChangesAsync(cancellationToken);
-        if (result.IsFailure)
-        {
-            return result;
-        }
-        return Result.Success();
+        return result.IsFailure
+            ? result
+            : Result.Success();
     }
 }

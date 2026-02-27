@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Services.Abstraction.Board;
 using Tracker.WebApp.Shared;
 
@@ -13,9 +14,9 @@ public partial class BoardSummary
     [Parameter]
     public bool IsInWorkspace { get; set; }
 
-    [Inject] IDialogService DialogService { get; set; } = null!;
-    [Inject] IBoardService BoardService { get; set; } = null!;
-    [Inject] NavigationManager Nav { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private IBoardService BoardService { get; set; } = null!;
+    [Inject] private NavigationManager Nav { get; set; } = null!;
 
     private string? _customColor;
     private bool IsArchived => Board.IsArchived;
@@ -39,19 +40,27 @@ public partial class BoardSummary
         }
     }
 
-
     private async Task ShowArchiveMessage()
     {
         if (!Board.IsAbleToUnarchive)
         {
-            _ = await DialogService.ShowMessageBox(
+            await DialogService.ShowMessageBox(
                 "Archived",
                 "Someone archived this board",
                 cancelText: "Cancel");
             return;
         }
 
-        bool? dialogResult = await DialogService.ShowMessageBox(
+        if (Board.ArchiveStatus != ArchiveStatus.Archived)
+        {
+            await DialogService.ShowMessageBox(
+                ArchiveStatusHelper.GetDescription(Board.ArchiveStatus),
+                "Board in archiving process, try again later",
+                cancelText: "Cancel");
+            return;
+        }
+
+        var dialogResult = await DialogService.ShowMessageBox(
             "Warning",
             "Do you want to move this board from archive? This could take some time",
             yesText: "Unarchive", cancelText: "Cancel");
@@ -63,7 +72,7 @@ public partial class BoardSummary
         var result = await BoardService.UnarchiveAsync(Board.Id);
         if (result.IsSuccess)
         {
-            Board.IsArchived = false;
+            Board.ArchiveStatus = ArchiveStatus.PendingUnarchive;
         }
     }
 

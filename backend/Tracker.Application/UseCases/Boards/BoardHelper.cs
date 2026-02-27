@@ -1,6 +1,7 @@
 ﻿using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.UnitOfWork;
 using Tracker.Domain.Entities;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Boards;
@@ -22,11 +23,17 @@ public static class BoardHelper
             return Error.NotFound("Board");
         }
 
+        if (IsArchiveStatusBlocking(board) && action != BoardAction.ChangeArchiveStatus)
+        {
+            return ArchiveErrors.Archived("Board");
+        }
+
         var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
         if (!isAllowed)
         {
             return AuthErrors.Forbidden("You cannot change this item");
         }
+
         return board;
     }
 
@@ -49,6 +56,11 @@ public static class BoardHelper
             return Error.Validation("Board does not have this list");
         }
 
+        if (IsArchiveStatusBlocking(board))
+        {
+            return ArchiveErrors.Archived("Board");
+        }
+
         var isAllowed = await IsActionAllowedAsync(uow, userContext, board, action);
         if (!isAllowed)
         {
@@ -67,7 +79,7 @@ public static class BoardHelper
     public static async Task<Result<BoardItem>> GetBoardItemForActionAsync(IUnitOfWork uow,
         IUserContext userContext, Guid boardItemId, Guid? boardId = null)
     {
-        BoardAction action = BoardAction.ChangeItem;
+        var action = BoardAction.ChangeItem;
 
         if (userContext.IsUnauthenticated())
         {
@@ -78,6 +90,11 @@ public static class BoardHelper
         if (board is null)
         {
             return Error.NotFound("Board");
+        }
+
+        if (IsArchiveStatusBlocking(board))
+        {
+            return ArchiveErrors.Archived("Board");
         }
 
         if (boardId is not null && board.Id != boardId)
@@ -118,12 +135,18 @@ public static class BoardHelper
             return Error.NotFound("Board", "Item");
         }
 
+        if (IsArchiveStatusBlocking(board))
+        {
+            return ArchiveErrors.Archived("Board");
+        }
+
         if (userContext.IsUnauthenticated())
         {
             if (!BoardPolicy.CanAnonView(board.Visibility))
             {
                 return AuthErrors.Unauthenticated;
             }
+
             return item;
         }
 
@@ -133,6 +156,7 @@ public static class BoardHelper
         {
             return Error.NotFound("Item");
         }
+
         var workspaceRole = await uow.WorkspaceUserRepository.GetRoleAsync(userId, board.WorkspaceId);
         var boardRole = await uow.BoardUserRepository.GetRoleAsync(userId, board.Id);
 
@@ -144,6 +168,11 @@ public static class BoardHelper
     public static async Task<Result> CanViewBoardAsync(Board board, IUnitOfWork uow, IUserContext userContext,
         CancellationToken cancellationToken)
     {
+        if (IsArchiveStatusBlocking(board))
+        {
+            return ArchiveErrors.Archived("Board");
+        }
+
         if (userContext.IsUnauthenticated())
         {
             if (BoardPolicy.CanAnonView(board.Visibility))
@@ -158,6 +187,7 @@ public static class BoardHelper
         {
             return AuthErrors.Unauthenticated;
         }
+
         var userRole = user.Role;
 
         var workspaceRole = await uow.WorkspaceUserRepository
@@ -169,6 +199,7 @@ public static class BoardHelper
         {
             return AuthErrors.Forbidden("Board is private");
         }
+
         return Result.Success();
     }
 
@@ -180,21 +211,29 @@ public static class BoardHelper
         {
             return Error.NotFound("Comment");
         }
+
         if (comment.IsDeleted)
         {
             return Error.Gone("Comment");
         }
+
         var userId = userContext.GetUserId();
         var ownComment = comment.UploadedBy.Id == userId;
 
         var item = await GetBoardItemForActionAsync(uow, userContext, comment.BoardItemId);
 
-        if (!item.IsFailure)
+        if (item.IsSuccess)
         {
             return comment;
         }
 
-        if (item.Error.Type == ErrorType.Forbidden && ownComment)
+        if (ArchiveErrors.IsArchived(item.Error))
+        {
+            return item.Error;
+        }
+
+        if (item.Error.Type == ErrorType.Forbidden
+            && ownComment)
         {
             return comment;
         }
@@ -202,6 +241,10 @@ public static class BoardHelper
         return item.Error;
     }
 
+    public static bool IsArchiveStatusBlocking(Board board)
+    {
+        return board.ArchiveStatus != ArchiveStatus.NotArchived;
+    }
 
     // User must be authenticated before call
     // for proper separation of unauthenticated and forbidden error

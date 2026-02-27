@@ -24,7 +24,7 @@ public class UnarchiveBoard(ILogger<ArchiveBoard> logger,
         }
 
         logger.LogInformation("Got board {id} to archive", message.BoardId);
-        await archivingService.ArchiveBoardAsync(message.BoardId);
+        await archivingService.UnarchiveBoardAsync(message.BoardId);
 
         await messageActions.CompleteMessageAsync(busMessage);
     }

@@ -12,20 +12,28 @@ public sealed record Error(
         "An unexpected error occurred");
 
     public static Error Validation(params string[] messages)
-        => new("Validation", ErrorType.Validation, "Validation failed", messages);
+    {
+        return new("Validation", ErrorType.Validation, "Validation failed", messages);
+    }
 
-    public static Error NotFound(string entityName, string propertyName = "id") => new(
-        $"{entityName}.NotFound",
-        ErrorType.NotFound,
-        $"{entityName} with this {propertyName} not found");
+    public static Error NotFound(string entityName, string propertyName = "id")
+    {
+        return new($"{entityName}.NotFound",
+            ErrorType.NotFound,
+            $"{entityName} with this {propertyName} not found");
+    }
 
-    public static Error AlreadyExists(string memberType, string containerType, string memberName) => new(
-        $"{containerType}.{memberType}.AlreadyMember",
-        ErrorType.Conflict,
-        $"{memberName} is already a member of this {containerType}");
+    public static Error AlreadyExists(string memberType, string containerType, string memberName)
+    {
+        return new($"{containerType}.{memberType}.AlreadyMember",
+            ErrorType.Conflict,
+            $"{memberName} is already a member of this {containerType}");
+    }
 
-    public static Error Gone(string entityName) => new(
-        $"{entityName}.Gone",
-        ErrorType.Gone,
-        $"{entityName} is no longer exists");
+    public static Error Gone(string entityName)
+    {
+        return new($"{entityName}.Gone",
+            ErrorType.Gone,
+            $"{entityName} is no longer exists");
+    }
 }

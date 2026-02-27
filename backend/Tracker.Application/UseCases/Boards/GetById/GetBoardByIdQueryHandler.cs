@@ -33,6 +33,7 @@ public class GetBoardByIdQueryHandler(
             {
                 return board.ToFullDto(BoardPermissionsDto.None);
             }
+
             return AuthErrors.Forbidden("Board is private");
         }
 
@@ -42,6 +43,7 @@ public class GetBoardByIdQueryHandler(
         {
             return AuthErrors.Unauthenticated;
         }
+
         var userRole = user.Role;
 
         var workspaceRole = await uow.WorkspaceUserRepository
@@ -55,6 +57,11 @@ public class GetBoardByIdQueryHandler(
         if (!BoardPolicy.CanView(userRole, board.Visibility, workspaceRole, boardRole))
         {
             return AuthErrors.Forbidden("Board is private");
+        }
+
+        if (BoardHelper.IsArchiveStatusBlocking(board))
+        {
+            return ArchiveErrors.Archived("Board");
         }
 
         var boardDto = board.ToFullDto(permissions);

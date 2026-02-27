@@ -23,7 +23,7 @@
                          Icon=@ArchiveStatusHelper.GetIcon(Board.ArchiveStatus)
                          Color=@ArchiveStatusHelper.GetColor(Board.ArchiveStatus)
                          Size="Size.Small">
-                    @Board.ArchiveStatus.ToString()
+                    @ArchiveStatusHelper.GetDescription(Board.ArchiveStatus)
                 </MudChip>
             }
             else
