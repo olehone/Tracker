@@ -16,7 +16,18 @@
               "RequiresSession": false,
               "EnablePartitioning": false
             }
+          },
+	  {
+            "Name": "unarchive-queue",
+            "Properties": {
+              "DeadLetteringOnMessageExpiration": true,
+              "DefaultMessageTimeToLive": "PT1H",
+              "RequiresDuplicateDetection": false,
+              "RequiresSession": false,
+              "EnablePartitioning": false
+            }
           }
+
         ]
       }
     ],

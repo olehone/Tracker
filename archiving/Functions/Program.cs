@@ -12,7 +12,8 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
-builder.Services.AddDataAccess();
+var isLocal = builder.Environment.IsDevelopment();
+builder.Services.AddDataAccess(isLocal);
 builder.Services.AddServices();
 
 builder.Build().Run();
