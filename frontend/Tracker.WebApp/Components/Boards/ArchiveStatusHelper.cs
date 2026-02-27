@@ -11,9 +11,9 @@ public static class ArchiveStatusHelper
         {
             ArchiveStatus.None => Icons.Material.Outlined.HelpOutline,
             ArchiveStatus.NotArchived => Icons.Material.Outlined.CheckCircleOutline,
-            ArchiveStatus.Pending => Icons.Material.Outlined.Schedule,
-            ArchiveStatus.Queued => Icons.Material.Outlined.Queue,
-            ArchiveStatus.Completed => Icons.Material.Outlined.DoneAll,
+            ArchiveStatus.PendingArchive => Icons.Material.Outlined.Schedule,
+            ArchiveStatus.QueuedArchive => Icons.Material.Outlined.Queue,
+            ArchiveStatus.Archived => Icons.Material.Outlined.DoneAll,
             ArchiveStatus.Failed => Icons.Material.Outlined.ErrorOutline,
             _ => Icons.Material.Outlined.HelpOutline
         };
@@ -25,9 +25,9 @@ public static class ArchiveStatusHelper
         {
             ArchiveStatus.None => Color.Default,
             ArchiveStatus.NotArchived => Color.Primary,
-            ArchiveStatus.Pending => Color.Info,
-            ArchiveStatus.Queued => Color.Warning,
-            ArchiveStatus.Completed => Color.Success,
+            ArchiveStatus.PendingArchive => Color.Info,
+            ArchiveStatus.QueuedArchive => Color.Warning,
+            ArchiveStatus.Archived => Color.Success,
             ArchiveStatus.Failed => Color.Error,
             _ => Color.Default
         };

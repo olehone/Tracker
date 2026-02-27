@@ -16,7 +16,7 @@ internal class BoardArchivingJob(IUnitOfWorkFactory unitOfWorkFactory,
     {
         await using var uow = unitOfWorkFactory.Create();
 
-        var boards = await uow.BoardRepository.GetByArchiveStatusAsync(ArchiveStatus.Pending);
+        var boards = await uow.BoardRepository.GetByArchiveStatusAsync(ArchiveStatus.PendingArchive);
 
         if (boards.Count == 0)
         {
@@ -65,7 +65,8 @@ internal class BoardArchivingJob(IUnitOfWorkFactory unitOfWorkFactory,
                     throw new Exception("Message is too large");
                 }
             }
-            board.ArchiveStatus = ArchiveStatus.Queued;
+
+            board.ArchiveStatus = ArchiveStatus.QueuedArchive;
             uow.BoardRepository.Update(board);
         }
 
