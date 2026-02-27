@@ -29,9 +29,12 @@ public class GetBoardByIdQueryHandler(
 
         if (userContext.IsUnauthenticated())
         {
-            return BoardPolicy.CanAnonView(board.Visibility)
-                ? (Result<BoardFullDto>)board.ToFullDto(BoardPermissionsDto.None)
-                : (Result<BoardFullDto>)AuthErrors.Forbidden("Board is private");
+            if (BoardPolicy.CanAnonView(board.Visibility))
+            {
+                return board.ToFullDto(BoardPermissionsDto.None);
+            }
+
+            return AuthErrors.Forbidden("Board is private");
         }
 
         var userId = userContext.GetUserId();
