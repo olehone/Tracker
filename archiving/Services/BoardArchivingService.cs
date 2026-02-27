@@ -28,9 +28,12 @@ internal class BoardArchivingService(IBoardRepository boardRepository,
         }
 
         var serialized = SerializeBoard(board);
-        await dataStorage.PutAsync(boardId, serialized);
+        var fileName = FileName(boardId);
+        await dataStorage.PutAsync(fileName, serialized);
+
         await boardRepository.DeleteBoardContentAsync(boardId);
         await boardRepository.UpdateBoardArchiveStatusAsync(boardId, ArchiveStatus.Archived);
+
         await AppendLog(boardId, "Board archived successfully", false, ArchiveStatus.Archived);
     }
 
@@ -56,7 +59,9 @@ internal class BoardArchivingService(IBoardRepository boardRepository,
             return;
         }
 
-        var boardArchive = await dataStorage.GetAsync(boardMetadata.BoardId);
+        var fileName = FileName(boardMetadata.BoardId);
+
+        var boardArchive = await dataStorage.GetAsync(fileName);
         if (boardArchive is null)
         {
             await AppendLog(boardId, "Board archive is not found", true);
@@ -72,7 +77,9 @@ internal class BoardArchivingService(IBoardRepository boardRepository,
 
         await boardRepository.RestoreBoardContent(deserialized);
         await boardRepository.UpdateBoardArchiveStatusAsync(boardId, ArchiveStatus.NotArchived);
-        await dataStorage.DeleteAsync(boardId);
+
+        await dataStorage.DeleteAsync(fileName);
+
         await AppendLog(boardId, "Board unarchived successfully", false, ArchiveStatus.NotArchived);
     }
 
@@ -119,5 +126,10 @@ internal class BoardArchivingService(IBoardRepository boardRepository,
     public static Board? DeserializeBoard(string boardJson)
     {
         return JsonSerializer.Deserialize<Board>(boardJson);
+    }
+
+    public static string FileName(Guid id)
+    {
+        return $"{id}.json";
     }
 }
