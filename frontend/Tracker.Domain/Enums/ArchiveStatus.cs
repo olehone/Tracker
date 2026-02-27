@@ -4,8 +4,10 @@ public enum ArchiveStatus
 {
     None = 0,
     NotArchived = 10,
-    Pending = 20,
-    Queued = 30,
-    Completed = 40,
-    Failed = 50,
+    PendingArchive = 20,
+    QueuedArchive = 30,
+    Archived = 40,
+    PendingUnarchive = 50,
+    QueuedUnarchive = 60,
+    Failed = 70,
 }

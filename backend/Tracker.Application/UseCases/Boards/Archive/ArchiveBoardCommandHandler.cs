@@ -12,7 +12,7 @@ public class ArchiveBoardCommandHandler
     IUserContext userContext
     ) : IRequestHandler<ArchiveBoardCommand, Result>
 {
-    public async Task<Result> Handle(ArchiveBoardCommand request, 
+    public async Task<Result> Handle(ArchiveBoardCommand request,
         CancellationToken cancellationToken)
     {
         await using var uow = unitOfWorkFactory.Create();
@@ -23,6 +23,7 @@ public class ArchiveBoardCommandHandler
         {
             return boardResult.Error;
         }
+
         var board = boardResult.Value;
         var updatedBoard = new Board
         {
@@ -32,15 +33,11 @@ public class ArchiveBoardCommandHandler
             Description = board.Description,
             Visibility = board.Visibility,
             PermissionRoles = board.PermissionRoles,
-            ArchiveStatus = ArchiveStatus.Pending
+            ArchiveStatus = ArchiveStatus.PendingArchive
         };
         uow.BoardRepository.Update(updatedBoard);
 
         var result = await uow.SaveChangesAsync(cancellationToken);
-        if (result.IsFailure)
-        {
-            return result;
-        }
-        return Result.Success();
+        return result.IsFailure ? result : Result.Success();
     }
 }

@@ -5,18 +5,18 @@ using Services.Abstractions;
 
 namespace Functions;
 
-public class ArchiveBoard(ILogger<ArchiveBoard> logger,
+public class UnarchiveBoard(ILogger<ArchiveBoard> logger,
     IBoardArchivingService archivingService)
 {
-    private const string QueueName = "archive-queue";
+    private const string QueueName = "unarchive-queue";
 
-    [Function(nameof(ArchiveBoard))]
+    [Function(nameof(UnarchiveBoard))]
     public async Task Run(
         [ServiceBusTrigger(QueueName, Connection = "ServiceBusConnection")]
         ServiceBusReceivedMessage busMessage,
         ServiceBusMessageActions messageActions)
     {
-        var message = busMessage.Body.ToObjectFromJson<ArchiveBoardMessage>();
+        var message = busMessage.Body.ToObjectFromJson<UnarchiveBoardMessage>();
         if (message is null)
         {
             logger.LogCritical("Can't get board info from message {id}", busMessage.MessageId);

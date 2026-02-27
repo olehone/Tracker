@@ -8,6 +8,13 @@ namespace DataAccess;
 public class BoardRepository(ApplicationDbContext dbContext)
     : IBoardRepository
 {
+    public async Task<Board?> LoadBoardAsync(Guid boardId)
+    {
+        return await dbContext.Boards
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == boardId);
+    }
+
     public async Task<Board?> LoadFullBoardAsync(Guid boardId)
     {
         return await dbContext.Boards
@@ -47,4 +54,5 @@ public class BoardRepository(ApplicationDbContext dbContext)
         dbContext.BoardLists.AddRange(snapshot.BoardLists);
         await dbContext.SaveChangesAsync();
     }
+
 }
