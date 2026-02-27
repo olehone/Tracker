@@ -8,4 +8,7 @@ public class ServiceBusOptions
 
     public required string BoardArchiveQueueName { get; init; }
     public required string BoardArchiveSubjectName { get; init; }
+
+    public required string BoardUnarchiveQueueName { get; init; }
+    public required string BoardUnarchiveSubjectName { get; init; }
 }

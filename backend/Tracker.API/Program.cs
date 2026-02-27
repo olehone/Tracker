@@ -62,6 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseHangfireDashboard("/hangfire");
 }
+
 app.UseHttpsRedirection();
 app.UseCors("DevCorsPolicy");
 app.UseAuthentication();
@@ -79,6 +80,11 @@ var hangfireOptions = app.Services.GetRequiredService<IOptions<HangfireOptions>>
 
 RecurringJob.AddOrUpdate<IBoardArchivingJob>(
     "archive-boards",
+    job => job.ExecuteAsync(),
+    hangfireOptions.BoardArchivingCron);
+
+RecurringJob.AddOrUpdate<IBoardUnarchivingJob>(
+    "unarchive-boards",
     job => job.ExecuteAsync(),
     hangfireOptions.BoardArchivingCron);
 

@@ -1,7 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Azure.Storage.Blobs;
 using Hangfire;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -90,6 +89,7 @@ public static class ServiceCollectionExtensions
 
         services.AddHangfireServer();
         services.AddScoped<IBoardArchivingJob, BoardArchivingJob>();
+        services.AddScoped<IBoardUnarchivingJob, BoardUnarchivingJob>();
 
         return services;
     }
