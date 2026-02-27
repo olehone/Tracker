@@ -1,10 +1,9 @@
-﻿using ArchivingFunction.Domain.Entities;
-using ArchivingFunction.Domain.Enums;
-using ArchivingFunction.Interfaces;
-
+﻿using DataAccess.Abstractions;
+using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace ArchivingFunction.Persistence;
+namespace DataAccess;
 
 public class BoardRepository(ApplicationDbContext dbContext)
     : IBoardRepository
@@ -27,26 +26,25 @@ public class BoardRepository(ApplicationDbContext dbContext)
             .FirstOrDefaultAsync(b => b.Id == boardId);
     }
 
-    public void UpdateBoardArchiveStatusAsync(Guid boardId, ArchiveStatus status)
+    public async Task UpdateBoardArchiveStatusAsync(Guid boardId, ArchiveStatus status)
     {
-        var board = new Board { Id = boardId, ArchiveStatus = status };
-
-        dbContext.Attach(board);
-        dbContext.Entry(board).Property(x => x.ArchiveStatus).IsModified = true;
+        await dbContext.Boards
+            .Where(b => b.Id == boardId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.ArchiveStatus, status));
     }
 
     public async Task DeleteBoardContentAsync(Guid boardId)
     {
-        throw new NotImplementedException();
+        var lists = await dbContext.BoardLists
+            .AsNoTracking()
+            .Where(bl => bl.BoardId == boardId)
+            .ExecuteDeleteAsync();
     }
 
-    public async Task RestoreBoardContentAsync(Board snapshot)
+    public async Task RestoreBoardContent(Board snapshot)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task SaveChangesAsync()
-    {
-        return dbContext.SaveChangesAsync();
+        dbContext.BoardLists.AddRange(snapshot.BoardLists);
+        await dbContext.SaveChangesAsync();
     }
 }

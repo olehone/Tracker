@@ -1,4 +1,4 @@
-﻿namespace ArchivingFunction.Domain.Options;
+﻿namespace Domain.Options;
 
 public class BlobOptions
 {

@@ -1,4 +1,4 @@
-﻿namespace ArchivingFunction.Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class FileUpload : BaseEntity
 {
@@ -10,5 +10,5 @@ public class FileUpload : BaseEntity
     public required string StorageFolder { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTimeOffset UploadedAt { get; set; } = DateTimeOffset.UtcNow;
-    
+
 }

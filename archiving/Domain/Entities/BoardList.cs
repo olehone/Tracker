@@ -1,4 +1,4 @@
-﻿namespace ArchivingFunction.Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class BoardList : BaseEntity
 {
@@ -6,6 +6,5 @@ public class BoardList : BaseEntity
     public int Position { get; set; }
     public required string Title { get; set; }
     public string Description { get; set; } = string.Empty;
-    public Board? Board { get; set; }
-    public List<BoardItem> BoardItems{ get; set; } = [];
+    public List<BoardItem> BoardItems { get; set; } = [];
 }
