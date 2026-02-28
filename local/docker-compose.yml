@@ -71,11 +71,17 @@ services:
       - "8081:8081"
       - "10250-10255:10250-10255"
     environment:
-      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
-      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
-      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 3
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: true
+      AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: 127.0.0.1
     volumes:
       - cosmosdb-data:/tmp/cosmos/appdata
+
+  stripe-cli:
+    image: stripe/stripe-cli
+    command: listen --forward-to https://host.docker.internal:7240/api/webhooks/stripe --skip-verify
+    environment:
+      STRIPE_API_KEY: ${STRIPE_API_KEY}   
 
 volumes:
   sqlserver_data:
