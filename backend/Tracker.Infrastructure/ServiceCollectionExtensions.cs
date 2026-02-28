@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         AddRedis(services);
         AddHangfire(services);
         AddServiceBus(services);
+        AddStripe(services);
 
         return services;
     }
@@ -73,7 +74,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBoardCallState, RedisBoardCallState>();
     }
 
-    public static IServiceCollection AddHangfire(this IServiceCollection services)
+    public static void AddHangfire(IServiceCollection services)
     {
         services.AddOptions<HangfireOptions>()
             .BindConfiguration(HangfireOptions.SectionName);
@@ -90,11 +91,9 @@ public static class ServiceCollectionExtensions
         services.AddHangfireServer();
         services.AddScoped<IBoardArchivingJob, BoardArchivingJob>();
         services.AddScoped<IBoardUnarchivingJob, BoardUnarchivingJob>();
-
-        return services;
     }
 
-    public static IServiceCollection AddServiceBus(this IServiceCollection services)
+    public static void AddServiceBus(IServiceCollection services)
     {
         services.AddOptions<ServiceBusOptions>()
             .BindConfiguration(ServiceBusOptions.SectionName);
@@ -104,6 +103,11 @@ public static class ServiceCollectionExtensions
             var options = serviceProvider.GetRequiredService<IOptions<ServiceBusOptions>>().Value;
             return new ServiceBusClient(options.ConnectionString);
         });
-        return services;
+    }
+
+    public static void AddStripe(IServiceCollection services)
+    {
+        services.AddOptions<StripeOptions>()
+            .BindConfiguration(StripeOptions.SectionName);
     }
 }
