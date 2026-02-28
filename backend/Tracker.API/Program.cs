@@ -43,6 +43,9 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSwaggerAuth();
 }
 
+builder.Services.AddOptions<FrontendOptions>()
+    .BindConfiguration(FrontendOptions.SectionName);
+
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices();
