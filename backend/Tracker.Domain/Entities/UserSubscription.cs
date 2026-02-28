@@ -8,7 +8,7 @@ public class UserSubscription : BaseEntity
     public required Guid UserId { get; set; }
     public User User { get; set; } = null!;
     public SubscriptionPlan Plan { get; set; } = SubscriptionPlan.Free;
+    public DateTimeOffset? CurrentPeriodEnd { get; set; }
     public string? StripeCustomerId { get; set; }
     public string? StripeSubscriptionId { get; set; }
-    public DateTime? CurrentPeriodEnd { get; set; }
 }
