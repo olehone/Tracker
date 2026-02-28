@@ -4,24 +4,17 @@ using Tracker.Domain.Entities;
 
 namespace Tracker.Persistence.Configurations;
 
-public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
+public class UserSubscriptionConfiguration : IEntityTypeConfiguration<UserSubscription>
 {
-    public void Configure(EntityTypeBuilder<RefreshToken> builder)
+    public void Configure(EntityTypeBuilder<UserSubscription> builder)
     {
-        builder.ToTable("RefreshTokens");
+        builder.ToTable("UserSubscriptions");
 
-        builder.HasKey(t => t.Id);
+        builder.HasKey(subscription => subscription.Id);
 
-        builder.Property(t => t.Token)
-            .IsRequired()
-            .HasMaxLength(512);
-
-        builder.HasIndex(t => t.Token)
-            .IsUnique();
-
-        builder.HasOne(t => t.User)
-            .WithMany()
-            .HasForeignKey(t => t.UserId)
+        builder.HasOne(subscription => subscription.User)
+            .WithOne()
+            .HasForeignKey<UserSubscription>(subscription => subscription.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
