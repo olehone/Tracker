@@ -16,7 +16,7 @@ public class BoardUserConfiguration : IEntityTypeConfiguration<BoardUser>
             .IsRequired();
 
         builder.HasOne(ub => ub.User)
-            .WithMany(u => u.BoardUsers)
+            .WithMany()
             .HasForeignKey(ub => ub.UserId);
 
         builder.HasOne(ub => ub.Board)

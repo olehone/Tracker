@@ -12,7 +12,4 @@ public class User : BaseEntity
     public required string FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTimeOffset? AvatarUpdatedAt { get; set; }
-
-    public List<BoardUser> BoardUsers { get; set; } = [];
-    public List<WorkspaceUser> WorkspaceUsers { get; set; } = [];
 }
