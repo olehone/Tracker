@@ -23,6 +23,7 @@ public class BoardUserRepository : Repository<BoardUser, Guid>, IBoardUserReposi
     {
         return await _dbSet.AsNoTracking()
             .Include(ub => ub.User)
+                .ThenInclude(u => u.Subscription)
             .Where(ub => ub.BoardId == boardId)
             .ToListAsync();
     }
@@ -40,6 +41,7 @@ public class BoardUserRepository : Repository<BoardUser, Guid>, IBoardUserReposi
         {
             return BoardUserRole.None;
         }
+
         return userBoard.Role;
     }
 

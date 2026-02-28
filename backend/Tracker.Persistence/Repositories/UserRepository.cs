@@ -23,6 +23,7 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
     {
         return await _dbSet
             .AsNoTracking()
+            .Include(u => u.Subscription)
             .FirstOrDefaultAsync(user => user.Email == email);
     }
 
@@ -52,6 +53,7 @@ public class UserRepository : Repository<User, Guid>, IUserRepository
     {
         return await ApplyUsernameFilter(username)
             .OrderBy(u => u.Username)
+            .Include(u => u.Subscription)
             .Skip(skip)
             .Take(take)
             .ToListAsync();

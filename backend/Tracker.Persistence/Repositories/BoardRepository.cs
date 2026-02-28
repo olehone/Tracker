@@ -12,7 +12,6 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
-
     public async Task<IReadOnlyList<Board>> GetByUserAsync(Guid userId)
     {
         return await _dbSet
@@ -85,6 +84,7 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .Include(b => b.PermissionRoles)
             .Include(b => b.BoardUsers)
                 .ThenInclude(bu => bu.User)
+                    .ThenInclude(u => u.Subscription)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
