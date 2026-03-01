@@ -1,6 +1,10 @@
-﻿namespace Tracker.Application.Common.Services;
+﻿using Tracker.Domain.Enums;
+using Tracker.Domain.Results;
+
+namespace Tracker.Application.Common.Services;
 
 public interface IUserSubscriptionService
 {
-    Task<string> CreateCheckoutSessionAsync(Guid userId, string priceId);
+    Task<Result<string>> CreateCheckoutSessionAsync(Guid userId, SubscriptionPlan plan);
+    Task<Result> CancelSubscriptionAsync(string stripeSubscriptionId);
 }

@@ -10,11 +10,13 @@ internal class UserSubscriptionRepository(ApplicationDbContext dbContext)
     public Task<UserSubscription?> GetByUserIdAsync(Guid userId)
     {
         return _dbSet
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.UserId == userId);
     }
     public Task<UserSubscription?> GetBySubscriptionIdAsync(string subscriptionId)
     {
         return _dbSet
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.StripeSubscriptionId == subscriptionId);
     }
 }

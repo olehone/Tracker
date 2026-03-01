@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
+using Tracker.API.Services;
 using Tracker.Application.UseCases.UserSubscriptions.Activate;
 using Tracker.Application.UseCases.UserSubscriptions.Cancel;
+using Tracker.Application.UseCases.UserSubscriptions.CreateSession;
+using Tracker.Application.UseCases.UserSubscriptions.StopSubscription;
 using Tracker.Application.UseCases.UserSubscriptions.Update;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Options;
@@ -25,6 +28,21 @@ public class StripeWebhookController(
     private string BasicSubscription => options.Value.BasicSubscriptionName;
     private string ProSubscription => options.Value.ProSubscriptionName;
 
+    [HttpPost("/api/subscription")]
+    public async Task<IActionResult> GetCheckoutUrlAsync([FromQuery] SubscriptionPlan plan)
+    {
+        var mediatorRequest = new CreateCheckoutSessionCommand { Plan = plan };
+        var result = await mediator.Send(mediatorRequest);
+        return result.ToActionResult();
+    }
+
+    [HttpDelete("/api/subscription")]
+    public async Task<IActionResult> StopSubscriptionAsync()
+    {
+        var result = await mediator.Send(new StopCurrentUserSubscriptionCommand());
+        return result.ToActionResult();
+    }
+
     [HttpPost]
     public async Task<IActionResult> Index()
     {
@@ -35,6 +53,7 @@ public class StripeWebhookController(
             var signatureHeader = Request.Headers["Stripe-Signature"];
             var stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, WebHookSecret);
 
+            logger.LogInformation("Stripe event with {type} arrived", stripeEvent.Type);
             switch (stripeEvent.Type)
             {
                 case EventTypes.CheckoutSessionCompleted:

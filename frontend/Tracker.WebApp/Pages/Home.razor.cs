@@ -9,27 +9,27 @@ public partial class Home : IDisposable
 {
     private List<BoardSummaryDto> Boards = [];
 
-    [Inject] IBoardService BoardService { get; set; } = null!;
-    [Inject] AppState AppState { get; set; } = null!;
+    [Inject] private IBoardService BoardService { get; set; } = null!;
+    [Inject] private AppState AppState { get; set; } = null!;
 
     protected override void OnInitialized()
     {
-        AppState.OnUserChange += HandleUserChanged;
+        AppState.OnChange += HandleUserChanged;
 
         if (AppState.IsAuthenticated)
         {
-            TriggerBoardsReload();
+            TriggerBoardsReloadAsync();
         }
     }
 
-    private void HandleUserChanged()
+    private Task HandleUserChanged()
     {
-        TriggerBoardsReload();
+        return TriggerBoardsReloadAsync();
     }
 
-    private void TriggerBoardsReload()
+    private Task TriggerBoardsReloadAsync()
     {
-        _ = InvokeAsync(async () =>
+        return InvokeAsync(async () =>
         {
             await LoadBoardsAsync();
             StateHasChanged();
@@ -53,6 +53,6 @@ public partial class Home : IDisposable
 
     public void Dispose()
     {
-        AppState.OnUserChange -= HandleUserChanged;
+        AppState.OnChange -= HandleUserChanged;
     }
 }

@@ -1,5 +1,6 @@
 using Hangfire;
 using Microsoft.Extensions.Options;
+using Stripe;
 using Tracker.API;
 using Tracker.API.Hubs;
 using Tracker.Application;
@@ -33,6 +34,9 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = blobOptions.ItemAttachmentMaxSize;
 });
+
+var stripeOptions = builder.Configuration.GetSection("StripeOptions").Get<StripeOptions>()!;
+StripeConfiguration.ApiKey = stripeOptions.SecretKey;
 
 builder.Services.AddControllers();
 builder.Services.AddJwtBearerAndAuth();

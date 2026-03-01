@@ -12,7 +12,9 @@ public static class SubscriptionPolicy
     {
         if (role >= GlobalRole.Admin)
         {
-            return All(aiQueriesUsed);
+            var allPlan = All(aiQueriesUsed);
+            allPlan.CurrentPlan = subscriptionPlan ?? SubscriptionPlan.Free;
+            return allPlan;
         }
 
         var plan = subscriptionPlan ?? SubscriptionPlan.Free;
@@ -77,7 +79,7 @@ public static class SubscriptionPolicy
     {
         return new()
         {
-            CurrentPlan = SubscriptionPlan.Pro,
+            CurrentPlan = SubscriptionPlan.Free,
             CanSeeBoardCalendar = true,
             CanSeeBoardEisenhower = true,
             CanUseAi = true,

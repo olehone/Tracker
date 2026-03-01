@@ -9,7 +9,7 @@ using Tracker.Services.ApiClients;
 
 namespace Tracker.Services;
 
-public class UserService(IApiErrorHandler apiErrorHandler, 
+public class UserService(IApiErrorHandler apiErrorHandler,
     IUserApi api,
     IApiUrlService apiUrl)
     : IUserService
@@ -27,6 +27,11 @@ public class UserService(IApiErrorHandler apiErrorHandler,
     public Task<Result<UserDto>> GetCurrentAsync()
     {
         return apiErrorHandler.ExecuteAsync(api.GetCurrentAsync);
+    }
+
+    public Task<Result<UserPermissionsDto>> GetPermissionsAsync()
+    {
+        return apiErrorHandler.ExecuteAsync(api.GetCurrentUserPermissionsAsync);
     }
 
     public Task<Result<Paginated<UserDto>>> GetAsync(PaginatedSearchRequest request)

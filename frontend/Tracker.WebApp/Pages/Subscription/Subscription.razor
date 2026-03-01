@@ -1,0 +1,139 @@
+﻿@page "/subscription"
+@using Tracker.Domain.Enums
+@using Tracker.WebApp.Components
+
+
+<MudContainer Class="mt-16">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Pricing</MudText>
+    <MudText Align="Align.Center">
+        Here you can choose plan you want to use
+    </MudText>
+
+    <MudGrid Class="mt-8">
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudStack AlignItems="AlignItems.Center">
+                            <SubscriptionPlanChip Plan="SubscriptionPlan.Free" />
+                        </MudStack>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudText Typo="Typo.h3">$0</MudText>
+                        <MudText Typo="Typo.h5" Class="ml-1 mt-5" Color="Color.Secondary">/Monthly</MudText>
+                    </div>
+                    <MudList T="string" Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Looking at boards
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Creating workspaces
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Videocalls
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                @if (AppState.Permissions.CurrentPlan == SubscriptionPlan.Free)
+                {
+                    <MudCardActions Class="d-flex justify-center">
+                        <MudButton Disabled
+                                   Variant="Variant.Filled">
+                            Current plan
+                        </MudButton>
+                    </MudCardActions>
+                }
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <MudStack AlignItems="AlignItems.Center">
+                        <SubscriptionPlanChip Plan="SubscriptionPlan.Basic" />
+                    </MudStack>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudText Typo="Typo.h3">$5</MudText>
+                        <MudText Typo="Typo.h5" Class="ml-1 mt-5" Color="Color.Secondary">/Monthly</MudText>
+                    </div>
+                    <MudList T="string" Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Everything from free plan
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Calendar board view
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            AI FAQ
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    @if (AppState.Permissions.CurrentPlan == SubscriptionPlan.Basic)
+                    {
+                        <MudButton OnClick=@StopSubscription
+                                   Variant="Variant.Filled"
+                                   Color="Color.Default">
+                            Stop subscription
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton OnClick=@(() => SelectPlanAsync(SubscriptionPlan.Basic))
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success">
+                            Use
+                        </MudButton>
+                    }
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudStack AlignItems="AlignItems.Center">
+                            <SubscriptionPlanChip Plan="SubscriptionPlan.Pro" />
+                        </MudStack>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudText Typo="Typo.h3">$10</MudText>
+                        <MudText Typo="Typo.h5" Class="ml-1 mt-5" Color="Color.Secondary">/Monthly</MudText>
+                    </div>
+                    <MudList T="string" Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Everything from free plan
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.LiveHelp">
+                            Even more somethings
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    @if (AppState.Permissions.CurrentPlan == SubscriptionPlan.Pro)
+                    {
+                        <MudButton OnClick=@StopSubscription
+                                   Variant="Variant.Filled"
+                                   Color="Color.Default">
+                            Stop subscription
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton OnClick=@(() => SelectPlanAsync(SubscriptionPlan.Pro))
+                                   Variant="Variant.Filled"
+                                   Color="Color.Success">
+                            Use
+                        </MudButton>
+                    }
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
