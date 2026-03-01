@@ -7,62 +7,29 @@ public static class SubscriptionPolicy
 {
     public static UserPermissionsDto GetPermissions(
         GlobalRole role,
-        SubscriptionPlan? subscriptionPlan,
-        int aiQueriesUsed)
+        SubscriptionPlan? subscriptionPlan)
     {
         if (role >= GlobalRole.Admin)
         {
-            var allPlan = All(aiQueriesUsed);
+            var allPlan = All();
             allPlan.CurrentPlan = subscriptionPlan ?? SubscriptionPlan.Free;
             return allPlan;
         }
 
         var plan = subscriptionPlan ?? SubscriptionPlan.Free;
 
-        var aiLimit = GetAiQueriesLimit(plan);
-
         return new UserPermissionsDto
         {
             CurrentPlan = plan,
             CanSeeBoardCalendar = plan >= SubscriptionPlan.Basic,
             CanSeeBoardEisenhower = plan >= SubscriptionPlan.Pro,
-            CanUseAi = CanUseAi(plan, aiQueriesUsed),
-            IsAiLimited = plan <= SubscriptionPlan.Pro,
-            AiQueriesLimit = aiLimit is null
-                ? null
-                : aiLimit,
-            AiQueriesUsed = aiQueriesUsed,
-            AiQueriesRemaining = aiLimit is null
-                ? null
-                : Math.Max(0, aiLimit.Value - aiQueriesUsed),
+            CanUseAi = CanUseAi(plan),
         };
     }
 
-    public static bool CanUseAi(SubscriptionPlan plan, int aiQueriesUsed)
+    public static bool CanUseAi(SubscriptionPlan plan)
     {
-        if (plan < SubscriptionPlan.Basic)
-        {
-            return false;
-        }
-
-        var limit = GetAiQueriesLimit(plan);
-        if (limit is null)
-        {
-            return true;
-        }
-
-        return aiQueriesUsed < limit;
-    }
-
-    public static int? GetAiQueriesLimit(SubscriptionPlan plan)
-    {
-        return plan switch
-        {
-            SubscriptionPlan.Free => 0,
-            SubscriptionPlan.Basic => 10,
-            SubscriptionPlan.Pro => null,
-            _ => 0
-        };
+        return plan >= SubscriptionPlan.Basic;
     }
 
     public static UserPermissionsDto None => new()
@@ -71,11 +38,9 @@ public static class SubscriptionPolicy
         CanSeeBoardCalendar = false,
         CanSeeBoardEisenhower = false,
         CanUseAi = false,
-        IsAiLimited = true,
-        AiQueriesUsed = 0,
     };
 
-    public static UserPermissionsDto All(int aiQueriesUsed)
+    public static UserPermissionsDto All()
     {
         return new()
         {
@@ -83,8 +48,6 @@ public static class SubscriptionPolicy
             CanSeeBoardCalendar = true,
             CanSeeBoardEisenhower = true,
             CanUseAi = true,
-            IsAiLimited = false,
-            AiQueriesUsed = aiQueriesUsed,
         };
     }
 }

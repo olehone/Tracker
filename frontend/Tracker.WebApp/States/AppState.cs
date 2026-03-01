@@ -1,4 +1,5 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
 using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
@@ -21,7 +22,7 @@ public class AppState
         _currentUser ?? throw new InvalidOperationException("User accessed when unauthenticated.");
 
     public UserPermissionsDto Permissions =>
-        _permissions ?? throw new InvalidOperationException("Permissions accessed when unauthenticated.");
+        _permissions ?? Empty;
 
     public Guid MyId => _currentUser!.Id;
 
@@ -89,4 +90,12 @@ public class AppState
             await OnChange.Invoke();
         }
     }
+
+    private UserPermissionsDto Empty => new()
+    {
+        CurrentPlan = SubscriptionPlan.Free,
+        CanSeeBoardCalendar = false,
+        CanSeeBoardEisenhower = false,
+        CanUseAi = false,
+    };
 }
