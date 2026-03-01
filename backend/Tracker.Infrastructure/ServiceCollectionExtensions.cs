@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
         AddHangfire(services);
         AddServiceBus(services);
         AddStripe(services);
+        AddAzureAI(services);
 
         return services;
     }
@@ -111,5 +112,11 @@ public static class ServiceCollectionExtensions
         services.AddOptions<StripeOptions>()
             .BindConfiguration(StripeOptions.SectionName);
         services.AddScoped<IUserSubscriptionService, StripeService>();
+    }
+
+    public static void AddAzureAI(IServiceCollection services)
+    {
+        services.AddOptions<AIOptions>()
+            .BindConfiguration(AIOptions.SectionName);
     }
 }
