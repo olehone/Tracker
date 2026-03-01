@@ -11,6 +11,5 @@ public class User : BaseEntity
     public required GlobalRole Role { get; set; }
     public required string FirstName { get; set; }
     public string? LastName { get; set; }
-    public UserSubscription? Subscription { get; set; }
     public DateTimeOffset? AvatarUpdatedAt { get; set; }
 }

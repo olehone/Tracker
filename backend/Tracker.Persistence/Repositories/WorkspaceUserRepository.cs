@@ -24,7 +24,6 @@ public class WorkspaceUserRepository : Repository<WorkspaceUser, Guid>, IWorkspa
     {
         return await _dbSet.AsNoTracking()
             .Include(uw => uw.User)
-                .ThenInclude(u => u.Subscription)
             .Where(uw => uw.WorkspaceId == workspaceId)
             .ToListAsync();
     }

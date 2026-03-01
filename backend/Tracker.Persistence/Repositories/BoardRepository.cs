@@ -84,7 +84,6 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
             .Include(b => b.PermissionRoles)
             .Include(b => b.BoardUsers)
                 .ThenInclude(bu => bu.User)
-                    .ThenInclude(u => u.Subscription)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
