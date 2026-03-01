@@ -1,0 +1,93 @@
+﻿@page "/subscription/failure"
+@using Tracker.WebApp.States
+
+<PageTitle>Payment Failed</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-16">
+    <MudStack AlignItems="AlignItems.Center" Spacing="6">
+
+            <MudIcon Icon="@Icons.Material.Rounded.ErrorOutline"
+                     Color="Color.Error"
+                     Style="font-size: 80px;" />
+
+        <MudStack AlignItems="AlignItems.Center" Spacing="2">
+            <MudText Typo="Typo.h4" Align="Align.Center">
+                Payment Failed
+            </MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center" Color="Color.Secondary">
+                We were unable to process your payment. No charges have been made.
+                Please check your payment details and try again.
+            </MudText>
+        </MudStack>
+
+        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error"
+                      Variant="Variant.Outlined"
+                      Icon="@Icons.Material.Rounded.Info"
+                      Class="rounded-xl"
+                      Style="width: 100%;">
+                @ErrorMessage
+            </MudAlert>
+        }
+
+        <MudPaper Outlined Class="pa-6 rounded-xl" Style="width: 100%;">
+            <MudText Typo="Typo.subtitle2" GutterBottom>
+                Common reasons for failure
+            </MudText>
+            <MudStack Spacing="2" Class="mt-2">
+                @foreach (var reason in _commonReasons)
+                {
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                        <MudIcon Icon="@Icons.Material.Rounded.ChevronRight"
+                                 Size="Size.Small"
+                                 Color="Color.Secondary" />
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">@reason</MudText>
+                    </MudStack>
+                }
+            </MudStack>
+        </MudPaper>
+
+        <MudStack Row Spacing="2" Justify="Justify.Center" Style="width: 100%;">
+            <MudButton Href="/billing/upgrade"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Refresh"
+                       FullWidth>
+                Try Again
+            </MudButton>
+            <MudButton Href="/"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Home"
+                       FullWidth>
+                Go to Dashboard
+            </MudButton>
+        </MudStack>
+
+        <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Secondary">
+            Need help?
+            <MudLink Href="mailto:support@tracker.com" Typo="Typo.caption">
+                Contact support
+            </MudLink>
+        </MudText>
+
+    </MudStack>
+</MudContainer>
+
+@code{
+    [CascadingParameter] public AppState? AppState { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "error")]
+    public string? ErrorMessage { get; set; }
+
+    protected readonly IReadOnlyList<string> _commonReasons =
+    [
+        "Insufficient funds on the card",
+        "Incorrect card number, expiry, or CVV",
+        "Card blocked for online / international transactions",
+        "Bank declined the transaction for security reasons",
+    ];
+}

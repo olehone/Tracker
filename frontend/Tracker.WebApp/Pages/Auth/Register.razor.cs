@@ -1,5 +1,5 @@
-using MudBlazor;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using Tracker.Domain.Requests;
 using Tracker.Domain.Results;
 using Tracker.Services.Abstraction;
@@ -22,13 +22,11 @@ public partial class Register
     private AppState? AppState { get; set; }
 
     [Inject] private IAuthService Auth { get; set; } = null!;
-    [Inject] private IUserService UserService { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     private async Task HandleRegister()
     {
-        await _form!.Validate();
-
+        await _form.Validate();
         if (!_form.IsValid)
         {
             return;
@@ -51,20 +49,15 @@ public partial class Register
 
         var result = await Auth.RegisterAsync(ToRequest(_registerModel));
         _isLoading = false;
+
         if (NotifyIfError(result))
         {
             return;
         }
 
-        var userResult = await UserService.GetCurrentAsync();
-        if (NotifyIfError(userResult))
+        if (AppState is not null)
         {
-            return;
-        }
-
-        if (AppState != null && userResult.IsSuccess)
-        {
-            AppState.CurrentUser = userResult.Value;
+            await AppState.ReloadAsync();
         }
 
         Navigation.NavigateTo("/", false);

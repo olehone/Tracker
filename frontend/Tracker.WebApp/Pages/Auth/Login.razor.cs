@@ -26,8 +26,7 @@ public partial class Login
 
     private async Task HandleLogin()
     {
-        await _form!.Validate();
-
+        await _form.Validate();
         if (!_form.IsValid)
         {
             return;
@@ -40,24 +39,19 @@ public partial class Login
         }
 
         _isLoading = true;
+        _errorMessages = null;
 
         var result = await AuthService.LoginAsync(ToRequest(_loginModel));
         _isLoading = false;
+
         if (NotifyIfError(result))
         {
             return;
         }
-        StateHasChanged();
 
-        var userResult = await UserService.GetCurrentAsync();
-        if (NotifyIfError(userResult))
+        if (AppState is not null)
         {
-            return;
-        }
-
-        if (AppState != null && userResult.IsSuccess)
-        {
-            AppState.CurrentUser = userResult.Value;
+            await AppState.ReloadAsync();
         }
 
         Navigation.NavigateTo("/", false);

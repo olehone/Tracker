@@ -1,0 +1,44 @@
+﻿@using Tracker.Domain.Enums
+
+@if (Plan is SubscriptionPlan.Free)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Default"
+			 Icon=@Icons.Material.Filled.HorizontalRule>
+		Free
+	</MudChip>
+}
+else if (Plan is SubscriptionPlan.Basic)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Success"
+			 Icon=@Icons.Material.Filled.KeyboardControlKey>
+		Basic
+	</MudChip>
+}
+else if (Plan is SubscriptionPlan.Pro)
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Warning"
+			 Icon=@Icons.Material.Filled.KeyboardDoubleArrowUp>
+		Pro
+	</MudChip>
+}
+else
+{
+	<MudChip T="string"
+			 Size="Size.Small"
+			 Color="Color.Error"
+			 Icon=@Icons.Material.Filled.Error>
+		Error
+	</MudChip>
+}
+
+
+@code {
+    [Parameter, EditorRequired]
+    public SubscriptionPlan Plan { get; set; }
+}

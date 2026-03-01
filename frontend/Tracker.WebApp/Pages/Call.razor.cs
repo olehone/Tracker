@@ -8,9 +8,9 @@ public partial class Call : IAsyncDisposable
     [Parameter]
     public Guid CallId { get; set; }
 
-    [Inject] AppState AppState { get; set; } = null!;
-    [Inject] CallState CallState { get; set; } = null!;
-    [Inject] NavigationManager Nav { get; set; } = null!;
+    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private CallState CallState { get; set; } = null!;
+    [Inject] private NavigationManager Nav { get; set; } = null!;
 
     private bool _disposed = false;
     private string? _expandedVideoId;
@@ -33,12 +33,12 @@ public partial class Call : IAsyncDisposable
             {
                 await CallState.ConnectToCallAsync(CallId);
             }
+
             return;
         }
 
         CallState.OnChange += OnCallStateChanged;
         CallState.OnLeaveCall += LeavePage;
-        AppState.OnUserChange += OnCallStateChanged;
 
         await CallState.InitializeAsync();
         await CallState.ConnectToCallAsync(CallId);
@@ -95,6 +95,5 @@ public partial class Call : IAsyncDisposable
         _disposed = true;
         CallState.OnChange -= OnCallStateChanged;
         CallState.OnLeaveCall -= LeavePage;
-        AppState.OnUserChange -= OnCallStateChanged;
     }
 }
