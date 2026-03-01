@@ -17,6 +17,9 @@ public interface IUserApi
     [Get("/api/users/me")]
     Task<IApiResponse<UserDto>> GetCurrentAsync();
 
+    [Get("/api/users/me/permissions")]
+    Task<IApiResponse<UserPermissionsDto>> GetCurrentUserPermissionsAsync();
+
     [Get("/api/users/all")]
     Task<IApiResponse<Paginated<UserDto>>> GetAsync([Query] PaginatedSearchRequest request);
 
