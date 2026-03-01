@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.KernelMemory;
 using StackExchange.Redis;
 using Tracker.Application.Common.Auth;
 using Tracker.Application.Common.Jobs;
@@ -118,5 +119,32 @@ public static class ServiceCollectionExtensions
     {
         services.AddOptions<AIOptions>()
             .BindConfiguration(AIOptions.SectionName);
+
+        services.AddSingleton<IKernelMemory>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<AIOptions>>().Value;
+
+            return new KernelMemoryBuilder()
+                .WithAzureOpenAITextGeneration(new AzureOpenAIConfig
+                {
+                    Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+                    Endpoint = options.OpenAIEndpoint,
+                    APIKey = options.OpenAIApiKey,
+                    Deployment = options.Deployment
+                })
+                .WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
+                {
+                    Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+                    Endpoint = options.OpenAIEndpoint,
+                    APIKey = options.OpenAIApiKey,
+                    Deployment = options.EmbeddingDeployment
+                })
+                .WithAzureAISearchMemoryDb(new AzureAISearchConfig
+                {
+                    Endpoint = options.AzureAISearchEndpoint,
+                    APIKey = options.AzureAISearchApiKey
+                })
+                .Build<MemoryServerless>();
+        });
     }
 }
