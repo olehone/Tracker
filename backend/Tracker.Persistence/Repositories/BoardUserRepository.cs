@@ -40,6 +40,7 @@ public class BoardUserRepository : Repository<BoardUser, Guid>, IBoardUserReposi
         {
             return BoardUserRole.None;
         }
+
         return userBoard.Role;
     }
 

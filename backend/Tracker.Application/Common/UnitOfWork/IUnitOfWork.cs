@@ -6,6 +6,7 @@ namespace Tracker.Application.Common.UnitOfWork;
 public interface IUnitOfWork : IAsyncDisposable
 {
     IUserRepository UserRepository { get; }
+    IUserSubscriptionRepository UserSubscriptionRepository { get; }
     IWorkspaceRepository WorkspaceRepository { get; }
     IWorkspaceUserRepository WorkspaceUserRepository { get; }
     IBoardRepository BoardRepository { get; }

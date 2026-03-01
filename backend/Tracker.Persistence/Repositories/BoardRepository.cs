@@ -12,7 +12,6 @@ public class BoardRepository : Repository<Board, Guid>, IBoardRepository
     {
     }
 
-
     public async Task<IReadOnlyList<Board>> GetByUserAsync(Guid userId)
     {
         return await _dbSet

@@ -41,6 +41,7 @@ public class WorkspaceUserRepository : Repository<WorkspaceUser, Guid>, IWorkspa
         {
             return WorkspaceUserRole.None;
         }
+
         return userWorkspace.Role;
     }
 }

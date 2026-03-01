@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
-using Tracker.Domain.Results;
 using Tracker.Application.Common.Repositories;
 using Tracker.Application.Common.UnitOfWork;
+using Tracker.Domain.Results;
 using Tracker.Persistence.Repositories;
 
 namespace Tracker.Persistence;
@@ -11,6 +11,7 @@ internal class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _dbContext;
 
     private IUserRepository _userRepository = null!;
+    private IUserSubscriptionRepository _userSubscriptionRepository = null!;
     private IWorkspaceRepository _workspaceRepository = null!;
     private IWorkspaceUserRepository _userWorkspaceRepository = null!;
     private IBoardRepository _boardRepository = null!;
@@ -25,6 +26,8 @@ internal class UnitOfWork : IUnitOfWork
 
     public IUserRepository UserRepository
         => _userRepository ??= new UserRepository(_dbContext);
+    public IUserSubscriptionRepository UserSubscriptionRepository
+        => _userSubscriptionRepository ??= new UserSubscriptionRepository(_dbContext);
     public IWorkspaceRepository WorkspaceRepository
         => _workspaceRepository ??= new WorkspaceRepository(_dbContext);
     public IWorkspaceUserRepository WorkspaceUserRepository
