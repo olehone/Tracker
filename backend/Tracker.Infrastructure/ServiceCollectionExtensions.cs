@@ -13,6 +13,7 @@ using Tracker.Infrastructure.Auth;
 using Tracker.Infrastructure.Hagnfire;
 using Tracker.Infrastructure.Redis;
 using Tracker.Infrastructure.Services;
+using Tracker.Infrastructure.Stripe;
 
 namespace Tracker.Infrastructure;
 
@@ -109,5 +110,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddOptions<StripeOptions>()
             .BindConfiguration(StripeOptions.SectionName);
+        services.AddScoped<IUserSubscriptionService, StripeService>();
     }
 }
