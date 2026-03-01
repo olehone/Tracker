@@ -51,7 +51,7 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("me/permissions")]
-    public async Task<IActionResult> GetCurrentUserPermissionsAsync()
+    public async Task<IActionResult> GetPermissionsAsync()
     {
         var response = await mediator.Send(new GetCurrentUserPermissionsQuery());
         return response.ToActionResult();
