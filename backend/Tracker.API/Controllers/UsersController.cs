@@ -8,6 +8,7 @@ using Tracker.Application.UseCases.Users.DeleteAvatar;
 using Tracker.Application.UseCases.Users.GetAll;
 using Tracker.Application.UseCases.Users.GetAvatarUrl;
 using Tracker.Application.UseCases.Users.GetById;
+using Tracker.Application.UseCases.Users.GetCurrentPermissions;
 using Tracker.Application.UseCases.Users.Update;
 using Tracker.Application.UseCases.Users.UploadAvatar;
 using Tracker.Application.UseCases.Workspaces.GetAllForUser;
@@ -46,6 +47,13 @@ public class UserController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetCurrentAsync()
     {
         var response = await mediator.Send(new GetCurrentUserQuery());
+        return response.ToActionResult();
+    }
+
+    [HttpGet("me/permissions")]
+    public async Task<IActionResult> GetCurrentUserPermissionsAsync()
+    {
+        var response = await mediator.Send(new GetCurrentUserPermissionsQuery());
         return response.ToActionResult();
     }
 
@@ -108,6 +116,7 @@ public class UserController(IMediator mediator) : ControllerBase
         {
             return response.ToActionResult();
         }
+
         return Redirect(response.Value);
     }
 
@@ -115,7 +124,7 @@ public class UserController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UploadAvatarAsync(Guid id,
         [FromForm] FileUploadRequest request)
     {
-        await using Stream stream = request.File.OpenReadStream();
+        await using var stream = request.File.OpenReadStream();
         var mediatorRequest = new UploadAvatarCommand
         {
             UserId = id,
