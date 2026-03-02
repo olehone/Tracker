@@ -11,6 +11,7 @@ using Tracker.Application.Common.Services;
 using Tracker.Application.Common.States;
 using Tracker.Domain.Options;
 using Tracker.Infrastructure.Auth;
+using Tracker.Infrastructure.AzureAI;
 using Tracker.Infrastructure.Hagnfire;
 using Tracker.Infrastructure.Redis;
 using Tracker.Infrastructure.Services;
@@ -141,10 +142,15 @@ public static class ServiceCollectionExtensions
                 })
                 .WithAzureAISearchMemoryDb(new AzureAISearchConfig
                 {
+                    Auth = AzureAISearchConfig.AuthTypes.APIKey,
                     Endpoint = options.AzureAISearchEndpoint,
                     APIKey = options.AzureAISearchApiKey
                 })
-                .Build<MemoryServerless>();
+                .Build<MemoryServerless>(new KernelMemoryBuilderBuildOptions
+                {
+                    AllowMixingVolatileAndPersistentData = true
+                });
         });
+        services.AddScoped<IFaqService, AzureAIFaqService>();
     }
 }
