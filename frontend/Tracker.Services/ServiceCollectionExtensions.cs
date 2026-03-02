@@ -47,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddApiClientWithAuth<IAttachmentApi>();
         services.AddApiClientWithAuth<ICallApi>();
         services.AddApiClientWithAuth<ISubscriptionApi>();
+        services.AddApiClientWithAuth<IFaqApi>();
 
         services.AddScoped<IApiUrlService, ApiUrlService>();
         services.AddScoped<IUserService, UserService>();
@@ -60,6 +61,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<ICallService, CallService>();
         services.AddScoped<ISubscriptionService, SubscriptionService>();
+        services.AddScoped<IFaqService, FaqService>();
 
         services.AddScoped<IBoardRealtimeService, BoardRealtimeService>();
         services.AddScoped<IItemRealtimeService, ItemRealtimeService>();
