@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
-using Tracker.Services.Abstraction.Auth;
-using Tracker.Services.Auth;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
 public partial class Eisenhower
 {
+
+    [Inject] AppState AppState { get; set; } = null!;
+
     private List<BoardItemDto> UrgentImportant = [];
     private List<BoardItemDto> UrgentUnimportant = [];
     private List<BoardItemDto> UnurgentImportant = [];

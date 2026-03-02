@@ -9,6 +9,7 @@ public partial class MainLayout : IDisposable
 {
     private bool _isDarkMode;
     private bool _isDrawerOpen = true;
+    private bool _isFaqOpen = false;
 
     [CascadingParameter]
     private AppState AppState { get; set; } = null!;

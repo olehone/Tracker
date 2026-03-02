@@ -32,7 +32,7 @@ public class GetCurrentUserPermissionsQueryHandler(
 
         var subscription = await uow.UserSubscriptionRepository.GetByUserIdAsync(userId);
 
-        var permissions = SubscriptionPolicy.GetPermissions(user.Role, subscription?.Plan, 0);
+        var permissions = SubscriptionPolicy.GetPermissions(user.Role, subscription?.Plan);
         return permissions;
     }
 }
