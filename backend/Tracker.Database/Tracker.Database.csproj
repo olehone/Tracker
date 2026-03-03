@@ -33,8 +33,10 @@
 		<EmbeddedResource Include="Scripts\024-Add-ItemComments.sql" />
 		<EmbeddedResource Include="Scripts\025-Add-CommentAttachments.sql" />
 		<EmbeddedResource Include="Scripts\027-Make-ItemComments-UpdatedAt-Nullable.sql" />
-		<EmbeddedResource Include="Scripts\029-Drop-Default-ArchiveStatus.sql" />
 		<EmbeddedResource Include="Scripts\028-Add-ArchiveStatus-To-Boards.sql" />
+		<EmbeddedResource Include="Scripts\029-Drop-Default-ArchiveStatus.sql" />
+		<EmbeddedResource Include="Scripts\031-Set-Keys-Lenght.sql" />
+		<EmbeddedResource Include="Scripts\030-Add-UserSubscriptions.sql" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -15,20 +15,33 @@
                 <MudText Typo="Typo.h6">@User.FirstName @User.LastName</MudText>
 
                 <UserGlobalRoleChip Role="@User.Role" />
+                @if (IsMe)
+                {
+                    <SubscriptionPlanChip Plan=AppState.Permissions.CurrentPlan />
+                }
             </MudStack>
 
             <MudText Typo="Typo.h5">@User.Username</MudText>
 
             <MudText>@User.Email</MudText>
 
-            @if (AppState.IsAuthenticated && AppState.MyId == User.Id)
+            @if (IsMe)
             {
-                <MudButton FullWidth
-                           Color="Color.Primary"
-                           Variant="Variant.Filled"
-                           OnClick=@OpenSettingsAsync>
-                    Change
-                </MudButton>
+                <MudStack Row
+                          AlignItems="AlignItems.Center">
+                    <MudButton Color="Color.Primary"
+                               Variant="Variant.Filled"
+                               OnClick=@OpenSettingsAsync>
+                        Change profile
+                    </MudButton>
+                    <MudStack Row>
+                        <MudButton Color="Color.Primary"
+                                   Variant="Variant.Filled"
+                                   OnClick=@OpenSubscription>
+                            See subscription plans
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
             }
             else
             {

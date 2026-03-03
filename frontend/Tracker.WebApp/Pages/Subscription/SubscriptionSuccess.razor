@@ -1,0 +1,74 @@
+﻿@page "/subscription/success"
+@using Tracker.WebApp.States
+
+<PageTitle>Payment Successful</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="py-16">
+    <MudStack AlignItems="AlignItems.Center" Spacing="6">
+
+        <MudIcon Icon=@Icons.Material.Rounded.CheckCircle
+                 Color="Color.Success"
+                 Style="font-size: 80px;" />
+
+        <MudStack AlignItems="AlignItems.Center"
+                  Spacing="2">
+            <MudText Typo="Typo.h4"
+                     Align="Align.Center">
+                Payment Successful
+            </MudText>
+
+            <MudText Typo="Typo.body1"
+                     Align="Align.Center">
+                Your subscription has been activated. You now have access to all features
+                included in your plan.
+            </MudText>
+        </MudStack>
+
+        <MudPaper Outlined
+                  Class="pa-6 rounded-xl"
+                  Style="width: 100%;">
+            <MudStack Spacing="3">
+                <MudStack Row
+                          Justify="Justify.SpaceBetween"
+                          AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.body2">
+                        Status
+                    </MudText>
+
+                    <MudChip T="string"
+                             Color="Color.Success"
+                             Variant="Variant.Filled"
+                             Size="Size.Small"
+                             Icon=@Icons.Material.Rounded.Check>
+                        Active
+                    </MudChip>
+                </MudStack>
+
+            </MudStack>
+        </MudPaper>
+
+        <MudStack Row
+                  Spacing="2"
+                  Justify="Justify.Center"
+                  Style="width: 100%;">
+            <MudButton Href="/"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Home"
+                       FullWidth>
+                Go to Home
+            </MudButton>
+
+            <MudButton Href="/subscription"
+                       Variant="Variant.Outlined"
+                       Color="Color.Default"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Rounded.Receipt"
+                       FullWidth>
+                View plans
+            </MudButton>
+        </MudStack>
+
+    </MudStack>
+</MudContainer>

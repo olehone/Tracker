@@ -21,7 +21,7 @@ public sealed class GetAllWorkspacesByUserQueryHandler(
         {
             return AuthErrors.Unauthenticated;
         }
-        
+
         await using var uow = unitOfWorkFactory.Create();
         var userId = userContext.GetUserId();
         var user = await uow.UserRepository.GetByIdAsync(userId);
@@ -31,12 +31,12 @@ public sealed class GetAllWorkspacesByUserQueryHandler(
         }
 
         var userRole = user.Role;
-        if (userRole < GlobalRole.Admin)
+        if (request.Id != userId && userRole < GlobalRole.Admin)
         {
             return AuthErrors.Forbidden("You must to be admin to perform this action");
         }
 
-        int skip = (request.Page - 1) * request.AmountInPage;
+        var skip = (request.Page - 1) * request.AmountInPage;
 
         var count = await uow.WorkspaceRepository
             .CountAllAsync(request.SearchQuery, request.Id);
@@ -44,7 +44,7 @@ public sealed class GetAllWorkspacesByUserQueryHandler(
         {
             return Paginated<WorkspaceSummaryDto>.Empty();
         }
-        
+
         var workspaces = await uow.WorkspaceRepository
             .GetAllAsync(skip, request.AmountInPage, request.SearchQuery, request.Id);
 

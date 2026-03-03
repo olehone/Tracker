@@ -1,41 +1,101 @@
 ﻿using Tracker.Domain.Dtos;
+using Tracker.Domain.Enums;
+using Tracker.Services.Abstraction;
 
 namespace Tracker.WebApp.States;
 
-public class AppState()
+public class AppState
 {
-    private UserDto? _currentUser;
+    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
-    public UserDto CurrentUser
+    private UserDto? _currentUser;
+    private UserPermissionsDto? _permissions;
+
+    public AppState(IUserService userService, IAuthService authService)
     {
-        get => _currentUser
-            ?? throw new InvalidOperationException("User accessed when unauthenticated");
-        set
-        {
-            _currentUser = value;
-            NotifyUserChanged();
-        }
+        _userService = userService;
+        _authService = authService;
     }
 
+    public UserDto CurrentUser =>
+        _currentUser ?? throw new InvalidOperationException("User accessed when unauthenticated.");
+
+    public UserPermissionsDto Permissions =>
+        _permissions ?? Empty;
+
     public Guid MyId => _currentUser!.Id;
+
+    public bool IsLoading { get; private set; }
     public bool IsUnauthenticated => _currentUser is null;
     public bool IsAuthenticated => !IsUnauthenticated;
 
-    public event Action? OnUserChange;
+    public event Func<Task>? OnChange;
 
-    public void StartLoading()
+    public async Task ReloadAsync()
     {
-        NotifyUserChanged();
+        IsLoading = true;
+        await NotifyAsync();
+
+        try
+        {
+            var principal = await _authService.GetPrincipalAsync();
+
+            if (principal.Identity?.IsAuthenticated is not true)
+            {
+                Clear();
+                return;
+            }
+
+            var userResult = await _userService.GetCurrentAsync();
+            if (userResult.IsFailure)
+            {
+                Clear();
+                return;
+            }
+
+            var permissionsResult = await _userService.GetPermissionsAsync();
+            if (permissionsResult.IsFailure)
+            {
+                Clear();
+                return;
+            }
+
+            _currentUser = userResult.Value;
+            _permissions = permissionsResult.Value;
+        }
+        finally
+        {
+            IsLoading = false;
+            await NotifyAsync();
+        }
     }
 
-    public void Clear()
+    public async Task ClearAsync()
+    {
+        Clear();
+        await NotifyAsync();
+    }
+
+    private void Clear()
     {
         _currentUser = null;
-        NotifyUserChanged();
+        _permissions = null;
     }
 
-    private void NotifyUserChanged()
+    private async Task NotifyAsync()
     {
-        OnUserChange?.Invoke();
+        if (OnChange is not null)
+        {
+            await OnChange.Invoke();
+        }
     }
+
+    private UserPermissionsDto Empty => new()
+    {
+        CurrentPlan = SubscriptionPlan.Free,
+        CanSeeBoardCalendar = false,
+        CanSeeBoardEisenhower = false,
+        CanUseAi = false,
+    };
 }

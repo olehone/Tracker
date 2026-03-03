@@ -9,12 +9,12 @@ public partial class WorkspacesNavList : IDisposable
 {
     private List<WorkspaceSummaryDto>? _workspaces;
 
-    [Inject] AppState AppState { get; set; } = null!;
-    [Inject] IWorkspaceService WorkspaceService { get; set; } = null!;
+    [Inject] private AppState AppState { get; set; } = null!;
+    [Inject] private IWorkspaceService WorkspaceService { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
-        AppState.OnUserChange += StateHasChangedHandler;
+        AppState.OnChange += StateHasChangedHandler;
         await LoadWorkspaces();
     }
 
@@ -24,6 +24,7 @@ public partial class WorkspacesNavList : IDisposable
         {
             return;
         }
+
         var result = await WorkspaceService.CreateAsync(title);
         if (result.IsFailure)
         {
@@ -34,9 +35,9 @@ public partial class WorkspacesNavList : IDisposable
         StateHasChanged();
     }
 
-    private void StateHasChangedHandler()
+    private Task StateHasChangedHandler()
     {
-        _ = InvokeAsync(async () =>
+        return InvokeAsync(async () =>
         {
             await LoadWorkspaces();
             StateHasChanged();
@@ -49,6 +50,7 @@ public partial class WorkspacesNavList : IDisposable
         {
             return;
         }
+
         var result = await WorkspaceService.GetForCurrentUserAsync();
         if (result.IsFailure)
         {
@@ -60,6 +62,6 @@ public partial class WorkspacesNavList : IDisposable
 
     public void Dispose()
     {
-        AppState.OnUserChange -= StateHasChangedHandler;
+        AppState.OnChange -= StateHasChangedHandler;
     }
 }

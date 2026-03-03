@@ -3,6 +3,7 @@
 @using Tracker.WebApp.Components.Call
 @using Tracker.WebApp.Components.Items
 @using Tracker.WebApp.Components.Shared
+@using Tracker.WebApp.Components.Subscription
 @using Tracker.WebApp.Components.Users
 @using Tracker.WebApp.Shared
 
@@ -30,7 +31,7 @@
         <PeekingCall CallId=@(Board.CallId.Value)
                      OnEnded=BoardState.ApplyCallEnded />
     }
-    else
+    else if (Board.Permissions.CanChangeBoard)
     {
         <MudButton OnClick=StartCall
                    Size="Size.Small"
@@ -50,8 +51,12 @@
                  ActivePanelIndexChanged=@OnTabIndexChanged
                  Color="Color.Secondary">
             <MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
-            <MudTabPanel Icon=@Icons.Material.Filled.CalendarToday ToolTip="Calendar" />
-            <MudTabPanel Icon=@Icons.Material.Filled.BorderAll ToolTip="Eisenhower matrix" />
+            <MudTabPanel Disabled=@(!AppState.Permissions.CanSeeBoardCalendar)
+                         Icon=@Icons.Material.Filled.CalendarToday
+                         ToolTip=@(AppState.Permissions.CanSeeBoardCalendar ? "Calendar" : "You must update your subscription") />
+            <MudTabPanel Disabled=@(!AppState.Permissions.CanSeeBoardCalendar)
+                         Icon=@Icons.Material.Filled.BorderAll
+                         ToolTip=@(AppState.Permissions.CanSeeBoardCalendar ? "Eisenhower matrix" : "You must update your subscription") />
         </MudTabs>
 
         @if (Board.Permissions.CanChangeList && BoardState.ListsState.BoardLists.Count > 1)

@@ -12,6 +12,8 @@ public partial class Calendar : IDisposable
     [CascadingParameter]
     private BoardState BoardState { get; set; } = null!;
 
+    [Inject] AppState AppState { get; set; } = null!;
+
     private bool _showNotOwn = true;
     private bool _showNotCompleted = true;
     private List<CalendarItemWrapper> ItemsWithDate = [];

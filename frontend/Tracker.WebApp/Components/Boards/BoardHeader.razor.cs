@@ -7,8 +7,10 @@ namespace Tracker.WebApp.Components.Boards;
 
 public partial class BoardHeader
 {
+    [Inject] AppState AppState { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] NavigationManager Nav { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     [Parameter, EditorRequired]
     public int TabIndex { get; set; }
@@ -47,6 +49,10 @@ public partial class BoardHeader
     private async Task StartCall()
     {
         await BoardState.StartCallAsync();
+        if (BoardState.Board.CallId is null)
+        {
+            Snackbar.Add("Cannot start a call, try later", Severity.Error);
+        }
         OpenCall();
     }
 

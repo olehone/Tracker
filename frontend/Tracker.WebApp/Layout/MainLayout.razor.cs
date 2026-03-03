@@ -9,17 +9,18 @@ public partial class MainLayout : IDisposable
 {
     private bool _isDarkMode;
     private bool _isDrawerOpen = true;
+    private bool _isFaqOpen = false;
 
     [CascadingParameter]
-    AppState AppState { get; set; } = null!;
+    private AppState AppState { get; set; } = null!;
 
-    [Inject] CallState CallState { get; set; } = null!;
-    [Inject] IAuthService AuthService { get; set; } = null!;
-    [Inject] NavigationManager Nav { get; set; } = null!;
+    [Inject] private CallState CallState { get; set; } = null!;
+    [Inject] private IAuthService AuthService { get; set; } = null!;
+    [Inject] private NavigationManager Nav { get; set; } = null!;
 
     protected override void OnInitialized()
     {
-        AppState.OnUserChange += StateHasChangedHandler;
+        AppState.OnChange += StateHasChangedHandler;
         CallState.OnChange += OnCallStateChanged;
 
     }
@@ -30,6 +31,7 @@ public partial class MainLayout : IDisposable
         {
             return Color.Tertiary;
         }
+
         return Color.Primary;
     }
 
@@ -41,21 +43,43 @@ public partial class MainLayout : IDisposable
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
-        AppState.Clear();
+        await AppState.ReloadAsync();
         Nav.NavigateTo("/");
     }
 
-    private void DrawerToggle() => _isDrawerOpen = !_isDrawerOpen;
-    private void GoToLogin() => Nav.NavigateTo("/login");
-    private void GoToRegister() => Nav.NavigateTo("/register");
-    private void GoToHome() => Nav.NavigateTo("/");
-    private void GoToCall() => Nav.NavigateTo("/call");
+    private void DrawerToggle()
+    {
+        _isDrawerOpen = !_isDrawerOpen;
+    }
 
-    private void StateHasChangedHandler() => InvokeAsync(StateHasChanged);
+    private void GoToLogin()
+    {
+        Nav.NavigateTo("/login");
+    }
+
+    private void GoToRegister()
+    {
+        Nav.NavigateTo("/register");
+    }
+
+    private void GoToHome()
+    {
+        Nav.NavigateTo("/");
+    }
+
+    private void GoToCall()
+    {
+        Nav.NavigateTo("/call");
+    }
+
+    private Task StateHasChangedHandler()
+    {
+        return InvokeAsync(StateHasChanged);
+    }
 
     public void Dispose()
     {
-        AppState.OnUserChange -= StateHasChangedHandler;
+        AppState.OnChange -= StateHasChangedHandler;
         CallState.OnChange -= OnCallStateChanged;
     }
 }

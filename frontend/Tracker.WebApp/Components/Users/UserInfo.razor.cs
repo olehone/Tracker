@@ -15,6 +15,7 @@ public partial class UserInfo
 
     [Inject] private AppState AppState { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] NavigationManager Navigation { get; set; }
 
     private bool IsMe => AppState.IsAuthenticated && AppState.MyId == User.Id;
 
@@ -34,6 +35,11 @@ public partial class UserInfo
         await dialog.Result;
     }
 
+    private void OpenSubscription()
+    {
+        Navigation.NavigateTo("/subscription");
+    }
+
     private async Task OnUserUpdated(UserDto updatedUser)
     {
         User = updatedUser;
@@ -44,11 +50,7 @@ public partial class UserInfo
     {
         if (IsMe)
         {
-            var user = AppState.CurrentUser;
-            user.Username = User.Username;
-            user.FirstName = User.FirstName;
-            user.LastName = User.LastName;
-            AppState.CurrentUser = user;
+            await AppState.ReloadAsync();
         }
 
         await UserChanged.InvokeAsync(User);

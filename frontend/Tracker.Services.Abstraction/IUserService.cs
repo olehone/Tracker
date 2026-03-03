@@ -10,6 +10,7 @@ public interface IUserService
     Task<Result<UserDto>> GetByIdAsync(Guid id);
     Task<Result> UpdateAsync(Guid id, UpdateUserRequest request);
     Task<Result<UserDto>> GetCurrentAsync();
+    Task<Result<UserPermissionsDto>> GetPermissionsAsync();
     Task<Result<Paginated<UserDto>>> GetAsync(PaginatedSearchRequest request);
     Task<Result<Paginated<WorkspaceSummaryDto>>> GetAllWorkspacesAsync(
         Guid id, PaginatedSearchRequest request);
