@@ -23,6 +23,7 @@ public static class SubscriptionPolicy
             CurrentPlan = plan,
             CanSeeBoardCalendar = plan >= SubscriptionPlan.Basic,
             CanSeeBoardEisenhower = plan >= SubscriptionPlan.Pro,
+            CanSeeBoardRoadmap = plan >= SubscriptionPlan.Basic,
             CanUseAi = CanUseAi(plan),
         };
     }
@@ -37,6 +38,7 @@ public static class SubscriptionPolicy
         CurrentPlan = SubscriptionPlan.Free,
         CanSeeBoardCalendar = false,
         CanSeeBoardEisenhower = false,
+        CanSeeBoardRoadmap = false,
         CanUseAi = false,
     };
 
@@ -47,6 +49,7 @@ public static class SubscriptionPolicy
             CurrentPlan = SubscriptionPlan.Free,
             CanSeeBoardCalendar = true,
             CanSeeBoardEisenhower = true,
+            CanSeeBoardRoadmap = true,
             CanUseAi = true,
         };
     }
