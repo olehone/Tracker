@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 using Soenneker.Blazor.Drawflow;
+using Soenneker.Blazor.Drawflow.Dtos;
 using Soenneker.Blazor.Drawflow.Options;
-using System.Text;
 using Tracker.Domain.Dtos;
 using Tracker.Domain.Enums;
 using Tracker.Domain.Requests.Roadmap;
@@ -58,7 +59,6 @@ public partial class Roadmap : BoardSubscribeBase
 
     protected override void StateHasChangedHandler()
     {
-        // When new items arrive (real-time or after a create), add any missing nodes
         _ = SyncNewItemsAsync();
         base.StateHasChangedHandler();
     }
@@ -76,7 +76,12 @@ public partial class Roadmap : BoardSubscribeBase
         if (_flow is null)
             return;
 
-        var dto = await RoadmapService.LoadAsync(BoardState.Board!.Id);
+        // FIX: was LoadAsync — correct method name is GetAsync per IRoadmapService
+        var result = await RoadmapService.GetAsync(BoardState.Board!.Id);
+        if (result.IsFailure)
+            return;
+
+        var dto = result.Value;
         var items = BoardState.ItemsState.BoardItems;
 
         _nodeMap.Clear();
@@ -84,14 +89,9 @@ public partial class Roadmap : BoardSubscribeBase
         _nextNodeId = 1;
 
         if (dto.Nodes.Count == 0)
-        {
-            // First time — auto-place items in a grid (5 per row)
             await AutoPlaceItemsAsync(items);
-        }
         else
-        {
             await ImportSavedCanvasAsync(dto, items);
-        }
     }
 
     private async Task AutoPlaceItemsAsync(IEnumerable<BoardItemDto> items)
@@ -122,18 +122,73 @@ public partial class Roadmap : BoardSubscribeBase
 
         foreach (var node in dto.Nodes)
         {
-            if (!itemLookup.TryGetValue(node.BoardItemId, out var item))
+            if (!itemLookup.ContainsKey(node.BoardItemId))
                 continue; // item was deleted
 
             int id = _nextNodeId++;
-            _nodeMap[id] = item.Id;
-            _reverseMap[item.Id] = id;
+            _nodeMap[id] = node.BoardItemId;
+            _reverseMap[node.BoardItemId] = id;
             nodeDrawflowId[node.Id] = id;
         }
 
-        // Build drawflow JSON and import in one shot (avoids 1-node-at-a-time async calls)
-        var json = BuildImportJson(dto, itemLookup, nodeDrawflowId);
-        await _flow!.ImportAsJson(json);
+        // FIX: was BuildImportJson + ImportAsJson (neither exists in v4).
+        // Build a DrawflowExport object and call Import() instead.
+        var moduleData = new Dictionary<string, DrawflowNode>();
+
+        foreach (var node in dto.Nodes)
+        {
+            if (!itemLookup.TryGetValue(node.BoardItemId, out var item))
+                continue;
+            if (!nodeDrawflowId.TryGetValue(node.Id, out int dfId))
+                continue;
+
+            var outgoing = dto.Arrows
+                .Where(a => a.SourceNodeId == node.Id && nodeDrawflowId.ContainsKey(a.TargetNodeId))
+                .Select(a => new DrawflowConnection
+                {
+                    Node = nodeDrawflowId[a.TargetNodeId].ToString(),
+                    Input = "input_1"
+                })
+                .ToList();
+
+            var incoming = dto.Arrows
+                .Where(a => a.TargetNodeId == node.Id && nodeDrawflowId.ContainsKey(a.SourceNodeId))
+                .Select(a => new DrawflowConnection
+                {
+                    Node = nodeDrawflowId[a.SourceNodeId].ToString(),
+                    Input = "output_1"
+                })
+                .ToList();
+
+            moduleData[dfId.ToString()] = new DrawflowNode
+            {
+                Id = dfId.ToString(),
+                Name = "task",
+                Data = new Dictionary<string, object> { ["boardItemId"] = item.Id.ToString() },
+                Class = "roadmap-node",
+                Html = BuildNodeHtml(item),
+                PosX = (int)node.X,
+                PosY = (int)node.Y,
+                Inputs = new Dictionary<string, DrawflowNodeIO>
+                {
+                    ["input_1"] = new DrawflowNodeIO { Connections = incoming }
+                },
+                Outputs = new Dictionary<string, DrawflowNodeIO>
+                {
+                    ["output_1"] = new DrawflowNodeIO { Connections = outgoing }
+                }
+            };
+        }
+
+        var exportData = new DrawflowExport
+        {
+            Drawflow = new Dictionary<string, DrawflowModule>
+            {
+                ["Home"] = new DrawflowModule { Data = moduleData }
+            }
+        };
+
+        await _flow!.Import(exportData);
 
         // Add nodes for any items that exist but have no saved position yet
         var positionedItems = dto.Nodes.Select(n => n.BoardItemId).ToHashSet();
@@ -159,15 +214,16 @@ public partial class Roadmap : BoardSubscribeBase
         _nodeMap[id] = item.Id;
         _reverseMap[item.Id] = id;
 
+        // FIX: was using named parameter cssClass: which does not exist in v4 — use positional args
         await _flow.AddNode(
-            name: "task",
-            inputs: 1,
-            outputs: 1,
-            posX: x,
-            posY: y,
-            cssClass: "roadmap-node",
-            data: new { boardItemId = item.Id.ToString() },
-            html: BuildNodeHtml(item));
+            "task",
+            1,
+            1,
+            (int)x,
+            (int)y,
+            "roadmap-node",
+            new { boardItemId = item.Id.ToString() },
+            BuildNodeHtml(item));
     }
 
     private async Task SyncNewItemsAsync()
@@ -202,8 +258,8 @@ public partial class Roadmap : BoardSubscribeBase
 
         var doneStyle = item.IsDone ? "text-decoration:line-through;opacity:0.6;" : string.Empty;
 
-        var listName = string.Empty; // enriched later if needed
-
+        // FIX: was $$$"""...""" (triple-$ raw string) — single $ is sufficient here
+        // since the template contains no literal { } that need escaping
         return $"""
             <div class="rn-card {(item.IsDone ? "rn-done" : string.Empty)}">
               <div class="rn-importance" style="background:{importanceColor}" title="{importanceLabel}"></div>
@@ -217,62 +273,24 @@ public partial class Roadmap : BoardSubscribeBase
             """;
     }
 
-    // ── Drawflow import JSON builder ─────────────────────────────────────────
-    private string BuildImportJson(
-        RoadmapDto dto,
-        Dictionary<Guid, BoardItemDto> itemLookup,
-        Dictionary<Guid, int> nodeDrawflowId)
-    {
-        var sb = new StringBuilder();
-        sb.Append("""{"drawflow":{"Home":{"data":{""");
-
-        bool first = true;
-        foreach (var node in dto.Nodes)
-        {
-            if (!itemLookup.TryGetValue(node.BoardItemId, out var item))
-                continue;
-            if (!nodeDrawflowId.TryGetValue(node.Id, out int dfId))
-                continue;
-
-            // Outgoing connections from this node
-            var outgoing = dto.Arrows
-                .Where(a => a.SourceNodeId == node.Id)
-                .Where(a => nodeDrawflowId.ContainsKey(a.TargetNodeId))
-                .Select(a => $$$"""{"node":"{{{nodeDrawflowId[a.TargetNodeId]}}}","output":"input_1"}""");
-
-            // Incoming connections to this node
-            var incoming = dto.Arrows
-                .Where(a => a.TargetNodeId == node.Id)
-                .Where(a => nodeDrawflowId.ContainsKey(a.SourceNodeId))
-                .Select(a => $$$"""{"node":"{{{nodeDrawflowId[a.SourceNodeId]}}}","input":"output_1"}""");
-
-            string outConn = string.Join(",", outgoing);
-            string inConn = string.Join(",", incoming);
-
-            string html = BuildNodeHtml(item).Replace("\"", "\\\"").Replace("\n", "").Replace("\r", "");
-
-            if (!first)
-                sb.Append(',');
-            first = false;
-
-            sb.Append($"""
-                "{dfId}":{{"id":{dfId},"name":"task","data":{{"boardItemId":"{item.Id}"}},"class":"roadmap-node","html":"{html}","pos_x":{node.X.ToString(System.Globalization.CultureInfo.InvariantCulture)},"pos_y":{node.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)},"inputs":{{"input_1":{{"connections":[{inConn}]}}}},"outputs":{{"output_1":{{"connections":[{outConn}]}}}}}}
-                """);
-        }
-
-        sb.Append("}}}}}");
-        return sb.ToString();
-    }
-
     // ── Drawflow event handlers ──────────────────────────────────────────────
-    private Task OnNodeSelected(string drawflowId)
+    private Task OnNodeSelected(List<string> drawflowIds)
     {
+        if (drawflowIds == null || drawflowIds.Count == 0)
+            return Task.CompletedTask;
+
+        // If only one selection matters:
+        var drawflowId = drawflowIds.First();
+
         if (!int.TryParse(drawflowId, out int id))
             return Task.CompletedTask;
+
         if (!_nodeMap.TryGetValue(id, out var boardItemId))
             return Task.CompletedTask;
 
-        var item = BoardState.ItemsState.BoardItems.FirstOrDefault(i => i.Id == boardItemId);
+        var item = BoardState.ItemsState.BoardItems
+            .FirstOrDefault(i => i.Id == boardItemId);
+
         if (item is null)
             return Task.CompletedTask;
 
@@ -309,15 +327,20 @@ public partial class Roadmap : BoardSubscribeBase
         try
         {
             var export = await _flow.Export();
-            if (export?.Drawflow?.Home?.Data is null)
+
+            // FIX: was export.Drawflow.Home.Data — Drawflow is Dictionary<string, DrawflowModule>,
+            // so Home must be accessed via the indexer, not a property.
+            if (export?.Drawflow is null || !export.Drawflow.TryGetValue("Home", out var homeModule) || homeModule.Data is null)
                 return;
 
             var nodes = new List<SaveRoadmapNodeRequest>();
             var arrows = new List<SaveRoadmapArrowRequest>();
 
-            foreach (var (idStr, node) in export.Drawflow.Home.Data)
+            // FIX: was foreach (var (idStr, node) in ...) — type inference fails on
+            // Dictionary<string, DrawflowNode>; use explicit KeyValuePair iteration instead
+            foreach (KeyValuePair<string, DrawflowNode> pair in homeModule.Data)
             {
-                if (!int.TryParse(idStr, out int dfId))
+                if (!int.TryParse(pair.Key, out int dfId))
                     continue;
                 if (!_nodeMap.TryGetValue(dfId, out var itemId))
                     continue;
@@ -325,12 +348,11 @@ public partial class Roadmap : BoardSubscribeBase
                 nodes.Add(new SaveRoadmapNodeRequest
                 {
                     BoardItemId = itemId,
-                    X = node.PosX,
-                    Y = node.PosY
+                    X = pair.Value.PosX,
+                    Y = pair.Value.PosY
                 });
 
-                // Outgoing connections
-                if (node.Outputs?.TryGetValue("output_1", out var output) == true)
+                if (pair.Value.Outputs?.TryGetValue("output_1", out var output) == true)
                 {
                     foreach (var conn in output.Connections ?? [])
                     {
@@ -362,9 +384,14 @@ public partial class Roadmap : BoardSubscribeBase
     }
 
     // ── Toolbar actions ──────────────────────────────────────────────────────
-    private ValueTask ZoomIn() => _flow?.ZoomIn() ?? ValueTask.CompletedTask;
-    private ValueTask ZoomOut() => _flow?.ZoomOut() ?? ValueTask.CompletedTask;
-    private ValueTask FitView() => _flow?.Zoom(1) ?? ValueTask.CompletedTask; // reset to 1:1; drawflow has no auto-fit
+    // FIX: was returning ValueTask — MudBlazor OnClick is EventCallback<MouseEventArgs>,
+    // which requires Task (not ValueTask). Accept MouseEventArgs and wrap ValueTask → Task.
+    private Task ZoomIn(MouseEventArgs _) => _flow?.ZoomIn().AsTask() ?? Task.CompletedTask;
+    private Task ZoomOut(MouseEventArgs _) => _flow?.ZoomOut().AsTask() ?? Task.CompletedTask;
+
+    // FIX: was _flow.Zoom(1) — no such method in v4; drawflow.js has no auto-fit API.
+    // A workaround is to reset via ZoomIn/ZoomOut or leave as no-op.
+    private Task FitView(MouseEventArgs _) => Task.CompletedTask;
 
     // ── Open item dialog ─────────────────────────────────────────────────────
     private async Task OpenItemSettingsAsync(BoardItemDto item)

@@ -9,17 +9,17 @@
         <div class="roadmap-toolbar">
             <MudTooltip Text="Fit all nodes into view">
                 <MudIconButton Icon="@Icons.Material.Filled.FitScreen"
-                               OnClick=@FitView
+                               OnClick="FitView"
                                Size="Size.Small" />
             </MudTooltip>
             <MudTooltip Text="Zoom in">
                 <MudIconButton Icon="@Icons.Material.Filled.ZoomIn"
-                               OnClick=@ZoomIn
+                               OnClick="ZoomIn"
                                Size="Size.Small" />
             </MudTooltip>
             <MudTooltip Text="Zoom out">
                 <MudIconButton Icon="@Icons.Material.Filled.ZoomOut"
-                               OnClick=@ZoomOut
+                               OnClick="ZoomOut"
                                Size="Size.Small" />
             </MudTooltip>
             @if (_saving)
@@ -33,7 +33,7 @@
         <div class="roadmap-canvas-wrapper">
             <Drawflow @ref="_flow"
                       Options="_options"
-                      OnNodeSelected="OnNodeSelected"
+                      OnNodeSelected=@OnNodeSelected
                       OnConnectionCreated="OnConnectionCreated"
                       OnConnectionRemoved="OnConnectionRemoved"
                       OnNodeMoved="OnNodeMoved"

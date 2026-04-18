@@ -96,6 +96,7 @@ public class AppState
         CurrentPlan = SubscriptionPlan.Free,
         CanSeeBoardCalendar = false,
         CanSeeBoardEisenhower = false,
+        CanSeeBoardRoadmap = false,
         CanUseAi = false,
     };
 }

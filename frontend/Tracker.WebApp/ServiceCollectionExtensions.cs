@@ -29,7 +29,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<AppState>();
         services.AddScoped<CallState>();
         services.AddScoped<BoardState>();
-        services.AddScoped<RoadmapState>();
         return services;
     }
 
