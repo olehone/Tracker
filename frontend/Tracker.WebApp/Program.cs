@@ -16,5 +16,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddAuthServices();
 builder.Services.AddApiAndServices();
 builder.Services.AddMudBlazorServices();
+builder.Services.AddStates();
+builder.Services.AddDrawflow();
+builder.Services.AddOtherServices();
 
 await builder.Build().RunAsync();

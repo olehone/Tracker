@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using Tracker.Services.Abstraction.Results;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
+using Soenneker.Blazor.Drawflow.Registrars;
 
 namespace Tracker.WebApp;
 
@@ -11,12 +12,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddMudBlazorServices(this IServiceCollection services)
     {
-        services.AddScoped<AppState>();
-        services.AddScoped<CallState>();
-        services.AddScoped<BoardState>();
-        services.AddScoped<IErrorNotifier, GlobalSnackbarMessages>();
-        services.AddScoped<IResultNotifier, GlobalSnackbarMessages>();
-        services.AddBlazoredLocalStorage();
         services.AddMudServices(config =>
         {
             config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopRight;
@@ -26,6 +21,29 @@ public static class ServiceCollectionExtensions
             config.SnackbarConfiguration.SnackbarVariant = Variant.Outlined;
         });
 
+        return services;
+    }
+
+    public static IServiceCollection AddStates(this IServiceCollection services)
+    {
+        services.AddScoped<AppState>();
+        services.AddScoped<CallState>();
+        services.AddScoped<BoardState>();
+        services.AddScoped<RoadmapState>();
+        return services;
+    }
+
+    public static IServiceCollection AddOtherServices(this IServiceCollection services)
+    {
+        services.AddScoped<IErrorNotifier, GlobalSnackbarMessages>();
+        services.AddScoped<IResultNotifier, GlobalSnackbarMessages>();
+        services.AddBlazoredLocalStorage();
+        return services;
+    }
+
+    public static IServiceCollection AddDrawflow(this IServiceCollection services)
+    {
+        services.AddDrawflowInteropAsScoped();
         return services;
     }
 }
