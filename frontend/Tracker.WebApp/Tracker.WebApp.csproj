@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateMvcApplicationPartsAssemblyAttributes>false</GenerateMvcApplicationPartsAssemblyAttributes>
@@ -12,13 +12,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.20" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.20" PrivateAssets="all" />
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="Heron.MudCalendar" Version="3.4.0" />
 		<PackageReference Include="Markdig" Version="0.45.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.6" PrivateAssets="all" />
 		<PackageReference Include="MudBlazor" Version="8.15.0" />
-		<PackageReference Include="Soenneker.Blazor.Drawflow" Version="4.0.346" />
 	</ItemGroup>
 
 	<ItemGroup>

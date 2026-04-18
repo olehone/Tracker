@@ -4,7 +4,7 @@ using MudBlazor.Services;
 using Tracker.Services.Abstraction.Results;
 using Tracker.WebApp.Shared;
 using Tracker.WebApp.States;
-using Soenneker.Blazor.Drawflow.Registrars;
+//using Soenneker.Blazor.Drawflow.Registrars;
 
 namespace Tracker.WebApp;
 
@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddDrawflow(this IServiceCollection services)
     {
-        services.AddDrawflowInteropAsScoped();
+        //services.AddDrawflowInteropAsScoped();
         return services;
     }
 }
