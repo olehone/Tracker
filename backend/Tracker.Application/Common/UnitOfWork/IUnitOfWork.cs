@@ -18,5 +18,7 @@ public interface IUnitOfWork : IAsyncDisposable
     IBoardItemAttachmentRepository BoardItemAttachmentRepository { get; }
     ICommentAttachmentRepository CommentAttachmentRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
+    IRoadmapRepository RoadmapRepository { get; }
+
     Task<Result<int>> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

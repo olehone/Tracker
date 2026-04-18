@@ -12,12 +12,14 @@ public class ApplicationDbContext : DbContext
     public DbSet<BoardItem> BoardItems => Set<BoardItem>();
     public DbSet<BoardItemAssignee> BoardItemAssignees => Set<BoardItemAssignee>();
     public DbSet<WorkspaceUser> WorkspaceUsers => Set<WorkspaceUser>();
+    public DbSet<RoadmapArrow> RoadmapArrows => Set<RoadmapArrow>();
+    public DbSet<RoadmapNode> RoadmapNodes => Set<RoadmapNode>();
     public DbSet<BoardUser> BoardUsers => Set<BoardUser>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) 
-    { 
+        : base(options)
+    {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

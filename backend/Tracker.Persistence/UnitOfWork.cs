@@ -23,6 +23,7 @@ internal class UnitOfWork : IUnitOfWork
     private IBoardItemAttachmentRepository _boardItemAttachmentRepository = null!;
     private ICommentAttachmentRepository _commentAttachmentRepository = null!;
     private IRefreshTokenRepository _refreshTokenRepository = null!;
+    private IRoadmapRepository _roadmapRepository = null!;
 
     public IUserRepository UserRepository
         => _userRepository ??= new UserRepository(_dbContext);
@@ -50,6 +51,8 @@ internal class UnitOfWork : IUnitOfWork
         => _commentAttachmentRepository ??= new CommentAttachmentRepository(_dbContext);
     public IRefreshTokenRepository RefreshTokenRepository
         => _refreshTokenRepository ??= new RefreshTokenRepository(_dbContext);
+    public IRoadmapRepository RoadmapRepository
+        => _roadmapRepository ??= new RoadmapRepository(_dbContext);
 
     public UnitOfWork(ApplicationDbContext applicationDbContext)
     {
