@@ -1,0 +1,112 @@
+/* roadmap.css — place in wwwroot/css/ and reference in app.css or index.html */
+
+/* Canvas wrapper — fills the remaining page height */
+.roadmap-canvas-wrapper {
+    height: calc(100vh - 112px); /* adjust 112px to match your header + toolbar */
+    position: relative;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.roadmap-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    gap: 4px;
+}
+
+/* ── Node card ─────────────────────────────────────────────────────────── */
+.rn-card {
+    display: flex;
+    width: 200px;
+    min-height: 56px;
+    background: var(--mud-palette-surface);
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.18);
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow .15s ease;
+}
+
+.rn-card:hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,.26);
+}
+
+.rn-card.rn-done {
+    opacity: 0.55;
+}
+
+/* Left colour strip — encodes importance */
+.rn-importance {
+    width: 5px;
+    flex-shrink: 0;
+}
+
+.rn-body {
+    padding: 8px 10px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.rn-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--mud-palette-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rn-meta {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rn-due {
+    font-size: 11px;
+    color: var(--mud-palette-text-secondary);
+}
+
+/* ── Drawflow overrides ─────────────────────────────────────────────────── */
+/* Make the connection ports smaller and unobtrusive */
+.drawflow .drawflow-node .input,
+.drawflow .drawflow-node .output {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--mud-palette-primary);
+    background: var(--mud-palette-surface);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.drawflow .drawflow-node .input:hover,
+.drawflow .drawflow-node .output:hover {
+    background: var(--mud-palette-primary);
+}
+
+/* Remove drawflow's default node background/border — our .rn-card provides it */
+.drawflow .drawflow-node {
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+}
+
+.drawflow .drawflow-node.selected {
+    background: transparent;
+    border: none;
+}
+
+.drawflow .drawflow-node.selected .rn-card {
+    box-shadow: 0 0 0 2px var(--mud-palette-primary), 0 3px 10px rgba(0,0,0,.26);
+}
+
+/* Arrow colour */
+.drawflow svg .main-path {
+    stroke: var(--mud-palette-primary);
+    stroke-width: 2;
+}

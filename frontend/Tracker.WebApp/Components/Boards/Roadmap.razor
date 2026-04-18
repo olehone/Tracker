@@ -1,0 +1,43 @@
+@using Soenneker.Blazor.Drawflow
+@using Soenneker.Blazor.Drawflow.Options
+@using Tracker.WebApp.Components.Subscription
+
+@inherits BoardSubscribeBase
+
+<SubscriptionWrapper IsAllowed=@AppState.Permissions.CanSeeBoardRoadmap>
+    <Content>
+        <div class="roadmap-toolbar">
+            <MudTooltip Text="Fit all nodes into view">
+                <MudIconButton Icon="@Icons.Material.Filled.FitScreen"
+                               OnClick=@FitView
+                               Size="Size.Small" />
+            </MudTooltip>
+            <MudTooltip Text="Zoom in">
+                <MudIconButton Icon="@Icons.Material.Filled.ZoomIn"
+                               OnClick=@ZoomIn
+                               Size="Size.Small" />
+            </MudTooltip>
+            <MudTooltip Text="Zoom out">
+                <MudIconButton Icon="@Icons.Material.Filled.ZoomOut"
+                               OnClick=@ZoomOut
+                               Size="Size.Small" />
+            </MudTooltip>
+            @if (_saving)
+            {
+                <MudProgressCircular Size="Size.Small"
+                                     Indeterminate
+                                     Class="ml-2" />
+            }
+        </div>
+
+        <div class="roadmap-canvas-wrapper">
+            <Drawflow @ref="_flow"
+                      Options="_options"
+                      OnNodeSelected="OnNodeSelected"
+                      OnConnectionCreated="OnConnectionCreated"
+                      OnConnectionRemoved="OnConnectionRemoved"
+                      OnNodeMoved="OnNodeMoved"
+                      style="height: 100%; width: 100%;" />
+        </div>
+    </Content>
+</SubscriptionWrapper>
