@@ -4,21 +4,16 @@ using Blazor.Diagrams.Core.Models;
 using Microsoft.AspNetCore.Components;
 using Tracker.Domain.Requests.Roadmap;
 using Tracker.Services.Abstraction.Board;
-using Tracker.WebApp.Components.Roadmap;
 using Tracker.WebApp.States;
 
 namespace Tracker.WebApp.Components.Boards;
 
-public partial class Roadmap
+public partial class Roadmap : IDisposable
 {
     // ── Parameters & injections ────────────────────────────────────────────
 
     [Parameter] public Guid BoardId { get; set; }
 
-    /// <summary>
-    /// Provided by the parent board layout so ItemBrief works normally.
-    /// Also cascaded implicitly into every child widget rendered inside DiagramCanvas.
-    /// </summary>
     [CascadingParameter] private BoardState BoardState { get; set; } = null!;
 
     [Inject] private IRoadmapService RoadmapService { get; set; } = null!;
@@ -28,13 +23,12 @@ public partial class Roadmap
     private readonly BlazorDiagram _diagram = new();
     private bool _loading = true;
     private bool _saving;
+    private bool _saved;
 
     // ── Lifecycle ──────────────────────────────────────────────────────────
 
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        // Register the custom node → widget mapping once.
         _diagram.RegisterComponent<RoadmapItemNode, RoadmapNodeWidget>();
     }
 
@@ -47,8 +41,6 @@ public partial class Roadmap
 
     public void Dispose()
     {
-        // BlazorDiagram doesn't implement IDisposable in all versions;
-        // guard with a pattern-match so it compiles either way.
         if (_diagram is IDisposable d)
             d.Dispose();
     }
@@ -62,17 +54,14 @@ public partial class Roadmap
             return;
 
         var roadmap = result.Value;
-
         _diagram.Nodes.Clear();
         _diagram.Links.Clear();
 
-        // Build lookup tables from the persisted roadmap.
-        // RoadmapNodeDto.Id  → dto    (for resolving arrow endpoints)
-        // RoadmapNodeDto.BoardItemId → dto  (for looking up saved positions)
+        // Lookup tables from persisted data
         var nodeDtoById = roadmap.Nodes.ToDictionary(n => n.Id);
         var nodeDtoByBoardItemId = roadmap.Nodes.ToDictionary(n => n.BoardItemId);
 
-        // One diagram node per board item (new items land on a grid row).
+        // Create one node per board item; fall back to a grid row for new items
         var diagramNodeByItemId = new Dictionary<Guid, RoadmapItemNode>();
         var col = 0;
 
@@ -80,7 +69,7 @@ public partial class Roadmap
         {
             var position = nodeDtoByBoardItemId.TryGetValue(item.Id, out var saved)
                 ? new Point(saved.X, saved.Y)
-                : new Point(col * 280, 20);   // default grid position for new items
+                : new Point(col * 320, 40);   // 320px spacing so nodes don't overlap
 
             col++;
 
@@ -89,15 +78,13 @@ public partial class Roadmap
             diagramNodeByItemId[item.Id] = node;
         }
 
-        // Restore persisted arrows.
-        // Arrow DTO uses node IDs, so resolve via the dto lookup first.
+        // Restore persisted arrows (dto uses node IDs; resolve to board-item IDs)
         foreach (var arrow in roadmap.Arrows)
         {
             if (!nodeDtoById.TryGetValue(arrow.SourceNodeId, out var srcDto))
                 continue;
             if (!nodeDtoById.TryGetValue(arrow.TargetNodeId, out var tgtDto))
                 continue;
-
             if (!diagramNodeByItemId.TryGetValue(srcDto.BoardItemId, out var srcNode))
                 continue;
             if (!diagramNodeByItemId.TryGetValue(tgtDto.BoardItemId, out var tgtNode))
@@ -114,6 +101,7 @@ public partial class Roadmap
     private async Task SaveAsync()
     {
         _saving = true;
+        _saved = false;
         StateHasChanged();
 
         var request = new SaveRoadmapRequest
@@ -130,20 +118,18 @@ public partial class Roadmap
 
             Arrows = _diagram.Links
                 .OfType<LinkModel>()
-                .Select(link => TryGetArrowRequest(link))
-                .OfType<SaveRoadmapArrowRequest>()   // filters out nulls
+                .Select(TryGetArrowRequest)
+                .OfType<SaveRoadmapArrowRequest>()   // filters out nulls (dangling links)
                 .ToList()
         };
 
         await RoadmapService.SaveAsync(BoardId, request);
 
         _saving = false;
+        _saved = true;
+        StateHasChanged();
     }
 
-    /// <summary>
-    /// Converts a diagram link to a save request, or returns null if the link
-    /// endpoints are not both RoadmapItemNodes (e.g. a dangling link being drawn).
-    /// </summary>
     private static SaveRoadmapArrowRequest? TryGetArrowRequest(LinkModel link)
     {
         if (link.Source.Model is not PortModel srcPort)

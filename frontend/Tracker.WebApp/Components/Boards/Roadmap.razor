@@ -1,17 +1,14 @@
 @page "/board/{BoardId:guid}/roadmap"
-@using Blazor.Diagrams
 @using Blazor.Diagrams.Components
 @using MudBlazor
-@using Blazor.Diagrams.Core.PathGenerators;
-@using Blazor.Diagrams.Core.Routers;
-@using Blazor.Diagrams.Options;
 
 @*
-    Full-height canvas that fills whatever space the parent layout provides.
-    The Save button is overlaid in the top-right corner.
+    The canvas MUST have an explicit pixel or vh height — "height:100%" chains
+    only if every ancestor also has an explicit height, which is rarely the case.
+    Adjust the 64px offset to match your top app-bar / nav height.
 *@
 
-<div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
+<div style="width: 100%; height: calc(100vh - 64px); position: relative;">
 
     @if (_loading)
     {
@@ -20,7 +17,11 @@
     }
     else
     {
-        <div style="position: absolute; top: 8px; right: 8px; z-index: 20; display: flex; gap: 8px;">
+        <div style="position: absolute; top: 8px; right: 8px; z-index: 20; display: flex; gap: 8px; align-items: center;">
+            @if (_saved)
+            {
+                <MudText Typo="Typo.caption" Color="Color.Success">Saved ✓</MudText>
+            }
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.Save"
@@ -36,5 +37,3 @@
     }
 
 </div>
-
-        

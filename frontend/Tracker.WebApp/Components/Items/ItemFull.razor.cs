@@ -61,7 +61,7 @@ public partial class ItemFull
     }
     private int GetElevation()
     {
-        return IsOwn() ? 3 : 0;
+        return IsOwn() ? 8 : 3;
     }
 
     private async Task OpenItemSettings()
