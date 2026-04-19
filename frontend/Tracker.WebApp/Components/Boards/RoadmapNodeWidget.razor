@@ -1,0 +1,24 @@
+@using Tracker.WebApp.Components.Items
+@using Tracker.WebApp.Components.Roadmap
+@using Tracker.WebApp.States
+@using MudBlazor
+
+@*
+    BoardState cascades down from the Roadmap page through the diagram canvas,
+    so ItemBrief's [CascadingParameter] BoardState is satisfied automatically.
+
+    @onpointerdown:stopPropagation is intentionally NOT set on the content so
+    the diagram's drag behaviour still works. Clicking the MudButton fires
+    OpenItemSettings via @onclick (pointer-up), which does not conflict.
+*@
+
+<div style="min-width: 210px; max-width: 270px; cursor: grab;">
+    <ItemBrief Item="@Node.Item"
+               OnlyTitle="true"
+               Size="Size.Small" />
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public RoadmapItemNode Node { get; set; } = null!;
+}

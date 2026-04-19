@@ -18,6 +18,8 @@
 		<PackageReference Include="Heron.MudCalendar" Version="3.4.0" />
 		<PackageReference Include="Markdig" Version="0.45.0" />
 		<PackageReference Include="MudBlazor" Version="8.15.0" />
+		<PackageReference Include="Z.Blazor.Diagrams" Version="3.0.4.1" />
+		<PackageReference Include="Z.Blazor.Diagrams.Core" Version="3.0.4.1" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,43 +1,40 @@
-@* @using Soenneker.Blazor.Drawflow
-@using Soenneker.Blazor.Drawflow.Options
-@using Tracker.WebApp.Components.Subscription
+@page "/board/{BoardId:guid}/roadmap"
+@using Blazor.Diagrams
+@using Blazor.Diagrams.Components
+@using MudBlazor
+@using Blazor.Diagrams.Core.PathGenerators;
+@using Blazor.Diagrams.Core.Routers;
+@using Blazor.Diagrams.Options;
 
-@inherits BoardSubscribeBase
+@*
+    Full-height canvas that fills whatever space the parent layout provides.
+    The Save button is overlaid in the top-right corner.
+*@
 
-<SubscriptionWrapper IsAllowed=@AppState.Permissions.CanSeeBoardRoadmap>
-    <Content>
-        <div class="roadmap-toolbar">
-            <MudTooltip Text="Fit all nodes into view">
-                <MudIconButton Icon="@Icons.Material.Filled.FitScreen"
-                               OnClick="FitView"
-                               Size="Size.Small" />
-            </MudTooltip>
-            <MudTooltip Text="Zoom in">
-                <MudIconButton Icon="@Icons.Material.Filled.ZoomIn"
-                               OnClick="ZoomIn"
-                               Size="Size.Small" />
-            </MudTooltip>
-            <MudTooltip Text="Zoom out">
-                <MudIconButton Icon="@Icons.Material.Filled.ZoomOut"
-                               OnClick="ZoomOut"
-                               Size="Size.Small" />
-            </MudTooltip>
-            @if (_saving)
-            {
-                <MudProgressCircular Size="Size.Small"
-                                     Indeterminate
-                                     Class="ml-2" />
-            }
+<div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
+
+    @if (_loading)
+    {
+        <MudProgressCircular Indeterminate="true"
+                             Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);" />
+    }
+    else
+    {
+        <div style="position: absolute; top: 8px; right: 8px; z-index: 20; display: flex; gap: 8px;">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="SaveAsync"
+                       Disabled="_saving">
+                @(_saving ? "Saving…" : "Save layout")
+            </MudButton>
         </div>
 
-        <div class="roadmap-canvas-wrapper">
-            <Drawflow @ref="_flow"
-                      Options="_options"
-                      OnNodeSelected=@OnNodeSelected
-                      OnConnectionCreated="OnConnectionCreated"
-                      OnConnectionRemoved="OnConnectionRemoved"
-                      OnNodeMoved="OnNodeMoved"
-                      style="height: 100%; width: 100%;" />
-        </div>
-    </Content>
-</SubscriptionWrapper> *@
+        <CascadingValue Value="_diagram" IsFixed="true">
+            <DiagramCanvas />
+        </CascadingValue>
+    }
+
+</div>
+
+        
