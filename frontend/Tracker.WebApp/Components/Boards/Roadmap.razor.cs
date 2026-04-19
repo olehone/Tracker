@@ -37,7 +37,25 @@ public partial class Roadmap : IDisposable
     protected override void OnInitialized()
     {
         _diagram.RegisterComponent<RoadmapItemNode, RoadmapNodeWidget>();
+        _diagram.Options.Links.Factory = (diagram, source, targetAnchor) =>
+        {
+            Anchor sourceAnchor;
 
+            if (source is PortModel port)
+            {
+                sourceAnchor = new SinglePortAnchor(port);
+            }
+            else if (source is NodeModel node)
+            {
+                sourceAnchor = new ShapeIntersectionAnchor(node);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            return new ArrowLinkModel(sourceAnchor, targetAnchor);
+        };
         // Track when the user starts/finishes drawing a link so the
         // Roadmap container can add .rn-diagram-linking and reveal all ports.
         _diagram.Links.Added += OnLinkAdded;
@@ -140,7 +158,7 @@ public partial class Roadmap : IDisposable
             var srcPort = GetPort(srcNode, GetFromEnum(arrow.SourceSide));
             var tgtPort = GetPort(tgtNode, GetFromEnum(arrow.TargetSide));
 
-            _diagram.Links.Add(new LinkModel(srcPort, tgtPort));
+            _diagram.Links.Add(new ArrowLinkModel(srcPort, tgtPort));
         }
     }
 
