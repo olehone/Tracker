@@ -1,62 +1,45 @@
 @using Blazor.Diagrams.Components.Renderers
 @using Blazor.Diagrams.Core.Models
-@using Tracker.Domain.Enums
 @using Tracker.WebApp.Components.Items
 @using MudBlazor
 
 @*
-    Ports are wrapped in absolutely-positioned divs so they land exactly on each
-    edge regardless of when/whether the library measures the node.
-    The .rn-port CSS cancels the library's own left/top inline overrides so our
-    wrapper placement wins; the library still reads getBoundingClientRect() for
-    drawing links, so arrows snap to the right spots.
+    Port placement: each port is wrapped in an absolutely-positioned div that
+    manually places it on its edge (old approach that actually works).
+    `position: static !important` on .rn-port cancels the library's inline
+    left/top overrides so our wrapper wins — but the library still reads
+    getBoundingClientRect() for drawing links, so arrows snap correctly.
+
+    Visibility: ports are hidden by default (opacity 0) and revealed either
+    by hovering the card or while a link is being drawn (.rn-diagram-linking
+    is toggled on the Roadmap container by _isLinking).
 *@
 
 <div class="rn-card">
 
-    @* ── Drag handle ── *@
-    <div class="rn-handle">
-        <MudIcon Icon="@Icons.Material.Filled.DragIndicator"
-                 Size="Size.Small"
-                 Style="color: var(--mud-palette-text-disabled);" />
+    <div class="rn-title mx-2" @onpointerdown:stopPropagation="true">
+        <ItemFull Item="@Node.Item" />
     </div>
-
-    @* ── Item title (stopPropagation keeps click from triggering a drag) ── *@
-    <div class="rn-title" @onpointerdown:stopPropagation="true">
-        <ItemFull Item="@Node.Item"/>
-    </div>
-
-    @* ── Drag handle ── *@
-    <div class="rn-handle">
-        <MudIcon Icon="@Icons.Material.Filled.DragIndicator"
-                 Size="Size.Small"
-                 Style="color: var(--mud-palette-text-disabled);" />
-    </div>
-
-    @* ══ Ports — each wrapped in a positioned div, one per edge ══ *@
 
     <div class="rn-port-wrap rn-port-top">
-        <PortRenderer Port="@Node.GetPort(PortAlignment.Top)" Class="rn-port" />
+        <PortRenderer Port="@Node.GetPort(PortAlignment.Top)"    Class="rn-port" />
     </div>
-
     <div class="rn-port-wrap rn-port-bottom">
         <PortRenderer Port="@Node.GetPort(PortAlignment.Bottom)" Class="rn-port" />
     </div>
-
     <div class="rn-port-wrap rn-port-left">
-        <PortRenderer Port="@Node.GetPort(PortAlignment.Left)" Class="rn-port" />
+        <PortRenderer Port="@Node.GetPort(PortAlignment.Left)"   Class="rn-port" />
     </div>
-
     <div class="rn-port-wrap rn-port-right">
-        <PortRenderer Port="@Node.GetPort(PortAlignment.Right)" Class="rn-port" />
+        <PortRenderer Port="@Node.GetPort(PortAlignment.Right)"  Class="rn-port" />
     </div>
 
 </div>
 
 <style>
-    /* ── Card ──────────────────────────────────────────────────────────── */
+    /* ── Card ────────────────────────────────────────────────────────── */
     .rn-card {
-        position: relative;           /* positioning context for port wrappers */
+        position: relative;            /* positioning context for port wrappers */
         display: flex;
         align-items: center;
         min-width: 260px;
@@ -66,47 +49,30 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,.10);
         transition: box-shadow .15s ease;
-        overflow: visible;            /* ports bleed outside */
+        overflow: visible;             /* ports bleed outside */
     }
     .rn-card:hover {
         box-shadow: 0 4px 18px rgba(0,0,0,.16);
     }
 
-    /* ── Accent strip ──────────────────────────────────────────────────── */
-    .rn-accent {
-        width: 5px;
-        align-self: stretch;
-        border-radius: 10px 0 0 10px;
-        flex-shrink: 0;
-    }
-
-    /* ── Drag handle ───────────────────────────────────────────────────── */
-    .rn-handle {
-        flex-shrink: 0;
-        cursor: grab;
-        padding: 6px 4px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-    }
-    .rn-handle:hover {
-        background: var(--mud-palette-action-default-hover, rgba(0,0,0,.06));
-    }
-
-    /* ── Title area ────────────────────────────────────────────────────── */
+    /* ── Title ───────────────────────────────────────────────────────── */
     .rn-title {
         flex: 1;
         min-width: 0;
         padding: 4px 10px 4px 2px;
     }
 
-    /* ── Port wrappers — manually place each on its edge ──────────────── */
+    /* ── Port wrappers — one per edge ────────────────────────────────── */
     .rn-port-wrap {
         position: absolute;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 10;
+        /* hide by default; revealed on hover or while linking */
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .15s ease;
     }
 
     .rn-port-top    { top: -7px;    left: 50%;  transform: translateX(-50%); }
@@ -114,17 +80,28 @@
     .rn-port-left   { left: -7px;   top: 50%;   transform: translateY(-50%); }
     .rn-port-right  { right: -7px;  top: 50%;   transform: translateY(-50%); }
 
-    /* ── Port squares — cancel the library's inline left/top overrides ── */
+    /* Show on hover */
+    .rn-card:hover .rn-port-wrap {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Show on ALL nodes while a link is being drawn */
+    .rn-diagram-linking .rn-port-wrap {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* ── Port squares — cancel library's inline left/top overrides ───── */
     .rn-port {
-        /* reset library positioning so our wrapper wins */
+        /* reset library positioning so our wrapper placement wins */
         position: static !important;
         left: auto !important;
         top: auto !important;
-
         /* visual */
-        width: 12px !important;
-        height: 12px !important;
-        border-radius: 3px !important;
+        width: 13px !important;
+        height: 13px !important;
+        border-radius: 4px !important;
         background: var(--mud-palette-surface, #fff) !important;
         border: 2px solid var(--mud-palette-primary, #594ae2) !important;
         box-shadow: 0 0 0 3px rgba(89,74,226,.12) !important;
@@ -133,12 +110,11 @@
     }
     .rn-port:hover {
         background: var(--mud-palette-primary, #594ae2) !important;
-        transform: scale(1.4) !important;
+        transform: scale(1.45) !important;
     }
 </style>
 
 @code {
     [Parameter, EditorRequired]
     public RoadmapItemNode Node { get; set; } = null!;
-
 }
