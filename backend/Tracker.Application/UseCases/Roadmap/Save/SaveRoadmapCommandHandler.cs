@@ -36,7 +36,9 @@ public class SaveRoadmapCommandHandler(IUnitOfWorkFactory unitOfWorkFactory)
             .Select(a => new RoadmapArrow
             {
                 SourceNodeId = nodeByItemId[a.SourceBoardItemId].Id,
-                TargetNodeId = nodeByItemId[a.TargetBoardItemId].Id
+                TargetNodeId = nodeByItemId[a.TargetBoardItemId].Id,
+                SourceSide = a.SourceSide,
+                TargetSide = a.TargetSide
             });
 
         await uow.RoadmapRepository.AddArrowsAsync(arrows, cancellationToken);

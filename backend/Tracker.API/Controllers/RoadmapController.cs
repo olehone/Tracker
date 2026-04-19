@@ -35,7 +35,9 @@ public class RoadmapController(IMediator mediator) : ControllerBase
             Arrows = request.Arrows.Select(a => new SaveRoadmapArrowCommand
             {
                 SourceBoardItemId = a.SourceBoardItemId,
-                TargetBoardItemId = a.TargetBoardItemId
+                TargetBoardItemId = a.TargetBoardItemId,
+                SourceSide = a.SourceSide,
+                TargetSide = a.TargetSide
             }).ToList()
         });
 

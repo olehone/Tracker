@@ -32,7 +32,9 @@ public class RoadmapRepository(ApplicationDbContext applicationDbContext)
                 {
                     Id = a.Id,
                     SourceNodeId = a.SourceNodeId,
-                    TargetNodeId = a.TargetNodeId
+                    TargetNodeId = a.TargetNodeId,
+                    SourceSide = a.SourceSide,
+                    TargetSide = a.TargetSide
                 }).ToList()
         };
     }

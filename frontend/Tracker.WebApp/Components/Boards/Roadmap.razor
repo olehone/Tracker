@@ -3,21 +3,23 @@
 @using MudBlazor
 
 @*
-    The canvas MUST have an explicit pixel or vh height — "height:100%" chains
-    only if every ancestor also has an explicit height, which is rarely the case.
-    Adjust the 64px offset to match your top app-bar / nav height.
+    .rn-diagram-linking is added to the container while a link is being drawn.
+    The widget's CSS picks this up to reveal ports on every node simultaneously,
+    so the user can see where to drop the arrow.
+    Adjust the 64px offset to match your app-bar height.
 *@
 
-<div style="width: 100%; height: calc(100vh - 64px); position: relative;">
+<div style="width: 100%; height: calc(100vh - 64px); position: relative;"
+     class="@(_isLinking ? "rn-diagram-linking" : "")">
 
     @if (_loading)
     {
         <MudProgressCircular Indeterminate="true"
-                             Style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);" />
+                             Style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);" />
     }
     else
     {
-        <div style="position: absolute; top: 8px; right: 8px; z-index: 20; display: flex; gap: 8px; align-items: center;">
+        <div style="position:absolute;top:8px;right:8px;z-index:20;display:flex;gap:8px;align-items:center;">
             @if (_saved)
             {
                 <MudText Typo="Typo.caption" Color="Color.Success">Saved ✓</MudText>

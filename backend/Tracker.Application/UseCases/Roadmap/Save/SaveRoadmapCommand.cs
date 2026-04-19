@@ -1,4 +1,5 @@
 using MediatR;
+using Tracker.Domain.Enums;
 using Tracker.Domain.Results;
 
 namespace Tracker.Application.UseCases.Roadmap.Save;
@@ -21,4 +22,6 @@ public class SaveRoadmapArrowCommand
 {
     public Guid SourceBoardItemId { get; set; }
     public Guid TargetBoardItemId { get; set; }
+    public SideEnum SourceSide { get; set; }
+    public SideEnum TargetSide { get; set; }
 }

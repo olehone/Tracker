@@ -8,13 +8,19 @@ public class RoadmapItemNode : NodeModel
 {
     public BoardItemDto Item { get; }
 
+    public PortModel TopPort { get; }
+    public PortModel BottomPort { get; }
+    public PortModel LeftPort { get; }
+    public PortModel RightPort { get; }
+
     public RoadmapItemNode(BoardItemDto item, Point? position = null)
         : base(position ?? Point.Zero)
     {
         Item = item;
-        AddPort(PortAlignment.Top);
-        AddPort(PortAlignment.Bottom);
-        AddPort(PortAlignment.Left);
-        AddPort(PortAlignment.Right);
+
+        TopPort = AddPort(PortAlignment.Top);
+        BottomPort = AddPort(PortAlignment.Bottom);
+        LeftPort = AddPort(PortAlignment.Left);
+        RightPort = AddPort(PortAlignment.Right);
     }
 }
