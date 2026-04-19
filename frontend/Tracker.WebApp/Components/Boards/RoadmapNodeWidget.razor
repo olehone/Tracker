@@ -3,21 +3,9 @@
 @using Tracker.WebApp.Components.Items
 @using MudBlazor
 
-@*
-    Port placement: each port is wrapped in an absolutely-positioned div that
-    manually places it on its edge (old approach that actually works).
-    `position: static !important` on .rn-port cancels the library's inline
-    left/top overrides so our wrapper wins — but the library still reads
-    getBoundingClientRect() for drawing links, so arrows snap correctly.
-
-    Visibility: ports are hidden by default (opacity 0) and revealed either
-    by hovering the card or while a link is being drawn (.rn-diagram-linking
-    is toggled on the Roadmap container by _isLinking).
-*@
-
 <div class="rn-card">
 
-    <div class="rn-title mx-2" @onpointerdown:stopPropagation="true">
+    <div class="rn-title pa-2" @onpointerdown:stopPropagation="true">
         <ItemFull Item="@Node.Item" />
     </div>
 
@@ -37,9 +25,8 @@
 </div>
 
 <style>
-    /* ── Card ────────────────────────────────────────────────────────── */
     .rn-card {
-        position: relative;            /* positioning context for port wrappers */
+        position: relative;
         display: flex;
         align-items: center;
         min-width: 260px;
@@ -49,27 +36,24 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,.10);
         transition: box-shadow .15s ease;
-        overflow: visible;             /* ports bleed outside */
+        overflow: visible;
     }
     .rn-card:hover {
         box-shadow: 0 4px 18px rgba(0,0,0,.16);
     }
 
-    /* ── Title ───────────────────────────────────────────────────────── */
     .rn-title {
         flex: 1;
         min-width: 0;
         padding: 4px 10px 4px 2px;
     }
 
-    /* ── Port wrappers — one per edge ────────────────────────────────── */
     .rn-port-wrap {
         position: absolute;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 10;
-        /* hide by default; revealed on hover or while linking */
         opacity: 0;
         pointer-events: none;
         transition: opacity .15s ease;
@@ -80,25 +64,20 @@
     .rn-port-left   { left: -7px;   top: 50%;   transform: translateY(-50%); }
     .rn-port-right  { right: -7px;  top: 50%;   transform: translateY(-50%); }
 
-    /* Show on hover */
     .rn-card:hover .rn-port-wrap {
         opacity: 1;
         pointer-events: auto;
     }
 
-    /* Show on ALL nodes while a link is being drawn */
     .rn-diagram-linking .rn-port-wrap {
         opacity: 1;
         pointer-events: auto;
     }
 
-    /* ── Port squares — cancel library's inline left/top overrides ───── */
     .rn-port {
-        /* reset library positioning so our wrapper placement wins */
         position: static !important;
         left: auto !important;
         top: auto !important;
-        /* visual */
         width: 13px !important;
         height: 13px !important;
         border-radius: 4px !important;

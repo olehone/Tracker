@@ -13,25 +13,17 @@ namespace Tracker.WebApp.Components.Boards;
 
 public partial class Roadmap : IDisposable
 {
-    // ── Parameters & injections ────────────────────────────────────────
-
     [CascadingParameter] private BoardState BoardState { get; set; } = null!;
     [Inject] private IRoadmapService RoadmapService { get; set; } = null!;
-
-    // ── State ──────────────────────────────────────────────────────────
 
     private readonly BlazorDiagram _diagram = new();
     private bool _loading = true;
     private bool _saving;
     private bool _saved;
-    private bool _isLinking;          // true while user is drawing a link
+    private bool _isLinking;
 
-    // Approximate rendered size of one node card.
-    // The library uses this immediately to place ports correctly before
-    // ResizeObserver fires. Height adjusts automatically after first render.
     private static readonly Size NodeSize = new(280, 48);
 
-    // ── Lifecycle ──────────────────────────────────────────────────────
     private Guid BoardId => BoardState.Board.Id;
 
     protected override void OnInitialized()
@@ -56,8 +48,6 @@ public partial class Roadmap : IDisposable
 
             return new ArrowLinkModel(sourceAnchor, targetAnchor);
         };
-        // Track when the user starts/finishes drawing a link so the
-        // Roadmap container can add .rn-diagram-linking and reveal all ports.
         _diagram.Links.Added += OnLinkAdded;
         _diagram.Links.Removed += OnLinkRemoved;
     }
@@ -77,12 +67,8 @@ public partial class Roadmap : IDisposable
             d.Dispose();
     }
 
-    // ── Link drag tracking ─────────────────────────────────────────────
-
     private void OnLinkAdded(BaseLinkModel link)
     {
-        // A user-drawn link starts with no target model (just a position anchor).
-        // Saved/loaded links have both ends set at creation time.
         if (link.Target?.Model is null)
         {
             _isLinking = true;
@@ -100,7 +86,6 @@ public partial class Roadmap : IDisposable
 
     private void OnLinkRemoved(BaseLinkModel link)
     {
-        // Handles the case where the user cancels mid-drag (link removed without target).
         if (!_diagram.Links.Any(l => l.Target?.Model is null))
         {
             _isLinking = false;
@@ -108,13 +93,13 @@ public partial class Roadmap : IDisposable
         }
     }
 
-    // ── Load ───────────────────────────────────────────────────────────
-
     private async Task LoadAsync()
     {
         var result = await RoadmapService.GetAsync(BoardId);
         if (!result.IsSuccess)
+        {
             return;
+        }
 
         var roadmap = result.Value;
         _diagram.Nodes.Clear();
@@ -135,8 +120,6 @@ public partial class Roadmap : IDisposable
 
             var node = new RoadmapItemNode(item, position)
             {
-                // Give the library the node dimensions immediately so it can
-                // compute port positions before ResizeObserver fires.
                 Size = NodeSize
             };
 
@@ -147,13 +130,24 @@ public partial class Roadmap : IDisposable
         foreach (var arrow in roadmap.Arrows)
         {
             if (!nodeDtoById.TryGetValue(arrow.SourceNodeId, out var srcDto))
+            {
                 continue;
+            }
+
             if (!nodeDtoById.TryGetValue(arrow.TargetNodeId, out var tgtDto))
+            {
                 continue;
+            }
+
             if (!diagramNodeByItemId.TryGetValue(srcDto.BoardItemId, out var srcNode))
+            {
                 continue;
+            }
+
             if (!diagramNodeByItemId.TryGetValue(tgtDto.BoardItemId, out var tgtNode))
+            {
                 continue;
+            }
 
             var srcPort = GetPort(srcNode, GetFromEnum(arrow.SourceSide));
             var tgtPort = GetPort(tgtNode, GetFromEnum(arrow.TargetSide));
@@ -161,8 +155,6 @@ public partial class Roadmap : IDisposable
             _diagram.Links.Add(new ArrowLinkModel(srcPort, tgtPort));
         }
     }
-
-    // ── Save ───────────────────────────────────────────────────────────
 
     private async Task SaveAsync()
     {
@@ -199,13 +191,24 @@ public partial class Roadmap : IDisposable
     private static SaveRoadmapArrowRequest? TryGetArrowRequest(LinkModel link)
     {
         if (link.Source.Model is not PortModel srcPort)
+        {
             return null;
+        }
+
         if (link.Target?.Model is not PortModel tgtPort)
+        {
             return null;
+        }
+
         if (srcPort.Parent is not RoadmapItemNode srcNode)
+        {
             return null;
+        }
+
         if (tgtPort.Parent is not RoadmapItemNode tgtNode)
+        {
             return null;
+        }
 
         return new SaveRoadmapArrowRequest
         {

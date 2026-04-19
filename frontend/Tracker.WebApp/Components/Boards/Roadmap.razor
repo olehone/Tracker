@@ -2,14 +2,7 @@
 @using Blazor.Diagrams.Components
 @using MudBlazor
 
-@*
-    .rn-diagram-linking is added to the container while a link is being drawn.
-    The widget's CSS picks this up to reveal ports on every node simultaneously,
-    so the user can see where to drop the arrow.
-    Adjust the 64px offset to match your app-bar height.
-*@
-
-<div style="width: 100%; height: calc(100vh - 64px); position: relative;"
+<div style="width: 100%; height: calc(100vh - 100px); position: relative;"
      class="@(_isLinking ? "rn-diagram-linking" : "")">
 
     @if (_loading)
