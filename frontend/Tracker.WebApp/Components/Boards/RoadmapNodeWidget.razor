@@ -5,7 +5,7 @@
 
 <div class="rn-card">
 
-    <div class="rn-title pa-2" @onpointerdown:stopPropagation="true">
+    <div class="rn-title mx-3 my-2" @onpointerdown:stopPropagation="true">
         <ItemFull Item="@Node.Item" />
     </div>
 
@@ -29,8 +29,10 @@
         position: relative;
         display: flex;
         align-items: center;
-        min-width: 260px;
-        max-width: 320px;
+
+        width: 520px;   /* 👈 fixed width */
+        min-width: 520px;
+
         background: var(--mud-palette-surface, #ffffff);
         border: 1.5px solid var(--mud-palette-lines-default, #e0e0e0);
         border-radius: 10px;
@@ -38,14 +40,16 @@
         transition: box-shadow .15s ease;
         overflow: visible;
     }
+
     .rn-card:hover {
         box-shadow: 0 4px 18px rgba(0,0,0,.16);
     }
 
+
+
     .rn-title {
-        flex: 1;
-        min-width: 0;
-        padding: 4px 10px 4px 2px;
+        white-space: normal;
+        word-break: break-word;
     }
 
     .rn-port-wrap {

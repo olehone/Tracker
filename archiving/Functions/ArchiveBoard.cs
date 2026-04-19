@@ -22,10 +22,10 @@ public class ArchiveBoard(ILogger<ArchiveBoard> logger,
             logger.LogCritical("Can't get board info from message {id}", busMessage.MessageId);
             return;
         }
-
+        await messageActions.CompleteMessageAsync(busMessage);
+        return;
         logger.LogInformation("Got board {id} to archive", message.BoardId);
         await archivingService.ArchiveBoardAsync(message.BoardId);
 
-        await messageActions.CompleteMessageAsync(busMessage);
     }
 }

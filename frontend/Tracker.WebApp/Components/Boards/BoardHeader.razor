@@ -50,10 +50,10 @@
                  ActivePanelIndex=@TabIndex
                  ActivePanelIndexChanged=@OnTabIndexChanged
                  Color="Color.Secondary">
+            <MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
             <MudTabPanel Disabled=@(!AppState.Permissions.CanSeeBoardRoadmap)
                          Icon=@Icons.Material.Filled.Map
                          ToolTip=@(AppState.Permissions.CanSeeBoardRoadmap ? "Roadmap" : "You must update your subscription") />
-            <MudTabPanel Icon=@Icons.Material.Filled.Assessment Class="icon-rotate-180" ToolTip="Kanban" />
             <MudTabPanel Disabled=@(!AppState.Permissions.CanSeeBoardCalendar)
                          Icon=@Icons.Material.Filled.CalendarToday
                          ToolTip=@(AppState.Permissions.CanSeeBoardCalendar ? "Calendar" : "You must update your subscription") />
