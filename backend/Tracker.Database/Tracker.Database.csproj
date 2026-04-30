@@ -35,6 +35,9 @@
 		<EmbeddedResource Include="Scripts\027-Make-ItemComments-UpdatedAt-Nullable.sql" />
 		<EmbeddedResource Include="Scripts\028-Add-ArchiveStatus-To-Boards.sql" />
 		<EmbeddedResource Include="Scripts\029-Drop-Default-ArchiveStatus.sql" />
+		<EmbeddedResource Include="Scripts\037-Fix-Other-Attachments.sql" />
+		<EmbeddedResource Include="Scripts\036-Fix-Attachments.sql" />
+		<EmbeddedResource Include="Scripts\035-Fix-PasswordHash.sql" />
 		<EmbeddedResource Include="Scripts\034-Add-Roadmap-Arrow-Sides.sql" />
 		<EmbeddedResource Include="Scripts\033-Add-Roadmap-Arrow.sql" />
 		<EmbeddedResource Include="Scripts\032-Add-Roadmap-Node.sql" />
