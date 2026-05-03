@@ -21,7 +21,8 @@ public static class DbMigrations
         }
 
         var result = upgrader.PerformUpgrade();
-        
+
+        // I reccoment to place breakpoint here, great to check how migration is done
         if (!result.Successful)
         {
             Console.ForegroundColor = ConsoleColor.Red;
