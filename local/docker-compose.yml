@@ -1,4 +1,45 @@
 services:
+
+  backend:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DbOptions__DefaultConnectionString: ${DB_CONNECTION_STRING}
+      JwtOptions__SecretKey: ${JWT_SECRET_KEY}
+      StripeOptions__WebHookSecret: ${STRIPE_WEBHOOK_SECRET}
+      StripeOptions__SecretKey: ${STRIPE_SECRET_KEY}
+      AIOptions__OpenAIEndpoint: ${OPENAI_ENDPOINT}
+      AIOptions__OpenAIApiKey: ${OPENAI_API_KEY}
+      AIOptions__AzureAISearchEndpoint: ${AI_SEARCH_ENDPOINT}
+      AIOptions__AzureAISearchApiKey: ${AI_SEARCH_API_KEY}
+      AIOptions__Deployment: gpt-4o-mini
+      AIOptions__EmbeddingDeployment: text-embedding-3-small
+    depends_on:
+      - sqlserver
+      - redis
+      - azurite
+    ports:
+      - "7240:8080"
+    networks:
+      - main
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+
+  frontend:
+    build:
+      context: ../frontend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      - backend
+    ports:
+      - "7252:80"
+    networks:
+      - main
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: unless-stopped
@@ -76,12 +117,16 @@ services:
       AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE: 127.0.0.1
     volumes:
       - cosmosdb-data:/tmp/cosmos/appdata
+    networks:
+      - main 
 
   stripe-cli:
     image: stripe/stripe-cli
     command: listen --forward-to https://host.docker.internal:7240/api/webhooks/stripe --skip-verify
     environment:
-      STRIPE_API_KEY: ${STRIPE_API_KEY}   
+      STRIPE_API_KEY: ${STRIPE_API_KEY}  
+    networks:
+      - main  
 
 volumes:
   sqlserver_data:
