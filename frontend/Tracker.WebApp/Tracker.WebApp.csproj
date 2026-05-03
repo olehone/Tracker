@@ -9,6 +9,7 @@
 		<DebugType>portable</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 		<HotReloadAutoRestart>true</HotReloadAutoRestart>
+		<UserSecretsId>1286c046-1310-4aa8-b641-2d3045000c98</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -16,12 +16,13 @@ services:
       AIOptions__AzureAISearchApiKey: ${AI_SEARCH_API_KEY}
       AIOptions__Deployment: gpt-4o-mini
       AIOptions__EmbeddingDeployment: text-embedding-3-small
+      BlobOptions__DefaultConnectionString: ${BLOB_CONNECTION_STRING}
     depends_on:
       - sqlserver
       - redis
       - azurite
     ports:
-      - "7240:8080"
+      - "7240:7240"
     networks:
       - main
     volumes:
