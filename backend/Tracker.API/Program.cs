@@ -58,6 +58,8 @@ builder.Services.AddSignalR(options =>
     }
 });
 
+Console.WriteLine($"ENV: {builder.Environment.EnvironmentName}");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
