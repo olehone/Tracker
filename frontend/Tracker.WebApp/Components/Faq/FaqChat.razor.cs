@@ -18,7 +18,7 @@ public partial class FaqChat
 
     private List<ChatMessage> _messages = new()
     {
-        new("Hi! What do you want to know about", false)
+        new("Привіт! Ти можеш запитувати в мене питання, що стосуються дошок та роботи з ними", false)
     };
 
 

@@ -5,7 +5,7 @@
 
 <div class="rn-card">
 
-    <div class="rn-title mx-3 my-2" @onpointerdown:stopPropagation="true">
+    <div class="rn-title mx-3 my-2 mud-width-full" @onpointerdown:stopPropagation="true">
         <ItemFull Item="@Node.Item" />
     </div>
 
@@ -30,8 +30,8 @@
         display: flex;
         align-items: center;
 
-        width: 520px;   /* 👈 fixed width */
-        min-width: 520px;
+        width: 270px;
+        min-width: 270px;
 
         background: var(--mud-palette-surface, #ffffff);
         border: 1.5px solid var(--mud-palette-lines-default, #e0e0e0);
