@@ -19,7 +19,7 @@ public partial class FaqServiceMock : IFaqService
         var clean = Regex.Replace(question.ToLower(), @"[^\w\s]", "");
 
         var words = clean.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return "Для того, щоб додати користувача до дошки, необхідно мати на це дозвіл, обрати вкладку учасники, ввести ім'я користувача, обрати його, та присвоїти йому роль. Залежно від ролі та налаштувань дошки, доданий користувач матиме різні доступи";
+
         foreach (var word in words)
         {
             if (BasicFaqKeywords.Map.TryGetValue(word, out var faqId))

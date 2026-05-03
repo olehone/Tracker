@@ -42,7 +42,7 @@ Run:
 docker compose up -d
 ```
 
-By default the system uses local emulators: Azurite instead of Azure Blob Storage, Service Bus Emulator, and CosmosDB Emulator. Their configuration is already defined in `appsettings.Development.json` and requires no changes.
+By default the system uses local emulators: Azurite instead of Azure Blob Storage, Service Bus Emulator, mocking azure AI pipeline, and CosmosDB Emulator. Their configuration is already defined in `appsettings.Development.json` and requires no changes.
 
 To use real cloud services instead of emulators, add the corresponding variables to `.env` — they will override the values from `appsettings.Development.json`:
 
